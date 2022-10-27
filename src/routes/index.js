@@ -32,7 +32,7 @@ const router = createRouter({
     base:process.env.BASE_URL,
     routes:routes
   });
-
+/*
   router.beforeEach( async(to, from, next) => {
 	let currentUser =  await getAuth().currentUser;
 	let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
@@ -49,6 +49,6 @@ const router = createRouter({
 	if(requiresAuth && !currentUser) next('/account/login');
 	else next();
 })
-
+*/
 
   export default router 

@@ -1,5 +1,9 @@
 <template>
-  <router-view></router-view>
+  <NavBar />
+  <router-view>
+
+  </router-view>
+  <Footer/>
 </template>
 
 <script>

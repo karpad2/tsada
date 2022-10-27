@@ -4,12 +4,18 @@ import './style/app.css';
 import router from "@/routes"
 import {gettext} from "@/locales";
 import CountryFlag from 'vue-country-flag-next'
+import 'vfonts/Lato.css'
+import 'vfonts/FiraCode.css'
+import naive from 'naive-ui'
+import NavBar from "@/components/NavBar"
+import Footer from "@/components/Footer"
+
 
 let app= createApp(App);
 app.use(router);
 app.mixin(
     {
-        methods:{
+        computed:{
             gt(a)
             {
                 return gettext(a);
@@ -18,7 +24,11 @@ app.mixin(
     });
 app.mixin({
     components:{
-        CountryFlag
+        CountryFlag,
+        NavBar,
+        Footer
     }
-})
+});
+app.use(naive);
+
 app.mount('#app');

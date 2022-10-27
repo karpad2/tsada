@@ -14,7 +14,7 @@ import {enableIndexedDbPersistence, getFirestore,doc,getDoc,collection,updateDoc
 import firebaseCredentials from './credentials';
 const app = initializeApp(firebaseCredentials.firebaseCredentials);
 const appCheck = initializeAppCheck(app, {
-	provider: new ReCaptchaV3Provider("6LckM_IcAAAAAJjv3sIzeQP535EjkBl-so0aCuPH"),
+	provider: new ReCaptchaV3Provider("6Lc1oroiAAAAALhEIYK44ipKin-OQdEGCQL0F18s"),
   
 	// Optional argument. If true, the SDK automatically refreshes App Check
 	// tokens as needed.
