@@ -3,16 +3,17 @@
   <router-view>
 
   </router-view>
-  <Footer/>
+  
+  
 </template>
 
 <script>
-
+import CookieLaw from 'vue-cookie-law';
 
 export default {
   name: 'App',
   components: {
-    
+    CookieLaw
   }
 }
 </script>

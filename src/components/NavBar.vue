@@ -1,5 +1,5 @@
 <template>
     <div>
-    Nabnar
+    Navbar
     </div>
 </template>
