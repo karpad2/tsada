@@ -1,6 +1,4 @@
 <template>
-    <p>hello worldo</p>
-    <n-button>naive-ui</n-button>
     <Csidejo />
     <News/>
     <Statistics/>

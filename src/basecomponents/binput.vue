@@ -1,19 +1,13 @@
 <template>
-<n-space vertical>
-    <n-input placeholder="Autosizable" autosize style="min-width: 50%" />
-   
-    
-  </n-space>
+    <n-input :placeholder="text" :type="type" v-model="model" @input="$emit('update:model',event.target.value)" autosize style="min-width: 50%" />
 </template>
 <script>
- import { NInput,NSpace } from 'naive-ui'
+ import { NInput } from 'naive-ui'
  export default{
     components:{
-        NInput,NSpace
+        NInput
     },
-    props:{
-        name,
-        text:""
-    }
+    props:['model','type','text'],
+    emits:['update:model']
  }
 </script> 

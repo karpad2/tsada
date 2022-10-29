@@ -1,19 +1,23 @@
 <template>
+  <n-space vertical size="large">
   <NavBar />
-  <router-view>
-
-  </router-view>
-  
-  
+  <n-layout>
+    <router-view />
+  </n-layout>
+  <FooterTemplate />
+</n-space>
 </template>
 
 <script>
+import { NLayout,NSpace } from 'naive-ui'
 import CookieLaw from 'vue-cookie-law';
 
 export default {
   name: 'App',
   components: {
-    CookieLaw
+    CookieLaw,
+    NLayout,
+    NSpace
   }
 }
 </script>

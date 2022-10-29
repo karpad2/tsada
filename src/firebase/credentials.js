@@ -1,4 +1,4 @@
-const firebaseConfig = {
+const firebaseCredentials = {
     apiKey: "AIzaSyD_Dmnym37Ap0g2e0TTK1BQDGTxTtkNv5I",
     authDomain: "tsada-edu.firebaseapp.com",
     projectId: "tsada-edu",
@@ -8,4 +8,4 @@ const firebaseConfig = {
     measurementId: "G-FZYC1503VB"
   };
 
-  export {firebaseConfig}
+  export {firebaseCredentials}

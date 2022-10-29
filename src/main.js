@@ -7,7 +7,7 @@ import CountryFlag from 'vue-country-flag-next'
 import 'vfonts/Lato.css'
 import 'vfonts/FiraCode.css'
 import NavBar from "@/components/NavBar"
-import Footer from "@/components/Footer"
+import FooterTemplate from "@/components/FooterTemplate"
 
 
 let app= createApp(App);
@@ -25,7 +25,7 @@ app.mixin({
     components:{
         CountryFlag,
         NavBar,
-        Footer
+        FooterTemplate
     }
 });
 

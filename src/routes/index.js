@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from "@/Views/HomeView"
 import LoginView from "@/Views/LoginView"
+import Dashboard from "@/Views/Admin/Dashboard"
 import Error404 from "@/Views/Error404"    
 import {getAuth} from 'firebase/auth';
 
@@ -16,12 +17,18 @@ const routes=[
         name: 'login-View',
         component: LoginView
     },
+    {
+      path: '/home',
+      name: 'Dashboard',
+      component: Dashboard
+  },
 
     {
         path: '/:pathMatch(.*)*',
         name: 'error404',
         component: Error404,
     },
+
 
 ]
 //history: createWebHistory(),
