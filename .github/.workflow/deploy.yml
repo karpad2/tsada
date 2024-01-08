@@ -32,5 +32,5 @@ jobs:
         git commit -m "Deploy production version"
         git mv dist/* .
         git clean -fdx
-        git branch -M build
-        git push -f origin build
+        git branch -M deployed
+        git push -f origin deployed
