@@ -1,0 +1,158 @@
+<template>
+    <section class="text-gray-600 ">
+        <div class="container px-5 py-20 mx-auto">
+                <div class="flex flex-wrap w-full mb-20">
+                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
+                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ document_category.name }}</h1>
+                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+                    </div>
+                
+                </div>
+    <div   class="m-auto  w-full">
+    
+      <table v-if="false" class="table-zebra rounded w-3/4">
+        <!-- head -->
+        <thead>
+          <tr>
+            <th class="w-1/5"></th>
+            <th class="w-1/5">{{ $t("name") }}</th>
+            <th class="w-1/5">{{ $t("date") }}</th>
+            <th class="w-1/5">{{ $t("file") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- row {{ index }} -->
+          <tr v-for="(file,index) in documents" :key="index"  >
+            <td >{{ index+1 }}</td>
+            <td ><h3>{{file.name}}</h3></td>
+            <td >{{ file.upload_date }} </td>
+            <td ><router-link :to="'/document/'+file.id" class="object-cover w-20"><i class="pi pi-file-pdf"></i></router-link></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ag-grid-vue v-if="!loaded" style="height: 500px"
+    class="ag-theme-quartz"   :columnDefs="colDefs" :rowData:="documents">
+       </ag-grid-vue>
+    
+    </div>
+    </div>
+    </section>
+    
+    
+    </template>
+    <script>
+    import { ref } from 'vue';
+    import { Client, Databases, ID,Storage,Query } from "appwrite";
+    import {appw,config} from "@/appwrite";
+    import {convertifserbian} from "@/lang";
+    import useLoadingStore from '@/stores';
+    import moment from 'moment';
+    
+    export default {
+        name: 'Courses',
+        components: {
+           
+        },
+        mounted()
+        {
+            const loadingStore = useLoadingStore();
+            //loadingStore.setLoading(true);
+            this.load_documents_base();
+            this.colDefs= [
+                    { field: 'name', headerName:this.$t("name"), sortable: true, filter: true, checkboxSelection: true },
+                    { field: 'upload_date', headerName:this.$t("upload_date"), sortable: true, filter: true },
+                    { field: 'id', headerName:this.$t("file_download"), cellRenderer: function(params) {
+                        return '<a href="/document/'+params.value+'"><i class="pi pi-file-pdf"></i></a>';
+                      } }];
+            
+        },
+        data: () => ({
+            
+                documents:[],
+                document_category:{},
+                colDefs:[],
+                loaded: false,   
+                }),
+                
+            
+        methods:{
+            async load_documents_base()
+            {
+            const loadingStore = useLoadingStore();
+            
+            this.documents=[];
+            
+           
+            const database = new Databases(appw);
+            const storage = new Storage(appw);
+    
+            let local=localStorage.getItem("lang");
+            //let missing_picture=storage.getFileView(config.website_images,config.missing_worker_picture);
+            
+            let n= await database.listDocuments(config.website_db, config.document_categories_db,[Query.equal("$id",this.$route.params.category)]);
+            if(local=="en")
+                {
+                    this.document_category.name=n.documents[0].category_name_en;
+                   
+                }
+                else if(local=="hu")
+                {
+                    this.document_category.name=n.documents[0].category_name_hu;
+                   
+                }
+                else if(local=="rs"||local=="sr")
+                {
+                    this.document_category.name=convertifserbian(n.documents[0].category_name_rs);
+                    
+                }
+            let k= await database.listDocuments(config.website_db, config.documents_db);
+            let docs=[];
+            k.documents.forEach(async el1 => {
+                
+                //console.log(el1);
+                let l= await database.listDocuments(config.website_db, config.documents_db,[
+                    Query.equal("documentCategories",this.$route.params.category),
+                    Query.orderDesc("upload_date")
+                ]);
+                
+                
+                
+                l.documents.forEach(async el2 => {
+                let a={name:"",id:"",upload_date:""};
+                if(local=="en")
+                {
+                    a.name=el2.document_title_en;
+                    
+                }
+                else if(local=="hu")
+                {
+                    a.name=el2.document_title_hu;
+                   
+                }
+                else if(local=="rs"||local=="sr")
+                {
+                    a.name=convertifserbian(el2.document_title_rs);  
+                }
+                a.upload_date=await moment(el1.document_date).locale(local).format('LL');
+                a.id=el2.document_id;
+                docs.push(a);
+            });
+            
+    
+            });
+            
+            this.documents=docs;
+            
+            //console.log(this.documents);
+
+            //this.loaded=true;
+            //=docs;    
+            //console.log(this.roles);
+            //loadingStore.setLoading(false);
+           
+            },
+        }
+        
+    }
+    </script>

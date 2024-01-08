@@ -1,0 +1,101 @@
+<template>
+<section class="text-gray-600 body-font" id="usefullinks">
+        <div class="container px-5 py-20 mx-auto">
+            <div class="flex flex-wrap w-full mb-20">
+                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ $t('usefullinks') }}</h1>
+                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+                </div>
+            
+            </div>
+            <div class="w-full ">
+                <swiper
+                    
+                    class="object-cover object-center rounded"
+                    
+                    
+                    :slidesPerView="6"
+                    :spaceBetween="30"
+                    
+                    :modules="modules"
+                >
+                    <swiper-slide  v-for="link in links">
+                        <div  @click="goto(link.link)" class="bg-white rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
+                            <img class="object-scale-down  h-48 w-32" :src="link.img" />
+                        </div>
+                    </swiper-slide>
+                    
+                </swiper>
+            </div>
+        </div>
+    </section>
+
+
+</template>
+<script >
+
+
+import { Client, Databases, ID,Storage } from "appwrite";
+import {appw,config} from "@/appwrite";
+import {convertifserbian} from "@/lang";
+import 'swiper/css';
+import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { EffectFade, Navigation, Pagination } from 'swiper/modules';
+
+export default {
+    name: 'UsefulLinks',
+    components: {
+        Swiper,SwiperSlide
+    },
+    mounted()
+    {
+        this.load_links_base();
+    },
+    data: () => ({
+        links: [
+            {
+                img: 'https://dummyimage.com/720x400',
+                subtitle: 'SUBTITLE',
+                title: 'First',
+                text: 'Lorem ipsum dolor sit'}],
+                modules:[EffectFade, Navigation, Pagination],
+        options: {
+            mouseControls: true,
+            touchControls: true,
+            minHeight: 300.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00
+        }}
+        ),
+    
+    methods:{
+        async load_links_base()
+        {
+        this.links=[];
+            //console.log();
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
+        let l= await database.listDocuments(config.website_db, config.usefullinks);
+        
+        l.documents.forEach(element => {
+            let a={link:"",img:""};
+            a.link=element.link;
+            a.img=storage.getFileView(config.website_images,element.logo);
+            //a.img=storage.getFilePreview(config.website_images,element.logo,output="webp")
+               
+            this.links.push(a);
+        });
+        },
+        goto(link)
+        {
+            window.open(link, '_blank');
+        }
+    }
+    
+}
+
+</script>
