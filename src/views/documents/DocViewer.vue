@@ -1,13 +1,22 @@
 <template>
-<div class="w-3/4 p-y-2 m-auto pb-8"  style="height: 80vh;">
-    <vue-pdf-app v-if="!loading" class="h-full w-auto" :pdf="pdf_file.href" />
+<div v-if="!loading" class="w-3/4 p-y-2 m-auto pb-8"   style="height: 80vh;">
+    <VuePdfApp  class="h-full w-auto" :pdf="pdf_file" />
 </div>
 </template>
 <script>
 import  VuePdfApp  from "vue3-pdf-app";
-import "vue3-pdf-app/dist/icons/main.css";
+//import "vue3-pdf-app/dist/icons/main.css";
+//import PDF from "pdf-vue3";
+//import { VuePDF, usePDF } from '@tato30/vue-pdf'
+//import '@tato30/vue-pdf/style.css'
+//import {usePDF, VuePDF} from 'VuePDF';
+//import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
+//import { VuePdfPropsType } from 'vue3-pdfjs/components/vue-pdf/vue-pdf-props'; // Prop type definitions can also be imported
+//import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
+
 import { Client, Databases, ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
+import { ref } from 'vue';
 export default {
     components: {
         VuePdfApp
@@ -21,20 +30,33 @@ export default {
           toolbarViewerLeft: {
             previous: false
           }
-        }
+        },
+        pdf_link:null,
+        numOfPages: ref(0),
       },
         }
     },
     mounted() {
+        console.log("started loading docviewer")
+        console.log(this.$route.params.id);
+
         this.loadpdf();
     },
     methods: {
         async loadpdf()
         {   
             const storage = new Storage(appw);
-            this.pdf_file=await storage.getFileView(config.documents_storage,this.$route.params.id);
-            console.log(this.pdf_file);
+            
+            let tmp=await storage.getFileView(config.documents_storage,this.$route.params.id).href;
+            this.pdf_file=usePDF(tmp);
+            //this.pdf_link=pdf;
+           /* const loadingTask = createLoadingTask(this.pdf_file)
+      loadingTask.promise.then((pdf) => {
+        numOfPages.value = pdf.numPages
+      });*/
+            console.log(tmp);
             this.loading=false;
+        
         }
     }
 }

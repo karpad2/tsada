@@ -3,7 +3,7 @@
     "cometous":"The future starts with you. Your place is here!",
     "whycomehere":"Choose vocational training, choose knowledge, choose MSC.",
     "applynow":"Jelentkezz!",
-    "courses":"Szakok",
+    "courses":"Szakirányok",
     "feedback":"Feedback",
     "contactustext":"Contact us",
     "name":"Név",
@@ -20,11 +20,11 @@
      "submit":"Küldés",
      "gallery":"Galléria",
      "address":"Cím",
-      "phone":"Telefon",
-      "history":"Az iskola története",
-      "workers":"Dolgozók",
-      "upload_date":"Feltöltés dátuma",
-      "file_download":"Fájl letöltése"
+     "phone":"Telefon",
+     "history":"Az iskola története",
+     "workers":"Dolgozók",
+     "upload_date":"Feltöltés dátuma",
+     "file_download":"Fájl letöltése"
      
      
  }

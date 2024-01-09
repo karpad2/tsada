@@ -20,8 +20,8 @@
                 <div class="dropdown">
                 <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('education') }}</div>
                 <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                    <li ><router-link to="/courses">{{ $t("education_profiles") }}</router-link></li>
-                    <li ><router-link to="/courses">{{ $t("reports") }}</router-link></li>
+                    <li ><router-link to="/education">{{ $t("education_profiles") }}</router-link></li>
+                    <li ><router-link to="/render/about/">{{ $t("reports") }}</router-link></li>
                 </ul>
                 </div>
 
@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="dropdown">
-                    <div @click="" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }}</div>
+                    <div @click="erasmus" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }}</div>
                 </div>
             </nav>
             <router-link to="contact" class="inline-flex items-center bg-sky-100 border-0 py-1 px-3 focus:outline-none hover:bg-sky-500/100 rounded text-base mt-4 md:mt-0 cursor-pointer">
@@ -145,9 +145,9 @@ export default
         console.log(this.language);
         if(this.language=="sr")
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.select(["title","$id"])]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.select(["title","$id"])]);
         }
-        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.select(["title","$id"])]);
+        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.select(["title","$id"])]);
         //let local=localStorage.getItem("lang");
         console.log(l);
         l.documents.forEach(async element => {
@@ -159,9 +159,44 @@ export default
             this.abouts.push(a);
         });
 
+        },
+
+        async getCourses()
+        {
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
+        let l;
+        console.log(this.language);
+        if(this.language=="sr")
+        {
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","about"),Query.select(["title","$id"])]);
+        }
+        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","about"),Query.select(["title","$id"])]);
+        //let local=localStorage.getItem("lang");
+        console.log(l);
+        l.documents.forEach(async element => {
+            
+            let a={title:"",id:""};
+            a.title=convertifserbian(element.title);
+
+            a.id=element.$id;
+            this.abouts.push(a);
+        });
+
+        },
+
+        erasmus()
+        {
+            if(this.language=="sr")
+            {
+                this.$router.push("/renderer/erasmus/erasmus_rs");  
+            }
+            else
+            this.$router.push("/renderer/erasmus/erasmus_"+this.language);
         }
         
     },
+
   
 }
 </script>

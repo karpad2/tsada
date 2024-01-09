@@ -15,7 +15,7 @@
                 <span class="font-medium text-sky-400">{{ $t("msc") }}</span>.
                 </p>
                 <div class="flex justify-center">
-                    <button class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
+                    <button @click="$router.push('/presentation')" class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
                         {{ $t('applynow') }}
                     </button>
                     
@@ -109,5 +109,6 @@ export default {
   display: block;
   width: 100%;
 }
+
 
 </style>

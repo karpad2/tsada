@@ -76,7 +76,12 @@ const router = createRouter({
       path:'/education/profiles/:id',
       name:'educationprofiles',
       component: () => import('../views/EducationProfile.vue')      
-    }
+    },
+    {
+      path:'/presentation',
+      name:'presentation',
+      component: () => import('../views/Presentation.vue')      
+    },
   ]
 })
 router.beforeEach((to, from, next) => {

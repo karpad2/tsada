@@ -1,5 +1,3 @@
-<template>
-<main class="contact">
   <template>
      <!-- Contact Us -->
      <section class="text-gray-600 body-font relative">
@@ -75,17 +73,7 @@ props: {
   },
 };
 </script>
-</main>
-</template>
-<script>
-import Map from '@/components/Map.vue'
-export default {
-    components: {
-        Map
-    }
-}
 
-</script>
 <style>
 @media (min-width: 1024px) {
   .contact {

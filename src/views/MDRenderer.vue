@@ -1,8 +1,8 @@
 <template>
 
 <section class="text-gray-600 ">
-    <div class="container  px-5 py-20 mx-auto backdrop-filter bg-opacity-50 bg-gray-100  backdrop-blur-lg">
-            <div class="flex flex-wrap w-full mb-20">
+    <div  class="container  px-5 py-20 mx-auto backdrop-filter bg-opacity-50 bg-gray-100  backdrop-blur-lg">
+            <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
                     <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
@@ -12,6 +12,17 @@
                     {{ $t("author") }}:{{ author }}
                 </p>
             </div>
+            <video-background v-else src="@/assets/videoplayback.mp4" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
+            overlay="linear-gradient(45deg,#2a4ae430,#fb949e6b)"  >
+                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
+                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+                </div>
+                <p v-if="newsmode" class="mb-8 leading-relaxed">
+                    {{ $t("date") }}:{{ date }}
+                    {{ $t("author") }}:{{ author }}
+                </p>
+            </video-background>
 <div class="w-3/4 pb-2">
 <vue-markdown-it :source="chtml1" preset="commonmark" />
 </div>
@@ -41,6 +52,7 @@
 <script>
 
 import {Client,Databases,ID,Storage,Query } from "appwrite";
+
 import {appw,config} from "@/appwrite";
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -68,7 +80,9 @@ export default {
             loaded:false,
             author:"Admin",
             date:"",
-            newsmode:false
+            newsmode:false,
+            video_id:"",
+            video_link:""
         }
     },
     mounted()
@@ -93,6 +107,9 @@ export default {
                     mode=config.about_us_db;
                  break;
                 case "erasmus":
+                    mode=config.about_us_db;
+                 break;
+                 case "education":
                     mode=config.about_us_db;
                  break;
                 case "news":
@@ -133,9 +150,19 @@ export default {
                 this.gallery.push(af);
                 this.image_cnt++;
             });
+            console.log(k.documents[0]);
+            if(k.documents[0].part1!=""&&k.documents[0].part1!=null)
             this.chtml1 = convertifserbian(k.documents[0].part1);
+            if(k.documents[0].part2!=""&&k.documents[0].part2!=null)
             this.chtml2 = convertifserbian(k.documents[0].part2);
+            if(k.documents[0].part3!=""&&k.documents[0].part3!=null)
             this.chtml3 = convertifserbian(k.documents[0].part3);
+
+            this.video_id=k.documents[0].video;
+            let v2="659d5e6949ae7294f9f1";
+            this.video_id=v2;
+            this.video_link=storage.getFileView(config.website_images,this.video_id).href;
+            console.log(this.video_link);
             this.loaded=true;
         }   
     }
