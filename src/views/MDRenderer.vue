@@ -4,7 +4,7 @@
     <div  class="container  px-5 py-20 mx-auto backdrop-filter bg-opacity-50 bg-gray-100  backdrop-blur-lg">
             <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ title }}</h1>
+                    <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="newsmode" class="mb-8 leading-relaxed">
@@ -12,10 +12,10 @@
                     {{ $t("author") }}:{{ author }}
                 </p>
             </div>
-            <video-background v-else src="@/assets/videoplayback.mp4" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
+            <video-background v-else src="" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
             overlay="linear-gradient(45deg,#2a4ae430,#fb949e6b)"  >
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
+                    <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="newsmode" class="mb-8 leading-relaxed">
