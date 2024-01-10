@@ -50,8 +50,7 @@ import {appw,config} from "@/appwrite";
 import {convertifserbian} from "@/lang";
 import useLoadingStore from '@/stores';
 import {reactive,ref} from "vue";
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
+
 
 
 export default {

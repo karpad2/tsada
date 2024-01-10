@@ -6,12 +6,10 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 //import Particles from "vue3-particles";
-import VuePdf from 'vue3-pdfjs'
+
 
 import 'primeicons/primeicons.css'; //icons
-import "ag-grid-community/styles/ag-grid.css"; // Core CSS
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
-import { AgGridVue } from "ag-grid-vue3"; // Vue Grid Logic
+
 
 import LImage from "@/components/LImage.vue";
 import { createI18n } from 'vue-i18n'
@@ -38,7 +36,7 @@ const vuetify = createVuetify({
     directives,
   })
 
-app.use(VuePdf);
+
 //console.log(messages);
 
 
@@ -54,7 +52,7 @@ app.use(vuetify);
 app.component('video-background', VideoBackground);
 app.config.globalProperties.$appwrite = appw;
 app.use(Particles,{init:async engine => {await loadFull(engine)}});
-app.mixin({components:{LImage,AgGridVue}});
+
 app.use(i18n);
 
 app.use(router);

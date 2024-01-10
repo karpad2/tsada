@@ -64,21 +64,18 @@ export default {
             let a={title:"",subtitle:"",text:"",img:""};
             if(lang=="en")
             {
-                a.title=element.course_en;
-                a.subtitle=element.course_en_st;
-                a.text=element.course_en_detail;
+                a.title=element.title;
+               
             }
             else if(lang=="hu")
             {
-                a.title=element.course_hu;
-                a.subtitle=element.course_hu_st;
-                a.text=element.course_hu_detail;
+                a.title=element.title;
+              
             }
             else if(lang=="rs"||lang=="sr")
             {
-                a.title=convertifserbian(element.course_rs);
-                a.subtitle=convertifserbian(element.course_rs_st);
-                a.text=convertifserbian(element.course_rs_detail);
+                a.title=convertifserbian(element.title);
+                
             }
             let b=null;
             

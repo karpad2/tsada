@@ -12,8 +12,8 @@
                     {{ $t("author") }}:{{ author }}
                 </p>
             </div>
-            <video-background v-else src="" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
-            overlay="linear-gradient(45deg,#2a4ae430,#fb949e6b)"  >
+            <video-background v-else :src="video_link" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
+            overlay="linear-gradient(45deg,#2a4ae430,#0EA5E950)"  >
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
                     <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
@@ -82,7 +82,8 @@ export default {
             date:"",
             newsmode:false,
             video_id:"",
-            video_link:""
+            video_link:"",
+            edumode:false,
         }
     },
     mounted()
@@ -137,6 +138,14 @@ export default {
                 this.author= convertifserbian(k.documents[0].author);
                 this.date= moment(k.documents[0].$createdAt).locale(lang).format('LL');
             }
+
+            if(this.$route.params.node=="education")
+            {
+                this.edumode=true;
+                
+            }
+
+
             let gal=k.documents[0].gallery;
             console.log(k.documents[0].gallery);
             let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
@@ -163,6 +172,7 @@ export default {
             this.video_id=v2;
             this.video_link=storage.getFileView(config.website_images,this.video_id).href;
             console.log(this.video_link);
+            this.video_link=config.default_video;
             this.loaded=true;
         }   
     }

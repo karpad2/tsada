@@ -43,11 +43,13 @@
                 <div class="dropdown">
                     <div @click="erasmus" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }}</div>
                 </div>
-            </nav>
-            <router-link to="contact" class="inline-flex items-center bg-sky-100 border-0 py-1 px-3 focus:outline-none hover:bg-sky-500/100 rounded text-base mt-4 md:mt-0 cursor-pointer">
+                <router-link to="/contact" class="mr-5 hover:text-sky-400 cursor-pointer">
                 {{ $t('contactus') }}
                 <i class="pi pi-right"></i>
-            </router-link>
+                </router-link>
+            </nav>
+            
+                
         </div>
     </header>
 </template>
@@ -56,8 +58,7 @@ import { Client, Databases, ID,Storage,Query } from "appwrite";
 import {convertifserbian} from "@/lang";
 import {appw,config} from "@/appwrite";
 import { ref,nextTick } from "vue";
-import Button from 'primevue/button';
-import  Menu  from "primevue/menu";
+
 export default
 {
     name: 'Header',
@@ -142,12 +143,12 @@ export default
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l;
-        console.log(this.language);
+        console.log(this.language);//show_at_the_header_from_about
         if(this.language=="sr")
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.select(["title","$id"])]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.equal("show_at_the_header_from_about",true),Query.select(["title","$id"])]);
         }
-        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.select(["title","$id"])]);
+        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.equal("show_at_the_header_from_about",true),Query.select(["title","$id"])]);
         //let local=localStorage.getItem("lang");
         console.log(l);
         l.documents.forEach(async element => {

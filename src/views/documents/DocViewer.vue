@@ -1,10 +1,12 @@
 <template>
-<div v-if="!loading" class="w-3/4 p-y-2 m-auto pb-8"   style="height: 80vh;">
-    <VuePdfApp  class="h-full w-auto" :pdf="pdf_file" />
+<div  class="w-3/4  m-auto pb-8"   style="height: 100vh;">
+    
+    <iframe class="h-full w-full"  :src="pdf_file" ></iframe>
 </div>
 </template>
 <script>
-import  VuePdfApp  from "vue3-pdf-app";
+//import  VuePdfApp  from "vue3-pdf-app";//
+//import "vue3-pdf-app/dist/icons/main.css";
 //import "vue3-pdf-app/dist/icons/main.css";
 //import PDF from "pdf-vue3";
 //import { VuePDF, usePDF } from '@tato30/vue-pdf'
@@ -19,7 +21,7 @@ import {appw,config} from "@/appwrite";
 import { ref } from 'vue';
 export default {
     components: {
-        VuePdfApp
+        
     },
     data() {
         return {
@@ -47,8 +49,9 @@ export default {
         {   
             const storage = new Storage(appw);
             
-            let tmp=await storage.getFileView(config.documents_storage,this.$route.params.id).href;
-            this.pdf_file=usePDF(tmp);
+            let tmp=await storage.getFileView(config.documents_storage,this.$route.params.id);
+            this.pdf_file=tmp.href;
+            console.log(this.pdf_file);
             //this.pdf_link=pdf;
            /* const loadingTask = createLoadingTask(this.pdf_file)
       loadingTask.promise.then((pdf) => {

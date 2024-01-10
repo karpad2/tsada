@@ -8,7 +8,7 @@
                     </div>
                 
                 </div>
-    <div v-if="loaded"  class="m-auto  w-1/2">
+    <div v-for="doc in documents" v-if="loaded"  class="m-auto  w-1/2">
     
       <table v-if="false" class="table-zebra rounded ">
         <!-- head -->
@@ -31,15 +31,24 @@
         </tbody>
       </table>
 
-    <v-data-table  height="400" :headers="headers" :items="documents"></v-data-table>
+    <v-data-table v-if="doc.docs.length!=0"  height="400" :headers="headers" :items="doc.docs" item-key="_id">
+    
+
+    <template v-slot:item._id="{ item }">
+    <router-link :to="'/document/'+item._id"><i class="pi pi-file-pdf"></i></router-link>
+  </template>
+    </v-data-table>
+    <div v-else class="text-center">
+        
     </div>
+</div>
     </div>
     </section>
     
     
     </template>
     <script>
-    import { ref } from 'vue';
+    import { ref, nextTick } from 'vue'
     import { Client, Databases, ID,Storage,Query } from "appwrite";
     import {appw,config} from "@/appwrite";
     import {convertifserbian} from "@/lang";
@@ -51,12 +60,16 @@
         components: {
            
         },
+        onBeforeMount()
+        {
+
+        },
         mounted()
         {
             this.headers= [
                 { title: this.$t("name"), align: 'start', sortable: false, key: 'name' },
                 { title: this.$t("date"), align: 'end', key: 'upload_date' },
-                { title: this.$t("file_download"), align: 'end', key: 'id',cellRenderer:(params)=>{return '<router-link to="/document/'+params.value+'"><i class="pi pi-file-pdf"></i></router-link>'} }];  
+                { title: this.$t("file_download"), align: 'end', key: '_id'}];  
             const loadingStore = useLoadingStore();
             //loadingStore.setLoading(true);
             this.load_documents_base();
@@ -71,7 +84,7 @@
         },
         data: () => ({
             
-                documents:ref(),
+                documents:[],
                 document_category:{},
                 colDefs:[],
                 loaded: false,
@@ -84,7 +97,7 @@
             {
             const loadingStore = useLoadingStore();
             
-            this.documents=[];
+            this.documents=[{docs:[]}];
             
            
             const database = new Databases(appw);
@@ -121,8 +134,8 @@
                 
                 
                 
-                l.documents.forEach(async el2 => {
-                let a={name:"",id:"",upload_date:""};
+                 await l.documents.forEach(async el2 => {
+                let a={name:"",_id:"",upload_date:""};
                 if(local=="en")
                 {
                     a.name=el2.document_title_en;
@@ -138,23 +151,26 @@
                     a.name=convertifserbian(el2.document_title_rs);  
                 }
                 a.upload_date=await moment(el1.document_date).locale(local).format('LL');
-                a.id=el2.document_id;
+                a._id=el2.document_id;
                 docs.push(a);
             });
             
     
             });
             
-            this.documents=docs;
+            this.documents.push({docs});
 
             console.log(this.documents);
-            this.loaded=true;
             
+            //await nextTick();
             //this.loaded=true;
             //=docs;    
             //console.log(this.roles);
             //loadingStore.setLoading(false);
-           
+            setTimeout(() => {
+                this.loaded=true;
+            }, 1000);
+
             },
            
         }

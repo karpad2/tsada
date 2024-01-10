@@ -1,6 +1,6 @@
 <template>
     <section class="text-gray-600 body-font" id="courses">
-        <div class="container px-5 py-24 mx-auto cursor-pointer">
+        <div class="container px-5 py-24 mx-auto ">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
                     <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ $t('courses') }}</h1>
@@ -9,8 +9,8 @@
             
             </div>
             <div class="flex flex-wrap -m-4">
-                <div v-for="course in courses" class="xl:w-1/4 md:w-1/2 p-4">
-                    <div  class="bg-gray-100 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 hover:scale-125">
+                <div v-for="course in courses" class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
+                    <div @click="courseopen(course.en)"   class="bg-gray-100 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 hover:scale-125">
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out hover:scale-110"
                             :src="course.img" alt="content">
                        
@@ -53,13 +53,13 @@ export default {
         async load_courses_base()
         {
         this.courses=[];
-            console.log();
+           // console.log();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l= await database.listDocuments(config.website_db, config.courses_short);
         let local=localStorage.getItem("lang");
         l.documents.forEach(element => {
-            let a={title:"",subtitle:"",text:"",img:""};
+            let a={title:"",subtitle:"",text:"",img:"",en:""};
             if(local=="en")
             {
                 a.title=element.course_en;
@@ -78,7 +78,10 @@ export default {
                 a.subtitle=convertifserbian(element.course_rs_st);
                 a.text=convertifserbian(element.course_rs_detail);
             }
-            console.log(element.course_img);
+            if(element.code==""||element.code==null)
+            a.en=element.course_en;
+            else a.en=element.code;
+            //console.log(element.course_img);
             if(element.course_img==null||element.course_img=='')
             {
                 a.img="https://dummyimage.com/720x400";
@@ -89,6 +92,19 @@ export default {
             this.courses.push(a);
         });
         },
+        courseopen(a)
+        {
+            console.log(a);
+            let local=localStorage.getItem("lang");
+            if(local=="sr")
+            {
+                local="rs";
+            }
+            let b=a.toLowerCase();
+            b=b.replaceAll(" ","");
+            console.log(b);
+            this.$router.push("/renderer/education/"+b+"_"+local);
+        }
     }
     
 }
