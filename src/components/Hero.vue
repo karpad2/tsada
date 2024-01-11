@@ -15,8 +15,9 @@
                 <span class="font-medium text-sky-400">{{ $t("msc") }}</span>.
                 </p>
                 <div class="flex justify-center">
-                    <button @click="$router.push('/presentation')" class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
-                        {{ $t('applynow') }}
+                    <VBtn @click="$router.push('/presentation')">{{ $t('applynow') }}</VBtn>
+                    <button  v-if="false" class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
+                        
                     </button>
                     
                 </div>
@@ -50,6 +51,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Client, Databases, ID,Storage } from "appwrite";
 import {appw,config} from "@/appwrite";
+import { VaButton } from 'vuestic-ui/web-components';
 
 
 
@@ -63,10 +65,10 @@ import {appw,config} from "@/appwrite";
 */
 export default {
     components: {
-        Swiper,
-        SwiperSlide,
-      
-    },
+    Swiper,
+    SwiperSlide,
+    VaButton
+},
     mounted() {
         
        this.load_mp_images_from_base();

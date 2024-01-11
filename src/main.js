@@ -49,6 +49,7 @@ client
 //app.use(VueI18n);
 app.use(Notifications);
 app.use(vuetify);
+vuetify.theme.name.primary = '#0EA5E9';
 app.component('video-background', VideoBackground);
 app.config.globalProperties.$appwrite = appw;
 app.use(Particles,{init:async engine => {await loadFull(engine)}});

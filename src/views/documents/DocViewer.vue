@@ -1,6 +1,5 @@
 <template>
 <div  class="w-3/4  m-auto pb-8"   style="height: 100vh;">
-    
     <iframe class="h-full w-full"  :src="pdf_file" ></iframe>
 </div>
 </template>

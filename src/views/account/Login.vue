@@ -36,7 +36,7 @@
 <script >
 import { ref } from 'vue';
 import { Client, Account } from "appwrite";
-import {appw,config} from "@/appwrite";
+import {appw,config,user,checkUser} from "@/appwrite";
 import router from '@/router';
 import TextEmphasisPosition from 'autoprefixer/lib/hacks/text-emphasis-position';
 
@@ -50,15 +50,20 @@ export default {
             password
         }
     },
+    mounted()
+    {
+     // if(checkUser()) this.router.push("/home");
+       console.log("login");
+    },  
     methods:{
         login_by_app()
         {
-            const account = new Account(appw);
-            const promise = account.createEmailSession(this.email,this.password);
+            
+            const promise = user.createEmailSession(this.email,this.password);
 
             promise.then( (response)=>{
                 console.log(response);
-                router.go("/home");
+                router.push("/home");
                 this.$notify(this.$t('success'));
                  // takarodjá befelé
             }, (error)=>{

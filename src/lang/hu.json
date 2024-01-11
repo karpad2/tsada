@@ -1,7 +1,7 @@
 {
     "school_name":"Műszaki Iskola Ada",
-    "cometous":"The future starts with you. Your place is here!",
-    "whycomehere":"Choose vocational training, choose knowledge, choose MSC.",
+    "cometous":"Korszerű szakmával tudást és jövőt építesz",
+    "whycomehere":"Válasz a szakképzést! Válaszd a tudást, a ",
     "applynow":"Jelentkezz!",
     "courses":"Szakirányok",
     "feedback":"Feedback",
@@ -24,7 +24,9 @@
      "history":"Az iskola története",
      "workers":"Dolgozók",
      "upload_date":"Feltöltés dátuma",
-     "file_download":"Fájl letöltése"
+     "file_download":"Fájl letöltése",
+     "education":"Oktatás",
+     "documents":"Dokumentumok"
      
      
  }

@@ -82,6 +82,11 @@ const router = createRouter({
       name:'presentation',
       component: () => import('../views/Presentation.vue')      
     },
+    {
+      path:'/:pathMatch(.*)*',
+      name:'missingpage',
+      component: () => import('../views/MissingPage.vue')      
+    }
   ]
 })
 router.beforeEach((to, from, next) => {

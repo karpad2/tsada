@@ -47,6 +47,10 @@
                 {{ $t('contactus') }}
                 <i class="pi pi-right"></i>
                 </router-link>
+                <span v-if="logged_in" @click="logout" class="mr-5 hover:text-sky-400 cursor-pointer">
+                {{ $t('logout') }}
+                
+                </span>
             </nav>
             
                 
@@ -56,7 +60,7 @@
 <script>
 import { Client, Databases, ID,Storage,Query } from "appwrite";
 import {convertifserbian} from "@/lang";
-import {appw,config} from "@/appwrite";
+import {appw,config,user,checkUser} from "@/appwrite";
 import { ref,nextTick } from "vue";
 
 export default
@@ -74,13 +78,14 @@ export default
             ],
             doccategories:[],
             abouts:[],
-            reload:ref(true)
+            reload:ref(true),
+            logged_in:false
         }
     },
     mounted()
     {
         
-
+        this.logged_in=checkUser();
         this.language=localStorage.getItem('lang');
         
         if(this.language==null)
@@ -194,6 +199,12 @@ export default
             }
             else
             this.$router.push("/renderer/erasmus/erasmus_"+this.language);
+        },
+        logout()
+        {
+            user.deleteSession('current');
+            this.logged_in=false;
+            window.location.reload();
         }
         
     },
