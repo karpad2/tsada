@@ -1,7 +1,7 @@
 import { Client,Account } from 'appwrite';
 import config from './config.json';
 const appw = new Client();
-if(false)
+if(true)
 {
 appw
     .setEndpoint('https://appwrite.tsada.edu.rs/v1')
