@@ -14,6 +14,7 @@
                 <div v-if="reload" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
                 <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                     <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
+                    <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                     <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                 </ul>
                 </div>
@@ -21,8 +22,8 @@
                 <div class="dropdown">
                 <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
                 <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
-                    <li ><router-link to="/education">{{ $t("education_profiles") }}</router-link></li>
-                    <li ><router-link to="/render/about/">{{ $t("reports") }}</router-link></li>
+                    <li v-if="false" ><router-link to="/education">{{ $t("education_profiles") }}</router-link></li>
+                    <li ><router-link to="/renderer/education/adult_education">{{ $t("adult_education") }}</router-link></li>
                 </ul>
                 </div>
 
@@ -41,9 +42,16 @@
                 </ul>
                 </div>
 
+                
+
                 <div class="dropdown">
-                    <div @click="erasmus" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }}</div>
+                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
+                <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                    <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
+                </ul>
                 </div>
+
+
                 <router-link v-if="!isLoggedin" to="/contact" class="mr-5 hover:text-sky-400 cursor-pointer">
                 {{ $t('contactus') }}
                 <i class="pi pi-right"></i>
@@ -93,6 +101,7 @@ export default
                 {name: 'English', code: 'en',country:"gbr"}
             ],
             doccategories:[],
+            _erasmus:[],
             abouts:[],
             reload:ref(true),
             logged_in:false,
@@ -117,7 +126,7 @@ export default
         document.title=this.$t("school_name");
         this.getDocumentsCategories();
         this.getAbouts();
-
+        this.getErasmus();
         this.languages.forEach(element => {
             if(element.code==cc.language)
             this.lang=element.country;
@@ -252,6 +261,37 @@ export default
             a.id=element.$id;
             this.abouts.push(a);
             }
+        });
+
+        },
+        async getErasmus()
+        {
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
+        const cc=useLoadingStore();
+        let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","erasmus"),Query.select(["title_hu","title_en","title_rs","$id"])]);
+        console.log(l);
+        //let local=localStorage.getItem("lang");
+        l.documents.forEach(async element => {
+            console.log(element);
+            let a={name:"",id:""};
+            if(cc.language=="en")
+            {
+                a.name=element.title_en;
+                
+            }
+            else if(cc.language=="hu")
+            {
+                a.name=element.title_hu;
+                
+            }
+            else if(cc.language=="rs"||cc.language=="sr")
+            {
+                a.name=convertifserbian(element.title_rs);
+            }
+
+            a.id=element.$id;
+            this._erasmus.push(a);
         });
 
         },

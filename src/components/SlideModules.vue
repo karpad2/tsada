@@ -27,7 +27,7 @@
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
                             :src="course.img" alt="content">
                        
-                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font ">{{ course.subtitle }} <span v-if="!course.visible">{{ $t('invisible') }}</span></h3>
+                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font ">{{ course.subtitle }} <span v-if="isHidden(course.visible)">{{ $t('invisible') }}</span></h3>
                         <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ course.title }}</h2>
                         <p class="leading-relaxed text-base" :v-html="course.text"></p>
                     </div>
@@ -83,12 +83,13 @@ export default {
         }
         else
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image"]),Query.limit(6)]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(6)]);
          
         }
         let local=cc.language;
         l.documents.forEach(element => {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
+            //console.log(element);
             a.id=element.$id;
             a.visible=element.visible;
             if(local=="en")
@@ -122,6 +123,12 @@ export default {
             //a.imga=element.default_image.toString();
             this.courses.push(a);
         });
+        
+        },
+        isHidden(a)
+        {
+            //console.log(a);
+            return !a;
         },
         courseopen(a)
         {
