@@ -27,7 +27,7 @@
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
                             :src="course.img" alt="content">
                        
-                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font ">{{ course.subtitle }} <span v-if="admin&& (!course.visible)">{{ $t('invisible') }}</span></h3>
+                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font ">{{ course.subtitle }} <span v-if="!course.visible">{{ $t('invisible') }}</span></h3>
                         <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ course.title }}</h2>
                         <p class="leading-relaxed text-base" :v-html="course.text"></p>
                     </div>
