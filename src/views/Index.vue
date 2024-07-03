@@ -1,16 +1,14 @@
 <template>
     <div class="">
-        <TopBar v-if="false"/>
+       
         <Header />
         <vue-particles
             id="tsparticles"
             :particlesLoaded="particlesLoaded"
             :options="{
-                    background: {
-                        color: {
-                            value: '#fff'
-                        }
-                    },
+                   /*background: {
+                        
+                    },*/
                     fpsLimit: 120,
                     interactivity: {
                         events: {
@@ -21,7 +19,7 @@
                             onHover: {
                                 enable: true,
                                 mode: 'repulse'
-                            },
+                            }
                         },
                         modes: {
                             bubble: {
@@ -41,10 +39,11 @@
                     },
                     particles: {
                         color: {
-                            value: '#0d47a1'
+                            value: '#43afe1',
+                            
                         },
                         links: {
-                            color: '#0d47a1',
+                            color: '#43afe1',
                             distance: 150,
                             enable: true,
                             opacity: 0.5,
@@ -65,7 +64,7 @@
                             value: 80
                         },
                         opacity: {
-                            value: 0.5
+                            value: 0.8
                         },
                         shape: {
                             type: 'circle'
@@ -89,14 +88,12 @@
     </div>
 </template>
 
-<script>
-
-import useLoadingStore  from "@/stores";
+<script lang="ts">
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
 import Loading from '@/components/Loading.vue';
 import Toast from "primevue/toast";
-import TopBar from "@/components/TopBar.vue";
+import {useLoadingStore} from "@/stores/loading";
 
 
 export default {
@@ -104,21 +101,29 @@ export default {
     Header,
     Footer,
     Loading,
-    Toast,
-    TopBar,
+    Toast
+},
+data()
+{
+return {
     
+}
 },
     
     mounted()
     {
        //console.log( app.config.globalProperties.$loading);
+
+    
+            
     },
     computed: {
         isLoading() {
-            let loadingStore = useLoadingStore();
-            return loadingStore.isLoading;
+           return useLoadingStore().isLoading;
+            
             //return app.config.globalProperties.loading;
             
+           
         }
     },
     

@@ -2,24 +2,25 @@
 <header v-if="reload" style="z-index: 200;"  class="navbar text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
         <div class="container mx-auto flex flex-wrap p-4 flex-col md:flex-row items-center">
             <router-link to="/home" class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 ">
-                <img src="@a/tsada_logo.png" class="w-20 h-20 text-white p-1 bg-sky-300/50 rounded-full hover:scale-110">
+                <img src="@a/tsada_logo.png" class="size-20 text-white p-1 bg-sky-400/15 rounded-full">
                 <span class="ml-3 text-xl">{{ $t('school_name') }}</span>
-                <img src="@a/certop_logo.png" class="w-36 h-12 text-white p-2 hover:scale-110">
+                <img src="@a/certop_logo.png" class="w-36 h-12 text-white p-2 ">
+                <img src="@a/Erasmus_Logo.svg" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
             <nav class="md:ml-auto flex flex-wrap items-center text-base justify-acenter">
                 
                 <router-link to="/home" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('home') }}</router-link>
                 <div class="dropdown">
-                <div v-if="reload" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('aboutus') }}</div>
-                <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <div v-if="reload" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
+                <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                     <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                     <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                 </ul>
                 </div>
 
                 <div class="dropdown">
-                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('education') }}</div>
-                <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
+                <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                     <li ><router-link to="/education">{{ $t("education_profiles") }}</router-link></li>
                     <li ><router-link to="/render/about/">{{ $t("reports") }}</router-link></li>
                 </ul>
@@ -27,82 +28,117 @@
 
                 
                 <div class="dropdown">
-                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('documents') }}</div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
+                <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                     <li v-for="doccategory in doccategories" :key="doccategory.id"><router-link :to="'/documents/'+doccategory.id">{{ doccategory.name }}</router-link></li>
                 </ul>
                 </div>
 
                 <div class="dropdown">
-                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('language') }}</div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                    <li v-for="lang in languages "><a @click="changeLanguage(lang.code)">{{ lang.name }}</a></li>
+                <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                    <li v-for="lang in languages "><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                 </ul>
                 </div>
 
                 <div class="dropdown">
                     <div @click="erasmus" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer">{{ $t('Erasmus') }}</div>
                 </div>
-                <router-link to="/contact" class="mr-5 hover:text-sky-400 cursor-pointer">
+                <router-link v-if="!isLoggedin" to="/contact" class="mr-5 hover:text-sky-400 cursor-pointer">
                 {{ $t('contactus') }}
                 <i class="pi pi-right"></i>
                 </router-link>
-                <span v-if="logged_in" @click="logout" class="mr-5 hover:text-sky-400 cursor-pointer">
+
+                <router-link v-else to="/admin/messages" class="mr-5 hover:text-sky-400 cursor-pointer">
+                {{ $t('messages') }}
+                <i class="pi pi-right"></i>
+                </router-link>
+
+                <span v-if="isLoggedin" @click="logout" class="mr-5 hover:text-sky-400 cursor-pointer">
                 {{ $t('logout') }}
-                
                 </span>
+
+                <router-link v-else to="/login" class="mr-5 hover:text-sky-400 cursor-pointer">
+                {{ $t('login') }}
+                </router-link>
+
+
             </nav>
             
                 
         </div>
     </header>
 </template>
-<script>
-import { Client, Databases, ID,Storage,Query } from "appwrite";
+<script lang="ts">
+import { Client, Databases, ID,Storage,Query,Account } from "appwrite";
 import {convertifserbian} from "@/lang";
-import {appw,config,user,checkUser} from "@/appwrite";
-import { ref,nextTick } from "vue";
 
+import {appw,config} from "@/appwrite";
+import { ref,nextTick } from "vue";
+import {useLoadingStore} from "@/stores/loading";
 export default
 {
     name: 'Header',
+    components:{
+      
+    },
     data()
     {
         return {
             language: null,
             languages: [
-                {name: 'Српски', code: 'sr'},
-                {name: 'Srpski', code: 'rs'},
-                {name: 'Magyar', code: 'hu'},
-                {name: 'English', code: 'en'}
+                {name: 'Српски', code: 'sr',country:"srb"},
+                
+                {name: 'Magyar', code: 'hu',country:"hun"},
+                {name: 'English', code: 'en',country:"gbr"}
             ],
             doccategories:[],
             abouts:[],
             reload:ref(true),
-            logged_in:false
+            logged_in:false,
+            lang:"",
+            loa:null
         }
     },
     mounted()
     {
         
-        this.logged_in=checkUser();
-        this.language=localStorage.getItem('lang');
+        //cc=useLoadingStore();
+        //this.erasmusflag=cc.isErasmus;
         
-        if(this.language==null)
+        //this.language=cc.language;
+        
+        /*if(this.language==null)
         {
             this.language='sr';
-        }
-        this.$i18n.locale=this.language;
-
+        }*/
+        const cc=useLoadingStore();
+        this.$i18n.locale=cc.language;
+        document.title=this.$t("school_name");
         this.getDocumentsCategories();
         this.getAbouts();
+
+        this.languages.forEach(element => {
+            if(element.code==cc.language)
+            this.lang=element.country;
+        });
+
+
     },
     methods:{
-        async changeLanguage(code)
+        changeLanguage(code)
         {
-
-            await localStorage.setItem('lang', code);
+            const cc=useLoadingStore();
+            cc.setLanguage(code)
+            //await localStorage.setItem('lang', code);
             this.$i18n.locale=code;
+
+            this.languages.forEach(element => {
+            if(element.code==cc.language)
+            this.lang=element.country;
+        });
+            
+           
             //i am want to cry, but i cant
 
             /*await this.$router.push("/home");
@@ -114,26 +150,39 @@ export default
             window.location.reload();
             //this.language=lang;
         },
+        async logout()
+        {
+            const account = new Account(appw);
+            const result = await account.deleteSession(
+    'current' // sessionId
+);
+            const cc=useLoadingStore();
+            cc.setUserLoggedin(false);
+            console.warn("logout");
+            window.location.reload();
+        },
+    
         async getDocumentsCategories()
         {
         const database = new Databases(appw);
         const storage = new Storage(appw);
+        const cc=useLoadingStore();
         let l= await database.listDocuments(config.website_db, config.document_categories_db);
-        let local=localStorage.getItem("lang");
+        //let local=localStorage.getItem("lang");
         l.documents.forEach(async element => {
             console.log(element);
             let a={name:"",id:""};
-            if(local=="en")
+            if(cc.language=="en")
             {
                 a.name=element.category_name_en;
                 
             }
-            else if(local=="hu")
+            else if(cc.language=="hu")
             {
                 a.name=element.category_name_hu;
                 
             }
-            else if(local=="rs"||local=="sr")
+            else if(cc.language=="rs"||cc.language=="sr")
             {
                 a.name=convertifserbian(element.category_name_rs);
             }
@@ -148,18 +197,19 @@ export default
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l;
-        console.log(this.language);//show_at_the_header_from_about
-        if(this.language=="sr")
+        const cc=useLoadingStore();
+        //console.log(this.language);//show_at_the_header_from_about
+        if(cc.language=="sr")
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.equal("show_at_the_header_from_about",true),Query.select(["title","$id"])]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"])]);
         }
-        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","659c6c43ec54b208fff3"),Query.equal("show_at_the_header_from_about",true),Query.select(["title","$id"])]);
+        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"])]);
         //let local=localStorage.getItem("lang");
         console.log(l);
         l.documents.forEach(async element => {
             
             let a={title:"",id:""};
-            a.title=convertifserbian(element.title);
+            a.title=convertifserbian(element.title_rs);
 
             a.id=element.$id;
             this.abouts.push(a);
@@ -169,45 +219,68 @@ export default
 
         async getCourses()
         {
+        const cc=useLoadingStore();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l;
-        console.log(this.language);
-        if(this.language=="sr")
+        //console.log(cc.language);
+        if(cc.language=="sr")
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang","rs"),Query.equal("aboutCategories","about"),Query.select(["title","$id"])]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
         }
-        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("lang",this.language),Query.equal("aboutCategories","about"),Query.select(["title","$id"])]);
+        else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
         //let local=localStorage.getItem("lang");
         console.log(l);
         l.documents.forEach(async element => {
             
             let a={title:"",id:""};
-            a.title=convertifserbian(element.title);
+            if(cc.language=="sr")
+            a.title=convertifserbian(element.title_rs);
+            else if(cc.language=="rs")   
+            a.title=element.title_rs;
+            else if(cc.language=="hu")
+            a.title=element.title_hu;
+            else if(cc.language=="en")
+            a.title=element.title_hu;
+            else 
+                {
 
+                }
+            
+            if( a.title!="---")
+            {
             a.id=element.$id;
             this.abouts.push(a);
+            }
         });
 
         },
-
+    },
+    computed:{
         erasmus()
         {
-            if(this.language=="sr")
+            const cc=useLoadingStore();
+            if(cc.language=="sr")
             {
                 this.$router.push("/renderer/erasmus/erasmus_rs");  
             }
             else
-            this.$router.push("/renderer/erasmus/erasmus_"+this.language);
+            this.$router.push("/renderer/erasmus/");
         },
-        logout()
+        erasmusflag()
         {
-            user.deleteSession('current');
-            this.logged_in=false;
-            window.location.reload();
-        }
+            const cc=useLoadingStore();
+            return cc.isErasmus;
+        },
         
-    },
+        
+    
+        isLoggedin()
+        {
+            const cc=useLoadingStore();
+            return cc.userLoggedin;
+        },
+    }
 
   
 }

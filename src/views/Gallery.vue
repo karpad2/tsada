@@ -5,7 +5,7 @@
         <div class="container px-5 py-24 mx-auto">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ $t('gallery') }}</h1>
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ $t('gallery') }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
             </div>
@@ -15,9 +15,9 @@
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out hover:scale-110"
                             :src="album.img" alt="content">
                        
-                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font">{{ album.subtitle }}</h3>
-                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4">{{ album.title }}</h2>
-                        <p class="leading-relaxed text-base" :v-html="album.text"></p>
+                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font dark:text-white">{{ album.subtitle }}</h3>
+                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-slate-400">{{ album.title }}</h2>
+                        <p class="leading-relaxed text-base dark:text-slate-400" :v-html="album.text"></p>
                     </div>
                 </div>
                

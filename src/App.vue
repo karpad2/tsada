@@ -17,10 +17,12 @@ export default {
  
   <Index>
     
-    <notifications position="bottom right"/> 
+    <notifications position="top right"/> 
     <RouterView  />
   
   </Index>
+
+  
 
 </template>
 

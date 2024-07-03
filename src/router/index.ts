@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import useLoadingStore from '@/stores';
+import {useLoadingStore} from "@/stores/loading";
 import HomeView from '../views/HomeView.vue'
-
+import {check} from "@/appwrite";
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -46,6 +46,31 @@ const router = createRouter({
       path:'/renderer/:mode/:id',
       name:'renderer',
       component: () => import('../views/MDRenderer.vue')      
+    },
+    {
+      path:'/admin/edit/:mode/:id',
+      name:'content_editor',
+      component: () => import('../views/admin/editor/ContentEditor.vue')      
+    },
+    {
+      path:'/admin/worker/:id',
+      name:'worker_editor',
+      component: () => import('../views/admin/editor/WorkerEditor.vue')      
+    },
+    {
+      path:'/admin/document/:id',
+      name:'worker_editor',
+      component: () => import('../views/admin/editor/DocumentEditor.vue')      
+    },
+    {
+      path:'/admin/messages',
+      name:'messages',
+      component: () => import('../views/admin/messages/Messages.vue')      
+    },
+    {
+      path:'/admin/message/:id',
+      name:'message',
+      component: () => import('../views/admin/messages/Message.vue')      
     },
     {
       path:'/contact',
@@ -93,6 +118,20 @@ router.beforeEach((to, from, next) => {
   // Show loading screen
   const loadingStore = useLoadingStore();
   loadingStore.setLoading(true);
+  //console.log();
+  let b=to.fullPath;
+  try{
+  //check();
+  }
+  catch (e){console.warn(e);}
+  if(b.indexOf("erasmus") !== -1)
+  {
+    loadingStore.setErasmus(true);
+  }
+  else
+  {
+    loadingStore.setErasmus(false);
+  }
 
   // Wait for 1 second (for demonstration purposes)
   setTimeout(() => {

@@ -1,6 +1,6 @@
 <template>
-<img v-if="!load" :src="image" alt="Content" class="transition duration-300 ease-in-out hover:scale-110" />
-<img v-else src="https://dummyimage.com/720x400" alt="Content" class="transition duration-300 ease-in-out hover:scale-110" />
+<img v-if="!load" :src="image" alt="Content" class="transition duration-300 ease-in-out " />
+<img v-else src="https://dummyimage.com/720x400" alt="Content" class="transition duration-300 ease-in-out " />
 </template>
 <script>
 import { Client, Databases, ID,Storage } from "appwrite";

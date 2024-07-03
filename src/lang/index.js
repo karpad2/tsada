@@ -2,7 +2,7 @@ import hu from "./hu.json";
 import en from "./en.json";
 import rs from "./rs.json";
 import {convertWordToCyrillic} from "./transliteration.js";
-
+import {useLoadingStore} from "../stores/loading";
 let sr = {};
 
 
@@ -22,7 +22,8 @@ rs.forEach(element => {
 
 function convertifserbian(word)
 {
-    if(localStorage.getItem('lang') == 'sr'){
+    const cc=useLoadingStore();
+    if(cc.language == 'sr'){
     try{
         return convertWordToCyrillic(word); 
         }
@@ -35,9 +36,26 @@ function convertifserbian(word)
         return word;
 
 }
+
+function getStatus()
+{
+    const cc=useLoadingStore();
+    if(cc.language == 'sr'||cc.language == 'rs'){
+    return "isSerbian";
+    }
+    else if(cc.language == 'hu'){
+        return "isHungarian";
+    }
+    else if(cc.language == 'en') {
+        return "isEnglish";
+    }
+    else  {
+
+    }
+}
 //this.$i18n.locale 
 
 const messages={
     hu,en,rs,sr    
 }
-export  { messages,convertifserbian};
+export  { messages,getStatus,convertifserbian};

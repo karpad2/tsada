@@ -1,12 +1,11 @@
 <template>
     <div class="relative mb-4 container  px-5  mx-auto bg-white" >
         <div>
-            <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
-            <v-btn @click="save" class="m-5">{{ $t('save') }}</v-btn>
-            <v-btn @click="delete_content">{{ $t('delete') }}</v-btn>
+            <v-btn @click="delete_content" class="m-5">{{ $t('delete') }}</v-btn>
+            <VBtn @click="$router.go(-1)" class="m-5">{{ $t("goback") }}</VBtn>
         </div>
 
-        <div>
+    <div>
             <v-file-input @change="file_upload" v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
             {{ $t("preview") }}
 <div class="flex flex-wrap -m-4">
@@ -20,53 +19,44 @@
         </div>
     </div>
 </div>
-</div>
-        <div>
-            <v-switch @change="save" v-model="srb_flag" :label="$t('srb')"></v-switch>
-            
-            <div v-if="srb_flag">
-            <v-text-field
-            @change="save"
-            v-model="title_rs"
-            :counter="100"
-            :label="$t('srb_title')"
-            hide-details
-            
-          ></v-text-field>
-        
 
-            <QuillEditor  @textChange="save" content-type="html"  style="min-height:200px;"  v-model:content="content_rs" toolbar="full" theme="snow" />
-        </div>
-    </div>
-        <div>
-            <v-switch v-model="hun_flag" @change="save" :label="$t('hu')"></v-switch>
-            <div v-if="hun_flag">
+            
+            <div >
             <v-text-field
-            v-model="title_hu"
-            :counter="100"
             @change="save"
-            :label="$t('hu_title')"
+            v-model="worker_name_hu"
+            :counter="100"
+            :label="$t('worker_name_hu')"
             hide-details
             
           ></v-text-field>
-            <QuillEditor  content-type="html"  @textChange="save" style="min-height:200px;" v-model:content="content_hu" toolbar="full" theme="snow" />
         </div>
-    </div>
-        <div>
-            <v-switch v-model="en_flag" @change="save" :label="$t('en')"></v-switch>
-            <div v-if="en_flag">
-            <v-text-field
-            v-model="title_en"
-            :counter="100"
+        <div >
+          <v-text-field
             @change="save"
-            :label="$t('en_title')"
+            v-model="worker_name_rs"
+            :counter="100"
+            :label="$t('worker_name_rs')"
             hide-details
             
           ></v-text-field>
-            <QuillEditor content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
         </div>
+        <div >
+          <v-text-field
+            @change="save"
+            v-model="contact"
+            :counter="100"
+            :label="$t('contact')"
+            hide-details
+            
+          ></v-text-field>
+        </div>
+
+             
     </div>
-    </div>
+</div>    
+        
+    
 </template>
 <script lang="ts">
 import {Client,Databases,ID,Storage,Query } from "appwrite";
@@ -78,16 +68,10 @@ export default{
 data()
 {
     return{
-        title_en:"",
-        title_hu:"",
-        title_rs:"",
-        content_rs:"",
-        content_hu:"",
-        content_en:"",
-        srb_flag:true,
-        hun_flag:true,
-        en_flag:false,
-        visible:false,
+        worker_name_hu:"",
+        worker_name_rs:"",
+        contact:"",
+        
         default_img_link:"",
         file_link:null,
         img:""
@@ -111,29 +95,24 @@ methods:{
             let mode="";
            
             
-            let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
+            let k= await database.listDocuments(config.website_db, config.workers,[Query.equal("$id",this.$route.params.id)]);
             
                 
-                    this.title_rs=k.documents[0].title_rs;
-                    this.content_rs=k.documents[0].text_rs;
+                    this.worker_name_hu=k.documents[0].worker_name_hu;
+                    this.worker_name_rs=k.documents[0].worker_name_rs;
                 
-                    this.title_hu=k.documents[0].title_hu;
-                    this.content_hu=k.documents[0].text_hu;
-                    //this.$router.push("/home");
-                    
-                
-                    this.title_en=k.documents[0].title_en;
-                    this.content_en=k.documents[0].text_en;
+                    this.contact=k.documents[0].contact;
+                  
 
-                    this.visible=k.documents[0].visible;
+                    //this.visible=k.documents[0].visible;
 
 
-                    if(k.documents[0].default_image==null||k.documents[0].default_image=='')
+                    if(k.documents[0].worker_img==null||k.documents[0].worker_img=='')
                     {
-                        this.img="https://dummyimage.com/720x400";
+                        this.img=storage.getFileView(config.website_images,config.missing_worker_picture).href;
                     }
                     else
-                    this.img=storage.getFileView(config.website_images,k.documents[0].default_image).toString();
+                    this.img=storage.getFileView(config.website_images,k.documents[0].worker_img).toString();
                 
 
                
@@ -185,25 +164,18 @@ methods:{
     {   
         const database = new Databases(appw);
         //const storage = new Storage(appw);
-        let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);  
+        let k= await database.listDocuments(config.website_db, config.workers,[Query.equal("$id",this.$route.params.id)]);  
 
         
         const result = await database.updateDocument(
         config.website_db, // databaseId
-        config.about_us_db, // collectionId
+        config.workers, // collectionId
         this.$route.params.id, // documentId
         {
-            "title_rs":this.title_rs,
-            "title_hu":this.title_hu,
-            "title_en":this.title_en,
-            "text_en":this.content_en,
-            "text_hu":this.content_hu,
-            "text_rs":this.content_rs,
-            "isHungarian":this.hun_flag,
-            "isSerbian":this.srb_flag,
-            "isEnglish":this.en_flag,
-            "visible":this.visible,
-            "default_image":this.default_image
+            "worker_name_hu":this.worker_name_hu,
+            "worker_name_rs":this.worker_name_rs,
+            "worker_img":this.worker_img,
+            "contact":this.contact
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)
@@ -216,9 +188,9 @@ methods:{
     {
         const database = new Databases(appw);
         //const storage = new Storage(appw);
-        let k= await database.deleteDocument(config.website_db, config.about_us_db,this.$route.params.id);  
+        let k= await database.deleteDocument(config.website_db, config.workers,this.$route.params.id);  
         this.$notify(this.$t('deleted'));
-        this.router.push("/home");
+        this.router.push("/about/workers");
     },
     async file_upload()
     {

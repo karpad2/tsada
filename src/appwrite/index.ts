@@ -1,6 +1,7 @@
 import { Client,Account } from 'appwrite';
 import config from './config.json';
 const appw = new Client();
+import {useLoadingStore} from "@/stores/loading";
 if(true)
 {
 appw
@@ -14,6 +15,10 @@ else
     .setProject('653bb473ee7f6a6074e7');
 }
 const user=new Account(appw);
+function check()
+{
+
+const loading=useLoadingStore();
 let loggedIn=false;
 //console.log(user.get());
 const promise = user.get();
@@ -23,16 +28,14 @@ promise.then(function (response) {
         console.log(response); // Success
         if(response.status==true){
            accountloaded=response; 
-            loggedIn= true;
+            loading.setUserLoggedin(true);
         }
         else
         loggedIn= false;
     }, function (error) {
         console.log(error); // Failure
-        loggedIn=false;
+        loading.setUserLoggedin(false);
     });
-
-function checkUser(){
-    return loggedIn;
 }
-export {appw,config,user,checkUser};
+
+export {appw,config,user,check};

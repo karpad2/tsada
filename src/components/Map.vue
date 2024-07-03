@@ -17,7 +17,7 @@
                         </l-popup>
                     </l-marker> <!-- Add this line -->
                 </l-map>
-                <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
+                <div class="bg-slate-100/80 hover:bg-slate-100 relative flex flex-wrap py-6 rounded shadow-md">
                     <div class="lg:w-1/2 px-6">
                         <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('address') }}</h2>
                         <p class="mt-1">{{ contact.address }}, {{ contact.city }} {{ contact.country }}</p>

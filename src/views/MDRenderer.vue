@@ -1,16 +1,17 @@
 <template>
 
 <section class="text-gray-600 ">
-    <div  class="container  px-5 py-20 mx-auto backdrop-filter bg-opacity-50 bg-gray-100  backdrop-blur-lg">
+    <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" style="min-height: 70vh;">
             <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900">{{ title }}</h1>
+                    <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="newsmode" class="mb-8 leading-relaxed">
                     {{ $t("date") }}:{{ date }}
                     {{ $t("author") }}:{{ author }}
                 </p>
+                
             </div>
             <video-background v-else :src="video_link" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
             overlay="linear-gradient(45deg,#2a4ae430,#0EA5E950)"  >
@@ -18,41 +19,31 @@
                     <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <p v-if="newsmode" class="mb-8 leading-relaxed">
+                <p v-if="newsmode" class="mb-8 leading-relaxed dark:text-slate-400">
                     {{ $t("date") }}:{{ date }}
                     {{ $t("author") }}:{{ author }}
                 </p>
             </video-background>
-<div class="w-3/4 pb-2">
-<vue-markdown-it :source="chtml1" preset="commonmark" />
-</div>
-<div class="w-3/4 pb-2">
-    <swiper v-if="loaded"  class="object-cover object-center rounded"       
-                    :slidesPerView="img_cnt"
-                    :spaceBetween="30"
-                    :modules="modules">
-                    <swiper-slide  v-for="photo in gallery">
-                        <div  class="bg-white rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
-                            <img class="object-scale-down  h-48 w-32" :src="photo.img" />
-                        </div>
-                    </swiper-slide>
-    </swiper>
+
+            <p v-if="admin">
+                    <VBtn  @click="editmode">{{ $t("edit") }}</VBtn>
+            </p>
+
+<div class="w-3/4 pb-2" >
+    
 </div>
 
-<div class="w-3/4 pb-2">
-    <vue-markdown-it :source="chtml2" preset="commonmark" />
+<div class="w-3/4 pb-2 dark:text-white" v-html="chtml">
 </div>
 
-<div class="w-3/4 pb-2">
-    <vue-markdown-it :source="chtml3" preset="commonmark" />
-</div>
+
 </div>
 </section>
 </template>
-<script>
+<script lang="ts">
 
 import {Client,Databases,ID,Storage,Query } from "appwrite";
-
+import {useLoadingStore} from "@/stores/loading";
 import {appw,config} from "@/appwrite";
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -61,19 +52,17 @@ import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { EffectFade, Navigation, Pagination } from 'swiper/modules';
 import {convertifserbian} from "@/lang";
-import { VueMarkdownIt } from '@f3ve/vue-markdown-it';
+import moment from "moment";
 
 
 export default {
     components: {
-        Swiper,SwiperSlide,VueMarkdownIt
+        Swiper,SwiperSlide
     },
     data() {
         return {
             
-            chtml1:'',
-            chtml2:'',
-            chtml3:'',
+            chtml:'',
             gallery:[],
             title:'',
             img_cnt:3,
@@ -84,11 +73,14 @@ export default {
             video_id:"",
             video_link:"",
             edumode:false,
+            admin:false
         }
     },
     mounted()
     {
         this.getMD();
+        const cc=useLoadingStore();
+        this.admin=cc.userLoggedin;
     },
     methods:{
         async getMD()
@@ -96,12 +88,10 @@ export default {
             
             const database = new Databases(appw);
             const storage = new Storage(appw);
-    
-            let lang=localStorage.getItem("lang");
-            
+            const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
-            
+            /*
             switch(this.$route.params.mode)
             {
                 case "about":
@@ -114,58 +104,68 @@ export default {
                     mode=config.about_us_db;
                  break;
                 case "news":
-                    mode=config.news_db; break;
+                    mode=config.about_us_db; break;
                 
-            }
+            }*/
             
-            let k= await database.listDocuments(config.website_db, mode,[Query.equal("$id",this.$route.params.id)]);
-            if(lang!=k.documents[0].lang)
-            {
-                if(lang=="sr"&&k.documents[0].lang=="rs")
+            let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
+            
+                if(cc.language=="sr"||cc.language=="rs")
                 {
-
+                    this.title=convertifserbian(k.documents[0].title_rs);
+                    this.chtml=k.documents[0].text_rs;
                 }
-                else 
+                else if(cc.language=="hu")
                 {
-                    this.$router.push("/home");
+                    this.title=k.documents[0].title_hu;
+                    this.chtml=k.documents[0].text_hu;
+                    //this.$router.push("/home");
                     
                 }
+                else if(cc.language=="en")
+                {
+                    this.title=k.documents[0].title_en;
+                    this.chtml=k.documents[0].text_en;
+                }
+
+                else 
+            {
+                console.warn("reading error");
             }
-            if(this.$route.params.node=="news")
+           /* if(this.chtml=="---")
+            {
+                this.$router.push("/home");
+            }*/
+
+            /*if(this.$route.params.node=="news")
             {
                 this.newsmode=true;
                 if(k.documents[0].author!="")
                 this.author= convertifserbian(k.documents[0].author);
-                this.date= moment(k.documents[0].$createdAt).locale(lang).format('LL');
+                this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
             }
 
             if(this.$route.params.node=="education")
             {
                 this.edumode=true;
-                
-            }
+            }*/
 
-
+            //this.title=convertifserbian(k.documents[0].title);
             let gal=k.documents[0].gallery;
             console.log(k.documents[0].gallery);
-            let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
+            /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
-            this.title=convertifserbian(k.documents[0].title);
+            
             console.log(m);
             m.documents.forEach(element=>
             {
                 let af={img:""};
-                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id)
+                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id).toString();
                 this.gallery.push(af);
                 this.image_cnt++;
             });
-            console.log(k.documents[0]);
-            if(k.documents[0].part1!=""&&k.documents[0].part1!=null)
-            this.chtml1 = convertifserbian(k.documents[0].part1);
-            if(k.documents[0].part2!=""&&k.documents[0].part2!=null)
-            this.chtml2 = convertifserbian(k.documents[0].part2);
-            if(k.documents[0].part3!=""&&k.documents[0].part3!=null)
-            this.chtml3 = convertifserbian(k.documents[0].part3);
+            //console.log(k.documents[0]);
+            */
 
             this.video_id=k.documents[0].video;
             let v2="659d5e6949ae7294f9f1";
@@ -174,6 +174,10 @@ export default {
             console.log(this.video_link);
             this.video_link=config.default_video;
             this.loaded=true;
+        },
+        editmode()
+        {
+            this.$router.push("/admin/edit/"+this.$route.params.mode+"/"+this.$route.params.id);   
         }   
     }
 }   

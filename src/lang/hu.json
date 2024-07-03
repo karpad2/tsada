@@ -26,7 +26,20 @@
      "upload_date":"Feltöltés dátuma",
      "file_download":"Fájl letöltése",
      "education":"Oktatás",
-     "documents":"Dokumentumok"
+     "documents":"Dokumentumok",
+     "logout":"Kijelentkezés",
+     "sponsors":"Támogatók",
+     "education_profiles":"Oktatási profilok",
+     "reports":"Jelentések",
+     "Erasmus":"Erasmus",
+     "msc":"MSC",
+     "password":"Jelszó",
+     "accept":"Rendben",
+     "cookie-text":"Az weboldal sütiket (cookie-kat) használ.",
+     "invisible":"Nem látható",
+     "add_new_content":"Új tartalom hozzáadása",
+     "messages":"Üzenetek"
+     
      
      
  }

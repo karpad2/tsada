@@ -3,14 +3,17 @@ import './assets/main.css'
 import { createApp  } from 'vue'
 
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+
 import App from './App.vue'
 import router from './router'
 //import Particles from "vue3-particles";
 
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 import 'primeicons/primeicons.css'; //icons
-
-
+import VueCookieComply from '@ipaat/vue3-tailwind3-cookie-comply'
 import LImage from "@/components/LImage.vue";
 import { createI18n } from 'vue-i18n'
 import {messages} from '@/lang';
@@ -24,24 +27,26 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-
+import CountryFlag from 'vue-country-flag-next'
 
 const app = createApp(App)
 //const client = new Client();
-app.use(createPinia());
+const pinia =createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
 app.use(router);
 
 const vuetify = createVuetify({
     components,
     directives,
   })
-
+app.component('QuillEditor', QuillEditor)
 
 //console.log(messages);
 
 
 const i18n = createI18n({
-    locale: 'en', fallbackLocale: 'en',  messages  });
+    locale: 'en', fallbackLocale: 'en',  messages, globalInjection: true  });
 /*
 client
     .setEndpoint('https://appwrite.kasoft.co.uk/v1')
@@ -49,12 +54,13 @@ client
 //app.use(VueI18n);
 app.use(Notifications);
 app.use(vuetify);
-vuetify.theme.name.primary = '#0EA5E9';
+app.component('country-flag', CountryFlag)
+vuetify.theme.name.primary = "#0EA5E9";
 app.component('video-background', VideoBackground);
 app.config.globalProperties.$appwrite = appw;
 app.use(Particles,{init:async engine => {await loadFull(engine)}});
-
 app.use(i18n);
+app.component('VueCookieComply', VueCookieComply)
 
 app.use(router);
 app.mount('#app');

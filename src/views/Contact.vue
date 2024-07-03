@@ -3,9 +3,9 @@
      <section class="text-gray-600 body-font relative">
         <div class="container px-5 py-24 mx-auto flex sm:flex-nowrap flex-wrap">
             <div
-                class="lg:w-2/3 md:w-1/2 bg-gray-300 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative">
+                class="lg:w-2/3  bg-gray-300 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative">
                 <!-- leaflet-->
-                <l-map class="sm:hidden md:block absolute inset-0 h-250"  ref="map" style="filter: grayscale(1) contrast(1.5) opacity(0.4); min-height:250px; min-width: 300px;"  :use-global-leaflet="false" v-model:zoom="zoom" :center="[45.790699127440185, 20.12923110967009]">
+                <l-map class="sm:hidden md:block absolute inset-0 h-250"  ref="map" style="filter: grayscale(0.3) contrast(1.5) opacity(0.4); min-height:250px; min-width: 300px;"  :use-global-leaflet="false" v-model:zoom="zoom" :center="[45.790699127440185, 20.12923110967009]">
                     <l-tile-layer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         layer-type="base"
@@ -17,7 +17,7 @@
                         </l-popup>
                     </l-marker> <!-- Add this line -->
                 </l-map>
-                <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
+                <div class="bg-slate-100 dark:bg-slate-300/30 relative flex flex-wrap py-6 rounded shadow-md">
                     <div class="lg:w-1/2 px-6">
                         <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('address') }}</h2>
                         <p class="mt-1">{{ contact.address }}, {{ contact.city }} {{ contact.country }}</p>

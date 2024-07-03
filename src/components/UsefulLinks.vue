@@ -3,24 +3,21 @@
         <div class="container px-5 py-20 mx-auto">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ $t('usefullinks') }}</h1>
-                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ $t('usefullinks') }}</h1>
+                    <div class="h-1 w-20 bg-sky-500/100 rounded dark:bg-sky-400"></div>
                 </div>
             
             </div>
             <div class="w-full ">
                 <swiper
-                    
-                    class="object-cover object-center rounded"
-                    
-                    
+                    class="object-cover object-center rounded flex flex-wrap"
                     :slidesPerView="6"
                     :spaceBetween="30"
                     
                     :modules="modules"
                 >
                     <swiper-slide  v-for="link in links">
-                        <div  @click="goto(link.link)" class="bg-white rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
+                        <div  @click="goto(link.link)" class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
                             <img class="object-scale-down  h-48 w-32" :src="link.img" />
                         </div>
                     </swiper-slide>

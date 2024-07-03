@@ -3,18 +3,18 @@
         <div class="container px-5 py-24 mx-auto">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{{ $t('news') }}</h1>
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ $t('news') }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
             
             </div>
             <div class="flex flex-wrap -m-4">
                 <div v-for="course in courses" class="xl:w-1/4 md:w-1/2 p-4">
-                    <div  class="bg-gray-100 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700">
+                    <div  class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
                         <img class="h-40 rounded w-full object-cover object-center mb-6"
                             :src="course.img" alt="content">
                         <h3 class="tracking-widest text-sky-500 text-s font-medium title-font">{{ course.subtitle }}</h3>
-                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4">{{ course.title }}</h2>
+                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ course.title }}</h2>
                         <p class="leading-relaxed text-base" :v-html="course.text"></p>
                     </div>
                 </div>
@@ -23,13 +23,13 @@
         </div>
     </section>
 </template>
-<script >
+<script lang="ts">
 
 
 import { Client, Databases, ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian} from "@/lang";
-
+import {useLoadingStore} from "@/stores/loading";
 export default {
     name: 'News',
     components: {
@@ -50,6 +50,7 @@ export default {
     methods:{
         async load_news_base()
         {
+        const cc=useLoadingStore();
         this.courses=[];
         let lang=localStorage.getItem("lang");
             

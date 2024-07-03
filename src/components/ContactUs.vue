@@ -1,6 +1,6 @@
 <template>
     <div class="container px-5 py-24 mx-auto flex flex-wrap">
-        <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
+        <div class="lg:w-1/3 md:w-1/2 bg-slate-100 flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
        
        <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">{{ $t('contactus') }}</h2>
        <p class="leading-relaxed mb-5 text-gray-600">{{ $t('contactustext')  }}</p>

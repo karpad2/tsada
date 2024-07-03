@@ -1,30 +1,25 @@
 <template>
     <div class="relative mb-4 container  px-5  mx-auto bg-white" >
         <div>
-            <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
+            
             <v-btn @click="save" class="m-5">{{ $t('save') }}</v-btn>
             <v-btn @click="delete_content">{{ $t('delete') }}</v-btn>
         </div>
 
         <div>
-            <v-file-input @change="file_upload" v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
-            {{ $t("preview") }}
+            <v-file-input @change="file_upload" v-model="file_link"  accept="document/*" :label="$t('fileupload')"></v-file-input>
+           
 <div class="flex flex-wrap -m-4">
 
 <div  class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
-    <div   class="bg-slate-100/30 hover:bg-sky-600/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-        
-        
-            <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                            :src="img" alt="content">
-        </div>
+    
     </div>
 </div>
 </div>
         <div>
-            <v-switch @change="save" v-model="srb_flag" :label="$t('srb')"></v-switch>
+          
             
-            <div v-if="srb_flag">
+            <div >
             <v-text-field
             @change="save"
             v-model="title_rs"
@@ -35,12 +30,12 @@
           ></v-text-field>
         
 
-            <QuillEditor  @textChange="save" content-type="html"  style="min-height:200px;"  v-model:content="content_rs" toolbar="full" theme="snow" />
+           
         </div>
     </div>
         <div>
-            <v-switch v-model="hun_flag" @change="save" :label="$t('hu')"></v-switch>
-            <div v-if="hun_flag">
+            
+            <div >
             <v-text-field
             v-model="title_hu"
             :counter="100"
@@ -49,12 +44,12 @@
             hide-details
             
           ></v-text-field>
-            <QuillEditor  content-type="html"  @textChange="save" style="min-height:200px;" v-model:content="content_hu" toolbar="full" theme="snow" />
+            
         </div>
     </div>
         <div>
-            <v-switch v-model="en_flag" @change="save" :label="$t('en')"></v-switch>
-            <div v-if="en_flag">
+            
+            <div >
             <v-text-field
             v-model="title_en"
             :counter="100"
@@ -63,7 +58,7 @@
             hide-details
             
           ></v-text-field>
-            <QuillEditor content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
+            
         </div>
     </div>
     </div>
@@ -81,15 +76,9 @@ data()
         title_en:"",
         title_hu:"",
         title_rs:"",
-        content_rs:"",
-        content_hu:"",
-        content_en:"",
-        srb_flag:true,
-        hun_flag:true,
-        en_flag:false,
-        visible:false,
-        default_img_link:"",
+       
         file_link:null,
+        document_id:"",
         img:""
     }
 },
@@ -111,31 +100,19 @@ methods:{
             let mode="";
            
             
-            let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
+            let k= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("$id",this.$route.params.id)]);
             
                 
-                    this.title_rs=k.documents[0].title_rs;
-                    this.content_rs=k.documents[0].text_rs;
+                    this.title_rs=k.documents[0].document_title_rs;
+                    
                 
-                    this.title_hu=k.documents[0].title_hu;
-                    this.content_hu=k.documents[0].text_hu;
+                    this.title_hu=k.documents[0].document_title_hu;
+                    
                     //this.$router.push("/home");
                     
                 
-                    this.title_en=k.documents[0].title_en;
-                    this.content_en=k.documents[0].text_en;
-
-                    this.visible=k.documents[0].visible;
-
-
-                    if(k.documents[0].default_image==null||k.documents[0].default_image=='')
-                    {
-                        this.img="https://dummyimage.com/720x400";
-                    }
-                    else
-                    this.img=storage.getFileView(config.website_images,k.documents[0].default_image).toString();
-                
-
+                    this.title_en=k.documents[0].document_title_en;
+                    this.document_id=k.documents[0].document_id;
                
            /* if(this.chtml=="---")
             {
@@ -185,25 +162,19 @@ methods:{
     {   
         const database = new Databases(appw);
         //const storage = new Storage(appw);
-        let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);  
+        let k= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("$id",this.$route.params.id)]);  
 
         
         const result = await database.updateDocument(
         config.website_db, // databaseId
-        config.about_us_db, // collectionId
+        config.documents_db, // collectionId
         this.$route.params.id, // documentId
         {
-            "title_rs":this.title_rs,
-            "title_hu":this.title_hu,
-            "title_en":this.title_en,
-            "text_en":this.content_en,
-            "text_hu":this.content_hu,
-            "text_rs":this.content_rs,
-            "isHungarian":this.hun_flag,
-            "isSerbian":this.srb_flag,
-            "isEnglish":this.en_flag,
-            "visible":this.visible,
-            "default_image":this.default_image
+            "document_title_rs":this.title_rs,
+            "document_title_hu":this.title_hu,
+            "document_title_en":this.title_en,
+            "document_id":this.document_id
+            
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)
@@ -215,8 +186,10 @@ methods:{
     async delete_content()
     {
         const database = new Databases(appw);
-        //const storage = new Storage(appw);
-        let k= await database.deleteDocument(config.website_db, config.about_us_db,this.$route.params.id);  
+        const storage = new Storage(appw);
+        let n=await storage.deleteFile(config.documents_storage,this.document_id);
+        let k= await database.deleteDocument(config.website_db, config.documents_db,this.$route.params.id);  
+        
         this.$notify(this.$t('deleted'));
         this.router.push("/home");
     },
@@ -227,29 +200,23 @@ methods:{
             console.warn("no file");
             return;
         } 
+        this.$notify(this.$t('file_upload_in_progress'));
     console.log("file_upload");
     //console.log(this.file_link[0]);
 
     const storage = new Storage(appw);
     const result = await storage.createFile(
-    config.website_images, // bucketId
+    config.documents_storage, // bucketId
     ID.unique(), // fileId
     this.file_link[0] // file
     // permissions (optional)
     );
-    this.default_image=result.$id;
+    this.document_id= await result.$id;
     this.save();
-    
     this.getMD();
-
-
     this.$notify(this.$t('file_uploaded'));
 
     }
+}   
 }
-
-    
-}
-
-
 </script>
