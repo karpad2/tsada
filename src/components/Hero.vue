@@ -1,6 +1,6 @@
 <template>
     <!-- Top Hero -->
-    <video-background src="https://raw.githubusercontent.com/karpad2/tsada/main/src/assets/videoplayback.mp4" style="min-height: 200px;" class="flex flex-wrap w-full mb-20">
+    <video-background src="https://raw.githubusercontent.com/karpad2/tsada/main/src/assets/videoplayback.mp4" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
     <section class="text-gray-600 body-font" id="about">
        
         <div class="container mx-auto text-white flex px-5 py-24 md:flex-row flex-col items-center">
