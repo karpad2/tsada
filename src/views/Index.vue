@@ -3,6 +3,7 @@
        
         <Header />
         <vue-particles
+        v-if="animation_flag"
             id="tsparticles"
             :particlesLoaded="particlesLoaded"
             :options="{
@@ -112,6 +113,7 @@ return {
     
     mounted()
     {
+        
        //console.log( app.config.globalProperties.$loading);
 
     
@@ -124,6 +126,10 @@ return {
             //return app.config.globalProperties.loading;
             
            
+        },
+        animation_flag()
+        {
+            return useLoadingStore().animationSetting
         }
     },
     

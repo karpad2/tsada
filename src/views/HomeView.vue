@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed, nextTick } from 'vue'
 import SlideModules from '@/components/SlideModules.vue';
 import Hero from '@/components/Hero.vue';
 import Map from '@/components/Map.vue'
@@ -11,6 +12,8 @@ import { useI18n } from 'vue-i18n';
 //const { t } = useI18n();
 
 //document.title=t("msc");
+
+
 </script>
 
 <template>
@@ -21,7 +24,7 @@ import { useI18n } from 'vue-i18n';
     <SlideModules mode="courses"  />
     <SlideModules mode="news"  />
     <Map />
-    <Sponsors />
-    <UsefulLinks />
+    <Sponsors v-if="flag" />
+    <UsefulLinks v-if="flag"/>
   </main>
 </template>

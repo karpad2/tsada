@@ -157,7 +157,8 @@ methods:{
 
             //this.title=convertifserbian(k.documents[0].title);
             let gal=k.documents[0].gallery;
-            console.log(k.documents[0].gallery);
+            //console.log(k.documents[0].gallery);
+            
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             

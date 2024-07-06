@@ -11,13 +11,15 @@
             <div class="w-full ">
                 <swiper
                     class="object-cover object-center rounded flex flex-wrap"
-                    :slidesPerView="6"
+                    :slidesPerView="aaa()"
                     :spaceBetween="30"
-                    
+                    :autoplay="true"
+                    :loop="true"
+                    :pagination="{ clickable: true }"
                     :modules="modules"
                 >
                     <swiper-slide  v-for="link in links">
-                        <div  @click="goto(link.link)" class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
+                        <div  @click="goto(link.link)" style="min-width: 100px; max-width: 200px;" class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
                             <img class="object-scale-down  h-48 w-32" :src="link.img" />
                         </div>
                     </swiper-slide>
@@ -41,6 +43,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { EffectFade, Navigation, Pagination } from 'swiper/modules';
+import { DisplayP3ColorSpace } from "three";
 
 export default {
     name: 'UsefulLinks',
@@ -90,7 +93,27 @@ export default {
         goto(link)
         {
             window.open(link, '_blank');
+        },
+        aaa()
+        {
+            let l= window.innerWidth;
+            let k=0;
+            //console.log(l);
+            if(l<=480)
+            k=2;
+            else if(l<=768)
+            k=3;
+            else if(l<=1024)
+            k=4;
+            else 
+            k=5
+            
+            return k;
         }
+       
+    },
+    computed:{
+        
     }
     
 }

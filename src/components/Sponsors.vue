@@ -1,23 +1,26 @@
 <template>
 <section class="text-gray-600 body-font" id="usefullinks">
         <div class="container px-5 py-20 mx-auto">
-            <div class="flex flex-wrap w-full mb-20">
+            <div class="w-full mb-20">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
                     <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('sponsors') }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
             
             </div>
-            <div class="w-full ">
+            <div class=" w-full ">
                 <swiper
                     
-                    class="object-cover object-center rounded"
-                    :slidesPerView="5"
+                    class=""
+                    :slidesPerView="aaa()"
                     :spaceBetween="30"
+                    :autoplay="true"
+                    :loop="true"
+                    :pagination="{ clickable: true }"
                     :modules="modules"
                 >
-                    <swiper-slide  v-for="link in links">
-                        <div  @click="goto(link.link)" class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
+                    <swiper-slide class="" v-for="link in links">
+                        <div  @click="goto(link.link)" style="min-width: 100px; max-width: 200px;"  class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] cursor-pointer">
                             <img class="object-scale-down  h-48 w-32" :src="link.img" />
                         </div>
                     </swiper-slide>
@@ -50,8 +53,11 @@ export default {
     mounted()
     {
         this.load_links_base();
+        //this.l=aaa();
+       
     },
     data: () => ({
+        l:3,
         links: [
             {
                 img: 'https://dummyimage.com/720x400',
@@ -88,6 +94,22 @@ export default {
         goto(link)
         {
             window.open(link, '_blank');
+        },
+        aaa()
+        {
+            let l= window.innerWidth;
+            let k=0;
+            //console.log(l);
+            if(l<=480)
+            k=2;
+            else if(l<=768)
+            k=3;
+            else if(l<=1024)
+            k=4;
+            else 
+            k=5
+            
+            return k;
         }
     }
     

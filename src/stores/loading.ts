@@ -7,7 +7,9 @@ export const useLoadingStore = defineStore('loading', () => {
     const isLoading = ref(false);
     const isErasmus = ref(false);
     const userLoggedin=ref(false);
+    const animationSetting=ref(true);
     const language=ref("sr");
+    const uid=ref("");
     let notif=ref([]);
     const doubleCount = computed(() => count.value * 2)
     function increment() {
@@ -25,12 +27,21 @@ export const useLoadingStore = defineStore('loading', () => {
     {
       this.userLoggedin=v;
     }
+    function setAnimation(v)
+    {
+      this.animationSetting=v;
+    }
     function setLanguage(v:string)
     {
       this.language=v;
     }
-  
-    return { count,isLoading,language,setLoading,setErasmus,setUserLoggedin,setLanguage,userLoggedin,notif,isErasmus, doubleCount, increment }
+    function setuid(v:string)
+    {
+      this.uid=v;
+    }
+
+
+    return { count,isLoading,language,setLoading,setErasmus,setUserLoggedin,setLanguage,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment }
   },
 {persist:true})
 

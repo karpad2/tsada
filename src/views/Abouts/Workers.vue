@@ -138,11 +138,11 @@ export default {
         let el1=k.documents[i];
       //   k.documents.forEach(async (el1) => {
             let _works=[];
-            console.log(el1);
+            //console.log(el1);
             let l= await database.listDocuments(config.website_db, config.workers,[
                 Query.equal("roles",[el1.$id])
         ]);
-        console.log(l);
+        //console.log(l);
             let name="";
             if(local=="en")
             {

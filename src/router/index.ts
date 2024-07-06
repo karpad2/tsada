@@ -59,7 +59,7 @@ const router = createRouter({
     },
     {
       path:'/admin/document/:id',
-      name:'worker_editor',
+      name:'document_editor',
       component: () => import('../views/admin/editor/DocumentEditor.vue')      
     },
     {

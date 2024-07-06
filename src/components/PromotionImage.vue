@@ -29,7 +29,7 @@ methods:{
         const database= new Databases(appw);
         const storage = new Storage(appw);
         const res= await database.getDocument(config.website_db,config.general_settings,"668533c5a2c3747d18f6");
-        console.log(res);
+        //console.log(res);
 
         this.img=storage.getFileView(config.website_images,res.setting_data).href;
     }
