@@ -53,6 +53,7 @@ export default {
     },
     mounted()
     {
+        
         const cc=useLoadingStore();
         this.load_courses_base();
         this.admin=cc.userLoggedin;
@@ -117,7 +118,7 @@ export default {
                 //a.text=convertifserbian(element.course_rs_detail);
             }
         
-        
+        document.title=this.title;
         let l= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",this.$route.params.id)]);
          
         l.documents.forEach(async element => {

@@ -7,15 +7,15 @@
             <div
                 class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center"
             >
-                <h1 id="hero-heading-text" class="title-font sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
+                <h1 id="hero-heading-text" class="title-font py-8 sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
                     {{ $t('cometous') }}
                     <br class="hidden lg:inline-block" />
                 </h1>
-                <p class="mb-8 leading-relaxed items-center">
+                <p v-if="false" class="mb-8 leading-relaxed items-center">
                 {{ $t('whycomehere') }} 
                 <span class="font-medium text-sky-400">{{ $t("msc") }}</span>.
                 </p>
-                <div class="flex justify-center">
+                <div v-if="false" class="flex justify-center">
                     
                     <button  v-if="false" class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
                         

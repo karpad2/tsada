@@ -49,6 +49,7 @@ export default {
     },
     mounted()
     {
+        document.title=this.$t("gallery");
         const cc=useLoadingStore();
         this.load_courses_base();
         this.admin=cc.userLoggedin;

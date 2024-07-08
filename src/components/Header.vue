@@ -4,7 +4,7 @@
             
                 <div class="flex items-center">
 
-              <div class="md:hidden flex items-start text-xl">
+              <div v-if="mobile_view" class="flex items-start text-xl">
                 <button  @click="menuopener" class="btn btn-ghost mobile-menu-button m-3">
                 <i v-if="!menu_opened" class="pi pi-align-left"></i>
                 <i v-else class="pi pi-times"></i>
@@ -158,7 +158,7 @@
       methods:{
         onResize()
         {
-          this.mobile_view=window.innerWidth<=768;
+          this.mobile_view=window.innerWidth<=1024;
         },
         menuopener()
         {

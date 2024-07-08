@@ -64,7 +64,11 @@ app.component('video-background', VideoBackground);
 app.config.globalProperties.$appwrite = appw;
 app.use(Particles,{init:async engine => {await loadFull(engine)}});
 app.use(i18n);
-app.use(VueViewer);
+app.use(VueViewer, {
+    defaultOptions: {
+      zIndex: 9999
+    }
+  });
 app.component('VueCookieComply', VueCookieComply)
 //app.use(gsap);
 app.use(router);
