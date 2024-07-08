@@ -87,7 +87,22 @@ export default {
         l.documents.forEach(element => {
             let a={link:"",img:""};
             a.link=element.sponsor_url;
-            a.img=storage.getFileView(config.website_images,element.sponsor_img);
+            a.img=storage.getFilePreview(
+                config.website_images,           // bucket ID
+                element.sponsor_img,       // file ID
+                200,               // width, will be resized using this value.
+                0,                  // height, ignored when 0
+                'center',           // crop center
+                90,               // slight compression
+                0,                  // border width
+                'FFFFFF',           // border color
+                0,                 // border radius
+                1,                  // full opacity
+                0,                  // no rotation
+                'FFFFFF',           // background color
+                'webp'               // output webp format
+                ).href;
+           // =storage.getFileView(config.website_images,element.sponsor_img);
             this.links.push(a);
         });
         },

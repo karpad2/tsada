@@ -139,7 +139,9 @@ export default {
         },
         async set_user_setting()
         {
+          
           const cc=useLoadingStore();
+          cc.setAnimation(this.animation_backgound);
           const database = new Databases(appw);
           let n= await database.listDocuments(config.website_db, config.users_settings,[Query.equal("uid",cc.uid),Query.equal("setting","animation"),Query.select(["$id"])]);
           let k= await database.updateDocument(config.website_db,config.users_settings,n.documents[0].$id,
@@ -147,7 +149,7 @@ export default {
               "value":this.animation_backgound
             }
           );
-          cc.setAnimation(this.animation_backgound);
+          
         },
         login_by_app()
         {

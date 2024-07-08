@@ -1,5 +1,5 @@
 <template>
-  <header v-if="reload" style="z-index: 200;"  class="navbar text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
+  <header v-if="reload" :class="{mobile_force:style_computed_for_mobile}" style="z-index: 200;"  class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
           <div class="container mx-auto flex flex-wrap p-4 flex-col md:flex-row items-center ">
             
                 <div class="flex items-center">
@@ -56,8 +56,6 @@
                   <div v-if="mobile_view" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">
                     <button v-for="lang in languages" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
                   </div>
-  
-                  
   
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
@@ -360,6 +358,11 @@
 
           },
 
+          style_computed_for_mobile()
+          {
+            return this.mobile_view&&!this.mobile_mode;
+          },
+
           
       
           isLoggedin()
@@ -372,3 +375,8 @@
     
   }
   </script>
+  <style>
+.mobile_force{
+    max-height: 80px;
+}
+</style>

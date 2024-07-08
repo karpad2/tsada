@@ -84,7 +84,22 @@ export default {
         l.documents.forEach(element => {
             let a={link:"",img:""};
             a.link=element.link;
-            a.img=storage.getFileView(config.website_images,element.logo);
+            a.img=storage.getFilePreview(
+                config.website_images,           // bucket ID
+                element.logo,       // file ID
+                200,               // width, will be resized using this value.
+                0,                  // height, ignored when 0
+                'center',           // crop center
+                90,               // slight compression
+                0,                  // border width
+                'FFFFFF',           // border color
+                0,                 // border radius
+                1,                  // full opacity
+                0,                  // no rotation
+                'FFFFFF',           // background color
+                'webp'               // output webp format
+                ).href;
+            //a.img=storage.getFileView(config.website_images,element.logo);
             //a.img=storage.getFilePreview(config.website_images,element.logo,output="webp")
                
             this.links.push(a);

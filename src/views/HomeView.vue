@@ -37,7 +37,7 @@ export default{
     <SlideModules mode="courses"  />
     <SlideModules mode="news"  />
     <Map />
-    <Sponsors v-if="flag" />
-    <UsefulLinks v-if="flag"/>
+    <Sponsors  />
+    <UsefulLinks />
   </main>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <!-- Top Hero -->
-    <video-background src="https://raw.githubusercontent.com/karpad2/tsada/main/src/assets/videoplayback.mp4" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
+    <video-background :src="integrated_video" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
     <section class="text-gray-600 body-font" id="about">
        
         <div class="container mx-auto text-white flex px-5 py-5 md:flex-row flex-col items-center">
@@ -55,6 +55,7 @@ import { Client, Databases, ID,Storage } from "appwrite";
 import {appw,config} from "@/appwrite";
 import { VaButton } from 'vuestic-ui/web-components';
 import gsap from "gsap";
+import video from "@a/videoplayback.webm"
 
 
 
@@ -92,6 +93,7 @@ export default {
         swiper: null,
         images:[],
         modules:[EffectFade, Navigation, Pagination],
+        integrated_video:video,
         options: {
             mouseControls: true,
             touchControls: true,
