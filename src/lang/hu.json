@@ -74,9 +74,11 @@
      "timetable":"Órarend",
      "morning":"Délelőtt",
      "afternoon":"Délután",
-     "srb_short":"",
+     "srb_short":"Szerb rövid leírás",
     "hun_short":"Magyar rövid leírás",
-    "eng_short":"Angol rövid leírás"
+    "eng_short":"Angol rövid leírás",
+    "set_as_default":"Fő galléria kép kiválasztása",
+    "default_picture":"Fő galléria kép"
      
      
      

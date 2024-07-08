@@ -74,5 +74,7 @@
      "afternoon":"Afternoon",
      "srb_short": "Short description in Serbian",
     "hun_short": "Short description in Hungarian",
-    "eng_short": "Short description in English"
+    "eng_short": "Short description in English",
+    "set_as_default": "Select as main gallery image",
+    "default_picture":"Main gallery image"
 }

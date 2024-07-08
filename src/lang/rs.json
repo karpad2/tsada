@@ -73,7 +73,10 @@
     "morning":"Prepodne",
     "afternoon":"Poslepodne",
     "srb_short": "Kratak opis na srpskom",
-    "hun_short": "Kratak opis na mađarskom",
-    "eng_short": "Kratak opis na engleskom"
+    "hu_short": "Kratak opis na mađarskom",
+    "en_short": "Kratak opis na engleskom",
+    "set_as_default": "Izaberi kao glavnu galerijsku sliku",
+    "default_picture":"Glavnu galerijsku sliku"
+    
 
 }

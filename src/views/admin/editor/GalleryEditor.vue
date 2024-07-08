@@ -9,8 +9,8 @@
         <div>
         <v-file-input @change="file_upload" multiple v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
                     {{ $t("preview") }}
-                    <div class="flex flex-row w-3/4 grid-cols-3">
-        <div v-for="image in images" class="card card-compact bg-base-100 w-96 shadow-xl m-5" style="max-width: 250px;">
+                    <div class=" w-full grid sm:grid-cols-3">
+        <div v-for="image in images" class="card card-compact bg-base-100 w-96 shadow-xl m-5 flex" style="max-width: 400px;">
         <figure>
             <img
             :src="image.img"
@@ -22,8 +22,8 @@
             </p>
 
             <div class="card-actions justify-end">
-                <button v-if="default_image!=image.img_id" v-on:click="set_as_default(image.img_id)" class="btn btn-primary">{{$t("set_as_default")}}</button>
-            <button v-on:click="delete_picture(image.img_id)" class="btn btn-warning">{{$t("delete")}}</button>
+                <v-btn v-if="default_image!=image.img_id" v-on:click="set_as_default(image.img_id)" >{{$t("set_as_default")}}</v-btn>
+                <v-btn v-on:click="delete_picture(image.img_id)">{{$t("delete")}}</v-btn>
             </div>
         </div>
         </div>
@@ -170,7 +170,7 @@ methods:{
                         a.img= storage.getFilePreview(
                         config.gallery_pictures_storage,           // bucket ID
                         element.image_id,       // file ID
-                        700,               // width, will be resized using this value.
+                        300,               // width, will be resized using this value.
                         0,                  // height, ignored when 0
                         'center',           // crop center
                         90,               // slight compression
