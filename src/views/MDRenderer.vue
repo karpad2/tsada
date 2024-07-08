@@ -4,7 +4,7 @@
     <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" style="min-height: 70vh;">
             <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
+                    <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="newsmode" class="mb-8 leading-relaxed">
@@ -53,7 +53,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { EffectFade, Navigation, Pagination } from 'swiper/modules';
 import {convertifserbian} from "@/lang";
 import moment from "moment";
-
+import gsap from "gsap";
 
 export default {
     components: {
@@ -81,6 +81,20 @@ export default {
         this.getMD();
         const cc=useLoadingStore();
         this.admin=cc.userLoggedin;
+
+        gsap.fromTo(
+    "#render_title",
+    {
+      opacity: 0,
+      x: "150%",
+    },
+    {
+      duration: 1.5,
+      opacity: 1,
+      x: 0,
+    }
+  );
+        
     },
     methods:{
         async getMD()
@@ -114,11 +128,14 @@ export default {
                 {
                     this.title=convertifserbian(k.documents[0].title_rs);
                     this.chtml=k.documents[0].text_rs;
+                    document.title=convertifserbian(k.documents[0].title_rs);
+                    
                 }
                 else if(cc.language=="hu")
                 {
                     this.title=k.documents[0].title_hu;
                     this.chtml=k.documents[0].text_hu;
+                    document.title=k.documents[0].title_hu;
                     //this.$router.push("/home");
                     
                 }
@@ -126,6 +143,7 @@ export default {
                 {
                     this.title=k.documents[0].title_en;
                     this.chtml=k.documents[0].text_en;
+                    document.title=k.documents[0].title_en;
                 }
 
                 else 

@@ -18,7 +18,7 @@ export default {
   <Index>
     
     <notifications position="top right"/> 
-    <RouterView  />
+    <RouterView  :key="$route.path" />
   
   </Index>
 

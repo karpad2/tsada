@@ -13,12 +13,6 @@ for (let key in rs) {
         sr[key] = convertWordToCyrillic(rs[key]);
     }
 }
-//console.log(sr);
-
-/*
-rs.forEach(element => {
-    sr.push(convertWordToCyrillic(element));
-});*/
 
 function convertifserbian(word)
 {

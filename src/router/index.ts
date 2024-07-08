@@ -32,6 +32,14 @@ const router = createRouter({
       component: () => import('../views/Abouts/Workers.vue')
     },
     {
+      path: '/about/timetable',
+      name: 'timetable',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Abouts/Timetable.vue')
+    },
+    {
       path:'/document/:id',
       name:'document',
       component: () => import('../views/documents/DocViewer.vue')      
@@ -63,6 +71,11 @@ const router = createRouter({
       component: () => import('../views/admin/editor/DocumentEditor.vue')      
     },
     {
+      path:'/admin/gallery-edit/:id',
+      name:'gallery_editor',
+      component: () => import('../views/admin/editor/GalleryEditor.vue')      
+    },
+    {
       path:'/admin/messages',
       name:'messages',
       component: () => import('../views/admin/messages/Messages.vue')      
@@ -80,7 +93,7 @@ const router = createRouter({
     {
       path:'/gallery',
       name:'gallery',
-      component: () => import('../views/Gallery.vue')      
+      component: () => import('../views/Abouts/Gallery.vue')      
     },
     {
       path:'/login',

@@ -17,7 +17,7 @@
         </template>
     
       <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.id"><i class="pi pi-book text-5xl"></i></router-link>
+        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
        
       </template>
 
@@ -58,6 +58,7 @@
         mounted()
         {
             const loadingStore = useLoadingStore();
+            
             this.admin=loadingStore.userLoggedin;
             //loadingStore.setLoading(true);
             
@@ -115,7 +116,7 @@
                 
                 let n= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("documentCategories",this.$route.params.category),Query.orderDesc("$createdAt")]);
                 await n.documents.forEach(async el2 => {
-                    let a={name:"",date:"",id:""};
+                    let a={name:"",date:"",id:"",doc_id:""};
 
                     if(local=="rs"||local=="sr")
                     {
@@ -133,6 +134,7 @@
 
                     }
                         a.id=el2.$id;
+                        a.doc_id=el2.document_id;
                         a.date=el2.$createdAt;
                         //a.name=el2.name;
                         //a.email=el2.email;

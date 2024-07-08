@@ -7,7 +7,7 @@
             <div
                 class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center"
             >
-                <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
+                <h1 id="hero-heading-text" class="title-font sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
                     {{ $t('cometous') }}
                     <br class="hidden lg:inline-block" />
                 </h1>
@@ -54,7 +54,7 @@ import 'swiper/css/pagination';
 import { Client, Databases, ID,Storage } from "appwrite";
 import {appw,config} from "@/appwrite";
 import { VaButton } from 'vuestic-ui/web-components';
-
+import gsap from "gsap";
 
 
 
@@ -74,6 +74,19 @@ export default {
     mounted() {
         
        this.load_mp_images_from_base();
+
+    gsap.fromTo(
+    "#hero-heading-text",
+    {
+      opacity: 0,
+      x: "-100%",
+    },
+    {
+      duration: 1.5,
+      opacity: 1,
+      x: 0,
+    }
+  );
     },
     data:  () => ({
         swiper: null,

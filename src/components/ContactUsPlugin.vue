@@ -67,7 +67,7 @@ export default {
             
             });
 
-            this.$notify(this.$t('fb.thankyouforsendingmessage'));
+            this.$notify(this.$t('thankyouforsendingmessage'));
             this.email='';
             this.name= '';
             this.message= '';

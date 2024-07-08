@@ -5,7 +5,7 @@
                 <div class="flex items-center">
 
               <div class="md:hidden flex items-start text-xl">
-                <button  @click="menuopener" class="mobile-menu-button m-3">
+                <button  @click="menuopener" class="btn btn-ghost mobile-menu-button m-3">
                 <i v-if="!menu_opened" class="pi pi-align-left"></i>
                 <i v-else class="pi pi-times"></i>
               </button> 
@@ -20,12 +20,13 @@
             </div>
               <nav v-if="mobile_mode"  class="md:ml-auto flex flex-col md:flex-row items-center text-base justify-acenter">
                   
-                  <router-link to="/home" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('home') }}</router-link>
+                  <router-link to="/home" class=" mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('home') }}</router-link>
                   <div class="dropdown">
                   <div v-if="reload" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  py-2">
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
+                      <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                   </ul>
                   </div>
@@ -38,7 +39,7 @@
                   </ul>
                   </div>
   
-                  
+                  <router-link to="/gallery" class=" mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('gallery') }}</router-link>
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
@@ -248,7 +249,18 @@
           l.documents.forEach(async element => {
               
               let a={title:"",id:""};
+              if(cc.language=="sr")
               a.title=convertifserbian(element.title_rs);
+              else if(cc.language=="rs")   
+              a.title=element.title_rs;
+              else if(cc.language=="hu")
+              a.title=element.title_hu;
+              else if(cc.language=="en")
+              a.title=element.title_hu;
+              else 
+              {
+  
+              }
   
               a.id=element.$id;
               this.abouts.push(a);
@@ -271,7 +283,6 @@
           //let local=localStorage.getItem("lang");
           //console.log(l);
           l.documents.forEach(async element => {
-              
               let a={title:"",id:""};
               if(cc.language=="sr")
               a.title=convertifserbian(element.title_rs);
@@ -282,10 +293,9 @@
               else if(cc.language=="en")
               a.title=element.title_hu;
               else 
-                  {
+              {
   
-                  }
-              
+              }
               if( a.title!="---")
               {
               a.id=element.$id;
@@ -307,8 +317,7 @@
               let a={name:"",id:""};
               if(cc.language=="en")
               {
-                  a.name=element.title_en;
-                  
+                  a.name=element.title_en;  
               }
               else if(cc.language=="hu")
               {

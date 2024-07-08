@@ -70,7 +70,13 @@
      "Account page":"Felhasználói oldal",
      "worker_name_hu":"Dolgozó magyar neve",
      "worker_name_rs":"Dolgozó szerb neve",
-     "contact":"Dolgozó egyéb információja/Elérhetősége"
+     "contact":"Dolgozó egyéb információja/Elérhetősége",
+     "timetable":"Órarend",
+     "morning":"Délelőtt",
+     "afternoon":"Délután",
+     "srb_short":"",
+    "hun_short":"Magyar rövid leírás",
+    "eng_short":"Angol rövid leírás"
      
      
      

@@ -68,5 +68,11 @@
     "Account page": "Account page",
     "worker_name_hu": "Staff Hungarian name",
     "worker_name_rs": "Staff Serbian name",
-    "contact": "Staff contact information"
+    "contact": "Staff contact information",
+    "timetable":"Timetable",
+     "morning":"Morning",
+     "afternoon":"Afternoon",
+     "srb_short": "Short description in Serbian",
+    "hun_short": "Short description in Hungarian",
+    "eng_short": "Short description in English"
 }

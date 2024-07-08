@@ -10,7 +10,8 @@
                 {{ year }}
                 {{ $t('school_name') }}
                 <a href="https://karpad2.github.io" class="text-gray-500 ml-1" target="_blank"
-                    rel="noopener noreferrer">Designed by <span class="hover:text-sky-400">@karpad</span></a>
+                    rel="noopener noreferrer">Designed by <span class="hover:text-sky-400">Kovács Árpád
+                    </span></a>
                 <p>App version: {{ _version }}</p>
             </p>
             <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">

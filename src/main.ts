@@ -29,6 +29,10 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import CountryFlag from 'vue-country-flag-next'
 
+import 'viewerjs/dist/viewer.css'
+import VueViewer from 'v-viewer'
+
+import gsap from "gsap";
 const app = createApp(App)
 //const client = new Client();
 const pinia =createPinia();
@@ -60,8 +64,9 @@ app.component('video-background', VideoBackground);
 app.config.globalProperties.$appwrite = appw;
 app.use(Particles,{init:async engine => {await loadFull(engine)}});
 app.use(i18n);
+app.use(VueViewer);
 app.component('VueCookieComply', VueCookieComply)
-
+//app.use(gsap);
 app.use(router);
 app.mount('#app');
 

@@ -3,27 +3,26 @@
     <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('workers') }}</h1>
+                    <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('workers') }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
             
             </div>
-<div v-if="loaded"  v-for="role in roles" class="m-auto w-full" :key="role.role">
-<h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-  
-  <v-data-table  height="400" :headers="headers" :items="role.workers">
-    <template v-slot:item.img="{ item }">
-    <img :src="item.img"  class="object-cover w-20" />
-  </template>
+            <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
+            <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
+            <v-data-table  height="400" :headers="headers" :items="role.workers">
+                <template v-slot:item.img="{ item }">
+                <img :src="item.img"  class="object-cover w-20" />
+            </template>
 
-  <template v-slot:item.edit="{ item }">
-    <router-link :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit text-5xl"></i></router-link>
-   
-  </template>
-  <template #bottom></template>
-    </v-data-table>
-    <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_worker_in_that_category') }}</v-btn>
-</div>
+            <template v-slot:item.edit="{ item }">
+                <router-link :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit text-5xl"></i></router-link>
+            
+            </template>
+            <template #bottom></template>
+                </v-data-table>
+                <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_worker_in_that_category') }}</v-btn>
+            </div>
 </div>
 </section>
 
@@ -36,7 +35,7 @@ import {appw,config} from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
 import {reactive,ref} from "vue";
-
+import gsap from "gsap";
 
 
 export default {
@@ -52,6 +51,24 @@ export default {
     {
         const loadingStore = useLoadingStore();
         this.admin=loadingStore.userLoggedin;
+        document.title=this.$t("workers");
+
+        gsap.fromTo(
+    "#render_title",
+    {
+      opacity: 0,
+      x: "50%",
+    },
+    {
+      duration: 1.5,
+      opacity: 1,
+      x: 0,
+    }
+  );
+
+ 
+
+
         //loadingStore.setLoading(true);
         if(!this.admin)
         this.headers= [
@@ -93,6 +110,20 @@ export default {
                       
                     
                     ];
+
+
+                    gsap.fromTo(
+                    ".popups",
+                    {
+                    opacity: 0,
+                    y: "50%",
+                    },
+                    {
+                    duration: 1.5,
+                    opacity: 1,
+                    y: 0,
+                    }
+                );                
     },
     data: () => ({
         workers: [
@@ -207,3 +238,8 @@ export default {
     
 }
 </script>
+<style>
+.popups{
+
+}
+</style>

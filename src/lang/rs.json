@@ -7,7 +7,7 @@
     "feedback": "Pošalji poruku",
     "contactustext": "Pošaljite poruku",
     "name": "Ime",
-    "email": "E-mail",
+    "email": "Imejl",
     "message": "Poruka",
     "usefullinks": "Korisni linkovi",
     "news": "Vesti",
@@ -68,5 +68,12 @@
     "Account page": "Stranica naloga",
     "worker_name_hu": "Mađarsko ime radnika",
     "worker_name_rs": "Srpsko ime radnika",
-    "contact": "Kontakt informacije radnika"
+    "contact": "Kontakt informacije radnika",
+    "timetable":"Raspored časova",
+    "morning":"Prepodne",
+    "afternoon":"Poslepodne",
+    "srb_short": "Kratak opis na srpskom",
+    "hun_short": "Kratak opis na mađarskom",
+    "eng_short": "Kratak opis na engleskom"
+
 }

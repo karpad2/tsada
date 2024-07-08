@@ -1,13 +1,13 @@
 <template>
     <div class="container mx-auto">
-        <img class="m-auto" :src="img" alt="promo_image"/>
+        <img id="promo-img" class="m-auto" :src="img" alt="promo_image"/>
     </div>
 </template>
 <script lang="ts">
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import { data } from "autoprefixer";
-
+import gsap from "gsap";
 export default
 {
 name: 'PromoImage',
@@ -15,6 +15,18 @@ mounted()
 {
     
     this.getPromo();
+    gsap.fromTo(
+    "#promo-img",
+    {
+      opacity: 0,
+      y: "150%",
+    },
+    {
+      duration: 1.5,
+      opacity: 1,
+      y: 0,
+    }
+  );
 
 },
 data()

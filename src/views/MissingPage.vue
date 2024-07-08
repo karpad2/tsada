@@ -5,3 +5,12 @@
         <VBtn @click="$router.go(-1)">{{ $t("goback") }}</VBtn>
     </div>
 </template>
+<script >
+export default{
+    mounted()
+    {
+        document.title="404 "+this.$t("error");
+    }
+}
+   
+</script>
