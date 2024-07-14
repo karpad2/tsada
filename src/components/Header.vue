@@ -28,6 +28,7 @@
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
+                      <li ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
                   </ul>
                   </div>
 
@@ -61,6 +62,7 @@
                   <div tabindex="0" role="button" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
+                      <li v-if="false" ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
                   </ul>
                   </div>
   

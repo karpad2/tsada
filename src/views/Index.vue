@@ -77,6 +77,24 @@
                     detectRetina: true
                 }"
         />
+
+        <Fireworks
+            style="z-index: 5;"
+            v-if="firework_flag"
+        
+            :autostart="firework_flag"
+            
+            :style="{
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            position: 'fixed',
+            
+            
+            }"
+        />
+
         <main  v-if="!isLoading">
             <slot></slot>
         </main>
@@ -95,14 +113,15 @@ import Footer from '@/components/Footer.vue';
 import Loading from '@/components/Loading.vue';
 import Toast from "primevue/toast";
 import {useLoadingStore} from "@/stores/loading";
-
+import { Fireworks } from '@fireworks-js/vue'
 
 export default {
     components: {
     Header,
     Footer,
     Loading,
-    Toast
+    Toast,
+    Fireworks
 },
 data()
 {
@@ -121,7 +140,8 @@ return {
     },
     computed: {
         isLoading() {
-           return useLoadingStore().isLoading;
+        const cc=useLoadingStore();
+           return cc.isLoading;
             
             //return app.config.globalProperties.loading;
             
@@ -129,7 +149,14 @@ return {
         },
         animation_flag()
         {
-            return useLoadingStore().animationSetting
+            const cc=useLoadingStore();
+            return cc.animationSetting
+        },
+
+        firework_flag()
+        {
+            const cc=useLoadingStore();
+            return cc.fireworkSetting;
         }
     },
     

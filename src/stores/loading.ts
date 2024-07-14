@@ -8,6 +8,7 @@ export const useLoadingStore = defineStore('loading', () => {
     const isErasmus = ref(false);
     const userLoggedin=ref(false);
     const animationSetting=ref(true);
+    const fireworkSetting=ref(false);
     const language=ref("sr");
     const uid=ref("");
     let notif=ref([]);
@@ -40,8 +41,15 @@ export const useLoadingStore = defineStore('loading', () => {
       this.uid=v;
     }
 
+    function setfireworkSetting(v:boolean)
+    {
+      this.fireworkSetting=v;
+    }
 
-    return { count,isLoading,language,setLoading,setErasmus,setUserLoggedin,setLanguage,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment }
+    
+
+
+    return { count,isLoading,language,setLoading,setErasmus,setUserLoggedin,setLanguage,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
   },
 {persist:true})
 

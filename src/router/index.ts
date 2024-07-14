@@ -32,6 +32,14 @@ const router = createRouter({
       component: () => import('../views/Abouts/Workers.vue')
     },
     {
+      path: '/about/birthday',
+      name: 'birthday',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Abouts/Birthday.vue')
+    },
+    {
       path: '/about/timetable',
       name: 'timetable',
       // route level code-splitting
@@ -106,6 +114,11 @@ const router = createRouter({
       component: () => import('../views/Album.vue')      
     },
     {
+      path:'/erasmus/apply',
+      name:'erasmus_apply',
+      component: () => import('../views/Erasmus/Erasmus_Apply.vue')      
+    },
+    {
       path:'/education',
       name:'educationprofiles',
       component: () => import('../views/EducationProfiles.vue')      
@@ -145,6 +158,29 @@ router.beforeEach((to, from, next) => {
   {
     loadingStore.setErasmus(false);
   }
+  let k=false;
+  if(b.indexOf("admin") !== -1)
+    {
+      k=true;
+    }
+    else 
+    {
+      k=false;
+    }
+
+    if(b.indexOf("/about/birthday") !== -1)
+      {
+        loadingStore.setfireworkSetting(true);
+      }
+      else 
+      {
+        loadingStore.setfireworkSetting(false);
+      }
+
+  if(!loadingStore.userLoggedin&&k)
+    {
+    router.push("/home");   
+    }
 
   // Wait for 1 second (for demonstration purposes)
   setTimeout(() => {

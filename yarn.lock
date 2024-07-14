@@ -17,6 +17,13 @@
   resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.19.11.tgz"
   integrity sha512-vfkhltrjCAb603XaFhqhAF4LGDi2M4OrCRrFusyQ+iTLQ/o60QQXxc9cZC/FFpihBI9N1Grn6SMKVJ4KP7Fuiw==
 
+"@fireworks-js/vue@^2.10.7":
+  version "2.10.7"
+  resolved "https://registry.npmjs.org/@fireworks-js/vue/-/vue-2.10.7.tgz"
+  integrity sha512-F+aF6lHlYshvlHWo8j6rmkSx7Y7pXvaccIN9ZhaOTJsf3/Q16gkuCaq8lCjgZV3+KLRAmzNzCUr4Gg1Vu1izYA==
+  dependencies:
+    fireworks-js "2.10.7"
+
 "@floating-ui/core@^1.5.3":
   version "1.5.3"
   resolved "https://registry.npmjs.org/@floating-ui/core/-/core-1.5.3.tgz"
@@ -1312,6 +1319,11 @@ finalhandler@1.2.0:
     parseurl "~1.3.3"
     statuses "2.0.1"
     unpipe "~1.0.0"
+
+fireworks-js@2.10.7:
+  version "2.10.7"
+  resolved "https://registry.npmjs.org/fireworks-js/-/fireworks-js-2.10.7.tgz"
+  integrity sha512-FyRNiqlgu9ZeFCjfN0UiGUlj5dUWNYLyFaWN/Q8sOMf0E+KGA4dMROaBZpCtym85fChgCspoa3jHoLTRZiy74A==
 
 flat@^5.0.0:
   version "5.0.2"
@@ -2656,7 +2668,7 @@ vue@^2.6.11:
     "@vue/compiler-sfc" "2.7.16"
     csstype "^3.1.0"
 
-"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.2.41, vue@^3.3.0, vue@^3.3.11, vue@^3.3.13, vue@>=3.2.0, vue@3.4.5:
+"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.2.41, vue@^3.3.0, vue@^3.3.11, vue@^3.3.13, vue@>=3.0.0, vue@>=3.2.0, vue@3.4.5:
   version "3.4.5"
   resolved "https://registry.npmjs.org/vue/-/vue-3.4.5.tgz"
   integrity sha512-VH6nHFhLPjgu2oh5vEBXoNZxsGHuZNr3qf4PHClwJWw6IDqw6B3x+4J+ABdoZ0aJuT8Zi0zf3GpGlLQCrGWHrw==

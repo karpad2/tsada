@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "0.0.11a",
+  "version": "0.0.12a",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fireworks-js/vue": "^2.10.7",
     "@ipaat/vue3-tailwind3-cookie-comply": "^1.1.2",
     "@kyvg/vue3-notification": "^3.1.3",
     "@marp-team/marp-core": "^3.9.0",
