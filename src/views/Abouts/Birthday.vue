@@ -11,7 +11,7 @@
                 class="birthday-card bg-gradient-to-r from-yellow-200 via-red-100 to-pink-100 p-4 rounded-lg mb-4 fade-in-up flex items-center justify-between"
                 :style="{animationDelay: (0.2 * (filteredList.indexOf(person) + 1)) + 's'}">
                 <div>
-                    <span class="text-lg font-semibold">{{ person.name }}</span>
+                    <span class="text-lg font-semibold text-gray-500">{{ person.name }}</span>
                     <small class="text-gray-500 block">{{ person.class }}</small>
                     <small class="text-gray-600 block mt-1">{{ $t("born") }} {{ person.birthday }}</small>
                 </div>

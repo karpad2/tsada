@@ -28,6 +28,8 @@
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
+                      <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
+                      <li ><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
                       <li ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
                   </ul>
                   </div>
@@ -35,8 +37,43 @@
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  py-2">
-                      <li v-if="false" ><router-link to="/education">{{ $t("education_profiles") }}</router-link></li>
+                    <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
+                        <summary >{{ $t("school_profiles") }} </summary>
+                        <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                            
+                        <li ><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
+                        <summary >{{ $t("machine") }} </summary>
+                        <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                            <li><router-link to="/renderer/education/mechanical_technician">{{ $t("mechanical_technician") }}</router-link></li>
+                            <li><router-link to="/renderer/education/cnc_miller">{{ $t("cnc_miller") }}</router-link></li>
+                            
+                        </ul>
+                        </details>
+                        </li>
+                        
+                        <li ><details :class="{'dropdown-right':!mobile_view}"  class="dropdown dropdown-hover">
+                        <summary >{{ $t("electrotechnic") }} </summary>
+                        <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                            <li><router-link to="/renderer/education/mechatronic_technician">{{ $t("mechatronic_technician") }}</router-link></li>
+                            <li><router-link to="/renderer/education/computer_electrotechnician">{{ $t("computer_electrotechnician") }}</router-link></li>
+                        </ul>
+                        </details>
+                        </li>
+                        <li ><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
+                        <summary >{{ $t("civil_engineering") }} </summary>
+                        <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                            <li><router-link to="/renderer/education/primary_construction_works_operator">{{ $t("primary_construction_works_operator") }}</router-link></li>
+                            
+                        </ul>
+                        </details>
+                        </li>
+                        </ul>
+                        </details>
+                    </li>
+                    
+                    
                       <li ><router-link to="/renderer/education/adult_education">{{ $t("adult_education") }}</router-link></li>
+                      
                   </ul>
                   </div>
   
@@ -372,6 +409,10 @@
               const cc=useLoadingStore();
               return cc.userLoggedin;
           },
+          notMobile()
+          {
+            return !this.mobile_mode;
+          }
       }
   
     

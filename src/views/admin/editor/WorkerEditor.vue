@@ -51,6 +51,29 @@
             
           ></v-text-field>
         </div>
+        <div >
+          <v-text-field
+            @change="save"
+            v-model="p_receiving_hour"
+            :counter="100"
+            :label="$t('p_receiving_hour')"
+            hide-details
+            
+          ></v-text-field>
+        </div>
+
+        <div >
+          <v-text-field
+            @change="save"
+            v-model="u_receiving_hour"
+            :counter="100"
+            :label="$t('u_receiving_hour')"
+            hide-details
+            
+          ></v-text-field>
+        </div>
+        
+        
 
              
     </div>
@@ -71,7 +94,8 @@ data()
         worker_name_hu:"",
         worker_name_rs:"",
         contact:"",
-        
+        u_receiving_hour:"",
+        p_receiving_hour:"",
         default_img_link:"",
         file_link:null,
         img:""
@@ -102,7 +126,8 @@ methods:{
                     this.worker_name_rs=k.documents[0].worker_name_rs;
                 
                     this.contact=k.documents[0].contact;
-                  
+                    this.u_receiving_hour=k.documents[0].u_receiving_hour
+                    this.p_receiving_hour=k.documents[0].p_receiving_hour
 
                     //this.visible=k.documents[0].visible;
 
@@ -175,7 +200,9 @@ methods:{
             "worker_name_hu":this.worker_name_hu,
             "worker_name_rs":this.worker_name_rs,
             "worker_img":this.worker_img,
-            "contact":this.contact
+            "contact":this.contact,
+            "u_receiving_hour":this.u_receiving_hour,
+            "p_receiving_hour":this.p_receiving_hour,
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)

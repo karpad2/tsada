@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3 bg-slate-100 dark:bg-slate-300/30 flex flex-col md:ml-auto w-full md:py-8 flex-wrap  md:mt-0 rounded-lg">
+    <div  class="p-3 bg-slate-100 dark:bg-slate-300/30 flex flex-col md:ml-auto w-full md:py-8 flex-wrap  md:mt-0 rounded-lg">
        
                 <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">{{ $t('feedback') }}</h2>
                 <p class="leading-relaxed mb-5 text-gray-600">{{ $t('contactustext')  }}</p>
