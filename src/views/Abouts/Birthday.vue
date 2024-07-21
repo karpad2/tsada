@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-slate-900 h-screen flex justify-center items-center">
+    <div class="bg-slate-900 min-h-screen flex justify-center items-center">
         <div class="bg-slate-700 backdrop-blur-sm  p-9 rounded-xl shadow-lg w-2/3 md:w-1/2 lg:w-1/3 border-t-8 border-blue-500" style="z-index: 4;">
             <main>
     <h1 class="text-3xl font-bold mb-7 text-center text-white bg-blue-500 p-3 rounded">

@@ -1,5 +1,5 @@
 <template>
-    <section class="text-gray-600 h-screen">
+    <section class="text-gray-600 min-h-screen">
         <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" style="min-height: 70vh;">            
                 <video-background  :src="video_link" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
                 overlay="linear-gradient(45deg,#2a4ae430,#0EA5E950)"  >
