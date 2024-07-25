@@ -7,7 +7,7 @@ export const useLoadingStore = defineStore('loading', () => {
     const isLoading = ref(false);
     const isErasmus = ref(false);
     const userLoggedin=ref(false);
-    const animationSetting=ref(true);
+    const animationSetting=ref(false);
     const fireworkSetting=ref(false);
     const language=ref("sr");
     const uid=ref("");
