@@ -1,5 +1,5 @@
 <template>
-    <section class="text-gray-600 body-font mt-5 mb-5 min-h-screen" style="min-height: 40vh;" id="courses">
+    <section class="text-gray-600 body-font mt-5 mb-5 min-h-screen"  id="courses">
         <div class="container px-5 mx-auto ">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">

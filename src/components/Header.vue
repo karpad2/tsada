@@ -1,10 +1,10 @@
 <template>
   <header v-if="reload" :class="{mobile_force:style_computed_for_mobile}" style="z-index: 200;"  class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
-          <div class="container mx-auto flex flex-wrap p-4 flex-col md:flex-row items-center ">
+          <div  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="container mx-auto flex flex-wrap flex-col md:flex-row items-center ">
             
-                <div class="flex items-center">
+            <div class="flex items-center">
 
-              <div v-if="mobile_view" class="flex items-start text-xl">
+              <div v-if="mobile_view" class="flex items-start ">
                 <button  @click="menuopener" class="btn btn-ghost mobile-menu-button m-3">
                 <i v-if="!menu_opened" class="pi pi-align-left"></i>
                 <i v-else class="pi pi-times"></i>
@@ -12,18 +12,18 @@
               </div>
               <router-link to="/home" class="flex flex-row items-center title-font font-medium  text-gray-900 mb-4 md:mb-0 ">
                   <img src="@a/tsada_logo.png" class="size-20 text-white p-1 bg-sky-400/15 rounded-full">
-              <span class="ml-3 text-xl max-sm:hidden" >{{ $t('school_name') }}</span>
+              <span class="ml-3  max-sm:hidden text-xl" >{{ $t('school_name') }}</span>
               <img src="@a/certop_logo.png" class="w-36 h-12 text-white p-2 ">
               
               <img src="@a/Erasmus_Logo.svg" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
             </div>
-              <nav v-if="mobile_mode"  class="md:ml-auto flex flex-col md:flex-row items-center text-base justify-acenter">
+              <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter mt-5">
                   
-                  <router-link to="/home" class=" mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('home') }}</router-link>
+                  <router-link to="/home" class="btn btn-ghost    cursor-pointer block  ">{{ $t('home') }}</router-link>
                   <div class="dropdown">
-                  <div v-if="reload" tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  py-2">
+                  <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
@@ -35,8 +35,8 @@
                   </div>
 
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  py-2">
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                     <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
                         <summary >{{ $t("school_profiles") }} </summary>
                         <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
@@ -77,26 +77,26 @@
                   </ul>
                   </div>
   
-                  <router-link to="/gallery" class=" mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('gallery') }}</router-link>
+                  <router-link to="/gallery" class="btn btn-ghost    cursor-pointer block  ">{{ $t('gallery') }}</router-link>
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="doccategory in doccategories" :key="doccategory.id"><router-link :to="'/documents/'+doccategory.id">{{ doccategory.name }}</router-link></li>
                   </ul>
                   </div>
   
                   <div v-if="!mobile_view" class="dropdown ">
-                  <div tabindex="0" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  "><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="lang in languages" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                   </ul>
                   </div>
-                  <div v-if="mobile_view" role="button" class="mr-5 hover:text-sky-400 cursor-pointer block  py-2">
+                  <div v-if="mobile_view" role="button" class=" btn btn-ghost    cursor-pointer block  ">
                     <button v-for="lang in languages" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
                   </div>
   
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost  mr-6  cursor-pointer block  ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
                       <li v-if="false" ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
@@ -104,21 +104,21 @@
                   </div>
   
   
-                  <router-link v-if="!isLoggedin" to="/contact" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">
+                  <router-link v-if="!isLoggedin" to="/contact" class="btn btn-ghost  mr-6  cursor-pointer block  ">
                   {{ $t('contactus') }}
                   <i class="pi pi-right"></i>
                   </router-link>
   
-                  <router-link v-else to="/admin/messages" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">
+                  <router-link v-else to="/admin/messages" class="btn btn-ghost  mr-6  cursor-pointer block  ">
                   {{ $t('messages') }}
                   <i class="pi pi-right"></i>
                   </router-link>
   
-                  <span v-if="isLoggedin" @click="logout" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">
+                  <span v-if="isLoggedin" @click="logout" class="btn btn-ghost  mr-6  cursor-pointer block  ">
                   {{ $t('logout') }}
                   </span>
   
-                  <router-link v-else to="/login" class="mr-6 hover:text-sky-400 cursor-pointer block  py-2">
+                  <router-link v-else to="/login" class="btn btn-ghost  mr-6  cursor-pointer block  ">
                   {{ $t('login') }}
                   </router-link>
   
@@ -396,6 +396,7 @@
             return this.menu_opened&&this.mobile_view||!this.mobile_view;
 
           },
+
 
           style_computed_for_mobile()
           {

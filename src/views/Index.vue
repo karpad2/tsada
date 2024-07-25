@@ -95,7 +95,7 @@
             }"
         />
 
-        <main  v-if="!isLoading">
+        <main class="min-h-screen" v-if="!isLoading">
             <slot></slot>
         </main>
 
@@ -150,7 +150,7 @@ return {
         animation_flag()
         {
             const cc=useLoadingStore();
-            return cc.animationSetting
+            return !cc.animationSetting;
         },
 
         firework_flag()
