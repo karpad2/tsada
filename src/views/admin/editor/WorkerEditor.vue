@@ -233,7 +233,7 @@ methods:{
     const result = await storage.createFile(
     config.website_images, // bucketId
     ID.unique(), // fileId
-    this.file_link[0] // file
+    this.file_link // file
     // permissions (optional)
     );
     this.default_image=result.$id;

@@ -3,25 +3,37 @@
   <div class="">
     <div v-if="!isLoggedin">
       <div class=" font-[sans-serif]">
-      <div class="min-h-screen flex flex-col items-center justify-center  px-4 bg-white/60">
+      <div class="min-h-screen flex flex-col items-center justify-center  px-4">
         <div class="max-w-md w-full ">
           
           
-          <div class="p-8 rounded-2xl  shadow">
-            <h2 class="text-gray-800 text-center text-2xl font-bold">{{ $t("login") }}</h2>
+          <div class="p-8 rounded-2xl dark:bg-slate-700 shadow">
+            <h2 class="text-gray-800 text-center text-2xl font-bold dark:text-white">{{ $t("login") }}</h2>
             <form @submit.prevent="login_by_app" class="mt-8 space-y-4">
               <div>
-                <label class="text-gray-800 text-sm mb-2 block">{{ $t('email') }}</label>
+                <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('email') }}</label>
                 <div class="relative flex items-center">
-                  <input v-model.lazy="email" name="email" type="text" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('email')" />
+                  <v-text-field
+                  type="email"
+                  v-model="email"
+                  :label="$t('email')"
+                ></v-text-field>
+                  
+                  <InputText v-if="false" v-model.lazy="email" name="email" type="text" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('email')" />
+                  
                   
                 </div>
               </div>
 
               <div>
-                <label class="text-gray-800 text-sm mb-2 block">{{ $t('password') }}</label>
+                <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('password') }}</label>
                 <div class="relative flex items-center">
-                  <input v-model.lazy="password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('password')" />
+                  <v-text-field
+                  type="password"
+                  v-model="password"
+                  :label="$t('password')"
+                ></v-text-field>
+                  <InputText v-if="false" v-model.lazy="password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('password')" />
                   
                 </div>
               </div>
@@ -36,7 +48,8 @@
               </div>
 
               <div class="!mt-8">
-                <button type="submit" @click="login_by_app"  class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                <v-btn   @click="login_by_app" >{{ $t('login') }}</v-btn>
+                <button v-if="false" type="submit" @click="login_by_app"  class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                   {{ $t("login") }}
                 </button>
               </div>
@@ -155,7 +168,7 @@ export default {
         login_by_app()
         {
             
-            const promise = user.createEmailSession(this.email,this.password);
+            const promise = user.createEmailPasswordSession(this.email,this.password);
             const cc=useLoadingStore();
             promise.then( (response)=>{
                 console.log(response);

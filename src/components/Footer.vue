@@ -1,6 +1,6 @@
 <template>
     <!-- Footer -->
-    <footer class="text-gray-400 bg-gray-900 body-font">
+    <footer class="text-gray-400 bg-gray-900  body-font" >
         <div class="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
             <a class="flex title-font font-medium items-center md:justify-start justify-center text-white">
                 <img src="@a/tsada_logo.png" class="size-16 text-white p-2 bg-sky-300/50 rounded-full">

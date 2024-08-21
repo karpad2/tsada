@@ -106,5 +106,15 @@
     "add_new_class":"Add new class",
     "edit":"Edit",
     "year":"Year",
-    "class_number":"Class number"
+    "class_number":"Class number",
+    "erasmus_apply": "Erasmus application",
+    "born_year": "Year of birth",
+    "mark_avg": "Last year's average",
+    "law_for_data_store": "I accept the terms and conditions and the privacy policy.",
+    "apply_for_erasmus": "Apply for Erasmus",
+    "motivation_letter": "Motivation letter",
+    "other_positive_documents": "Other document/Recommendation letter",
+    "e.g.": "e.g.",
+    "erasmus_applies": "Erasmus applications",
+    "apply_saved": "Application saved."
 }

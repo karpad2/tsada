@@ -115,6 +115,16 @@ const router = createRouter({
       component: () => import('../views/admin/messages/Message.vue')      
     },
     {
+      path:'/admin/erasmus/docviewer/:id',
+      name:'ErDocViewer',
+      component: () => import('../views/admin/erasmus/ErDocViewer.vue')      
+    },
+    {
+      path:'/admin/erasmus/applies',
+      name:'ErAdApplies',
+      component: () => import('../views/admin/erasmus/ErasmusApplies.vue')      
+    },
+    {
       path:'/contact',
       name:'contact',
       component: () => import('../views/Contact.vue')      
@@ -137,7 +147,7 @@ const router = createRouter({
     {
       path:'/erasmus/apply',
       name:'erasmus_apply',
-      component: () => import('../views/Erasmus/Erasmus_Apply.vue')      
+      component: () => import('../views/Erasmus/ErasmusApply.vue')      
     },
     {
       path:'/education',

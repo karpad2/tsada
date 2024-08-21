@@ -19,7 +19,8 @@ import { createI18n } from 'vue-i18n'
 import {messages} from '@/lang';
 import Notifications from '@kyvg/vue3-notification';
 import {appw} from "@/appwrite";
-
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura';
 import Particles from "@tsparticles/vue3";
 import { loadFull } from "tsparticles";
 import VideoBackground from 'vue-responsive-video-background-player'
@@ -58,6 +59,11 @@ client
 //app.use(VueI18n);
 app.use(Notifications);
 app.use(vuetify);
+app.use(PrimeVue, {
+  theme: {
+      preset: Aura
+  }
+});
 app.component('country-flag', CountryFlag)
 vuetify.theme.name.primary = "#0EA5E9";
 app.component('video-background', VideoBackground);

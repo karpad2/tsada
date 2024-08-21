@@ -106,5 +106,15 @@
     "add_new_class":"Dodaj novo odeljenje",
     "edit":"Izmeni",
     "year":"Godina",
-    "class_number":"Broj odeljenja"
+    "class_number":"Broj odeljenja",
+    "erasmus_apply": "Prijava za Erasmus",
+    "born_year": "Godina rođenja",
+    "mark_avg": "Prosečna ocena prošle godine",
+    "law_for_data_store": "Prihvatam uslove i pravila o privatnosti.",
+    "apply_for_erasmus": "Prijavi se za Erasmus",
+    "motivation_letter": "Motivaciono pismo",
+    "other_positive_documents": "Drugi dokument/Preporuka",
+    "e.g.": "npr.",
+    "erasmus_applies": "Prijave za Erasmus",
+    "apply_saved": "Prijava sačuvana."
 }

@@ -1,7 +1,8 @@
 <template>
-    <div class="">
+    <div >
        
         <Header />
+        
         <vue-particles
         v-if="animation_flag"
             id="tsparticles"
@@ -94,7 +95,7 @@
             
             }"
         />
-
+        <div class="dark:bg-slate-600/50 bg-slate-50">    
         <main class="min-h-screen" v-if="!isLoading">
             <slot></slot>
         </main>
@@ -102,7 +103,7 @@
         <main v-else>
             <Loading />
         </main>
-
+            </div>
         <Footer />
     </div>
 </template>
@@ -168,5 +169,6 @@ return {
         width: 100%;
         height: 100%;
         z-index: -1;
+        
     }
 </style>

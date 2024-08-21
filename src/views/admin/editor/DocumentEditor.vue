@@ -208,7 +208,7 @@ methods:{
     const result = await storage.createFile(
     config.documents_storage, // bucketId
     ID.unique(), // fileId
-    this.file_link[0] // file
+    this.file_link // file
     // permissions (optional)
     );
     this.document_id= await result.$id;

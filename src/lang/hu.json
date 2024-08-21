@@ -108,11 +108,15 @@
     "add_new_class":"Új osztály hozzáadása",
     "edit":"Szerkesztés",
     "year":"Év",
-    "class_number":"Osztály száma"
-
-
-     
-     
-     
-     
+    "class_number":"Osztály száma",
+    "erasmus_apply":"Erasmus jelentkezés",
+    "born_year":"Születési év",
+    "mark_avg":"Tavalyi átlag",
+    "law_for_data_store":"Elfogadom a feltételeket és az adatvédelmi irányelveket.",
+    "apply_for_erasmus":"Jelentkezés Erasmus-ra",
+    "motivation_letter":"Motivációs levél",
+    "other_positive_documents":"Egyéb dokumentum/Ajánló levél",
+    "e.g.":" Pl.",
+    "erasmus_applies":"Erasmus jelentkezések",
+    "apply_saved":"Jelentkezés mentve."
  }
