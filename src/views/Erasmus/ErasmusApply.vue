@@ -9,7 +9,7 @@
                     </div>
                 </video-background>
     
-<div class="pb-2 sm:w-full w-1/2 dark:text-white">
+<div class="pb-2 w-full dark:text-white">
     
   <v-form @submit.prevent="submit" ref="form" v-model="isFormValid">
     <v-text-field
