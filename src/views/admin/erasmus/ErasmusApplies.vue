@@ -63,7 +63,7 @@
                     { title: this.$t("email"), align: 'start', key: 'email',width: '300px' },
                     { title: this.$t("phone"), align: 'start', key: 'phone',width: '300px' },
                     { title: this.$t("class"), align: 'start', key: 'class',width: '300px' },
-                    { title: this.$t("mark"), align: 'start', key: 'mark',width: '300px' },
+                    { title: this.$t("mark_avg"), align: 'start', key: 'mark',width: '300px' },
                     { title: this.$t("motivation_letter"), align: 'start', key: 'edit1',width: '300px' },
                     { title: this.$t("other_positive_documents"), align: 'start', key: 'edit2',width: '300px' },
                     ];

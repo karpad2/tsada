@@ -29,11 +29,9 @@
                     <VBtn  @click="editmode">{{ $t("edit") }}</VBtn>
             </p>
 
-<div class="w-3/4 pb-2" >
-    
-</div>
 
-<div class="w-3/4 pb-2 dark:text-white" v-html="chtml">
+
+<div class="w-full p-5 dark:text-white" v-html="chtml">
 </div>
 
 
