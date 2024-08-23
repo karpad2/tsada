@@ -20,9 +20,9 @@
             </div>
               <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter mt-5">
                   
-                  <router-link to="/home" class="btn btn-ghost    cursor-pointer block  ">{{ $t('home') }}</router-link>
+                  <router-link to="/home" class="btn btn-ghost    cursor-pointer   ">{{ $t('home') }}</router-link>
                   <div class="dropdown">
-                  <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
+                  <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
@@ -35,7 +35,7 @@
                   </div>
 
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                     <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
                         <summary >{{ $t("school_profiles") }} </summary>
@@ -77,26 +77,26 @@
                   </ul>
                   </div>
   
-                  <router-link to="/gallery" class="btn btn-ghost    cursor-pointer block  ">{{ $t('gallery') }}</router-link>
+                  <router-link to="/gallery" class="btn btn-ghost    cursor-pointer   ">{{ $t('gallery') }}</router-link>
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  ">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="doccategory in doccategories" :key="doccategory.id"><router-link :to="'/documents/'+doccategory.id">{{ doccategory.name }}</router-link></li>
                   </ul>
                   </div>
   
                   <div v-if="!mobile_view" class="dropdown ">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer block  "><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   "><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="lang in languages" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                   </ul>
                   </div>
-                  <div v-if="mobile_view" role="button" class=" btn btn-ghost    cursor-pointer block  ">
+                  <div v-if="mobile_view" role="button" class=" btn btn-ghost    cursor-pointer   ">
                     <button v-for="lang in languages" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
                   </div>
   
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost  mr-6  cursor-pointer block  ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost  mr-6  cursor-pointer   ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
                       <li  ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
@@ -105,21 +105,21 @@
                   </div>
                   
   
-                  <router-link v-if="!isLoggedin" to="/contact" class="btn btn-ghost  mr-6  cursor-pointer block  ">
+                  <router-link v-if="!isLoggedin" to="/contact" class="btn btn-ghost  mr-6  cursor-pointer   ">
                   {{ $t('contactus') }}
                   <i class="pi pi-right"></i>
                   </router-link>
   
-                  <router-link v-else to="/admin/messages" class="btn btn-ghost  mr-6  cursor-pointer block  ">
+                  <router-link v-else to="/admin/messages" class="btn btn-ghost  mr-6  cursor-pointer   ">
                   {{ $t('messages') }}
                   <i class="pi pi-right"></i>
                   </router-link>
   
-                  <span v-if="isLoggedin" @click="logout" class="btn btn-ghost  mr-6  cursor-pointer block  ">
+                  <span v-if="isLoggedin" @click="logout" class="btn btn-ghost  mr-6  cursor-pointer   ">
                   {{ $t('logout') }}
                   </span>
   
-                  <router-link v-else to="/login" class="btn btn-ghost  mr-6  cursor-pointer block  ">
+                  <router-link v-else to="/login" class="btn btn-ghost  mr-6  cursor-pointer   ">
                   {{ $t('login') }}
                   </router-link>
   

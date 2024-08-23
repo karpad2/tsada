@@ -9,12 +9,12 @@
                     </div>
                 </video-background>
     
-<div class="pb-2 sm:w-full w-1/2 dark:text-white">
+<div class="pb-2 w-full dark:text-white">
 <table class="table table-zebra mx-auto">
   <thead>
     <tr>
-      <th style="width: 200px;" class="text-left text-xl">{{ $t("morning") }}</th>
-      <th style="width: 200px;" class="text-left text-xl"> {{ $t("afternoon") }}</th>
+      <th style="width: 200px;" class="text-left text-xl dark:text-white">{{ $t("morning") }}</th>
+      <th style="width: 200px;" class="text-left text-xl dark:text-white"> {{ $t("afternoon") }}</th>
     </tr>
   </thead>
   <tbody>

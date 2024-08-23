@@ -187,9 +187,20 @@ methods:{
     {
         const database = new Databases(appw);
         const storage = new Storage(appw);
+        try{
         let n=await storage.deleteFile(config.documents_storage,this.document_id);
+        }
+        catch (ex)
+        {
+            console.warn(ex)
+        }
+        try{
         let k= await database.deleteDocument(config.website_db, config.documents_db,this.$route.params.id);  
-        
+        }
+        catch(ex)
+        {
+            console.warn(ex)
+        }
         this.$notify(this.$t('deleted'));
         this.router.push("/home");
     },

@@ -3,7 +3,7 @@
         <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
                 <div class="flex flex-wrap w-full mb-20">
                     <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('documents') }}</h1>
+                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ _title }}</h1>
                         <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                     </div>
                 
@@ -84,6 +84,7 @@
 
         },
         data: () => ({
+            _title:"",
             workers: [
                 {
                     img: 'https://dummyimage.com/720x400',
@@ -113,7 +114,25 @@
                 //console.log();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
+                let llll= await database.getDocument(config.website_db, config.document_categories_db,this.$route.params.category);
                 
+                if(local=="rs"||local=="sr")
+                    {
+                        this._title=llll.category_name_rs
+                    }
+                    else if(local=="hu")
+                    {
+                        this._title=llll.category_name_hu
+                    }
+                    else if(local=="en")
+                    {
+                        this._title=llll.category_name_en
+                    }
+                    else {
+
+                    }
+                
+
                 let n= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("documentCategories",this.$route.params.category),Query.orderDesc("$createdAt")]);
                 await n.documents.forEach(async el2 => {
                     let a={name:"",date:"",id:"",doc_id:""};

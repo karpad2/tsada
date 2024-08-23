@@ -22,6 +22,11 @@
       <template v-slot:item.edit2="{ item }">
         <router-link v-if="item.other_document!=null" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
       </template>
+
+      <template v-slot:item.edit3="{ item }">
+        <router-link v-if="false" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
+        <v-btn>{{ $t("delete") }}</v-btn>
+      </template>
       <template #bottom></template>
         </v-data-table>
         
@@ -66,6 +71,7 @@
                     { title: this.$t("mark_avg"), align: 'start', key: 'mark',width: '300px' },
                     { title: this.$t("motivation_letter"), align: 'start', key: 'edit1',width: '300px' },
                     { title: this.$t("other_positive_documents"), align: 'start', key: 'edit2',width: '300px' },
+                    { title: this.$t("delete"), align: 'start', key: 'edit3',width: '300px' },
                     ];
             this.load_messages_base();
            

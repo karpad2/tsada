@@ -73,14 +73,14 @@ export default {
         if(!this.admin)
         this.headers= [
                 { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                { title: this.$t("contactus"), align: 'start', key: 'contact',width: '300px' },
+                { title: this.$t("contact"), align: 'start', key: 'contact',width: '300px' },
                 { title: this.$t("photo"), align: 'start', key: 'img',cellRenderer:function(params) {
                         return '<img href="'+params.value+'" class="object-cover w-20" />';
                       } }];
         else 
         this.headers= [
                 { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                { title: this.$t("contactus"), align: 'start', key: 'contact',width: '300px' },
+                { title: this.$t("contact"), align: 'start', key: 'contact',width: '300px' },
                 { title: this.$t("photo"), align: 'start', key: 'img', width: '200px', cellRenderer:function(params) {
                         return '<img href="'+params.value+'" class="object-cover w-20" />';
                 },
