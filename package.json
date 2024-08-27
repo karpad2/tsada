@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "0.0.14d",
+  "version": "0.0.15",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,6 +16,7 @@
     "@tsparticles/vue3": "^3.0.1",
     "@vueup/vue-quill": "^1.2.0",
     "appwrite": "^15.0.0",
+    "axios": "^1.7.5",
     "express": "^4.19.2",
     "gsap": "^3.12.5",
     "mitt": "^3.0.1",

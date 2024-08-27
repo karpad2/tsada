@@ -5,6 +5,7 @@
             <v-btn @click="save" class="m-5">{{ $t('save') }}</v-btn>
             <v-btn @click="delete_content">{{ $t('delete') }}</v-btn>
         </div>
+        
 
         <div>
             <v-file-input @change="file_upload" v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
@@ -66,11 +67,19 @@
             <QuillEditor content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
         </div>
     </div>
+    <div>
+      
+       <div>
+            
+            <v-btn @click="share_fb">{{ $t('fb_share') }}</v-btn>
+        </div>
+    </div>
     </div>
 </template>
 <script lang="ts">
-import {Client,Databases,ID,Storage,Query } from "appwrite";
+import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
+import axios from "axios";
 
 import {useLoadingStore} from "@/stores/loading";
 
@@ -90,6 +99,8 @@ data()
         visible:false,
         default_img_link:"",
         file_link:null,
+        fb_message:"",
+        fb_public:false,
         img:""
     }
 },
@@ -213,6 +224,26 @@ methods:{
     //this.getMD();
 
     },
+    async share_fb() {
+  //const functions = new Functions(appw);
+  const database = new Databases(appw);
+
+  let kk=await database.getDocument(config.website_db,config.users_settings,"fb_access_token");
+  // Prepare the URL to share
+  let x = `https://share.tsada.edu.rs/${this.$route.params.id}`;
+
+  const response = await axios.post(
+      `https://graph.facebook.com/v20.0/${config.pan}/feed`,
+      {
+        message: null,  // Custom message from the request
+        link: x,  // Link to share
+        access_token: kk.parameter,
+        published: true  // If 'makePrivate' is true, set published to false
+      }
+    );
+    console.log(response);
+},
+
     async delete_content()
     {
         const database = new Databases(appw);

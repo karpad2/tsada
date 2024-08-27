@@ -64,7 +64,7 @@
     </div>
 </template>
 <script lang="ts">
-import {Client,Databases,ID,Storage,Query } from "appwrite";
+import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
 
 import {useLoadingStore} from "@/stores/loading";
@@ -95,6 +95,7 @@ methods:{
             
             const database = new Databases(appw);
             const storage = new Storage(appw);
+            
             const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
@@ -183,6 +184,8 @@ methods:{
     //this.getMD();
 
     },
+    
+
     async delete_content()
     {
         const database = new Databases(appw);

@@ -18,7 +18,7 @@
               <img src="@a/Erasmus_Logo.svg" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
             </div>
-              <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter mt-5">
+              <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter ">
                   
                   <router-link to="/home" class="btn btn-ghost    cursor-pointer   ">{{ $t('home') }}</router-link>
                   <div class="dropdown">

@@ -25,7 +25,7 @@
 
       <template v-slot:item.edit3="{ item }">
         <router-link v-if="false" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
-        <v-btn>{{ $t("delete") }}</v-btn>
+        <v-btn @click="delete_content(item.id,item.other_document)">{{ $t("delete") }}</v-btn>
       </template>
       <template #bottom></template>
         </v-data-table>
@@ -131,6 +131,28 @@
                 
             
                 this.loaded=true;
+                },
+                async delete_content(aaa,bbb)
+                {
+                    const database = new Databases(appw);
+                    const storage = new Storage(appw);
+                    try{
+                    let n=await storage.deleteFile(config.fs_erasmus,bbb);
+                    }
+                    catch (ex)
+                    {
+                        console.warn(ex)
+                    }
+                    try{
+                    let k= await database.deleteDocument(config.website_db, config.erasmus_applies,aaa);  
+                    }
+                    catch(ex)
+                    {
+                        console.warn(ex)
+                    }
+                    this.$notify(this.$t('deleted'));
+                    this.load_messages_base();
+                    //this.router.push("/home");
                 },
                 rt_time(a)
                 {   moment.locale('hu');

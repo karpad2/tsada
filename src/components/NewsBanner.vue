@@ -9,11 +9,11 @@
             
             </div>
             <div class="flex flex-wrap -m-4">
-                <div v-for="course in courses" class="xl:w-1/4 md:w-1/2 p-4">
-                    <div  class="bg-slate-100/30 hover:bg-sky-400/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-                        <img class="h-40 rounded w-full object-cover object-center mb-6"
+                <div v-for="course in courses" class="xl:w-1/4 sm:w-full md:w-1/2 p-4">
+                    <div  class="bg-slate-100/30 hover:bg-sky-400/30   dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
+                        <img class="h-40 rounded w-full object-cover sm:w-full object-center mb-6"
                             :src="course.img" alt="content">
-                        <h3 class="tracking-widest text-sky-500 text-s font-medium title-font">{{ course.subtitle }}</h3>
+                        <h3 class="tracking-widest text-sky-500 text-s  font-medium title-font">{{ course.subtitle }}</h3>
                         <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ course.title }}</h2>
                         <p class="leading-relaxed text-base" :v-html="course.text"></p>
                     </div>

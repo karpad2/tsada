@@ -1,6 +1,8 @@
 import { Client,Account } from 'appwrite';
 import config from './config.json';
 const appw = new Client();
+
+
 import {useLoadingStore} from "@/stores/loading";
 
 appw
