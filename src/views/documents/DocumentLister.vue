@@ -1,3 +1,5 @@
+
+
 <template>
     <section class="text-gray-600 min-h-screen">
         <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
@@ -99,6 +101,26 @@
                     
                 }),
         methods:{
+            rt_time(a)
+                {   const loadingStore = useLoadingStore();
+                    let local=loadingStore.language;
+                    if(local=="rs"||local=="sr")
+                    {
+                        moment.locale('sr');
+                    }
+                    else if(local=="hu")
+                    {
+                        moment.locale('hu');
+                    }
+                    else if(local=="en")
+                    {
+                        moment.locale('en');
+                    }
+                    else {
+
+                    }
+                    return moment(a).format("LLL");
+                },
             async new_stuff()
         {
             const database = new Databases(appw);
@@ -165,26 +187,7 @@
             
                 this.loaded=true;
                 },
-                rt_time(a)
-                {   const loadingStore = useLoadingStore();
-                    let local=loadingStore.language;
-                    if(local=="rs"||local=="sr")
-                    {
-                        moment.locale('sr');
-                    }
-                    else if(local=="hu")
-                    {
-                        moment.locale('hu');
-                    }
-                    else if(local=="en")
-                    {
-                        moment.locale('en');
-                    }
-                    else {
-
-                    }
-                    return moment(a).format("LLL");
-                } 
+               
             
            
         },

@@ -87,12 +87,7 @@
                   </div>
                   
                   
-                  <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
-                  <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
-                      <li v-for="doccategory in doccategories" :key="doccategory.id"><router-link :to="'/documents/'+doccategory.id">{{ doccategory.name }}</router-link></li>
-                  </ul>
-                  </div>
+                  <router-link to="/documents" class="btn btn-ghost  cursor-pointer ">{{ $t('documents') }}</router-link>
   
                   <div v-if="!mobile_view" class="dropdown ">
                   <div tabindex="0" role="button" class="btn btn-ghost cursor-pointer"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
@@ -123,15 +118,9 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('account') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li  ><router-link to="/admin/messages">{{ $t('messages') }}</router-link></li>
-                      <li @click="logout" ><router-link >{{ $t('logout') }}</router-link></li>
+                      <li  ><router-link to="/" @click="logout">{{ $t('logout') }}</router-link></li>
                   </ul>
                   </div>
-                  
-                  
-                  
-                  
-                  
-                  
 
                   <router-link v-else to="/login" class="btn btn-ghost  mr-5  cursor-pointer   ">
                   {{ $t('login') }}

@@ -70,9 +70,9 @@ const router = createRouter({
     },
     
   {  
-        path:'/documents/:category',
+        path:'/documents',
         name:'documents',
-        component: () => import('../views/documents/DocumentLister.vue')      
+        component: () => import('../views/documents/Documents.vue')      
       },  
     {
       path:'/renderer/:mode/:id',
