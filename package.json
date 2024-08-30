@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "0.0.15a",
+  "version": "0.0.15c",
   "private": true,
   "type": "module",
   "scripts": {
@@ -39,6 +39,7 @@
     "vuestic-ui": "^1.9.12"
   },
   "devDependencies": {
+    "@vite-pwa/assets-generator": "^0.2.4",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "autoprefixer": "^10.4.20",

@@ -1,6 +1,6 @@
 <template>
   <header v-if="reload" :class="{mobile_force:style_computed_for_mobile}" style="z-index: 200;"  class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
-          <div  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="container mx-auto flex flex-wrap flex-col md:flex-row items-center ">
+          <div :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="container mx-auto flex flex-wrap flex-col md:flex-row items-center ">
             
             <div class="flex items-center">
 
@@ -30,12 +30,12 @@
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                       <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
                       <li ><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
-                      <li ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
+                      <li v-if="false" ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
                   </ul>
                   </div>
 
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer   ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                     <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
                         <summary >{{ $t("school_profiles") }} </summary>
@@ -77,7 +77,16 @@
                   </ul>
                   </div>
   
-                  <router-link to="/gallery" class="btn btn-ghost    cursor-pointer   ">{{ $t('gallery') }}</router-link>
+                  <router-link to="/gallery" class="btn btn-ghost  cursor-pointer ">{{ $t('gallery') }}</router-link>
+                  
+                  <div class="dropdown">
+                  <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{ $t('for_students') }} <i class="pi pi-angle-down"></i></div>
+                  <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                      <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
+                  </ul>
+                  </div>
+                  
+                  
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('documents') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
@@ -86,17 +95,17 @@
                   </div>
   
                   <div v-if="!mobile_view" class="dropdown ">
-                  <div tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   "><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost cursor-pointer"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="lang in languages" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                   </ul>
                   </div>
-                  <div v-if="mobile_view" role="button" class=" btn btn-ghost    cursor-pointer   ">
+                  <div v-if="mobile_view" role="button" class=" btn btn-ghost  cursor-pointer   ">
                     <button v-for="lang in languages" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
                   </div>
   
                   <div class="dropdown">
-                  <div tabindex="0" role="button" class="btn btn-ghost  mr-6  cursor-pointer   ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
+                  <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
                       <li  ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
@@ -105,28 +114,29 @@
                   </div>
                   
   
-                  <router-link v-if="!isLoggedin" to="/contact" class="btn btn-ghost  mr-6  cursor-pointer   ">
+                  <router-link v-if="false" to="/contact" class="btn btn-ghost  mr-5  cursor-pointer   ">
                   {{ $t('contactus') }}
                   <i class="pi pi-right"></i>
                   </router-link>
   
-                  <router-link v-else to="/admin/messages" class="btn btn-ghost  mr-6  cursor-pointer   ">
-                  {{ $t('messages') }}
-                  <i class="pi pi-right"></i>
-                  </router-link>
-  
-                  <span v-if="isLoggedin" @click="logout" class="btn btn-ghost  mr-6  cursor-pointer   ">
-                  {{ $t('logout') }}
-                  </span>
-  
-                  <router-link v-else to="/login" class="btn btn-ghost  mr-6  cursor-pointer   ">
+                  <div v-if="isLoggedin"  class="dropdown">
+                  <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('account') }} <i class="pi pi-angle-down"></i></div>
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                      <li  ><router-link to="/admin/messages">{{ $t('messages') }}</router-link></li>
+                      <li @click="logout" ><router-link >{{ $t('logout') }}</router-link></li>
+                  </ul>
+                  </div>
+                  
+                  
+                  
+                  
+                  
+                  
+
+                  <router-link v-else to="/login" class="btn btn-ghost  mr-5  cursor-pointer   ">
                   {{ $t('login') }}
                   </router-link>
-  
-  
-              </nav>
-              
-                  
+              </nav> 
           </div>
       </header>
   </template>
@@ -159,6 +169,7 @@
               reload:ref(true),
               menu_opened:false,
               mobile_view:false,
+              _students:[],
               logged_in:false,
               lang:"",
               loa:null
@@ -182,6 +193,7 @@
           this.getDocumentsCategories();
           this.getAbouts();
           this.getErasmus();
+          this.getStudents();
           this.languages.forEach(element => {
               if(element.code==cc.language)
               this.lang=element.country;
@@ -372,6 +384,37 @@
           });
   
           },
+          async getStudents()
+          {
+          const database = new Databases(appw);
+          const storage = new Storage(appw);
+          const cc=useLoadingStore();
+          let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","students"),Query.select(["title_hu","title_en","title_rs","$id"])]);
+          //console.log(l);
+          //let local=localStorage.getItem("lang");
+          l.documents.forEach(async element => {
+              //console.log(element);
+              let a={name:"",id:""};
+              if(cc.language=="en")
+              {
+                  a.name=element.title_en;  
+              }
+              else if(cc.language=="hu")
+              {
+                  a.name=element.title_hu;
+                  
+              }
+              else if(cc.language=="rs"||cc.language=="sr")
+              {
+                  a.name=convertifserbian(element.title_rs);
+              }
+  
+              a.id=element.$id;
+              this._students.push(a);
+          });
+  
+          },
+
       },
       computed:{
           erasmus()
