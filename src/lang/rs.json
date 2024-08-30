@@ -35,7 +35,7 @@
     "msc":"MSC",
     "password":"Lozinka",
     "accept":"U redu",
-    "cookie-text":"Ova web stranica koristi kolačiće (cookies).",
+    "cookie-text":"Ova web stranica koristi kolačiće.",
     "invisible":"Nevidljivo",
     "add_new_content":"Dodaj novi sadržaj",
     "messages":"Poruke",
@@ -118,5 +118,7 @@
     "erasmus_applies": "Prijave za Erasmus",
     "apply_saved": "Prijava sačuvana.",
     "for_students":"Za studente",
-    "account":"Profil"
+    "account":"Profil",
+    "studentdocuments":"Dokumenti za učenike"
+
 }

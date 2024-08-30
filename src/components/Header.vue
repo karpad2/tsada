@@ -83,7 +83,8 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{ $t('for_students') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
-                  </ul>
+                      <li  ><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li>  
+                    </ul>
                   </div>
                   
                   

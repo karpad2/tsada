@@ -73,7 +73,12 @@ const router = createRouter({
         path:'/documents',
         name:'documents',
         component: () => import('../views/documents/Documents.vue')      
-      },  
+      },
+      {  
+        path:'/studentdocuments',
+        name:'studentdocuments',
+        component: () => import('../views/documents/StudentDocuments.vue')      
+      },     
     {
       path:'/renderer/:mode/:id',
       name:'renderer',
@@ -93,6 +98,11 @@ const router = createRouter({
       path:'/admin/document/:id',
       name:'document_editor',
       component: () => import('../views/admin/editor/DocumentEditor.vue')      
+    },
+    {
+      path:'/admin/studentdocument/:id',
+      name:'student_document_editor',
+      component: () => import('../views/admin/editor/StudentDocumentEditor.vue')      
     },
     {
       path:'/admin/gallery-edit/:id',
