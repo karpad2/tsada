@@ -119,7 +119,11 @@
     "apply_saved": "Application saved.",
     "for_students":"For students",
     "account":"Account",
-    "studentdocuments":"Documents for students"
+    "studentdocuments":"Documents for students",
+    "author":"Author",
+    "documents_flag":"Enable documents",
+    "album_flag":"Enable gallery",
+    "edit_gallery":"Edit gallery"
 
 
 

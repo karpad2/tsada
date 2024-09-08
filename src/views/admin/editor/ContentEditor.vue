@@ -2,8 +2,9 @@
     <div class="relative mb-4 container  px-5  mx-auto bg-white" >
         <div>
             <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
-            <v-btn @click="save" class="m-5">{{ $t('save') }}</v-btn>
-            <v-btn @click="delete_content">{{ $t('delete') }}</v-btn>
+            <v-btn class="m-5" @click="save" >{{ $t('save') }}</v-btn>
+            <v-btn class="m-5" @click="delete_content">{{ $t('delete') }}</v-btn>
+            <v-btn class="m-5" @click="share_fb">{{ $t('fb_share') }}</v-btn>
         </div>
         
 
@@ -67,11 +68,48 @@
             <QuillEditor content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
         </div>
     </div>
+
+    <div>
+            <v-switch v-model="documents_flag" @change="documents_load" :label="$t('documents_flag')"></v-switch>
+            <div v-if="documents_flag">
+                <div   class="m-auto w-full">
+   
+      
+   <v-data-table  height="400" :headers="headers" :items="documents">
+     <template v-slot:item.date="{ item }">
+     {{ rt_time(item.date) }}
+     </template>
+ 
+   <template v-slot:item.open="{ item }">
+     <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
+    
+   </template>
+
+   <template v-slot:item.edit="{ item }">
+     <router-link :to="'/admin/text-document-editor/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
+    
+   </template>
+
+   <template #bottom></template>
+     </v-data-table>
+     <v-btn @click="new_stuff()" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
+ </div>
+            
+        </div>
+    </div>
+
+    <div>
+            <v-switch v-model="album_flag" @change="gallery_change" :label="$t('album_flag')"></v-switch>
+            <div v-if="album_flag">
+                <AlbumViewer :caption="false" :id="gallery_id" />
+             </div>
+    </div>
+
     <div>
       
        <div>
             
-            <v-btn @click="share_fb">{{ $t('fb_share') }}</v-btn>
+            
         </div>
     </div>
     </div>
@@ -80,13 +118,16 @@
 import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
 import axios from "axios";
-
+import moment from 'moment/min/moment-with-locales';
 import {useLoadingStore} from "@/stores/loading";
+import AlbumViewer from "@/components/AlbumViewer.vue";
+import { convertifserbian } from "@/lang";
 
 export default{
 data()
 {
     return{
+        
         title_en:"",
         title_hu:"",
         title_rs:"",
@@ -97,18 +138,39 @@ data()
         hun_flag:true,
         en_flag:false,
         visible:false,
+        documents_flag:false,
+        album_flag:false,
         default_img_link:"",
+        gallery_id:"",
         file_link:null,
         fb_message:"",
         fb_public:false,
-        img:""
+        img:"",
+        headers:[],
+        colDefs:[],
+        documents:[],
+        doc_loaded:false
     }
 },
 components:{
+    AlbumViewer
 },
 mounted()
 {
     this.getMD();
+    this.headers= [
+                    { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
+                    { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
+                    
+                    { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
+                    
+                    ];
+        
+
+        
+            this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
+            this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
+        
 
 },
 methods:{
@@ -167,7 +229,7 @@ methods:{
             }*/
 
             //this.title=convertifserbian(k.documents[0].title);
-            let gal=k.documents[0].gallery;
+            this.gallery_id=k.documents[0].gallery;
             //console.log(k.documents[0].gallery);
             
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
@@ -191,6 +253,16 @@ methods:{
             console.log(this.video_link);
             this.video_link=config.default_video;
             this.loaded=true;*/
+            this.documents_flag=k.documents[0].has_documents;
+            this.album_flag=k.documents[0].has_gallery;
+            
+               
+            
+            
+
+
+
+            this.synchronize_documents();
         },
 
     async save()
@@ -215,12 +287,16 @@ methods:{
             "isSerbian":this.srb_flag,
             "isEnglish":this.en_flag,
             "visible":this.visible,
+            "has_documents":this.documents_flag,
+            "has_gallery":this.album_flag,
+            "gallery":this.gallery_id,
             "default_image":this.default_image
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)
     );
     this.$notify(this.$t('saved'));
+    
     //this.getMD();
 
     },
@@ -243,6 +319,99 @@ methods:{
     );
     console.log(response);
 },
+async documents_load()
+{
+    this.save();
+    this.synchronize_documents();
+    
+},
+async gallery_change()
+{
+    if(this.gallery_id==null)
+    {
+        this.gallery_id=await this.new_gallery();
+    }
+    this.save();
+    //console.log(this.gallery_id);
+ //if(this.gallery_id)
+}, 
+rt_time(a)
+                {   const loadingStore = useLoadingStore();
+                    let local=loadingStore.language;
+                    if(local=="rs"||local=="sr")
+                    {
+                        moment.locale('sr');
+                    }
+                    else if(local=="hu")
+                    {
+                        moment.locale('hu');
+                    }
+                    else if(local=="en")
+                    {
+                        moment.locale('en');
+                    }
+                    else {
+
+                    }
+                    return moment(a).format("LLL");
+                },
+
+    async new_stuff()
+        {
+            const database = new Databases(appw);
+            const l= await database.createDocument(config.website_db, config.text_documents,ID.unique(),{"texts":this.$route.params.id});
+            this.$router.push("/admin/text-document-editor/"+l.$id);
+        },
+        async new_gallery()
+        {
+            const database = new Databases(appw);
+            const l= await database.createDocument(config.website_db, config.gallery,ID.unique(),{"visible":false});
+            return l.$id;
+            //this.$router.push("/admin/gallery-edit/"+l.$id);
+        },
+
+        async synchronize_documents()
+        {
+            const database = new Databases(appw);
+            if(this.documents_flag)
+            {
+                this.doc_loaded=false;
+            this.documents=[];
+                const loadingStore = useLoadingStore();
+                let local=loadingStore.language;
+                let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
+                Query.equal("texts",[this.$route.params.id])]);
+
+                await documents_cucc.documents.forEach(async el2 => {
+                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
+                a.id=el2.$id;
+                if(local=="en"||local=="hu")
+                {
+                    a.name=el2.document_title_hu;
+                    //a.role=el2.role;
+                    a.contact=el2.contact;
+                }
+                else if(local=="rs"||local=="sr")
+                {
+                    a.name=convertifserbian(el2.document_title_rs);
+                    //a.role=convertifserbian(el2.role);
+                    a.contact=el2.contact;
+                }
+                
+                else
+                {
+    
+                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
+                }
+                a.id=el2.$id;
+                a.doc_id=el2.document_id;
+                a.date=el2.$createdAt;    
+                this.documents.push(a);
+                });
+                this.doc_loaded=true;
+            }
+        },
+        
 
     async delete_content()
     {

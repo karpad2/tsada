@@ -8,9 +8,9 @@
                 </div>
                 
             </div>
-            <p v-if="admin">
-                    <VBtn  @click="editmode">{{ $t("edit") }}</VBtn>
-                </p>
+            <div class=" mb-5 mt-5" v-if="admin">
+                    <VBtn  @click="editmode">{{ $t("edit_gallery") }}</VBtn>
+            </div>
             <div class="flex flex-wrap -m-4">
                 
                     

@@ -94,9 +94,10 @@
                     role: 'First',
                     contact: 'Lorem ipsum dolor sit'}],
                     documents:[],
-                    colDefs:[],
+                    
                     loaded:false,
                     headers:[],
+                    colDefs:[],
                     admin:false
                     
                 }),

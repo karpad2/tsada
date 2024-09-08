@@ -33,7 +33,7 @@
                   v-model="password"
                   :label="$t('password')"
                 ></v-text-field>
-                  <InputText v-if="false" v-model.lazy="password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('password')" />
+                  <InputText v-if="false" @keyup.enter="login_by_app" v-model.lazy="password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('password')" />
                   
                 </div>
               </div>
@@ -48,7 +48,7 @@
               </div>
 
               <div class="!mt-8">
-                <v-btn   @click="login_by_app" >{{ $t('login') }}</v-btn>
+                <v-btn type="submit"   @click="login_by_app" >{{ $t('login') }}</v-btn>
                 <button v-if="false" type="submit" @click="login_by_app"  class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                   {{ $t("login") }}
                 </button>

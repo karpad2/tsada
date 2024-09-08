@@ -97,7 +97,6 @@
     "primary_construction_works_operator":"Elsődleges építési munkák operatőre",
     "mechatronic_technician":"Mechatronikai technikus",
     "computer_electrotechnician":"Számítógépek Elektrotechnikusa",
-    
     "classlist":"Osztályok listája",
     "masterchief":"Osztályfőnök",
     "teaching_language":"Oktatás nyelve",
@@ -123,5 +122,9 @@
     "fb_public":"Facebook megosztás nyilvános?",
     "for_students":"Diákoknak",
     "account":"Profil",
-    "studentdocuments":"Dokumentumok tanulóknak"
+    "studentdocuments":"Dokumentumok tanulóknak",
+    "author":"Szerző",
+    "documents_flag":"Dokumentumok engedélyezése",
+    "album_flag":"Galéria engedélyezése",
+    "edit_gallery":"Galéria szerkesztése"
  }

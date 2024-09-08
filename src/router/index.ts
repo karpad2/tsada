@@ -100,6 +100,11 @@ const router = createRouter({
       component: () => import('../views/admin/editor/DocumentEditor.vue')      
     },
     {
+      path:'/admin/text-document-editor/:id',
+      name:'text_document_editor',
+      component: () => import('../views/admin/editor/TextDocumentEditor.vue')      
+    },
+    {
       path:'/admin/studentdocument/:id',
       name:'student_document_editor',
       component: () => import('../views/admin/editor/StudentDocumentEditor.vue')      
