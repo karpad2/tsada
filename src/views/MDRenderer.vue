@@ -7,7 +7,7 @@
                     <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <p  class="align-bottom  ml-3 leading-relaxed text-white">
+                <p v-if="false" class="align-bottom  ml-3 leading-relaxed text-white">
                     
                     <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
                     
@@ -20,7 +20,7 @@
                     <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <p  class=" align-bottom ml-3 leading-relaxed text-white">
+                <p v-if="false" class=" align-bottom ml-3 leading-relaxed text-white">
                     
                     <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
                     

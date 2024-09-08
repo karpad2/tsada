@@ -119,6 +119,10 @@
     "apply_saved": "Prijava sačuvana.",
     "for_students":"Za studente",
     "account":"Profil",
-    "studentdocuments":"Dokumenti za učenike"
+    "studentdocuments":"Dokumenti za učenike",
+    "author":"Autor",
+    "documents_flag":"Dozvoli dokumente",
+    "album_flag":"Dozvoli galeriju",
+    "edit_gallery":"Izmeni galeriju"
 
 }
