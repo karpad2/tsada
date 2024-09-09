@@ -323,9 +323,21 @@ methods:{
     {
         const storage = new Storage(appw);
     const database = new Databases(appw);
-
+    
+    try{
     let l= storage.deleteFile(config.gallery_pictures_storage,aa);
+    }
+    catch(ex)
+    {
+        console.log("hiba a törlésnél");
+    }
+    try{
     let k= database.deleteDocument(config.website_db, config.album_images,aa);
+}
+    catch(ex)
+    {
+        console.log("hiba a törlésnél");
+    }
     this.getMD();
 }
 }
