@@ -123,7 +123,11 @@
     "author":"Author",
     "documents_flag":"Enable documents",
     "album_flag":"Enable gallery",
-    "edit_gallery":"Edit gallery"
+    "edit_gallery":"Edit gallery",
+    "erasmus_applies_result":"Erasmus+ locations and student points list",
+    "score":"Score",
+    "delete_broken_images":"Delete broken images",
+    "applies_are_closed":"Applications are closed, or you have already applied"
 
 
 

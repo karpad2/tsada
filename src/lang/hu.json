@@ -117,6 +117,7 @@
     "other_positive_documents":"Egyéb dokumentum/Ajánlólevél",
     "e.g.":" Pl.",
     "erasmus_applies":"Erasmus jelentkezések",
+    "erasmus_applies_result":"Erasmus+ helyszínek és diákok pontlistája",
     "apply_saved":"Jelentkezés mentve.",
     "fb_share":"Facebook megosztás",
     "fb_public":"Facebook megosztás nyilvános?",
@@ -126,5 +127,10 @@
     "author":"Szerző",
     "documents_flag":"Dokumentumok engedélyezése",
     "album_flag":"Galéria engedélyezése",
-    "edit_gallery":"Galéria szerkesztése"
+    "edit_gallery":"Galéria szerkesztése",
+    "applies_are_closed":"Jelentkezés lezárult, vagy már jelentkeztél",
+    "score":"Pontszám",
+    "delete_broken_images":"Elromlott képek törlése",
+    "deleted":"Törölve.",
+    "location":"Helyszín"
  }

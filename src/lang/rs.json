@@ -123,6 +123,10 @@
     "author":"Autor",
     "documents_flag":"Dozvoli dokumente",
     "album_flag":"Dozvoli galeriju",
-    "edit_gallery":"Izmeni galeriju"
+    "edit_gallery":"Izmeni galeriju",
+     "erasmus_applies_result":"Spisak lokacija i bodovna lista učenika za Erasmus+",
+    "score":"Rezultat",
+     "delete_broken_images":"Obriši pokvarene slike",
+     "applies_are_closed":"Prijave su zatvorene ili ste se već prijavili"
 
 }

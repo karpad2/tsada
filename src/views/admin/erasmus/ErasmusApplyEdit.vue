@@ -8,22 +8,22 @@
                         <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                     </div>
                 </video-background>
-
-                
-<div class="pb-2 w-full dark:text-white" v-if="erasmus_apply_on&&!erasmus_applied">
     
-  <v-form @submit.prevent="submit" ref="form" v-model="isFormValid">
+<div class="pb-2 w-full dark:text-white">
+    
+  <v-form  ref="form">
     <v-text-field
     required
       v-model="name"
       :counter="40"
+       @change="save"
       :label="$t('name')"
     ></v-text-field>
 
     <v-text-field
     required
       v-model="phone"
-      
+       @change="save"
       :counter="15"
       :label="$t('phone')"
     ></v-text-field>
@@ -31,63 +31,43 @@
     <v-text-field
     required
       v-model="email"
+       @change="save"
       type="email"
       :label="$t('email')"
     ></v-text-field>
 
-    <v-text-field
-    required
-      v-model="born_year"
-      type="number"
-      :hint="$t('e.g.')+ eg_age"
-      :label="$t('born_year')"
-    ></v-text-field>
 
     <v-text-field
     required
-      v-model="mark_avg"
-      type="number"
-      :hint="$t('e.g.')+' 5.00'"
-      :label="$t('mark_avg')"
-    ></v-text-field>
-
-    <v-text-field
-    required
-    
+     @change="save"
       v-model="which_class"
       :hint="$t('e.g.')+' III-3'"
       :label="$t('class') "
     ></v-text-field>
 
-    <v-file-input required @change="upload_motivation_letter" v-model="file_motivation_letter"  accept=".pdf" :label="$t('motivation_letter')"></v-file-input>
+    <v-select
+            :items="locations"
+            v-model="location"
+             @change="save"
+            :label="$t('location')"
+            item-value="id"
+            item-text="title"
+            @update:modelValue="save"
+            ></v-select>
 
-    <v-file-input @change="upload_positive_document" v-model="file_positive_document"  accept=".pdf" :label="$t('other_positive_documents')"></v-file-input>
-
-    <v-checkbox
-      required
-      v-model="accept_law"
-      :label="$t('law_for_data_store')"
-      color="info"
+            <v-text-field
+    required
+     @change="save"
+      v-model="score"
       
-    ></v-checkbox>
-
-    <v-btn
-    
-      class="me-4"
-      type="submit"
-      :disabled="!accept_law&&isFormValid"  
-    >
-      {{$t("apply_for_erasmus")}}
-    </v-btn>
+      :label="$t('score') "
+    ></v-text-field>        
 
     
   </v-form>
 </div>
 
-<div class="pb-2 w-full dark:text-white text-center" v-else>
-    <h2 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ $t("applies_are_closed") }}</h2>
-    
-  </div>
+
     
     
     </div>
@@ -107,7 +87,7 @@
     import {convertifserbian} from "@/lang";
     import moment from "moment";
     import gsap from "gsap";
-import { AgXToneMapping, CubeCamera } from "three";
+import { AgXToneMapping } from "three";
     
     export default {
         components: {
@@ -115,7 +95,7 @@ import { AgXToneMapping, CubeCamera } from "three";
         },
         data() {
             return {
-                erasmus_applied:false,
+                
                 chtml:'',
                 gallery:[],
                 title:'',
@@ -131,6 +111,7 @@ import { AgXToneMapping, CubeCamera } from "three";
                 name:"",
                 email:"",
                 phone:"",
+                score:"",
                 which_class:"",
                 born_year:null,
                 file_motivation_letter:null,
@@ -141,94 +122,108 @@ import { AgXToneMapping, CubeCamera } from "three";
                 isFormValid:false,
                 mark:null,
                 accept_law:false,
-                items:[]
+                items:[],
+                locations:[{id:"",title:""}]
             }
         },
         mounted()
         {
            // this.getMD();
             const cc=useLoadingStore();
-            this.erasmus_applied=cc.erasmus_apply;
             this.admin=cc.userLoggedin;
             let v2="659d5e6949ae7294f9f1";
             const storage = new Storage(appw);
+            this.getLocations();
+            this.getData();
             document.title=this.$t("erasmus_apply");
             this.getErasmusSettings();
             //this.video_link=storage.getFileView(config.website_images,v2).href;
            
         },
         methods:{
-            
+            async getData()
+            {
+                const database = new Databases(appw);
+                const storage = new Storage(appw);
+                const loadingStore = useLoadingStore();
+                let local=loadingStore.language;
+                let n= await database.getDocument(config.website_db, config.erasmus_applies,this.$route.params.id);
+                //await n.documents.forEach(async el2 => {
+                  //  let a={name:"",class:"",contact:"",email:"",date:"",id:"",phone:"",mark:"",motivation_letter:"",other_document:""};
+                        
+                        this.name=n.name;
+                        this.phone=n.phone;
+                        this.email=n.email;
+                        this.mark=n.mark;
+                        this.score=n.score;
+                        this.which_class=n.class;
+                        console.log(n);
+                        if(n.erasmusLocation!=null)
+                        this.location=n.erasmusLocation.$id;
+                        //a.motivation_letter=el2.link_motivation_letter;
+                        //a.other_document=el2.link_other_document;
+                    //this.messages.push(a);
+                    //});
+            },
+            async getLocations()
+            {
+                this.locations=[{id:"",title:"nem megy"}]
+                const database = new Databases(appw);
+                let k= await database.listDocuments(config.website_db, config.erasmus_location);
+                k.documents.forEach(ll=>{
+                    this.locations.push({id:ll.$id,title:ll.location_hu})
+                })
+
+            },
             async submit()
             {
-              const database = new Databases(appw);
+             /* const database = new Databases(appw);
               const l= await database.createDocument(config.website_db, config.erasmus_applies,ID.unique(),
               {"name":this.name,"email":this.email,"age":this.born_year,"class":this.which_class,"phone":this.phone,"mark":this.mark_avg,
               "link_motivation_letter":this.link_motivation_letter,"link_other_document":this.link_positive_document}
-
-            );
-
-
+            );*/
             this.$notify(this.$t('apply_saved'));
-            const cc=useLoadingStore();
-            cc.setErasmusAppliedSetting(true);
-            this.erasmus_applied=true;
+
             },
             age()
             {
               let l=new Date();
               return l.getFullYear()-this.born_year;
             },
-            async upload_positive_document()
-            {
-              if (!this.file_positive_document)
-                {
-                    console.warn("no file");
-                    return;
-                } 
-            this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
-            //console.log(this.file_link[0]);
-
-            const storage = new Storage(appw);
-            const result = await storage.createFile(
-            config.fs_erasmus, // bucketId
-            ID.unique(), // fileId
-            this.file_positive_document // file
-            // permissions (optional)
-            );
-            this.link_positive_document= await result.$id;
-            //this.save();
-            //this.getMD();
-            this.$notify(this.$t('file_uploaded'));
-
-
-            },
-            async upload_motivation_letter()
-            {
-              if (!this.file_motivation_letter)
-                {
-                    console.warn("no file");
-                    return;
-                } 
-            this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
-            //console.log(this.file_motivation_letter);
-
-            const storage = new Storage(appw);
-            const result = await storage.createFile(
-            config.fs_erasmus, // bucketId
-            ID.unique(), // fileId
-            this.file_motivation_letter // file
-            // permissions (optional)
-            );
-            this.link_motivation_letter= await result.$id;
-            //this.save();
-            //this.getMD();
-            this.$notify(this.$t('file_uploaded'));
-
-
-            },
+            async save() {   
+  const database = new Databases(appw);
+  
+  try {
+    // Update the Erasmus application document with the data from the form
+    const result = await database.updateDocument(
+      config.website_db,         // Database ID
+      config.erasmus_applies,    // Collection ID
+      this.$route.params.id,     // Document ID (from route parameters)
+      {
+        name: this.name,
+        phone: this.phone,
+        email: this.email,
+        class: this.which_class,
+        erasmusLocation: this.location,   // Assuming the location stores an ID
+        score: this.score,                // Assuming there's a score field
+        mark: this.mark                   // Assuming there's a mark field
+        // Add any other fields you want to update
+      }
+    );
+    
+    // Notify the user of success
+    this.$notify(this.$t('apply_saved'));
+    console.log('Save successful:', result);
+  } catch (error) {
+    // Handle any errors during the document update
+    console.error('Error saving data:', error);
+    this.$notify({
+      type: 'error',
+      text: this.$t('error_saving')
+    });
+  }
+},
+            
             async getErasmusSettings()
           {
             const cc=useLoadingStore();

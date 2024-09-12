@@ -104,7 +104,8 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
-                      <li  ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
+                      <li v-if="erasmus_apply_on" ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
+                      <li v-if="erasmus_list" ><router-link to="/erasmus/results">{{ $t("erasmus_applies_result") }}</router-link></li>
                       <li v-if="isLoggedin" ><router-link  to="/admin/erasmus/applies">{{ $t("erasmus_applies") }}</router-link></li>
                   </ul>
                   </div>
@@ -162,6 +163,9 @@
               _students:[],
               logged_in:false,
               lang:"",
+              erasmus_list:false,
+              erasmus_apply_on:false,
+
               loa:null
           }
       },
@@ -346,6 +350,7 @@
           },
           async getErasmus()
           {
+          this.getErasmusSettings();
           const database = new Databases(appw);
           const storage = new Storage(appw);
           const cc=useLoadingStore();
@@ -404,6 +409,21 @@
           });
   
           },
+
+          async getErasmusSettings()
+          {
+            const cc=useLoadingStore();
+            const database = new Databases(appw);
+
+            let l,k;
+            l= await database.getDocument(config.website_db,config.general_settings,"erasmus_list");
+            k= await database.getDocument(config.website_db,config.general_settings,"erasmus_apply_on");
+            this.erasmus_apply_on=k.setting_status;
+            this.erasmus_list=l.setting_status;
+            //console.log(l);
+            //console.log(k);
+
+          }
 
       },
       computed:{

@@ -22,12 +22,18 @@
       <template v-slot:item.edit2="{ item }">
         <router-link v-if="item.other_document!=null" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
       </template>
+      
+      <template v-slot:item.edit4="{ item }">
+        <router-link v-if="false" :to="'/admin/erasmus/editapply/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
+        <v-btn @click="edit_content(item.id,item.other_document)">{{ $t("edit") }}</v-btn>
+      </template>
+
 
       <template v-slot:item.edit3="{ item }">
         <router-link v-if="false" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
         <v-btn @click="delete_content(item.id,item.other_document)">{{ $t("delete") }}</v-btn>
       </template>
-      <template #bottom></template>
+      
         </v-data-table>
         
     </div>
@@ -68,9 +74,11 @@
                     { title: this.$t("email"), align: 'start', key: 'email',width: '300px' },
                     { title: this.$t("phone"), align: 'start', key: 'phone',width: '300px' },
                     { title: this.$t("class"), align: 'start', key: 'class',width: '300px' },
-                    { title: this.$t("mark_avg"), align: 'start', key: 'mark',width: '300px' },
+                    { title: this.$t("location"), align: 'start', key: 'location',width: '300px' },
+                    { title: this.$t("score"), align: 'start', key: 'score',width: '300px' },
                     { title: this.$t("motivation_letter"), align: 'start', key: 'edit1',width: '300px' },
                     { title: this.$t("other_positive_documents"), align: 'start', key: 'edit2',width: '300px' },
+                    { title: this.$t("edit"), align: 'start', key: 'edit4',width: '300px' },
                     { title: this.$t("delete"), align: 'start', key: 'edit3',width: '300px' },
                     ];
             this.load_messages_base();
@@ -104,15 +112,16 @@
                 }),
         methods:{
             async load_messages_base(){
-                const loadingStore = useLoadingStore();
+                
                 //loadingStore.setLoading(true);
                 this.workers=[];
                 this.roles=[];
                 //console.log();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
+                const loadingStore = useLoadingStore();
                 let local=loadingStore.language;
-                let n= await database.listDocuments(config.website_db, config.erasmus_applies,[Query.orderDesc("$createdAt")]);
+                let n= await database.listDocuments(config.website_db, config.erasmus_applies,[Query.orderDesc("$createdAt"),Query.limit(50)]);
                 await n.documents.forEach(async el2 => {
                     let a={name:"",class:"",contact:"",email:"",date:"",id:"",phone:"",mark:"",motivation_letter:"",other_document:""};
                         a.id=el2.$id;
@@ -157,6 +166,10 @@
                 rt_time(a)
                 {   moment.locale('hu');
                     return moment(a).format("LLL");
+                },
+                edit_content(id)
+                {
+                    this.$router.push(`/admin/erasmus/editapply/${id}`);   
                 } 
             
            
