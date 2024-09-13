@@ -19,7 +19,7 @@
                 <router-link :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit text-5xl"></i></router-link>
             
             </template>
-            <template #bottom></template>
+            
                 </v-data-table>
                 <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_worker_in_that_category') }}</v-btn>
             </div>
