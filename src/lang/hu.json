@@ -4,6 +4,7 @@
     "whycomehere":"Válasz a szakképzést! Válaszd a tudást, a ",
     "applynow":"Jelentkezz!",
     "courses":"Szakirányok",
+    
     "feedback":"Üzenetküldés",
     "contactustext":"Küldjön üzenetet",
     "name":"Név",
@@ -22,7 +23,7 @@
      "address":"Cím",
      "phone":"Telefon",
      "history":"Az iskola története",
-     "workers":"Dolgozók",
+     "workers":"Alkalmazottak",
      "upload_date":"Feltöltés dátuma",
      "file_download":"Fájl letöltése",
      "education":"Oktatás",
@@ -71,7 +72,7 @@
      "worker_name_hu":"Dolgozó magyar neve",
      "worker_name_rs":"Dolgozó szerb neve",
      "contact":"Dolgozó egyéb információja/Elérhetősége",
-     "timetable":"Órarend",
+     "timetable":"Óra és csengetések rendje",
      "morning":"Délelőtt",
      "afternoon":"Délután",
      "srb_short":"Szerb rövid leírás",
@@ -89,9 +90,9 @@
     "p_receiving_hour":"Pótóra",
     "school_profiles":"Oktatási profil",
     "teachers_receiving_hour":"Tanárok fogadóórái",
-    "machine":"Gépészet",
+    "machine":"Gépészet és fémmegmunkálás",
     "electrotechnic":"Elektrotechnika",
-    "civil_engineering":"Építészet",
+    "civil_engineering":"Építészet és földméréstan",
     "cnc_miller":"CNC- és egyetemes fémforgácsológép- kezelő",
     "mechanical_technician":"Számítógépes vezérlésű (CNC) gépek technikusa",
     "primary_construction_works_operator":"Elsődleges építési munkák operatőre",
@@ -132,5 +133,8 @@
     "score":"Pontszám",
     "delete_broken_images":"Elromlott képek törlése",
     "deleted":"Törölve.",
-    "location":"Helyszín"
+    "location":"Helyszín",
+    "elibrary":"E-könyvtár",
+    "parentsclub":"Szülői tanács",
+    "pepszi":"Pedagó"
  }

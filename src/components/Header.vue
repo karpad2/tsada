@@ -26,9 +26,9 @@
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
-                      <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
+                      
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
-                      <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
+                      
                       <li ><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
                       <li v-if="false" ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
                   </ul>
@@ -38,7 +38,7 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer   ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
                     <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
-                        <summary >{{ $t("school_profiles") }} </summary>
+                        <summary >{{ $t("courses") }} </summary>
                         <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                             
                         <li ><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
@@ -71,8 +71,8 @@
                         </details>
                     </li>
                     
-                    
-                      <li ><router-link to="/renderer/education/adult_education">{{ $t("adult_education") }}</router-link></li>
+                    <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
+                    <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
                       
                   </ul>
                   </div>
@@ -89,6 +89,8 @@
                   
                   
                   <router-link to="/documents" class="btn btn-ghost  cursor-pointer ">{{ $t('documents') }}</router-link>
+
+                  <router-link to="/renderer/education/adult_education" class="btn btn-ghost  cursor-pointer ">{{ $t('adult_education') }}</router-link>
   
                   <div v-if="!mobile_view" class="dropdown ">
                   <div tabindex="0" role="button" class="btn btn-ghost cursor-pointer"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
@@ -287,7 +289,7 @@
           {
               l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"])]);
           }
-          else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"])]);
+          else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
           //let local=localStorage.getItem("lang");
           //console.log(l);
           l.documents.forEach(async element => {

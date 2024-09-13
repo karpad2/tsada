@@ -76,6 +76,7 @@
                     { title: this.$t("class"), align: 'start', key: 'class',width: '300px' },
                     { title: this.$t("location"), align: 'start', key: 'location',width: '300px' },
                     { title: this.$t("score"), align: 'start', key: 'score',width: '300px' },
+                    { title: this.$t("mark"), align: 'start', key: 'mark',width: '300px' },
                     { title: this.$t("motivation_letter"), align: 'start', key: 'edit1',width: '300px' },
                     { title: this.$t("other_positive_documents"), align: 'start', key: 'edit2',width: '300px' },
                     { title: this.$t("edit"), align: 'start', key: 'edit4',width: '300px' },

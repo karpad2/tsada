@@ -127,6 +127,8 @@
      "erasmus_applies_result":"Spisak lokacija i bodovna lista učenika za Erasmus+",
     "score":"Rezultat",
      "delete_broken_images":"Obriši pokvarene slike",
-     "applies_are_closed":"Prijave su zatvorene ili ste se već prijavili"
+     "applies_are_closed":"Prijave su zatvorene ili ste se već prijavili",
+     "parents_club":"Saveta roditelja",
+     "elibrary":"E-biblioteka"
 
 }
