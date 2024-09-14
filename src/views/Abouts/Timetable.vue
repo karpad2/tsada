@@ -54,7 +54,23 @@
   </tbody>
 </table>
     </div>
+    <v-data-table  height="400" :headers="headers" :items="documents">
+     <template v-slot:item.date="{ item }">
+     {{ rt_time(item.date) }}
+     </template>
+ 
+   <template v-slot:item.open="{ item }">
+     <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
     
+   </template>
+
+   <template v-slot:item.edit="{ item }">
+     <router-link :to="'/admin/text-document-editor/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
+    
+   </template>
+
+   <template #bottom></template>
+     </v-data-table>
     
     </div>
     </section>
@@ -92,11 +108,20 @@
                 video_id:"",
                 video_link:"",
                 edumode:false,
-                admin:false
+                admin:false,
+                documents:[],
+                headers:[]
             }
         },
         mounted()
         {
+            this.headers= [
+                    { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
+                    { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
+                    
+                    { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
+                    
+                    ];
            // this.getMD();
             const cc=useLoadingStore();
             this.admin=cc.userLoggedin;
@@ -215,6 +240,75 @@
                 this.video_link=config.default_video;
                 this.loaded=true;
             },
+            async synchronize_documents()
+        {
+            const database = new Databases(appw);
+            if(this.has_documents)
+            {
+                this.doc_loaded=false;
+            this.documents=[];
+                const loadingStore = useLoadingStore();
+                let local=loadingStore.language;
+                let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
+                Query.equal("texts","timetable")]);
+
+                await documents_cucc.documents.forEach(async el2 => {
+                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
+                try
+                {
+                a.id=el2.$id;
+                }
+                catch (ex)
+                 {
+                    console.log(ex);
+                 }
+                if(local=="en"||local=="hu")
+                {
+                    a.name=el2.document_title_hu;
+                    //a.role=el2.role;
+                    a.contact=el2.contact;
+                }
+                else if(local=="rs"||local=="sr")
+                {
+                    a.name=convertifserbian(el2.document_title_rs);
+                    //a.role=convertifserbian(el2.role);
+                    a.contact=el2.contact;
+                }
+                
+                else
+                {
+    
+                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
+                }
+                a.id=el2.$id;
+                a.doc_id=el2.document_id;
+                a.date=el2.$createdAt;    
+                this.documents.push(a);
+                });
+                this.doc_loaded=true;
+            }
+        },
+        rt_time(a)
+                {   const loadingStore = useLoadingStore();
+                    let local=loadingStore.language;
+                    if(local=="rs"||local=="sr")
+                    {
+                        moment.locale('sr');
+                    }
+                    else if(local=="hu")
+                    {
+                        moment.locale('hu');
+                    }
+                    else if(local=="en")
+                    {
+                        moment.locale('en');
+                    }
+                    else {
+
+                    }
+                    return moment(a).format("LL");
+                }, 
+
             editmode()
             {
                 this.$router.push("/admin/edit/"+this.$route.params.mode+"/"+this.$route.params.id);   

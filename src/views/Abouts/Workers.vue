@@ -10,7 +10,7 @@
             </div>
             <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
             <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-            <v-data-table  height="400" :headers="headers" :items="role.workers">
+            <v-data-table  height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
                 <template v-slot:item.img="{ item }">
                 <img :src="item.img"  class="object-cover w-20" />
             </template>
@@ -19,10 +19,11 @@
                 <router-link :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit text-5xl"></i></router-link>
             
             </template>
-            
+            <template #bottom></template>
                 </v-data-table>
                 <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_worker_in_that_category') }}</v-btn>
             </div>
+            <Loading v-else />
 </div>
 </section>
 
@@ -36,12 +37,13 @@ import { convertifserbian } from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
 import {reactive,ref} from "vue";
 import gsap from "gsap";
+import Loading from "@/components/Loading.vue";
 
 
 export default {
     name: 'Workers',
     components: {
-        
+        Loading
     },
     setup()
     {

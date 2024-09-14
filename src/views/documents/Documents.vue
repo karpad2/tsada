@@ -10,7 +10,7 @@
                 </div>
                 <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
                 <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-                <v-data-table  height="400" :headers="headers" :items="role.workers">
+                <v-data-table  height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
                     <template v-slot:item.date="{ item }">
         {{ rt_time(item.date) }}
         </template>

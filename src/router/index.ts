@@ -48,6 +48,14 @@ const router = createRouter({
       component: () => import('../views/Abouts/ClassList.vue')
     },
     {
+      path: '/about/parentvisiting',
+      name: 'parentvisiting',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Abouts/ParentVisiting.vue')
+    },
+    {
       path: '/about/birthday',
       name: 'birthday',
       // route level code-splitting
@@ -239,11 +247,12 @@ router.beforeEach((to, from, next) => {
     }
 
   // Wait for 1 second (for demonstration purposes)
-  setTimeout(() => {
+ /* setTimeout(() => {
     // Hide loading screen
     loadingStore.setLoading(false);
     // Continue with navigation
     next()
-  }, 600)
+  }, 1000)*/
+  next()
 })
 export default router

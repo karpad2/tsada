@@ -23,7 +23,7 @@
 
             <div class="card-actions justify-end">
                 <v-btn v-if="default_image!=image.img_id" v-on:click="set_as_default(image.img_id)" >{{$t("set_as_default")}}</v-btn>
-                <v-btn v-on:click="delete_picture(image.img_id)">{{$t("delete")}}</v-btn>
+                <v-btn v-on:click="delete_picture(image.img_id,image.doc_id)">{{$t("delete")}}</v-btn>
             </div>
         </div>
         </div>
@@ -165,8 +165,9 @@ methods:{
                     
 
                     l.documents.forEach(element => {
-                        let a={img:"",img_id:""};
+                        let a={img:"",img_id:"",doc_id:""};
                         a.img_id=element.image_id;
+                        a.doc_id=element.$id;
                         a.img= storage.getFilePreview(
                         config.gallery_pictures_storage,           // bucket ID
                         element.image_id,       // file ID
@@ -185,59 +186,9 @@ methods:{
                 this.images.push(a);
                     });
 
-/*
-                    if(k.documents[0].default_image==null||k.documents[0].default_image=='')
-                    {
-                        this.img="https://dummyimage.com/720x400";
-                    }
-                    else
-                    this.img=storage.getFileView(config.website_images,k.documents[0].default_image).toString();
-  */              
 
-               
-           /* if(this.chtml=="---")
-            {
-                this.$router.push("/home");
-            }*/
-
-            /*if(this.$route.params.node=="news")
-            {
-                this.newsmode=true;
-                if(k.documents[0].author!="")
-                this.author= convertifserbian(k.documents[0].author);
-                this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
-            }
-
-            if(this.$route.params.node=="education")
-            {
-                this.edumode=true;
-            }*/
-
-            //this.title=convertifserbian(k.documents[0].title);
             let gal=k.documents[0].gallery;
-            //console.log(k.documents[0].gallery);
             
-            /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
-            
-            
-            console.log(m);
-            m.documents.forEach(element=>
-            {
-                let af={img:""};
-                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id).toString();
-                this.gallery.push(af);
-                this.image_cnt++;
-            });
-            //console.log(k.documents[0]);
-            */
-/*
-            this.video_id=k.documents[0].video;
-            let v2="659d5e6949ae7294f9f1";
-            this.video_id=v2;
-            this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_link);
-            this.video_link=config.default_video;
-            this.loaded=true;*/
         },
 
     async save()
@@ -278,9 +229,9 @@ methods:{
     },
     async file_upload()
     {
-        const storage = new Storage(appw);
+    const storage = new Storage(appw);
     const database = new Databases(appw);
-        if (!this.file_link)
+    if (!this.file_link)
         {
             console.warn("no file");
             return;
@@ -288,6 +239,10 @@ methods:{
     console.log("file_upload");
 
     await this.file_link.forEach(async element => {
+        this.$notify({
+                    type: 'info',
+                    text: this.$t('file_upload_started')
+                });
         console.log(element);
         const result = await storage.createFile(
     config.gallery_pictures_storage, // bucketId
@@ -301,15 +256,22 @@ methods:{
     
     //this.default_image=result.$id;
     //this.save();
-    });
+    this.$notify({
+                    type: 'success',
+                    text: this.$t('file_uploaded')
+                });
+                setTimeout(()=>{
+        this.getMD();
+    },500)
+    
+            });
     //console.log(this.file_link[0]);
     
     
     
-    this.getMD();
 
 
-    this.$notify(this.$t('file_uploaded'));
+    //this.$notify(this.$t('file_uploaded'));
 
     },
     set_as_default(aa:string)
@@ -319,9 +281,9 @@ methods:{
         this.save();
         this.getMD();
     },
-    delete_picture(aa:string)
+    delete_picture(aa:string,bb:string)
     {
-        const storage = new Storage(appw);
+    const storage = new Storage(appw);
     const database = new Databases(appw);
     
     try{
@@ -332,7 +294,7 @@ methods:{
         console.log("hiba a törlésnél");
     }
     try{
-    let k= database.deleteDocument(config.website_db, config.album_images,aa);
+    let k= database.deleteDocument(config.website_db, config.album_images,bb);
 }
     catch(ex)
     {

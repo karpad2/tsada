@@ -174,12 +174,8 @@
                 let a={name:"",contact:"",img:"",id:"",p_receiving_hour:"",u_receiving_hour:""};
                 a.id=el2.$id;
                 console.log(el2);
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.worker_name_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                    if(el2.p_receiving_hour!=""||el2.p_receiving_hour!=null)
+
+                if(el2.p_receiving_hour!=""||el2.p_receiving_hour!=null)
                     a.p_receiving_hour=el2.p_receiving_hour;
                     else 
                     a.p_receiving_hour="---";
@@ -187,6 +183,13 @@
                     a.u_receiving_hour=el2.u_receiving_hour;
                     else 
                     a.u_receiving_hour="---";
+                
+                if(local=="en"||local=="hu")
+                {
+                    a.name=el2.worker_name_hu;
+                    //a.role=el2.role;
+                    a.contact=el2.contact;
+                    
                 }
                 else if(local=="rs"||local=="sr")
                 {

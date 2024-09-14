@@ -1,11 +1,16 @@
 <template>
-    <div class="loading">
-        <img src="@a/tsada_logo.png" alt="Loading" class="loading-image">
+    <div class="loading1">
+        <div>
+        <img v-if="false" src="@a/tsada_logo.png" alt="Loading" class=" spin">
+        </div>
+        <div>
+            <span  class=" w-20 h-20 loading loading-ring "></span>
+        </div>
     </div>
 </template>
 
 <style>
-.loading {
+.loading1 {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,7 +18,7 @@
     transform: scale(0.5);
 }
 
-.loading-image {
+.loading1-image {
     animation: pulse 2s linear infinite;
 }
 

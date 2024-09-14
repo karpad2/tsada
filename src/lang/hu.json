@@ -89,7 +89,7 @@
     "u_receiving_hour":"Emelt szintű óra",
     "p_receiving_hour":"Pótóra",
     "school_profiles":"Oktatási profil",
-    "teachers_receiving_hour":"Tanárok fogadóórái",
+    "teachers_receiving_hour":"Emelt szintű és pótórák",
     "machine":"Gépészet és fémmegmunkálás",
     "electrotechnic":"Elektrotechnika",
     "civil_engineering":"Építészet és földméréstan",
@@ -136,5 +136,9 @@
     "location":"Helyszín",
     "elibrary":"E-könyvtár",
     "parentsclub":"Szülői tanács",
-    "pepszi":"Pedagó"
+    "pepszi":"Pedagó",
+    "hu_short":"Magyar rövid leírás",
+    "en_short":"Angol rövid leírás",
+    "parentsvisiting":"Szülői fogadóórák",
+    "examslist":"Írásbeli és ellenőrző dolgozatok rendje"
  }

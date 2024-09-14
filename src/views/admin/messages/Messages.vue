@@ -11,7 +11,7 @@
     <div v-if="loaded"   class="m-auto w-full">
    
       
-      <v-data-table  height="400" :headers="headers" :items="messages">
+      <v-data-table  height="400" :headers="headers" :items="messages" :items-per-page="-1"> 
         <template v-slot:item.date="{ item }">
         {{ rt_time(item.date) }}
         </template>

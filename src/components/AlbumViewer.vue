@@ -24,12 +24,13 @@
             :options="options_for_image_viewer"
             >
             <template #default="scope">
-            <div v-for="src in scope.images"  :key="src" class="xl:w-1/5 md:w-1/2 sm:w-full p-4 cursor-pointer  becsuszo_kep">
-                <div style="min-width: 273px;"  class="align-middle transition items-center delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-                <img @load="loaded(src)" style="height: 272px;" class="object-contain " :src="src" />
-               
+            
+                <div v-for="src in scope.images"  :key="src"  class="card card-compact cursor-pointer glass m-3  w-full  sm:w-1/5 md:w-1/5 lg:w-1/5  transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 shadow-xl">
+                <figure>
+                    <img @load="loaded(src)" style="height: 272px;" class="object-contain " :src="src" />
+                </figure>
                 </div>
-                </div>
+                
             </template>
             </viewer>
             </div>

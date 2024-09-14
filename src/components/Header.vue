@@ -23,9 +23,10 @@
                   <router-link to="/home" class="btn btn-ghost    cursor-pointer   ">{{ $t('home') }}</router-link>
                   <div class="dropdown">
                   <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
-                      <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52  ">
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
+                      <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
+                      
                       
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                       
@@ -36,7 +37,7 @@
 
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer   ">{{ $t('education') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box block w-52  ">
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52  ">
                     <li><details :class="{'dropdown-right':!mobile_view}" class="dropdown dropdown-hover">
                         <summary >{{ $t("courses") }} </summary>
                         <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
@@ -73,7 +74,8 @@
                     
                     <li ><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
                     <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
-                      
+                    <li ><router-link to="/about/parentvisiting">{{ $t("parentsvisiting") }}</router-link></li>
+                    <li><router-link to="/renderer/education/examslist">{{ $t("examslist") }}</router-link></li> 
                   </ul>
                   </div>
   
@@ -81,7 +83,7 @@
                   
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{ $t('for_students') }} <i class="pi pi-angle-down"></i></div>
-                  <ul tabindex="0" class="dropdown-content  z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                  <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
                       <li  ><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li>  
                     </ul>
@@ -94,7 +96,7 @@
   
                   <div v-if="!mobile_view" class="dropdown ">
                   <div tabindex="0" role="button" class="btn btn-ghost cursor-pointer"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
-                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li v-for="lang in languages" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                   </ul>
                   </div>
@@ -104,7 +106,7 @@
   
                   <div class="dropdown">
                   <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('Erasmus') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li v-for="_eras in _erasmus" :key="_eras.id"><router-link :to="'/renderer/erasmus/'+_eras.id">{{ _eras.name }}</router-link></li>
                       <li v-if="erasmus_apply_on" ><router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link></li>
                       <li v-if="erasmus_list" ><router-link to="/erasmus/results">{{ $t("erasmus_applies_result") }}</router-link></li>
@@ -120,7 +122,7 @@
   
                   <div v-if="isLoggedin"  class="dropdown">
                   <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('account') }} <i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2 dark:text-white bg-base-100 rounded-box w-52">
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li  ><router-link to="/admin/messages">{{ $t('messages') }}</router-link></li>
                       <li  ><router-link to="/" @click="logout">{{ $t('logout') }}</router-link></li>
                   </ul>

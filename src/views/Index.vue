@@ -96,7 +96,7 @@
             }"
         />
         <div class="dark:bg-slate-600/50 bg-slate-50">    
-        <main class="min-h-screen" v-if="!isLoading">
+        <main class="min-h-screen" v-if="!_loading">
             <slot></slot>
         </main>
 
@@ -127,7 +127,7 @@ export default {
 data()
 {
 return {
-    
+    _loading:false
 }
 },
     
@@ -142,6 +142,8 @@ return {
     computed: {
         isLoading() {
         const cc=useLoadingStore();
+        console.log('isLoading:', cc.isLoading);
+        this._loading=cc.isLoading;
            return cc.isLoading;
             
             //return app.config.globalProperties.loading;

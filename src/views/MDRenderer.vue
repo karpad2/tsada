@@ -1,7 +1,7 @@
 <template>
 
 <section class="text-gray-600 min-h-screen ">
-    <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50 mb-5  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" style="min-height: 70vh;">
+    <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50 mb-5  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" v-if="loaded" style="min-height: 70vh;">
             <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="w-full mb-6 lg:mb-0">
                     <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
@@ -66,6 +66,7 @@
 </div>
 
 </div>
+<Loading v-else />
 </section>
 </template>
 <script lang="ts">
@@ -83,11 +84,14 @@ import AlbumViewer from "@/components/AlbumViewer.vue";
 import {convertifserbian} from "@/lang";
 import gsap from "gsap";
 import moment from 'moment/min/moment-with-locales';
+import Loading from "@/components/Loading.vue";
+
 
 export default {
     components: {
         Swiper,SwiperSlide,
-        AlbumViewer
+        AlbumViewer,
+        Loading
     },
     data() {
         return {
@@ -110,7 +114,8 @@ export default {
             headers:[],
             colDefs:[],
             documents:[],
-            has_documents:false
+            has_documents:false,
+            _loading:true
         }
     },
     mounted()
@@ -144,7 +149,7 @@ export default {
       x: 0,
     }
   );
-        
+      
     },
     methods:{
         async getMD()
@@ -223,7 +228,13 @@ export default {
             console.log(k.documents[0].gallery);
             this.gallery_flag=k.documents[0].has_gallery;
             this.has_documents=k.documents[0].has_documents;
+            try{
             this.gallery_id=k.documents[0].gallery.$id;
+            }
+            catch(ex)
+            {
+                console.log(ex);
+            }
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             
@@ -269,7 +280,14 @@ export default {
 
                 await documents_cucc.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
+                try
+                {
                 a.id=el2.$id;
+                }
+                catch (ex)
+                 {
+                    console.log(ex);
+                 }
                 if(local=="en"||local=="hu")
                 {
                     a.name=el2.document_title_hu;
