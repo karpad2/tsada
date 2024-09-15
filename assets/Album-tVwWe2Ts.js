@@ -1,1 +1,0 @@
-import{A as r}from"./AlbumViewer-DPqdT_yl.js";import{K as t,h as o,M as a,o as s}from"./index-C5fzAQrU.js";const i={__name:"Album",setup(u){let e=t().params.id;return(n,l)=>(s(),o(r,{caption:!0,id:a(e)},null,8,["id"]))}};export{i as default};
