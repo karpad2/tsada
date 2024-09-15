@@ -304,7 +304,7 @@
               else if(cc.language=="hu")
               a.title=element.title_hu;
               else if(cc.language=="en")
-              a.title=element.title_hu;
+              a.title=element.title_en;
               else 
               {
   

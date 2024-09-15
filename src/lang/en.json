@@ -129,7 +129,11 @@
     "delete_broken_images":"Delete broken images",
     "applies_are_closed":"Applications are closed, or you have already applied",
     "parents_club":"Parents' council",
-    "elibrary":"E-library"
+    "elibrary":"E-library",
+    "hu_short":"Short description in Hungarian",
+    "en_short":"Short description in English",
+    "parentsvisiting":"Parents' visiting hours",
+    "examslist":"Schedule of written and control exams"
 
 
 

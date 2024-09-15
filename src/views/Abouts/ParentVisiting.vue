@@ -1,7 +1,7 @@
 
 <template>
     <section class="text-gray-600 body-font mt-5 mb-5 min-h-screen" id="courses">
-        <div class="container px-5 mx-auto ">
+        <div class="container px-5 mx-auto " v-if="loaded">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
                     <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ $t("parentsvisiting") }}</h1>
@@ -23,6 +23,7 @@
                
             
         </div>
+        <Loading v-else />
     </section>
 </template>
 <script lang="ts">
@@ -33,10 +34,11 @@ import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
 import gsap from "gsap";
+import Loading from "@/components/Loading.vue";
 export default {
     name: 'PClassList',
     components: {
-       
+        Loading
     },
     mounted()
     {
@@ -59,7 +61,8 @@ export default {
     data: () => ({
         admin:false,
         classes: [],
-        headers:[]
+        headers:[],
+        loaded:false
     }),
     props:{
         mode:String
@@ -134,6 +137,7 @@ export default {
         }
         console.log(this.classes);
         
+        this.loaded=true;
         },
         isHidden(a)
         {

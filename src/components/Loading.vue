@@ -4,7 +4,7 @@
         <img v-if="false" src="@a/tsada_logo.png" alt="Loading" class=" spin">
         </div>
         <div>
-            <span  class=" w-20 h-20 loading loading-ring "></span>
+            <span  class=" w-28 h-28 loading loading-ring "></span>
         </div>
     </div>
 </template>

@@ -19,12 +19,12 @@
         </template>
     
       <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
+        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book icon_size" ></i></router-link>
        
       </template>
 
       <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/document/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
+        <router-link :to="'/admin/document/'+item.id"><i class="pi pi-cloud-upload icon_size"></i></router-link>
        
       </template>
 

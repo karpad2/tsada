@@ -131,6 +131,8 @@
      "parents_club":"Saveta roditelja",
      "elibrary":"E-biblioteka",
      "examslist":"Распоред писмених задатака и писаних провера",
-     "parentsvisiting":"Пријемни часови за родитеље"
+     "parentsvisiting":"Пријемни часови за родитеље",
+     "hu_short":"Kratak opis na mađarskom",
+    "en_short":"Kratak opis na engleskom"
 
 }

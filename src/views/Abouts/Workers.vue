@@ -16,7 +16,7 @@
             </template>
 
             <template v-slot:item.edit="{ item }">
-                <router-link :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit text-5xl"></i></router-link>
+                <router-link class="" :to="'/admin/worker/'+item.id"><i class="pi pi-user-edit worker_editor"></i></router-link>
             
             </template>
             <template #bottom></template>
@@ -241,7 +241,7 @@ export default {
 }
 </script>
 <style>
-.popups{
-
+.worker_editor{
+    font-size: 4em;;
 }
 </style>
