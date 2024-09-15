@@ -9,7 +9,7 @@
                     </div>
                 </video-background>
     
-<div class="pb-2 w-full dark:text-white">
+<div class="pb-2 w-full ">
 <table class="table table-zebra mx-auto">
   <thead>
     <tr>
@@ -55,14 +55,15 @@
 </table>
     </div>
     <v-data-table  height="400" :headers="headers" :items="documents">
-     <template v-slot:item.date="{ item }">
-     {{ rt_time(item.date) }}
-     </template>
+     
  
    <template v-slot:item.open="{ item }">
      <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
     
    </template>
+   <template v-slot:item.date="{ item }">
+     {{ rt_time(item.date) }}
+     </template>
 
    <template v-slot:item.edit="{ item }">
      <router-link :to="'/admin/text-document-editor/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
@@ -87,7 +88,7 @@
     import { Swiper, SwiperSlide } from 'swiper/vue';
     import { EffectFade, Navigation, Pagination } from 'swiper/modules';
     import {convertifserbian} from "@/lang";
-    import moment from "moment";
+    import moment from 'moment/min/moment-with-locales';
     import gsap from "gsap";
     
     export default {
@@ -110,7 +111,8 @@
                 edumode:false,
                 admin:false,
                 documents:[],
-                headers:[]
+                headers:[],
+                doc_loaded:false
             }
         },
         mounted()
@@ -125,6 +127,10 @@
            // this.getMD();
             const cc=useLoadingStore();
             this.admin=cc.userLoggedin;
+            if(this.admin)
+        {
+            this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
+        }
             let v2="659d5e6949ae7294f9f1";
             const storage = new Storage(appw);
             this.video_link=storage.getFileView(config.website_images,v2).href;
@@ -140,7 +146,7 @@
           x: 0,
         }
       );
-            
+      this.synchronize_documents();
         },
         methods:{
             async getMD()
@@ -240,19 +246,16 @@
                 this.video_link=config.default_video;
                 this.loaded=true;
             },
-            async synchronize_documents()
-        {
-            const database = new Databases(appw);
-            if(this.has_documents)
-            {
+            async synchronize_documents(){
+                const database = new Databases(appw);
                 this.doc_loaded=false;
-            this.documents=[];
+                this.documents=[];
                 const loadingStore = useLoadingStore();
                 let local=loadingStore.language;
                 let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
                 Query.equal("texts","timetable")]);
-
-                await documents_cucc.documents.forEach(async el2 => {
+                console.log(documents_cucc);
+                await documents_cucc.documents.forEach(async (el2) => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 try
                 {
@@ -286,9 +289,8 @@
                 this.documents.push(a);
                 });
                 this.doc_loaded=true;
-            }
-        },
-        rt_time(a)
+            },
+            rt_time(a)
                 {   const loadingStore = useLoadingStore();
                     let local=loadingStore.language;
                     if(local=="rs"||local=="sr")
@@ -307,12 +309,15 @@
 
                     }
                     return moment(a).format("LL");
-                }, 
-
-            editmode()
-            {
+                },
+                editmode()
+                {
                 this.$router.push("/admin/edit/"+this.$route.params.mode+"/"+this.$route.params.id);   
-            }   
+                }    
+        },
+        
+
+           
         }
-    }   
+    
     </script>
