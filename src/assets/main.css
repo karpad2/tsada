@@ -15,3 +15,7 @@ body {
   scrollbar-width: thin;
   scrollbar-color: text-sky-600 text-sky-400;
 }
+
+.ctextfield{
+  @apply text-gray-700 dark:text-white
+}

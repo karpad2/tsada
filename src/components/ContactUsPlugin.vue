@@ -6,7 +6,7 @@
                 <div class="relative mb-4">
                     
                 <v-text-field
-                 class=" text-gray-700 dark:text-white"
+                 class="ctextfield"
                   v-model="name"
                   :label="$t('name')"
                 ></v-text-field>
@@ -14,7 +14,7 @@
                 <div class="relative mb-4">
                     
                 <v-text-field
-                class=" text-gray-700 dark:text-white"
+                class="ctextfield"
                   v-model="email"
                   :label="$t('email')"
                 ></v-text-field>

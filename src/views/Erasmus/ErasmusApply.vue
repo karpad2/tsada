@@ -253,3 +253,9 @@ import { AgXToneMapping, CubeCamera } from "three";
         }
     }   
     </script>
+
+    <style>
+    v-text-field{
+      @apply text-gray-700 dark:text-white
+    }
+    </style>

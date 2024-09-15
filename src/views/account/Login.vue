@@ -14,6 +14,7 @@
                 <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('email') }}</label>
                 <div class="relative flex items-center">
                   <v-text-field
+                  class="ctextfield"
                   type="email"
                   v-model="email"
                   :label="$t('email')"
@@ -29,6 +30,7 @@
                 <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('password') }}</label>
                 <div class="relative flex items-center">
                   <v-text-field
+                  class="ctextfield"
                   type="password"
                   v-model="password"
                   :label="$t('password')"
@@ -60,11 +62,11 @@
     </div>
   </div>
   <div v-else class="w-1/2 h-full m-auto p-40" >
-        <h1>{{ $t("Account page") }}</h1>
-        <h2>{{ $t("welcome") }} {{  }} !</h2>
+        <h1 class="ctextfield">{{ $t("Account page") }}</h1>
+        <h2 class="ctextfield">{{ $t("welcome") }} {{  }} !</h2>
 
         <div>
-          <v-switch @change="set_user_setting" v-model="animation_backgound" :label="$t('disable_animation_background')"></v-switch>
+          <v-switch class="ctextfield" @change="set_user_setting" v-model="animation_backgound" :label="$t('disable_animation_background')"></v-switch>
         </div>
         <VBtn @click="logout">{{ $t("logout") }}</VBtn>
     </div>
