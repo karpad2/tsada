@@ -251,12 +251,18 @@ export default {
 
             this.video_id=k.documents[0].video;
             this.date=k.documents[0].$createdAt;
-            let v2="659d5e6949ae7294f9f1";
-            this.video_id=v2;
-            this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_id);
-            if(this.video_id==""||this.video_id==null||this.video_id=="659d5e6949ae7294f9f1")
+            
+            if(this.video_id==""||this.video_id==null)
+            
             { this.video_link=config.default_video;}
+            else
+            {
+                this.video_link=this.video_id;
+            }
+            //this.video_link=storage.getFileView(config.website_images,this.video_id).href;
+            console.log(this.video_link);
+            //if(this.video_id==""||this.video_id==null||this.video_id=="659d5e6949ae7294f9f1")
+            
             this.loaded=true;
             if(this.has_documents)
             {
