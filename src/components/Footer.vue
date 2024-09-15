@@ -43,6 +43,8 @@
 import Cookie from "@/components/Cookie.vue";
 import moment from 'moment';
 import vv from "../../package.json";
+import { useTheme } from 'vuetify'
+
 
 export default {
     name: 'Footer',
@@ -51,8 +53,13 @@ export default {
     },
     data() {
         return {
-            isDarkMode: false, // Track the theme state
+            isDarkMode: false,
+            themeprovider:useTheme() // Track the theme state
         };
+    },
+    setup()
+    {
+        //this.themeprovider=  ;
     },
     methods: {
         toggleDarkMode() {
@@ -66,6 +73,9 @@ export default {
                 localStorage.setItem("theme", "dark");
                 this.isDarkMode = true;
             }
+           // this.$vuetify.theme.dark=this.isDarkMode;
+           
+           this.themeprovider.global.name.value= this.isDarkMode?"dark":"light";
         },
     },
     mounted() {
@@ -85,7 +95,8 @@ export default {
         },
         _version() {
             return vv.version; // App version from package.json
-        }
+        },
+        
     }
 }
 </script>

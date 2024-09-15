@@ -28,6 +28,7 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+
 import CountryFlag from 'vue-country-flag-next'
 
 import 'viewerjs/dist/viewer.css'
@@ -44,6 +45,16 @@ app.use(router);
 const vuetify = createVuetify({
     components,
     directives,
+    theme: {
+      defaultTheme: 'light',
+      themes:
+      {
+        light:{
+
+        },
+        dark:{}
+      }
+    }
   })
 app.component('QuillEditor', QuillEditor)
 
