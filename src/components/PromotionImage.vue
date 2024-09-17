@@ -1,5 +1,5 @@
 <template>
-    <div class="container mx-auto">
+    <div class="container mx-auto ">
         <img id="promo-img" class="m-auto" :src="img" alt="promo_image"/>
     </div>
 </template>
@@ -64,3 +64,9 @@ methods:{
 }
 }
 </script>
+<style>
+.bg_image
+{
+  
+}
+</style>

@@ -11,6 +11,7 @@ export const useLoadingStore = defineStore('loading', () => {
     const fireworkSetting=ref(false);
     const erasmus_apply=ref(false);
     const language=ref("sr");
+    const theme=ref("light");
     const uid=ref("");
     let notif=ref([]);
     const doubleCount = computed(() => count.value * 2)
@@ -51,11 +52,15 @@ export const useLoadingStore = defineStore('loading', () => {
     {
       this.erasmus_apply=v;
     }
+    function setThemeSetting(v:String)
+    {
+      this.theme=v;
+    }
 
     
 
 
-    return { count,isLoading,language,erasmus_apply,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
+    return { count,isLoading,language,erasmus_apply, theme, setThemeSetting,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
   },
 {persist:true})
 

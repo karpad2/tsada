@@ -1,11 +1,12 @@
 <template>
     <div >
        
-        <Header />
+        <Header class="no_print" />
         
         <vue-particles
         v-if="animation_flag"
             id="tsparticles"
+            class="no_print"
             :particlesLoaded="particlesLoaded"
             :options="{
                    /*background: {
@@ -95,16 +96,33 @@
             
             }"
         />
-        <div class="dark:bg-slate-600/50 bg-slate-50">    
+        <div :class="{ bg_image: light_theme }" class="min-h-screen dark:bg-slate-600/50 bg-slate-50">
+         
+        <div v-if="checking">
+            <Loading />
+            
+        </div>
+        <div class="container m-auto w-60 mt-5" v-else-if="!we_have_net">
+            <NoInternet  />
+        </div>
+        <div v-else-if="we_have_net"> 
+
+            
         <main class="min-h-screen" v-if="!_loading">
             <slot></slot>
         </main>
 
         <main v-else>
             <Loading />
+            
         </main>
+    </div>
+    <div v-else>
+
+    </div>
+
             </div>
-        <Footer />
+        <Footer class="no_print" />
     </div>
 </template>
 
@@ -115,6 +133,8 @@ import Loading from '@/components/Loading.vue';
 import Toast from "primevue/toast";
 import {useLoadingStore} from "@/stores/loading";
 import { Fireworks } from '@fireworks-js/vue'
+import NoInternet from '@/components/NoInternet.vue';
+import axios from 'axios';
 
 export default {
     components: {
@@ -122,12 +142,15 @@ export default {
     Footer,
     Loading,
     Toast,
-    Fireworks
+    Fireworks,
+    NoInternet
 },
 data()
 {
 return {
-    _loading:false
+    _loading:false,
+    we_have_net:false,
+    checking:true
 }
 },
     
@@ -135,7 +158,7 @@ return {
     {
         
        //console.log( app.config.globalProperties.$loading);
-
+       this.checkServerConnection();
     
             
     },
@@ -160,8 +183,35 @@ return {
         {
             const cc=useLoadingStore();
             return cc.fireworkSetting;
+        },
+        theme_flag()
+        {
+            const cc=useLoadingStore();
+            return cc.theme;
+        },
+        light_theme()
+        {
+            return this.theme_flag=="light";
         }
+
     },
+    methods:{
+    async checkServerConnection() {
+      try {
+        const response = await axios.get('https://share.tsada.edu.rs/ping');
+        if (response.data === 'Pong') {
+          this.serverMessage = 'Server responded: Pong';
+          this.we_have_net=true;
+        } else {
+          this.serverMessage = 'Unexpected server response';
+        }
+      } catch (error) {
+        this.serverMessage = 'Failed to connect to the server';
+        this.we_have_net=false;
+      }
+      this.checking=false;
+    }
+    }
     
 }
 </script>
@@ -173,4 +223,14 @@ return {
         z-index: -1;
         
     }
+
+    .bg_image
+    {
+        background-image: url("@a/waves.svg");
+        background-repeat: no-repeat;
+        
+        
+    }
+
+   
 </style>

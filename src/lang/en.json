@@ -133,7 +133,12 @@
     "hu_short":"Short description in Hungarian",
     "en_short":"Short description in English",
     "parentsvisiting":"Parents' visiting hours",
-    "examslist":"Schedule of written and control exams"
+    "examslist":"Schedule of written and control exams",
+    "show_archive":"Open archive",
+    "archive_category":"Archive category",
+    "getting_ready":"Please wait...",
+    "no_internet":"No connection to the server.",
+    "archived":"Archived document."
 
 
 

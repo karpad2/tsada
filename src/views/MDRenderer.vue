@@ -8,9 +8,7 @@
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="false" class="align-bottom  ml-3 leading-relaxed text-white">
-                    
                     <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
-                    
                 </p>
                 
             </div>
@@ -27,13 +25,14 @@
                 </p>
             </video-background>
 
-            <p v-if="admin ">
-                    <VBtn  @click="editmode">{{ $t("edit") }}</VBtn>
+            <p class="no_print" v-if="admin ">
+                    <VBtn   @click="editmode">{{ $t("edit") }}</VBtn>
+                    <VBtn v-if="false" @click="downloadPDF">PDF</VBtn>
             </p>
 
 
 
-<div class="w-full p-5 dark:text-white" v-html="chtml">
+<div ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
 <div v-if="gallery_flag">
@@ -85,6 +84,9 @@ import {convertifserbian} from "@/lang";
 import gsap from "gsap";
 import moment from 'moment/min/moment-with-locales';
 import Loading from "@/components/Loading.vue";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+
 
 
 export default {
@@ -132,9 +134,7 @@ export default {
         this.headers= [
                     { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
                     { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    
                     { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
-                    
                     ];
         
         gsap.fromTo(
@@ -321,6 +321,54 @@ export default {
                 this.doc_loaded=true;
             }
         },
+        async downloadPDF() {
+      const pdfContent = this.$refs.pdfContent;
+
+      // Capture the content using html2canvas
+      const canvas = await html2canvas(pdfContent, {
+        scale: 2, // Increase scale for better resolution
+      });
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgData = canvas.toDataURL("image/png");
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 0;
+      let heightLeft = imgHeight;
+
+      const addHeaderFooter = (pdf, pageNumber) => {
+        pdf.setFontSize(12);
+        // Custom header text (top of each page)
+        pdf.text("Custom Header", 105, 10, { align: "center" });
+        // Custom footer text (bottom of each page)
+        pdf.text(`Page ${pageNumber}`, 105, pageHeight - 10, { align: "center" });
+      };
+
+      let pageNumber = 1;
+
+      // Add first page
+      addHeaderFooter(pdf, pageNumber);
+      pdf.addImage(imgData, "PNG", 0, 20, imgWidth, imgHeight); // Start content below header
+      heightLeft -= pageHeight - 30; // Adjust for header and footer space
+
+      // Add more pages if necessary
+      while (heightLeft > 0) {
+        pageNumber++;
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        addHeaderFooter(pdf, pageNumber);
+        pdf.addImage(imgData, "PNG", 0, position + 20, imgWidth, imgHeight); // Adjust for header
+        heightLeft -= pageHeight - 30; // Again, leave space for header/footer
+      }
+
+      // Save the PDF
+      pdf.save("content.pdf");
+    },
+
+
         rt_time(a)
                 {   const loadingStore = useLoadingStore();
                     let local=loadingStore.language;

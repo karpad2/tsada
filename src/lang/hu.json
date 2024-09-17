@@ -140,5 +140,14 @@
     "hu_short":"Magyar rövid leírás",
     "en_short":"Angol rövid leírás",
     "parentsvisiting":"Szülői fogadóórák",
-    "examslist":"Írásbeli és ellenőrző dolgozatok rendje"
+    "examslist":"Írásbeli és ellenőrző dolgozatok rendje",
+    
+    "show_archive":"Archívum megnyitása",
+    "archive_category": "Kategória archiválása",
+    "getting_ready":"Kérem várjon...",
+    "no_internet":"Nincs kapcsolat a szerverrel.",
+    "archived":"Archivált dokumentum."
+
+
+
  }

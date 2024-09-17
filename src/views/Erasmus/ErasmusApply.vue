@@ -84,8 +84,8 @@
   </v-form>
 </div>
 
-<div class="pb-2 w-full dark:text-white text-center" v-else>
-    <h2 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ $t("applies_are_closed") }}</h2>
+<div class="pb-2 w-full dark:text-white text-black text-center" v-else>
+    <h2 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2">{{ $t("applies_are_closed") }}</h2>
     
   </div>
     
@@ -255,7 +255,5 @@ import { AgXToneMapping, CubeCamera } from "three";
     </script>
 
     <style>
-    v-text-field{
-      @apply text-gray-700 dark:text-white
-    }
+    
     </style>

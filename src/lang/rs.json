@@ -133,6 +133,11 @@
      "examslist":"Распоред писмених задатака и писаних провера",
      "parentsvisiting":"Пријемни часови за родитеље",
      "hu_short":"Kratak opis na mađarskom",
-    "en_short":"Kratak opis na engleskom"
+    "en_short":"Kratak opis na engleskom",
+    "show_archive":"Otvorite arhivu",
+    "archive_category":"Arhiviranje kategorije",
+    "getting_ready":"Molimo sačekajte...",
+    "no_internet":"Nema veze sa serverom.",
+    "archived":"Arhiviran dokument."
 
 }

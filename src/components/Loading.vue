@@ -1,10 +1,11 @@
 <template>
-    <div class="loading1">
+    <div class="loading1 text-black dark:text-white ">
         <div>
         <img v-if="false" src="@a/tsada_logo.png" alt="Loading" class=" spin">
         </div>
         <div>
             <span  class=" w-28 h-28 loading loading-ring "></span>
+            <h2 class=" text-2xl">{{ $t("getting_ready") }}</h2>
         </div>
     </div>
 </template>
