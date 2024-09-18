@@ -5,14 +5,15 @@ import {convertWordToCyrillic} from "./transliteration.js";
 import {useLoadingStore} from "../stores/loading";
 let sr = {};
 
-
+/*
 for (let key in rs) {
     if (rs.hasOwnProperty(key)) {
         // Perform any transformation or operation you need here
         // For example, we'll just copy the key-value pair as it is
         sr[key] = convertWordToCyrillic(rs[key]);
     }
-}
+}*/
+sr=rs;
 
 function convertifserbian(word)
 {

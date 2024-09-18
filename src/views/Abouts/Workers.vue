@@ -172,7 +172,7 @@ export default {
       //   k.documents.forEach(async (el1) => {
             let _works=[];
             //console.log(el1);
-            let l= await database.listDocuments(config.website_db, config.workers,[
+            let l= await database.listDocuments(config.website_db, config.workers,[Query.select(["worker_name_hu","worker_name_rs","contact","worker_img","$id"]),
                 Query.equal("roles",[el1.$id])
         ]);
         //console.log(l);

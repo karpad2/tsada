@@ -1,6 +1,6 @@
 <template>
   <header v-if="reload" :class="{mobile_force:style_computed_for_mobile}" style="z-index: 200;"  class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300  backdrop-blur-lg body-font sticky top-0" id="home">
-          <div :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="container mx-auto flex flex-wrap flex-col md:flex-row items-center ">
+          <div :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="container mx-auto flex flex-wrap items-center ">
             
             <div class="flex items-center">
 
@@ -18,13 +18,13 @@
               <img src="@a/Erasmus_Logo.svg" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
             </div>
-              <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter ">
+              <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'mx-auto':mobile_view||tablet_mode},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter ">
                   
                   <router-link to="/home" class=" btn btn-ghost    cursor-pointer   ">{{ $t('home') }}</router-link>
                   <div class="dropdown">
                   <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost    cursor-pointer   ">{{ $t('aboutus') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52  ">
-                      <li ><router-link  to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
+                      <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       
                       
@@ -167,6 +167,7 @@
               _students:[],
               logged_in:false,
               lang:"",
+              tablet_view:false,
               erasmus_list:false,
               erasmus_apply_on:false,
 
@@ -206,7 +207,8 @@
       methods:{
         onResize()
         {
-          this.mobile_view=window.innerWidth<=1024;
+          this.mobile_view=window.innerWidth<=1276;
+          this.tablet_view=window.innerWidth>=1276&&window.innerWidth<=1550;
         },
         menuopener()
         {
@@ -344,7 +346,8 @@
               {
   
               }
-              if( a.title!="---")
+              if( a.title=="") return;
+            if( a.title!="---")
               {
               a.id=element.$id;
               this.abouts.push(a);
@@ -377,7 +380,7 @@
               {
                   a.name=convertifserbian(element.title_rs);
               }
-  
+              if( a.name=="") return;
               a.id=element.$id;
               this._erasmus.push(a);
           });
@@ -407,7 +410,7 @@
               {
                   a.name=convertifserbian(element.title_rs);
               }
-  
+              if( a.name=="") return;
               a.id=element.$id;
               this._students.push(a);
           });

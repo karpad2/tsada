@@ -138,7 +138,8 @@
     "archive_category":"Archive category",
     "getting_ready":"Please wait...",
     "no_internet":"No connection to the server.",
-    "archived":"Archived document."
+    "archived":"Archived document.",
+    "restore":"Restore the document"
 
 
 

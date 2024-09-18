@@ -29,7 +29,8 @@
                     </v-data-table>
                     <div v-if="admin">
                         <v-btn  @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
-                        <v-btn  @click="archive_stuff(role.id)" class="m-5">{{ $t('archive_category') }}</v-btn>
+                        <v-btn v-if="!role.archived"  @click="archive_stuff(role.id)" class="m-5">{{ $t('archive_category') }}</v-btn>
+                        <v-btn v-else  @click="restore_stuff(role.id)" class="m-5">{{ $t('restore') }}</v-btn>
                 </div>    
                 </div>
                 <div v-else>
@@ -170,6 +171,16 @@
                 this.load_workers_base();
             },
 
+            async restore_stuff(aaa)
+            {
+                const database = new Databases(appw);
+                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
+                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":false});
+                console.log(l);
+
+                this.load_workers_base();
+            },
+
             async open_archive()
             {
                 this.archived=true;
@@ -251,9 +262,10 @@
                 a.date=el2.$createdAt;    
                 _works.push(a);
             });
-            let b={role:"",workers:[],id:""};
+            let b={role:"",workers:[],id:"",archived:false};
             b.id=el1.$id;
             b.role=name;
+            b.archived=el1.archived;
             b.workers=_works;
             this.roles.push(b);
     //        });
@@ -314,9 +326,10 @@
                 a.date=el2.$createdAt;    
                 _works.push(a);
             });
-            let b={role:"",workers:[],id:""};
+            let b={role:"",workers:[],id:"",archived:false};
             b.id=el1.$id;
             b.role=name;
+            b.archived=el1.archived;
             b.workers=_works;
             this.roles.push(b);
     //        });
