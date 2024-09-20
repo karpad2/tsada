@@ -291,13 +291,16 @@
           //console.log(this.language);//show_at_the_header_from_about
           if(cc.language=="sr")
           {
-              l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"])]);
+              l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
           }
           else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
           //let local=localStorage.getItem("lang");
           //console.log(l);
-          l.documents.forEach(async element => {
-              
+          for (let i=0;i<l.documents.length;i++)
+
+          
+          {
+            let element=l.documents[i];    
               let a={title:"",id:""};
               if(cc.language=="sr")
               a.title=convertifserbian(element.title_rs);
@@ -314,7 +317,7 @@
   
               a.id=element.$id;
               this.abouts.push(a);
-          });
+          }
   
           },
   
