@@ -1106,6 +1106,13 @@
   resolved "https://registry.npmjs.org/@kyvg/vue3-notification/-/vue3-notification-3.2.1.tgz"
   integrity sha512-qn4bCBBCxW0Ya+RmHXu2SYBVwGXWsAGdlDKqCqyLryaZTbtFXi32iSSLnuKjSUVxFqQRToFc6g1zp1XLTyHrvw==
 
+"@mayasabha/ckeditor4-vue3@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.npmjs.org/@mayasabha/ckeditor4-vue3/-/ckeditor4-vue3-1.0.8.tgz"
+  integrity sha512-4JVyaDujCWhlF07blbIZhOzEmINRga82QCC86VcRkMni9MI9+CTurKf5oPr5ID1Rx6o2r8YUZdFBO/wbRAm6Eg==
+  dependencies:
+    ckeditor4-integrations-common "^1.0.0"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -1241,6 +1248,13 @@
     json5 "^2.2.0"
     magic-string "^0.25.0"
     string.prototype.matchall "^4.0.6"
+
+"@tinymce/tinymce-vue@^4.0.7":
+  version "4.0.7"
+  resolved "https://registry.npmjs.org/@tinymce/tinymce-vue/-/tinymce-vue-4.0.7.tgz"
+  integrity sha512-1esB8wGWrjPCY+rK8vy3QB1cxwXo7HLJWuNrcyPl6LOVR+QJjub0OiV/C+TUEsLN6OpCtRv+QnIqMC5vXz783Q==
+  dependencies:
+    tinymce "^5.5.0"
 
 "@tsparticles/basic@^3.5.0":
   version "3.5.0"
@@ -1603,6 +1617,13 @@
   version "4.14.202"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.202.tgz"
   integrity sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==
+
+"@types/node@^18.0.0 || >=20.0.0":
+  version "22.5.5"
+  resolved "https://registry.npmjs.org/@types/node/-/node-22.5.5.tgz"
+  integrity sha512-Xjs4y5UPO/CLdzpgR6GirZJx36yScjh73+2NlLlkFRSoQN8B0DpfXPdZGnvVmLRLOsqDpOfTNv7D9trgGhmOIA==
+  dependencies:
+    undici-types "~6.19.2"
 
 "@types/raf@^3.4.0":
   version "3.4.3"
@@ -2163,6 +2184,11 @@ chownr@^1.1.1:
   version "1.1.4"
   resolved "https://registry.npmjs.org/chownr/-/chownr-1.1.4.tgz"
   integrity sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==
+
+ckeditor4-integrations-common@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/ckeditor4-integrations-common/-/ckeditor4-integrations-common-1.0.0.tgz"
+  integrity sha512-OAoQT/gYrHkg0qgzf6MS/rndYhq3SScLVQ3rtXQeuCE8ju7nFHg3qZ7WGA2XpFxcZzsMP6hhugXqdel5vbcC3g==
 
 cleave.js@^1.6.0:
   version "1.6.0"
@@ -4821,6 +4847,11 @@ tinyglobby@^0.2.0:
     fdir "^6.2.0"
     picomatch "^4.0.2"
 
+tinymce@^5.5.0:
+  version "5.10.9"
+  resolved "https://registry.npmjs.org/tinymce/-/tinymce-5.10.9.tgz"
+  integrity sha512-5bkrors87X9LhYX2xq8GgPHrIgJYHl87YNs+kBcjQ5I3CiUgzo/vFcGvT3MZQ9QHsEeYMhYO6a5CLGGffR8hMg==
+
 to-data-view@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/to-data-view/-/to-data-view-1.1.0.tgz"
@@ -4961,6 +4992,11 @@ unconfig@^0.3.11:
     "@antfu/utils" "^0.7.7"
     defu "^6.1.4"
     jiti "^1.21.0"
+
+undici-types@~6.19.2:
+  version "6.19.8"
+  resolved "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
@@ -5167,7 +5203,7 @@ vue@^2.6.11:
     "@vue/compiler-sfc" "2.7.16"
     csstype "^3.1.0"
 
-"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.2.41, vue@^3.3.0, vue@^3.3.13, vue@^3.4.26, vue@^3.4.38, vue@>=3.0.0, vue@>=3.2.0, vue@3.4.38:
+"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.2.41, vue@^3.3.0, vue@^3.3.13, vue@^3.3.4, vue@^3.4.26, vue@^3.4.38, vue@>=3.0.0, vue@>=3.2.0, vue@3.4.38:
   version "3.4.38"
   resolved "https://registry.npmjs.org/vue/-/vue-3.4.38.tgz"
   integrity sha512-f0ZgN+mZ5KFgVv9wz0f4OgVKukoXtS3nwET4c2vLBGQR50aI8G0cqbFtLlX9Yiyg3LFGBitruPHt2PxwTduJEw==

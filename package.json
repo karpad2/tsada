@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "0.0.22c",
+  "version": "0.0.23a",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,9 @@
     "@fireworks-js/vue": "^2.10.8",
     "@ipaat/vue3-tailwind3-cookie-comply": "^1.1.2",
     "@kyvg/vue3-notification": "^3.2.1",
+    "@mayasabha/ckeditor4-vue3": "^1.0.8",
     "@primevue/themes": "^4.0.4",
+    
     "@tsparticles/vue3": "^3.0.1",
     "@vueup/vue-quill": "^1.2.0",
     "appwrite": "^15.0.0",

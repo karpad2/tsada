@@ -28,9 +28,9 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-
+import CKEditor from '@mayasabha/ckeditor4-vue3';
 import CountryFlag from 'vue-country-flag-next'
-
+//import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
 
@@ -60,7 +60,7 @@ app.component('QuillEditor', QuillEditor)
 
 //console.log(messages);
 
-
+app.use(CKEditor);
 const i18n = createI18n({
     locale: 'en', fallbackLocale: 'en',  messages, globalInjection: true  });
 /*
@@ -68,6 +68,7 @@ client
     .setEndpoint('https://appwrite.kasoft.co.uk/v1')
     .setProject('653bb473ee7f6a6074e7');*/
 //app.use(VueI18n);
+//app.use(CkeditorPlugin);
 app.use(Notifications);
 app.use(vuetify);
 app.use(PrimeVue, {

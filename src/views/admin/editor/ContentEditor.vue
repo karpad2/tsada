@@ -36,8 +36,8 @@
             
           ></v-text-field>
         
-
-            <QuillEditor  @textChange="save" content-type="html"  style="min-height:200px;"  v-model:content="content_rs" toolbar="full" theme="snow" />
+          <ckeditor v-model="content_rs"></ckeditor>
+            <QuillEditor v-if="false"  @textChange="save" content-type="html"  style="min-height:200px;"  v-model:content="content_rs" toolbar="full" theme="snow" />
         </div>
     </div>
         <div>
@@ -51,7 +51,8 @@
             hide-details
             
           ></v-text-field>
-            <QuillEditor  content-type="html"  @textChange="save" style="min-height:200px;" v-model:content="content_hu" toolbar="full" theme="snow" />
+          <ckeditor v-model="content_hu"></ckeditor>
+          <QuillEditor v-if="false"  content-type="html"  @textChange="save" style="min-height:200px;" v-model:content="content_hu" toolbar="full" theme="snow" />
         </div>
     </div>
         <div>
@@ -65,7 +66,8 @@
             hide-details
             
           ></v-text-field>
-            <QuillEditor content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
+          <ckeditor v-model="content_en"></ckeditor>
+            <QuillEditor v-if="false" content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
         </div>
     </div>
 
@@ -123,6 +125,7 @@ import {useLoadingStore} from "@/stores/loading";
 import AlbumViewer from "@/components/AlbumViewer.vue";
 import { convertifserbian } from "@/lang";
 
+
 export default{
 data()
 {
@@ -153,7 +156,7 @@ data()
     }
 },
 components:{
-    AlbumViewer
+    AlbumViewer,
 },
 mounted()
 {
