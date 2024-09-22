@@ -149,7 +149,7 @@ data()
 {
 return {
     _loading:false,
-    we_have_net:true,
+    we_have_net:false,
     checking:true
 }
 },
