@@ -150,7 +150,7 @@ data()
 return {
     _loading:false,
     we_have_net:true,
-    checking:false
+    checking:true
 }
 },
     
@@ -158,7 +158,7 @@ return {
     {
         
        //console.log( app.config.globalProperties.$loading);
-       //this.checkServerConnection();
+       this.checkServerConnection();
     
             
     },
