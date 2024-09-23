@@ -158,10 +158,9 @@ return {
     
     mounted()
     {
-        
+        this.checkingstuff();
        //console.log( app.config.globalProperties.$loading);
-       this.checkForUpdates();
-       this.checkServerConnection();
+       
     
             
     },
@@ -217,6 +216,12 @@ return {
         this.we_have_net=false;
       }
       this.checking=false;
+    },
+    async checkingstuff()
+    {
+        this.checkForUpdates();
+        this.checkServerConnection();
+
     },
     async checkForUpdates() {
       try {
