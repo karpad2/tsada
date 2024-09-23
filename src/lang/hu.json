@@ -147,7 +147,9 @@
     "getting_ready":"Kérem várjon...",
     "no_internet":"Nincs kapcsolat a szerverrel.",
     "archived":"Archivált dokumentum.",
-    "restore":"Dokumentumok visszaállítása"
+    "restore":"Dokumentumok visszaállítása",
+
+    "not_news":"Nem hír"
 
 
 

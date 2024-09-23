@@ -139,7 +139,9 @@
     "getting_ready":"Please wait...",
     "no_internet":"No connection to the server.",
     "archived":"Archived document.",
-    "restore":"Restore the document"
+    "restore":"Restore the document",
+
+    "not_news":"Not News"
 
 
 

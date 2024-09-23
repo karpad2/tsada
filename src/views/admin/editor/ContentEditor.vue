@@ -2,6 +2,7 @@
     <div class="relative mb-4 container  px-5  mx-auto bg-white" >
         <div>
             <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
+            <v-switch @change="save" v-model="notNews" :label="$t('not_news')"></v-switch>
             <v-btn class="m-5" @click="save" >{{ $t('save') }}</v-btn>
             <v-btn class="m-5" @click="delete_content">{{ $t('delete') }}</v-btn>
             <v-btn class="m-5" @click="share_fb">{{ $t('fb_share') }}</v-btn>
@@ -152,7 +153,8 @@ data()
         headers:[],
         colDefs:[],
         documents:[],
-        doc_loaded:false
+        doc_loaded:false,
+        notNews:true,
     }
 },
 components:{
@@ -202,7 +204,7 @@ methods:{
                     this.content_en=k.documents[0].text_en;
 
                     this.visible=k.documents[0].visible;
-
+                    this.notNews=k.documents[0].notNews;
 
                     if(k.documents[0].default_image==null||k.documents[0].default_image=='')
                     {
@@ -293,7 +295,8 @@ methods:{
             "has_documents":this.documents_flag,
             "has_gallery":this.album_flag,
             "gallery":this.gallery_id,
-            "default_image":this.default_image
+            "default_image":this.default_image,
+            "notNews":this.notNews
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)

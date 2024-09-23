@@ -99,11 +99,11 @@ export default {
         let l;
         if(!cc.userLoggedin)
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(6)]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",this.mode=="news"?false:true)]),Query.equal("notNews",this.mode=="news"?false:true),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
         }
         else
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(6)]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",this.mode=="news"?false:true)]),Query.select(["$createdAt","title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
          
         }
         let local=cc.language;
@@ -111,6 +111,7 @@ export default {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
             //console.log(element);
             a.id=element.$id;
+            
             a.visible=element.visible;
             if(local=="en")
             {
@@ -177,7 +178,7 @@ export default {
         async new_stuff()
         {
             const database = new Databases(appw);
-            const l= await database.createDocument(config.website_db, config.about_us_db,ID.unique(),{"type":this.mode});
+            const l= await database.createDocument(config.website_db, config.about_us_db,ID.unique(),{"type":this.mode,"aboutCategories":config.news_category_in_text,"notNews":false});
             this.$router.push("/admin/edit/"+this.mode+"/"+l.$id);
         }
     }
