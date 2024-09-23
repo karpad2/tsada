@@ -251,7 +251,7 @@ export default {
 
             this.video_id=k.documents[0].video;
             this.date=k.documents[0].$createdAt;
-            
+                
             if(this.video_id==""||this.video_id==null)
             
             { this.video_link=config.default_video;}

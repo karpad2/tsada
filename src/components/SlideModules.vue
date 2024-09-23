@@ -97,13 +97,23 @@ export default {
         const storage = new Storage(appw);
         const cc=useLoadingStore();
         let l;
-        if(!cc.userLoggedin)
+        if(this.mode=="news"&&cc.userLoggedin)
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",this.mode=="news"?false:true)]),Query.equal("notNews",this.mode=="news"?false:true),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.select(["$createdAt","title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+         
+        }
+        else if(this.mode=="news"&&!cc.userLoggedin)
+        {
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+
+        }
+        else if(!cc.userLoggedin)
+        {
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
         }
         else
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",this.mode=="news"?false:true)]),Query.select(["$createdAt","title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.select(["$createdAt","title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
          
         }
         let local=cc.language;

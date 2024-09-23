@@ -134,7 +134,9 @@ import Toast from "primevue/toast";
 import {useLoadingStore} from "@/stores/loading";
 import { Fireworks } from '@fireworks-js/vue'
 import NoInternet from '@/components/NoInternet.vue';
+import vv from "../../package.json";
 import axios from 'axios';
+import { version } from 'vite';
 
 export default {
     components: {
@@ -158,6 +160,7 @@ return {
     {
         
        //console.log( app.config.globalProperties.$loading);
+       this.checkForUpdates();
        this.checkServerConnection();
     
             
@@ -192,6 +195,10 @@ return {
         light_theme()
         {
             return this.theme_flag=="light";
+        },
+        __version()
+        {
+            return vv.version;
         }
 
     },
@@ -210,7 +217,31 @@ return {
         this.we_have_net=false;
       }
       this.checking=false;
-    }
+    },
+    async checkForUpdates() {
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/karpad2/tsada/refs/heads/main/package.json');
+        const data = await response.json();
+
+        const latestVersion = data.version;
+        if (latestVersion !== this.__version  && process.env.NODE_ENV === 'production') {
+            this.refreshApp();
+        }
+      } catch (error) {
+        console.error('Error checking for app updates:', error);
+      }
+    },
+    refreshApp() {
+      console.log('New version detected. Reloading the app with cache bypass...');
+      const currentUrl = window.location.href;
+      const newUrl = currentUrl.split('?')[0] + '?v=' + new Date().getTime();
+
+      setTimeout( ()=>{
+        
+        window.location.href = newUrl;
+      },1000);
+        // Reloads the page with a unique query string
+    },
     }
     
 }
