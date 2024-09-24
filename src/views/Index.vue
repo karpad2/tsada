@@ -219,7 +219,7 @@ return {
     },
     async checkingstuff()
     {
-        this.checkForUpdates();
+        //this.checkForUpdates();
         this.checkServerConnection();
 
     },
