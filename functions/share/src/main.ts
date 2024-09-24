@@ -22,7 +22,7 @@ export default async ({ req, res, log, error }: any) => {
   const storage = new Storage(client);
 
   // Define your default image URL
-  const defaultImageUrl = 'https://beta.tsada.edu.rs/favicon.png';
+  const defaultImageUrl = 'https://www.tsada.edu.rs/favicon.png';
 
   // Function to fetch content from Appwrite
   async function fetchContentFromAppwrite(id: string): Promise<MyDocument | null> {
@@ -89,7 +89,7 @@ export default async ({ req, res, log, error }: any) => {
           <meta property="og:title" content="${content.title_hu || content.title_rs}" />
           <meta property="og:description" content="${content.text_hu || content.text_rs}" />
           <meta property="og:image" content="${imageUrl}" />
-          <meta property="og:url" content="https://share.tsada.edu.rs/${id}" />
+          <meta property="og:url" content="https://www.tsada.edu.rs/${id}" />
           <meta property="og:type" content="article" />
           <meta property="fb:app_id" content="885580820143317" />  <!-- Facebook App ID -->
           <title>${content.title_hu || content.title_rs}</title>
@@ -104,7 +104,7 @@ export default async ({ req, res, log, error }: any) => {
     return res.send(html, 200, { 'Content-Type': 'text/html' });
   } else {
     // Redirect normal browsers to the SPA page
-    const redirectUrl = `https://beta.tsada.edu.rs/renderer/news/${id}`;
+    const redirectUrl = `https://www.tsada.edu.rs/renderer/news/${id}`;
     return res.send('', 301, { Location: redirectUrl });
   }
 };
