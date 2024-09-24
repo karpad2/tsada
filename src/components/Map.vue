@@ -23,7 +23,7 @@
                  </div>
                  <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
                      <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('email') }}</h2>
-                     <a :href="'mailto:'+$t('contact_email')" class="text-sky-500 leading-relaxed">{{$t("contact_email")}}</a>
+                     <a :href="'mailto:'+contact.email" class="text-sky-500 leading-relaxed">{{contact.email}}</a>
                      <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">{{ $t('phone') }}</h2>
                      <p class="leading-relaxed">{{ $t("phone1") }}</p>
                  </div>
