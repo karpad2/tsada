@@ -16,18 +16,18 @@
                            <p>{{ $t('school_name') }}</p>
                        </l-popup>
                    </l-marker> <!-- Add this line -->               </l-map>
-               <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
-                   <div class="lg:w-1/2 px-6">
-                       <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('address') }}</h2>
-                       <p class="mt-1">{{ contact.address }}, {{ contact.city }} {{ contact.country }}</p>
-                   </div>
-                   <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
-                       <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('email') }}</h2>
-                       <a :href="'mailto:'+contact.email" class="text-sky-500 leading-relaxed">{{ contact.email }}</a>
-                       <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">{{ $t('phone') }}</h2>
-                       <p class="leading-relaxed">{{ contact.phone1 }}</p>
-                   </div>
-               </div>
+                   <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
+                 <div class="lg:w-1/2 px-6">
+                     <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('address') }}</h2>
+                     <p class="mt-1"><p>{{ $t("contact_address")}},</p> {{ $t("city") }} {{ $t("country") }}</p>
+                 </div>
+                 <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
+                     <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('email') }}</h2>
+                     <a :href="'mailto:'+$t('contact_email')" class="text-sky-500 leading-relaxed">{{$t("contact_email")}}</a>
+                     <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">{{ $t('phone') }}</h2>
+                     <p class="leading-relaxed">{{ $t("phone1") }}</p>
+                 </div>
+             </div>
            </div>
            <ContactUsPlugin style="max-width: 650px;" class="max-sm:w-full w-1/2 mt-5 mb-5" v-if="showContactUs"/>
            

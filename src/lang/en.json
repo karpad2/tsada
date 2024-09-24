@@ -141,7 +141,17 @@
     "archived":"Archived document.",
     "restore":"Restore the document",
 
-    "not_news":"Not News"
+    "not_news":"Not News",
+
+    
+    "contact_email":"iskolada@mts.rs",
+    "phone1":"024/853-034",
+    "phone2":"024/855-555",
+    "contact_address":"Моše Pijade 47",
+    "city":"24430 Ada",
+    "country":"Serbia",
+    "website":"www.tsada.edu.rs/"
+
 
 
 

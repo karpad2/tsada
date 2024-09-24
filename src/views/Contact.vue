@@ -20,13 +20,13 @@
              <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
                  <div class="lg:w-1/2 px-6">
                      <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('address') }}</h2>
-                     <p class="mt-1">{{ contact.address }}, {{ contact.city }} {{ contact.country }}</p>
+                     <p class="mt-1">{{ $t("contact_address")}}, {{ $t("city") }} {{ $t("country") }}</p>
                  </div>
                  <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
                      <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">{{ $t('email') }}</h2>
-                     <a :href="'mailto:'+contact.email" class="text-sky-500 leading-relaxed">{{ contact.email }}</a>
+                     <a :href="'mailto:'+$t('contact_email')" class="text-sky-500 leading-relaxed">{{$t("contact_email")}}</a>
                      <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">{{ $t('phone') }}</h2>
-                     <p class="leading-relaxed">{{ contact.phone1 }}</p>
+                     <p class="leading-relaxed">{{ $t("phone1") }}</p>
                  </div>
              </div>
          </div>

@@ -140,6 +140,14 @@
     "getting_ready": "Молимо сачекајте...",
     "no_internet": "Нема везе са сервером.",
     "archived": "Архивиран документ.",
-    "restore":"Враћање докумената"
+    "restore":"Враћање докумената",
+
+    "contact_email":"iskolada@mts.rs",
+    "phone1":"024/853-034",
+    "phone2":"024/855-555",
+    "contact_address":"Моше Пијаде 47",
+    "city":"24430 Ада",
+    "country":"Србија",
+    "website":"www.tsada.edu.rs/"
   }
   
