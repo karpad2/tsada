@@ -17,12 +17,12 @@ export default defineConfig({
         theme_color: '#0ea5e9',
         icons: [
           {
-            src: '/src/assets/tsada_logo.png',
+            src: 'favicon.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/src/assets/tsada_logo.png',
+            src: 'favicon.png',
             sizes: '512x512',
             type: 'image/png'
           }
