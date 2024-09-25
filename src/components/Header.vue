@@ -11,11 +11,11 @@
               </button> 
               </div>
               <router-link to="/home" class=" flex flex-row items-center title-font font-medium  text-gray-900 mb-4 md:mb-0 ">
-                  <img src="@a/tsada_logo.png" class="size-20 text-white p-1 bg-sky-400/15 rounded-full">
+                  <img src="@a/tsada_logo.png" alt="logo" class="size-20 text-white p-1 bg-sky-400/15 rounded-full">
               <span class="ml-3  max-sm:hidden text-xl" >{{ $t('school_name') }}</span>
-              <img src="@a/certop_logo.png" class="w-36 h-12 text-white p-2 ">
+              <img src="@a/certop_logo.png"  alt="certop" class="w-36 h-12 text-white p-2 ">
               
-              <img src="@a/Erasmus_Logo.svg" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
+              <img src="@a/Erasmus_Logo.svg"  alt="erasmus+" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
             </div>
               <nav v-if="mobile_mode"  :class="[{'flex-col':mobile_view},{'mx-auto':mobile_view||tablet_mode},{'flex-row':!mobile_view}]" class="md:ml-auto flex items-center text-base justify-acenter ">
@@ -85,7 +85,8 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{ $t('for_students') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
-                      <li  ><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li>  
+                      <li  ><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li> 
+                      <li  ><a href="https://moodle.tsada.edu.rs">{{ $t("eclassroom") }}</a></li>  
                     </ul>
                   </div>
                   
