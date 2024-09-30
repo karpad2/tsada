@@ -155,6 +155,7 @@ data()
         documents:[],
         doc_loaded:false,
         notNews:true,
+        uploading:false
     }
 },
 components:{
@@ -176,7 +177,11 @@ mounted()
             this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
             this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
         
-
+            window.addEventListener('beforeunload', this.handleBeforeUnload);
+},
+onBeforeUnmount()
+{
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
 },
 methods:{
     async getMD()
@@ -269,7 +274,18 @@ methods:{
 
             this.synchronize_documents();
         },
-
+    handleBeforeUnload(event){
+      if (this.uploading) {
+        event.preventDefault();
+        this.$notify({
+                    type: 'error',
+                    text: this.$t('file_still_uploading')
+                });
+        event.returnValue = '';
+        return '';
+      }
+    
+    },
     async save()
     {   
         const database = new Databases(appw);
@@ -425,7 +441,7 @@ rt_time(a)
         //const storage = new Storage(appw);
         let k= await database.deleteDocument(config.website_db, config.about_us_db,this.$route.params.id);  
         this.$notify(this.$t('deleted'));
-        this.router.push("/home");
+        this.$router.push("home");
     },
     async file_upload()
     {
@@ -436,7 +452,7 @@ rt_time(a)
         } 
     console.log("file_upload");
     //console.log(this.file_link[0]);
-
+    this.uploading=true;
     const storage = new Storage(appw);
     const result = await storage.createFile(
     config.website_images, // bucketId
@@ -451,7 +467,7 @@ rt_time(a)
 
 
     this.$notify(this.$t('file_uploaded'));
-
+    this.uploading=false;
     }
 }
 

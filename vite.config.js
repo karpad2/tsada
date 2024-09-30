@@ -7,23 +7,21 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     VitePWA({ registerType: 'autoUpdate', 
+      cleanupOutdatedCaches: true,
+      skipWaiting: true,
       devOptions: {
         enabled: true // Enable PWA in development (optional)
       },
       manifest: {
         name: 'Tehnička Škola Ada',
-        short_name: 'TSAda',
+        short_name: 'TŠAda',
         description: 'Tehnička Škola Ada',
         theme_color: '#0ea5e9',
         icons: [
+          
           {
             src: 'favicon.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'favicon.png',
-            sizes: '512x512',
+            sizes: '1024x1024',
             type: 'image/png'
           }
         ]

@@ -121,7 +121,8 @@ data()
         visible:false,
         default_image:"",
         file_link:null,
-        images:[""]
+        images:[""],
+        uploading:false
     }
 },
 components:{
@@ -130,6 +131,11 @@ mounted()
 {
     this.getMD();
     this.gallery_id=this.$route.params.id;
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+},
+onBeforeUnmount()
+{
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
 },
 methods:{
     async getMD()
@@ -190,7 +196,18 @@ methods:{
             let gal=k.documents[0].gallery;
             
         },
-
+        handleBeforeUnload(event){
+      if (this.uploading) {
+        event.preventDefault();
+        this.$notify({
+                    type: 'error',
+                    text: this.$t('file_still_uploading')
+                });
+        event.returnValue = '';
+        return '';
+      }
+    
+    },
     async save()
     {   
         const database = new Databases(appw);
@@ -237,7 +254,7 @@ methods:{
             return;
         } 
     console.log("file_upload");
-
+    this.uploading=true;
     await this.file_link.forEach(async element => {
         this.$notify({
                     type: 'info',
@@ -272,7 +289,7 @@ methods:{
 
 
     //this.$notify(this.$t('file_uploaded'));
-
+    this.uploading=false;
     },
     set_as_default(aa:string)
     {

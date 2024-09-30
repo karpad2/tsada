@@ -140,7 +140,7 @@
   import { Client, Databases, ID,Storage,Query,Account } from "appwrite";
   import {convertifserbian} from "@/lang";
   
-  import {appw,config} from "@/appwrite";
+  import {appw,config,check} from "@/appwrite";
   import { ref,nextTick } from "vue";
   import {useLoadingStore} from "@/stores/loading";
   export default
@@ -190,6 +190,7 @@
           const cc=useLoadingStore();
           this.$i18n.locale=cc.language;
           document.title=this.$t("school_name");
+          check();
           this.getDocumentsCategories();
           this.getAbouts();
           this.getErasmus();

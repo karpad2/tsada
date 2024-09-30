@@ -79,7 +79,8 @@ data()
        
         file_link:null,
         document_id:"",
-        img:""
+        img:"",
+        uploading:false
     }
 },
 components:{
@@ -87,7 +88,12 @@ components:{
 mounted()
 {
     this.getMD();
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
 
+},
+onBeforeUnmount()
+{
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
 },
 methods:{
     async getMD()
@@ -184,6 +190,18 @@ methods:{
     //this.getMD();
 
     },
+    handleBeforeUnload(event){
+      if (this.uploading) {
+        event.preventDefault();
+        this.$notify({
+                    type: 'error',
+                    text: this.$t('file_still_uploading')
+                });
+        event.returnValue = '';
+        return '';
+      }
+    
+    },
     
 
     async delete_content()
@@ -213,7 +231,8 @@ methods:{
         {
             console.warn("no file");
             return;
-        } 
+        }
+        this.uploading=true;
         this.$notify(this.$t('file_upload_in_progress'));
     console.log("file_upload");
     //console.log(this.file_link[0]);
@@ -229,7 +248,7 @@ methods:{
     this.save();
     this.getMD();
     this.$notify(this.$t('file_uploaded'));
-
+    this.uploading=false;
     }
 }   
 }
