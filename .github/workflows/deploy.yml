@@ -44,3 +44,25 @@ jobs:
           git add .
           git commit -m "Deploy version $VERSION-r to builded branch"
           git push origin builded
+
+    # New SSH step to deploy files to ~/tsada
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.ACCESS_TOKEN }}  # Use your named access token here
+
+      - name: Deploy to Fedora server (~/tsada)
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          echo "Deploying version $VERSION to Fedora server"
+          
+          # Define server connection details
+          SERVER_USER="${{ secrets.USER }}"
+          SERVER_HOST="${{ secrets.USERWEBHOST }}"
+          SERVER_PORT="${{ secrets.PORT }}"
+          DEPLOY_PATH="~/tsada"  # Deployment path is ~/tsada where Apache reads from
+
+          # SSH to the server and pull the latest changes from the repository
+          ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST "cd $DEPLOY_PATH && git pull origin main"
+
