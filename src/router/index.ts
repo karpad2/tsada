@@ -84,7 +84,7 @@ const router = createRouter({
       },
       {  
         path:'/docs/:id',
-        name:'documents',
+        name:'documentLister',
         component: () => import('../views/documents/DocumentLister.vue')      
       },
 
