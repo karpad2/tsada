@@ -91,7 +91,16 @@
                   </div>
                   
                   
-                  <router-link to="/documents" class="btn btn-ghost  cursor-pointer ">{{ $t('documents') }}</router-link>
+                  
+                  <div class="dropdown dropdown-hover">
+                  <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{  $t('documents') }} <i class="pi pi-angle-down"></i></div>
+                  <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52">
+                      <li  ><router-link to="/documents">{{ $t("school_documents") }}</router-link></li> 
+                      <li  ><router-link to="/docs/public_procurements">{{ $t("public_procurements") }}</router-link></li> 
+                      <li  ><router-link to="/docs/leases">{{ $t("lease") }}</router-link></li>   
+                    </ul>
+                  </div>
+
 
                   <router-link to="/renderer/education/adult_education" class="btn btn-ghost  cursor-pointer ">{{ $t('adult_education') }}</router-link>
   

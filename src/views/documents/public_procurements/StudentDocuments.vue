@@ -1,43 +1,33 @@
 <template>
     <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30" >
+        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
                 <div class="flex flex-wrap w-full mb-20">
                     <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('documents') }}</h1>
+                        <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('studentdocuments') }}</h1>
                         <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                     </div>
                 
                 </div>
                 <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
                 <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-                <v-data-table  height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
+                <v-data-table  height="400" :headers="headers" :items="role.workers">
                     <template v-slot:item.date="{ item }">
         {{ rt_time(item.date) }}
         </template>
     
       <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book icon_size"></i></router-link>
+        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
        
       </template>
 
       <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/document/'+item.id"><i class="pi pi-cloud-upload icon_size"></i></router-link>
+        <router-link :to="'/admin/studentdocument/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
        
       </template>
 
       <template #bottom></template>
                     </v-data-table>
-                    <div v-if="admin">
-                        <v-btn  @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
-                        <v-btn v-if="!role.archived"  @click="archive_stuff(role.id)" class="m-5">{{ $t('archive_category') }}</v-btn>
-                        <v-btn v-else  @click="restore_stuff(role.id)" class="m-5">{{ $t('restore') }}</v-btn>
-                </div>    
-                </div>
-                <div v-else>
-                    <Loading />
-                </div>
-                <div>
-                    <v-btn v-if=" loaded && !archived" @click="open_archive" class="m-5">{{ $t('show_archive') }}</v-btn>
+                    <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
                 </div>
     </div>
     </section>
@@ -53,12 +43,11 @@
     import {reactive,ref} from "vue";
     import gsap from "gsap";
     import moment from 'moment/min/moment-with-locales';
-    import Loading from "@/components/Loading.vue";
     
     export default {
         name: 'Workers',
         components: {
-            Loading
+            
         },
         setup()
         {
@@ -68,7 +57,7 @@
         {
             const loadingStore = useLoadingStore();
             this.admin=loadingStore.userLoggedin;
-            document.title=this.$t("documents");
+            document.title=this.$t("studentdocuments");
     
             gsap.fromTo(
         "#render_title",
@@ -130,8 +119,7 @@
                     colDefs:[],
                     loaded:false,
                     headers:[],
-                    admin:false,
-                    archived:false
+                    admin:false
                     
                 }),
         methods:{
@@ -158,36 +146,10 @@
             async new_stuff(aaa)
             {
                 const database = new Databases(appw);
-                const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                this.$router.push("/admin/document/"+l.$id);
-            },
-            async archive_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":true});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async restore_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":false});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async open_archive()
-            {
-                this.archived=true;
-                this.load_workers_base();
+                const l= await database.createDocument(config.website_db, config.st_documents,ID.unique(),{"stDocumentCategories":aaa});
+                this.$router.push("/admin/studentdocument/"+l.$id);
             },
             async load_workers_base(){
-            this.loaded=false;
             const loadingStore = useLoadingStore();
             //loadingStore.setLoading(true);
             this.workers=[];
@@ -201,85 +163,18 @@
             //let missing_picture=storage.getFileView(config.website_images,config.missing_worker_picture).href;
             
             //this is f voodoo, and sucks, but it works
-            let k,n;
             
-            k= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",false)]);
-            
-            if(this.archived)
-            {
-                n= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",true)]);
-            }
+            let k= await database.listDocuments(config.website_db, config.st_document_categories,[Query.orderAsc("listasorrend")]);
+    
             for (let i=0;i<k.documents.length;i++)
             {
+    
             let el1=k.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
                 //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
-            ]);
-            //console.log(l);
-                let name="";
-                if(local=="en")
-                {
-                    name=el1.category_name_en;
-                }
-                else if(local=="hu")
-                {
-                    name=el1.category_name_hu;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    name=el1.category_name_rs;
-                }
-                //console.log(l);
-                await l.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=el2.document_title_rs;
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                if(el2.worker_img==""||el2.worker_img==null)
-                {
-                //a.img=missing_picture;
-                }
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                _works.push(a);
-            });
-            let b={role:"",workers:[],id:"",archived:false};
-            b.id=el1.$id;
-            b.role=name;
-            b.archived=el1.archived;
-            b.workers=_works;
-            this.roles.push(b);
-    //        });
-          }
-          if(this.archived)
-          {
-          for (let i=0;i<n.documents.length;i++)
-            {
-            let el1=n.documents[i];
-          //   k.documents.forEach(async (el1) => {
-                let _works=[];
-                //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
+                let l= await database.listDocuments(config.website_db, config.st_documents,[
+                    Query.equal("stDocumentCategories",[el1.$id])
             ]);
             //console.log(l);
                 let name="";
@@ -295,7 +190,6 @@
                 {
                     name=convertifserbian(el1.category_name_rs);
                 }
-                name+=` ~ ${this.$t("archived")}`;
                 //console.log(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
@@ -326,16 +220,13 @@
                 a.date=el2.$createdAt;    
                 _works.push(a);
             });
-            let b={role:"",workers:[],id:"",archived:false};
+            let b={role:"",workers:[],id:""};
             b.id=el1.$id;
             b.role=name;
-            b.archived=el1.archived;
             b.workers=_works;
             this.roles.push(b);
     //        });
           }
-        }
-
             console.log(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
@@ -355,7 +246,7 @@
     }
     </script>
     <style>
-    .icon_size{
-        /*font-size: 3em;;*/
+    .popups{
+    
     }
-</style>
+    </style>

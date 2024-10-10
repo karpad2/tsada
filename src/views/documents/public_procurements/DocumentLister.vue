@@ -137,7 +137,7 @@
                 //console.log();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
-                let llll= await database.getDocument(config.website_db, config.document_categories_db,this.$route.params.id);
+                let llll= await database.getDocument(config.website_db, config.document_categories_db,this.$route.params.category);
                 
                 if(local=="rs"||local=="sr")
                     {
@@ -156,7 +156,7 @@
                     }
                 
 
-                let n= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("documentCategories",this.$route.params.id),Query.orderDesc("$createdAt")]);
+                let n= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("documentCategories",this.$route.params.category),Query.orderDesc("$createdAt")]);
                 await n.documents.forEach(async el2 => {
                     let a={name:"",date:"",id:"",doc_id:""};
 

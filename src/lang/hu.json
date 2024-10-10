@@ -159,7 +159,11 @@
     "country":"Szerbia",
     "website":"www.tsada.edu.rs/",
     "eclassroom":"E-Tanterem",
-    "file_still_uploading":"Fájl még feltöltés alatt."
+    "file_still_uploading":"Fájl még feltöltés alatt.",
+
+    "school_documents":"Iskolai dokumentumok",
+    "public_procurements":"Közbeszerzés",
+    "lease":"Bérlet"
 
 
 
