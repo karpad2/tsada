@@ -982,10 +982,10 @@
   resolved "https://registry.npmjs.org/@canvas/image-data/-/image-data-1.0.0.tgz"
   integrity sha512-BxOqI5LgsIQP1odU5KMwV9yoijleOPzHL18/YvNqF9KFSGF2K/DLlYAbDQsWqd/1nbaFuSkYD/191dpMtNh4vw==
 
-"@esbuild/linux-x64@0.21.5":
+"@esbuild/win32-x64@0.21.5":
   version "0.21.5"
-  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.21.5.tgz"
-  integrity sha512-1rYdTpyv03iycF1+BhzrzQJCdOuAOtaqHTWJZCWvijKD2N5Xu0TtVC8/+1faWqcP9iBCWOmjmhoH94dH82BxPQ==
+  resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.21.5.tgz"
+  integrity sha512-tQd/1efJuzPC6rCFwEvLtci/xNFcTZknmXs98FYDfGE4wP9ClFV98nyKrzJKVPMhdDnjzLhdUyMX4PsQAPjwIw==
 
 "@fireworks-js/vue@^2.10.8":
   version "2.10.8"
@@ -1229,15 +1229,10 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@rollup/rollup-linux-x64-gnu@4.21.0":
+"@rollup/rollup-win32-x64-msvc@4.21.0":
   version "4.21.0"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.21.0.tgz"
-  integrity sha512-e2hrvElFIh6kW/UNBQK/kzqMNY5mO+67YtEh9OA65RM5IJXYTWiXjX6fjIiPaqOkBthYF1EqgiZ6OXKcQsM0hg==
-
-"@rollup/rollup-linux-x64-musl@4.21.0":
-  version "4.21.0"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.21.0.tgz"
-  integrity sha512-1vvmgDdUSebVGXWX2lIcgRebqfQSff0hMEkLJyakQ9JQUbLDkEaMsPTLOmyccyC6IJ/l3FZuJbmrBw/u0A0uCQ==
+  resolved "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.21.0.tgz"
+  integrity sha512-2jsCDZwtQvRhejHLfZ1JY6w6kEuEtfF9nzYsZxzSlNVKDX+DpsDJ+Rbjkm74nvg2rdx0gwBS+IMdvwJuq3S9pQ==
 
 "@surma/rollup-plugin-off-main-thread@^2.2.3":
   version "2.2.3"
@@ -1248,13 +1243,6 @@
     json5 "^2.2.0"
     magic-string "^0.25.0"
     string.prototype.matchall "^4.0.6"
-
-"@tinymce/tinymce-vue@^4.0.7":
-  version "4.0.7"
-  resolved "https://registry.npmjs.org/@tinymce/tinymce-vue/-/tinymce-vue-4.0.7.tgz"
-  integrity sha512-1esB8wGWrjPCY+rK8vy3QB1cxwXo7HLJWuNrcyPl6LOVR+QJjub0OiV/C+TUEsLN6OpCtRv+QnIqMC5vXz783Q==
-  dependencies:
-    tinymce "^5.5.0"
 
 "@tsparticles/basic@^3.5.0":
   version "3.5.0"
@@ -4846,11 +4834,6 @@ tinyglobby@^0.2.0:
   dependencies:
     fdir "^6.2.0"
     picomatch "^4.0.2"
-
-tinymce@^5.5.0:
-  version "5.10.9"
-  resolved "https://registry.npmjs.org/tinymce/-/tinymce-5.10.9.tgz"
-  integrity sha512-5bkrors87X9LhYX2xq8GgPHrIgJYHl87YNs+kBcjQ5I3CiUgzo/vFcGvT3MZQ9QHsEeYMhYO6a5CLGGffR8hMg==
 
 to-data-view@^1.1.0:
   version "1.1.0"
