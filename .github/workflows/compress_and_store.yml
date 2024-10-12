@@ -1,4 +1,4 @@
-name: Compress, Cache, and Push to Builded Functions Branch
+name: Compress and Push to Builded Functions Branch
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Trigger on pushes to the main branch
 
 jobs:
-  compress_cache_and_push:
+  compress_and_push:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,39 +30,22 @@ jobs:
             exit 1
           fi
 
-      - name: Cache the Compressed Archive
-        uses: actions/cache@v3
-        id: cache-share
-        with:
-          path: share.tar.gz
-          key: share-archive-${{ github.sha }}
-
-      - name: Check for Cache and Exit if None
-        if: steps.cache-share.outputs.cache-hit != 'true'
-        run: |
-          echo "No cache found. Exiting."
-          exit 1
-
       - name: Checkout builded_functions Branch
-        if: steps.cache-share.outputs.cache-hit == 'true'
         uses: actions/checkout@v3
         with:
           ref: builded_functions
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clear Existing Files
-        if: steps.cache-share.outputs.cache-hit == 'true'
         run: |
           git rm -rf .
           git clean -fxd
 
-      - name: Copy Cached Archive and Commit
-        if: steps.cache-share.outputs.cache-hit == 'true'
+      - name: Copy Archive and Commit
         run: |
-          cp share.tar.gz .
+          cp ../share.tar.gz .
           git add share.tar.gz
           git commit -m "Add compressed share folder contents archive"
 
       - name: Push Changes
-        if: steps.cache-share.outputs.cache-hit == 'true'
         run: git push origin builded_functions --force
