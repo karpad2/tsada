@@ -24,11 +24,7 @@ jobs:
 
       - name: Compress Share Folder Contents to /tmp
         run: |
-          tar -czf /tmp/share.tar.gz -C functions/share .
-          if [ ! -f "/tmp/share.tar.gz" ]; then
-            echo "share.tar.gz was not created!"
-            exit 1
-          fi
+          tar -czf /tmp/share.tar.gz -C functions/share .  # Use -C to change directory, removing ./
 
       - name: Checkout builded_functions Branch
         uses: actions/checkout@v3
