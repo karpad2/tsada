@@ -15,6 +15,7 @@ dist-ssr
 coverage
 dev-dist
 *.local
+.appwrite
 
 /cypress/videos/
 /cypress/screenshots/

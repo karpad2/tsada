@@ -6,11 +6,25 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    VitePWA({ registerType: 'autoUpdate', 
+    VitePWA({
+      registerType: 'autoUpdate',
       cleanupOutdatedCaches: true,
       skipWaiting: true,
-      devOptions: {
-        enabled: true // Enable PWA in development (optional)
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'dynamic-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60 // Cache for 24 hours
+              },
+              networkTimeoutSeconds: 10 // Fallback to cache if network takes too long
+            }
+          }
+        ]
       },
       manifest: {
         name: 'Tehnička Škola Ada',
@@ -18,7 +32,6 @@ export default defineConfig({
         description: 'Tehnička Škola Ada',
         theme_color: '#0ea5e9',
         icons: [
-          
           {
             src: 'favicon.png',
             sizes: '1024x1024',

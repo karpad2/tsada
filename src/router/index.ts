@@ -242,6 +242,10 @@ router.beforeEach((to, from, next) => {
     {
       k=false;
     }
+    if(b.indexOf("/moodle") !== -1)
+      {
+        window.location.replace("https://moodle.tsada.edu.rs");
+      }
 
     if(b.indexOf("/about/birthday") !== -1)
       {
@@ -265,6 +269,8 @@ router.beforeEach((to, from, next) => {
     {
     router.push("/home");   
     }
+
+
 
   // Wait for 1 second (for demonstration purposes)
  /* setTimeout(() => {
