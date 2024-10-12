@@ -1,4 +1,4 @@
-name: Compress and Store Artifact
+name: Compress, Cache, and Push to Builded Functions Branch
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Trigger on pushes to the main branch
 
 jobs:
-  compress_and_store:
+  compress_cache_and_push:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,15 +24,45 @@ jobs:
 
       - name: Compress Share Folder Contents
         run: |
-          tar -czf share.tar.gz -C functions/share .  # Compress contents
+          tar -czf share.tar.gz -C functions/share .
           if [ ! -f "share.tar.gz" ]; then
             echo "share.tar.gz was not created!"
             exit 1
           fi
-          echo "share.tar.gz created successfully."
 
-      - name: Upload share.tar.gz as Artifact
-        uses: actions/upload-artifact@v3
+      - name: Cache the Compressed Archive
+        uses: actions/cache@v3
+        id: cache-share
         with:
-          name: share-archive
           path: share.tar.gz
+          key: share-archive-${{ github.sha }}
+
+      - name: Check for Cache and Exit if None
+        if: steps.cache-share.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache found. Exiting."
+          exit 1
+
+      - name: Checkout builded_functions Branch
+        if: steps.cache-share.outputs.cache-hit == 'true'
+        uses: actions/checkout@v3
+        with:
+          ref: builded_functions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clear Existing Files
+        if: steps.cache-share.outputs.cache-hit == 'true'
+        run: |
+          git rm -rf .
+          git clean -fxd
+
+      - name: Copy Cached Archive and Commit
+        if: steps.cache-share.outputs.cache-hit == 'true'
+        run: |
+          cp share.tar.gz .
+          git add share.tar.gz
+          git commit -m "Add compressed share folder contents archive"
+
+      - name: Push Changes
+        if: steps.cache-share.outputs.cache-hit == 'true'
+        run: git push origin builded_functions --force
