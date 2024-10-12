@@ -19,12 +19,6 @@ jobs:
         run: |
           tar -czf share.tar.gz -C functions/share .  # Compress contents of the share folder directly
 
-      - name: Create a directory for the archive
-        run: mkdir archive_folder
-
-      - name: Move compressed archive
-        run: mv share.tar.gz archive_folder/
-
       - name: Switch to builded_functions branch
         run: |
           git config --global user.name "Your GitHub Username"
@@ -36,9 +30,9 @@ jobs:
           git rm -rf .
           git clean -fxd
 
-      - name: Add and commit new archive
+      - name: Move archive to branch and commit
         run: |
-          cp archive_folder/share.tar.gz .
+          mv share.tar.gz .
           git add share.tar.gz
           git commit -m "Add compressed share folder contents archive"
 
