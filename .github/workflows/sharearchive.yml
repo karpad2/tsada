@@ -1,0 +1,46 @@
+name: Compress and Push to Builded Functions Branch
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+
+jobs:
+  compress_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Compress Folder
+        run: |
+          tar -czf share.tar.gz functions/share
+
+      - name: Create a directory for the archive
+        run: mkdir archive_folder
+
+      - name: Move compressed archive
+        run: mv share.tar.gz archive_folder/
+
+      - name: Switch to builded_functions branch
+        run: |
+          git config --global user.name "Your GitHub Username"
+          git config --global user.email "your-email@example.com"
+          git checkout -B builded_functions
+
+      - name: Remove existing files in builded_functions branch
+        run: |
+          git rm -rf .
+          git clean -fxd
+
+      - name: Add and commit new archive
+        run: |
+          cp archive_folder/share.tar.gz .
+          git add share.tar.gz
+          git commit -m "Add compressed share folder archive"
+
+      - name: Push changes
+        run: git push origin builded_functions --force
