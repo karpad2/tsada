@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: share-archive
           path: /tmp  # Download to /tmp directory
@@ -22,7 +22,7 @@ jobs:
         run: ls -la /tmp/share.tar.gz
 
       - name: Checkout builded_functions Branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: builded_functions
           token: ${{ secrets.GITHUB_TOKEN }}
