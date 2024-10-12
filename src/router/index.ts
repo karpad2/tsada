@@ -204,6 +204,11 @@ const router = createRouter({
       component: () => import('../views/Presentation.vue')      
     },
     {
+      path:'/tvview',
+      name:'tvpresentation',
+      component: () => import('../views/TV/TVView.vue')      
+    },
+    {
       path:'/:pathMatch(.*)*',
       name:'missingpage',
       component: () => import('../views/MissingPage.vue')      
@@ -246,6 +251,15 @@ router.beforeEach((to, from, next) => {
       {
         loadingStore.setfireworkSetting(false);
       }
+      if(b.indexOf("/tvview") !== -1)
+        {
+          loadingStore.sethideheaders(true);
+        }
+        else 
+        {
+          loadingStore.sethideheaders(false);
+        }
+  
 
   if(!loadingStore.userLoggedin&&k)
     {

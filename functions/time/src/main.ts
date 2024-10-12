@@ -67,11 +67,6 @@ export default async ({ req, res, log, error }: any) => {
     return res.send('Pong');
   }
 
-  if (req.path === '/__time__') {
-    let b= new Date().toISOString();
-    return res.send(b);
-  }
-
   // Fetch content based on the ID
   const content = await fetchContentFromAppwrite(id);
 

@@ -1,7 +1,7 @@
 <template>
     <div >
        
-        <Header class="no_print" />
+        <Header v-if="!__hideheaders" class="no_print" />
         
         <vue-particles
         v-if="animation_flag"
@@ -122,7 +122,7 @@
     </div>
 
             </div>
-        <Footer class="no_print" />
+        <Footer v-if="!__hideheaders" class="no_print" />
     </div>
 </template>
 
@@ -198,6 +198,11 @@ return {
         __version()
         {
             return vv.version;
+        },
+        __hideheaders()
+        {
+            const cc=useLoadingStore();
+            return cc.hideheaders;
         }
 
     },

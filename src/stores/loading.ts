@@ -10,6 +10,7 @@ export const useLoadingStore = defineStore('loading', () => {
     const animationSetting=ref(false);
     const fireworkSetting=ref(false);
     const erasmus_apply=ref(false);
+    const hideheaders=ref(false);
     const language=ref("sr");
     const theme=ref("light");
     const uid=ref("");
@@ -57,10 +58,15 @@ export const useLoadingStore = defineStore('loading', () => {
       this.theme=v;
     }
 
+    function sethideheaders(v:Boolean)
+    {
+      this.hideheaders=v;
+    }
+
     
 
 
-    return { count,isLoading,language,erasmus_apply, theme, setThemeSetting,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
+    return { count,isLoading,language,erasmus_apply, theme, setThemeSetting,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
   },
 {persist:true})
 
