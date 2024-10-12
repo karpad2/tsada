@@ -1,0 +1,42 @@
+name: Retrieve Artifact and Push to Builded Functions Branch
+
+on:
+  workflow_run:
+    workflows: ["Compress and Store Artifact"]
+    types:
+      - completed
+
+jobs:
+  retrieve_and_push:
+    runs-on: ubuntu-latest
+    needs: compress_and_store
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: share-archive
+          path: /tmp  # Download to /tmp directory
+
+      - name: Verify Artifact Download
+        run: ls -la /tmp/share.tar.gz
+
+      - name: Checkout builded_functions Branch
+        uses: actions/checkout@v2
+        with:
+          ref: builded_functions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clear Existing Files
+        run: |
+          git rm -rf .
+          git clean -fxd
+
+      - name: Copy Artifact and Commit
+        run: |
+          cp /tmp/share.tar.gz .
+          git add share.tar.gz
+          git commit -m "Add compressed share folder contents archive"
+
+      - name: Push Changes
+        run: git push origin builded_functions --force

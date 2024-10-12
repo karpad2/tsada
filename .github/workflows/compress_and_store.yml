@@ -1,0 +1,38 @@
+name: Compress and Store Artifact
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
+
+jobs:
+  compress_and_store:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Verify Folder Exists
+        run: |
+          if [ ! -d "functions/share" ]; then
+            echo "Directory functions/share does not exist!"
+            exit 1
+          fi
+
+      - name: Compress Share Folder Contents
+        run: |
+          tar -czf share.tar.gz -C functions/share .  # Compress contents
+          if [ ! -f "share.tar.gz" ]; then
+            echo "share.tar.gz was not created!"
+            exit 1
+          fi
+          echo "share.tar.gz created successfully."
+
+      - name: Upload share.tar.gz as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: share-archive
+          path: share.tar.gz
