@@ -22,10 +22,10 @@ jobs:
             exit 1
           fi
 
-      - name: Compress Share Folder Contents
+      - name: Compress Share Folder Contents to /tmp
         run: |
-          tar -czf share.tar.gz -C functions/share .
-          if [ ! -f "share.tar.gz" ]; then
+          tar -czf /tmp/share.tar.gz -C functions/share .
+          if [ ! -f "/tmp/share.tar.gz" ]; then
             echo "share.tar.gz was not created!"
             exit 1
           fi
@@ -39,15 +39,15 @@ jobs:
       - name: Check for Existing Archive and Remove If Found
         run: |
           if [ -f "share.tar.gz" ]; then
-            echo "share.tar.gz found. Removing it."
+            echo "share.tar.gz found in the repository. Removing it."
             git rm share.tar.gz
           else
-            echo "share.tar.gz not found. Skipping deletion."
+            echo "No existing share.tar.gz found. Skipping removal."
           fi
 
-      - name: Copy Archive and Commit
+      - name: Copy Archive from /tmp and Commit
         run: |
-          cp ../share.tar.gz .
+          cp /tmp/share.tar.gz .
           git add share.tar.gz
           git commit -m "Add compressed share folder contents archive"
 
