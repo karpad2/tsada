@@ -15,9 +15,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Compress Folder
+      - name: Compress Share Folder Contents
         run: |
-          tar -czf share.tar.gz functions/share
+          tar -czf share.tar.gz -C functions/share .  # Compress contents of the share folder directly
 
       - name: Create a directory for the archive
         run: mkdir archive_folder
@@ -40,7 +40,7 @@ jobs:
         run: |
           cp archive_folder/share.tar.gz .
           git add share.tar.gz
-          git commit -m "Add compressed share folder archive"
+          git commit -m "Add compressed share folder contents archive"
 
       - name: Push changes
         run: git push origin builded_functions --force
