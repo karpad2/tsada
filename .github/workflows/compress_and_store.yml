@@ -36,10 +36,14 @@ jobs:
           ref: builded_functions
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Clear Existing Files
+      - name: Check for Existing Archive and Remove If Found
         run: |
-          git rm -rf .
-          git clean -fxd
+          if [ -f "share.tar.gz" ]; then
+            echo "share.tar.gz found. Removing it."
+            git rm share.tar.gz
+          else
+            echo "share.tar.gz not found. Skipping deletion."
+          fi
 
       - name: Copy Archive and Commit
         run: |
