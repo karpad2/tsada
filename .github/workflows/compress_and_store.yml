@@ -36,14 +36,11 @@ jobs:
           ref: builded_functions
           token: ${{ secrets.GITHUB_TOKEN }}
 
-<<<<<<< HEAD
       - name: Configure Git User
         run: |
           git config user.name "Your GitHub Username"
           git config user.email "your-email@example.com"
 
-=======
->>>>>>> origin/main
       - name: Check for Existing Archive and Remove If Found
         run: |
           if [ -f "share.tar.gz" ]; then
