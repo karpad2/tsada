@@ -3,36 +3,57 @@
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.png" sizes="any">
-    <link
-  href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;1,700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  rel="stylesheet"
-/>
-
-<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FZYC1503VB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-FZYC1503VB');
-</script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FZYC1503VB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-FZYC1503VB');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Technical School Ada website.">
     <title>Tehnička Škola Ada</title>
-    <script type="module" crossorigin src="/assets/index-Ctc4Fj5m.js"></script>
+    <script type="module" crossorigin src="/assets/index-Dx_Kapxh.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-CVWHGUqk.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
   <body>
     <div id="app"></div>
     <noscript>You need to enable Javascript to run this website.</noscript>
+    
+    <!-- Error Message for Cache Issues -->
+    <div id="loadError" style="display: none; background: #ffcccb; padding: 10px; margin: 10px 0; text-align: center;">
+      <p>It looks like the page didn't load correctly. <button onclick="clearCache()">Clear Cache and Reload</button></p>
+    </div>
+    
+    <script>
+      // Check if SPA loaded within a reasonable time
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const essentialElement = document.querySelector('#app');
+          if (!essentialElement || essentialElement.innerHTML === '') {
+            document.getElementById('loadError').style.display = 'block';
+          }
+        }, 5000); // 5-second timeout, adjust as necessary
+      });
+
+      function clearCache() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+            window.location.reload(true); // Reloads page after clearing service worker
+          });
+        } else {
+          window.location.reload(true); // Fallback for hard reload
+        }
+      }
+    </script>
   </body>
 </html>
