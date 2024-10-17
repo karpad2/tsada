@@ -134,6 +134,7 @@
                   <div tabindex="0" role="button" class="btn btn-ghost  mr-5 cursor-pointer   ">{{ $t('account') }} <i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li  ><router-link to="/admin/messages">{{ $t('messages') }}</router-link></li>
+                      <li  ><router-link to="/admin/slide-editor">{{ $t('presentation_editor') }}</router-link></li>
                       <li  ><router-link to="/" @click="logout">{{ $t('logout') }}</router-link></li>
                   </ul>
                   </div>
@@ -199,7 +200,7 @@
           const cc=useLoadingStore();
           this.$i18n.locale=cc.language;
           document.title=this.$t("school_name");
-          check();
+          this.checker();
           this.getDocumentsCategories();
           this.getAbouts();
           this.getErasmus();
@@ -220,6 +221,10 @@
         {
           this.mobile_view=window.innerWidth<=1276;
           this.tablet_view=window.innerWidth>=1276&&window.innerWidth<=1550;
+        },
+        async checker()
+        {
+            check();
         },
         menuopener()
         {

@@ -163,7 +163,13 @@
 
     "school_documents":"Iskolai dokumentumok",
     "public_procurements":"Közbeszerzés",
-    "lease":"Terembérlet"
+    "lease":"Terembérlet",
+    "add_new_slide":"Új dia hozzáadása",
+    "edit_slide":"Dia szerkesztése",
+    "order":"Sorrend",
+    "title":"Cím",
+    "presentation_editor":"Prezentáció szerkesztő",
+    "show_date":"Dátum mutatása"
 
 
 

@@ -3,6 +3,7 @@
         <div>
             <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
             <v-switch @change="save" v-model="notNews" :label="$t('not_news')"></v-switch>
+            <v-switch @change="save" v-model="show_date" :label="$t('show_date')"></v-switch>
             <v-btn class="m-5" @click="save" >{{ $t('save') }}</v-btn>
             <v-btn class="m-5" @click="delete_content">{{ $t('delete') }}</v-btn>
             <v-btn class="m-5" @click="share_fb">{{ $t('fb_share') }}</v-btn>
@@ -138,6 +139,7 @@ data()
         content_rs:"",
         content_hu:"",
         content_en:"",
+        show_date:false,
         srb_flag:true,
         hun_flag:true,
         en_flag:false,
@@ -210,6 +212,7 @@ methods:{
 
                     this.visible=k.documents[0].visible;
                     this.notNews=k.documents[0].notNews;
+                    this.show_date=k.documents[0].show_date;
 
                     if(k.documents[0].default_image==null||k.documents[0].default_image=='')
                     {
@@ -312,7 +315,8 @@ methods:{
             "has_gallery":this.album_flag,
             "gallery":this.gallery_id,
             "default_image":this.default_image,
-            "notNews":this.notNews
+            "notNews":this.notNews,
+            "show_date":this.show_date
 
         }, // data (optional)
     //["read("any)"] // permissions (optional)

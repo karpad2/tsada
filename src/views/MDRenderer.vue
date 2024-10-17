@@ -7,7 +7,7 @@
                     <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <p v-if="false" class="align-bottom  ml-3 leading-relaxed text-white">
+                <p v-if="show_date||admin" class="align-bottom  ml-3 leading-relaxed text-white">
                     <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
                 </p>
                 
@@ -18,7 +18,7 @@
                     <h1 class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <p v-if="false" class=" align-bottom ml-3 leading-relaxed text-white">
+                <p v-if="show_date||admin" class=" align-bottom ml-3 leading-relaxed text-white">
                     
                     <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
                     
@@ -113,6 +113,7 @@ export default {
             edumode:false,
             admin:false,
             not_fotos:false,
+            show_date:false,
             headers:[],
             colDefs:[],
             documents:[],
@@ -227,6 +228,7 @@ export default {
             let gal=k.documents[0].gallery;
             console.log(k.documents[0].gallery);
             this.gallery_flag=k.documents[0].has_gallery;
+            this.show_date=k.documents[0].show_date;
             this.has_documents=k.documents[0].has_documents;
             try{
             this.gallery_id=k.documents[0].gallery.$id;

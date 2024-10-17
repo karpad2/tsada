@@ -98,11 +98,11 @@ export default {
         let l;
         if(!cc.userLoggedin)
         {
-            l= await database.listDocuments(config.website_db, config.gallery,[Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(6)]);
+            l= await database.listDocuments(config.website_db, config.gallery,[Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(25)]);
         }
         else
         {
-            l= await database.listDocuments(config.website_db, config.gallery,[Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(6)]);
+            l= await database.listDocuments(config.website_db, config.gallery,[Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(25)]);
          
         }
         let local=cc.language;

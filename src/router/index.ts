@@ -134,6 +134,11 @@ const router = createRouter({
       component: () => import('../views/admin/editor/ClassEditor.vue')      
     },
     {
+      path:'/admin/slide-editor',
+      name:'slide_editor',
+      component: () => import('../views/admin/editor/SlideEditor.vue')      
+    },
+    {
       path:'/admin/messages',
       name:'messages',
       component: () => import('../views/admin/messages/Messages.vue')      

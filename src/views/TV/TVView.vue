@@ -1,35 +1,47 @@
 <template>
   <div class="relative h-screen w-full overflow-hidden bg-gray-900 text-white">
-    <!-- Background Presentation -->
-    <div class="absolute inset-0" ref="slides">
+    <!-- Slide Background Presentation -->
+    <div class="absolute inset-0 flex justify-center items-center" ref="slides">
       <transition name="fade-slide" mode="out-in">
         <div 
           v-if="slides.length > 0" 
           :key="currentSlide" 
-          :class="['absolute inset-0 flex flex-col justify-center items-center text-center px-12', slideBackgrounds[currentSlide % slideBackgrounds.length], 'slide-animation']"
+          class="flex justify-center items-center w-full h-full px-12"
+          :style="{ backgroundColor: slideBackgrounds[currentSlide % slideBackgrounds.length] }"
         >
-          <img v-if="slides[currentSlide].image" :src="slides[currentSlide].image" alt="Slide Image" class="w-full h-64 object-cover mb-4 rounded-lg" />
-          <h2 class="text-6xl font-extrabold mb-8 animate-fade-in-down">{{ slides[currentSlide].title }}</h2>
-          <p class="text-3xl animate-fade-in-up max-w-4xl">{{ slides[currentSlide].text }}</p>
+          <!-- Slide Content with Image and Text -->
+          <div class="flex flex-wrap items-center justify-center w-full max-w-5xl">
+            <div v-if="slides[currentSlide].image" class="w-full md:w-1/2 p-4">
+              <img 
+                :src="slides[currentSlide].image" 
+                alt="Slide Image" 
+                class="object-cover w-full h-96 rounded-lg shadow-lg"
+              />
+            </div>
+            <div :class="[slides[currentSlide].image ? 'w-full md:w-1/2' : 'w-full']" class="p-4">
+              <h2 class="text-5xl font-extrabold mb-4 animate-fade-in-down text-center" v-html="slides[currentSlide].title"></h2>
+              <p class="text-2xl max-w-3xl animate-fade-in-up text-center" v-html="slides[currentSlide].text"></p>
+            </div>
+          </div>
         </div>
       </transition>
     </div>
 
     <!-- News Ticker -->
     <div class="absolute bottom-0 w-full bg-gray-800 text-white flex items-center py-6 px-8">
-      <img src="@/assets/tsada_logo.png" alt="School Logo" class="h-16 w-auto mr-6 animate-bounce" />
+      <img src="@/assets/tsada_logo.png" alt="School Logo" class="h-16 w-auto mr-6" />
       <div class="flex overflow-hidden whitespace-nowrap animate-marquee space-x-12">
         <div v-for="(news, index) in newsItems" :key="index" class="flex-shrink-0 text-3xl">
           {{ news }}
         </div>
       </div>
-      <div class="ml-auto pr-8 text-3xl animate-pulse">
+      <div class="ml-auto pr-8 text-3xl">
         {{ currentTemperature ? `${currentTemperature}°C` : 'Loading...' }}
       </div>
     </div>
 
     <!-- Current Date and Time -->
-    <div class="absolute bottom-16 right-8 text-4xl font-bold animate-pulse">
+    <div class="absolute bottom-16 right-8 text-4xl font-bold">
       {{ currentDate }} - {{ currentTime }}
     </div>
 
@@ -38,10 +50,19 @@
       <h3 class="text-4xl font-bold mb-4 text-white">Recent Events</h3>
       <div v-if="events.length === 0" class="text-lg text-gray-300">No recent events available.</div>
       <div v-for="(event, index) in events" :key="index" class="mb-4 border-b border-gray-700 pb-4">
-        <img :src="event.image" alt="Event Image" class="w-full h-32 object-cover rounded-lg mb-2" />
-        <h4 class="text-2xl font-semibold">{{ event.title }}</h4>
+        <!-- Event Image or Placeholder -->
+        <img 
+          v-if="event.image" 
+          :src="event.image" 
+          alt="Event Image" 
+          class="w-full h-32 object-cover rounded-lg mb-2" 
+        />
+        <div v-else class="w-full h-32 bg-gray-600 flex items-center justify-center text-gray-300 rounded-lg mb-2">
+          <span>No Image Available</span>
+        </div>
+        <h4 class="text-2xl font-semibold" v-html="event.title"></h4>
         <p class="text-gray-400 text-sm">{{ event.date }}</p>
-        <p class="text-lg">{{ event.description }}</p>
+        <p class="text-lg" v-html="event.description"></p>
       </div>
     </div>
   </div>
@@ -50,7 +71,7 @@
 <script>
 import { onMounted } from 'vue';
 import moment from 'moment';
-import { Databases, Query } from 'appwrite';
+import { Databases, Query, Storage } from 'appwrite';
 import { config, appw } from "@/appwrite"; 
 
 export default {
@@ -62,15 +83,13 @@ export default {
       currentSlide: 0,
       slides: [],
       newsItems: [],
-      events: [], // Data property for recent events
-      slideBackgrounds: [
-        'bg-red-500', 
-        'bg-blue-500', 
-        'bg-gradient-to-r from-green-400 to-blue-600', 
-        'bg-purple-500', 
-        'bg-gradient-to-r from-yellow-400 to-red-500'
-      ]
+      events: [], 
+      slideBackgrounds: ['#f87171', '#60a5fa', '#34d399', '#a78bfa', '#fbbf24'],
+      storage: null
     }
+  },
+  created() {
+    this.storage = new Storage(appw);  // Initialize the Storage instance here
   },
   methods: {
     async updateTime() {
@@ -88,26 +107,37 @@ export default {
         this.currentDate = moment().format('YYYY-MM-DD');
       }
     },
-    async fetchSlides() {
+    async fetchContent() {
       const database = new Databases(appw);
       try {
-        const slideData = await database.listDocuments(config.website_db, config.tv_slides, [
+        const contentData = await database.listDocuments(config.website_db, config.tv_slides, [
           Query.orderAsc("sorrend")
         ]);
-        const newSlides = slideData.documents.map(doc => ({
-          title: doc.title,
-          text: doc.text,
-          image: doc.image, // Assuming the image field contains the URL of the slide image
-          order: doc.sorrend
-        }));
+        
+        this.slides = [];
+        this.events = [];
+        
+        contentData.documents.forEach(doc => {
+          const imageUrl = doc.image ? this.getImageUrl(doc.image) : null;
+          if (doc.type === 'slide') {
+            this.slides.push({
+              title: doc.title,
+              text: doc.text,
+              image: imageUrl,
+              order: doc.sorrend
+            });
+          } else if (doc.type === 'event') {
+            this.events.push({
+              title: doc.title,
+              date: moment(doc.event_date).format('YYYY-MM-DD'),
+              description: doc.description,
+              image: imageUrl
+            });
+          }
+        });
 
-        // Update only if the slides have changed
-        if (JSON.stringify(newSlides) !== JSON.stringify(this.slides)) {
-          this.slides = newSlides;
-          console.log("Slides updated with new content.");
-        }
       } catch (error) {
-        console.error("Error fetching slides:", error);
+        console.error("Error fetching content:", error);
       }
     },
     async fetchNewsItems() {
@@ -129,41 +159,25 @@ export default {
         this.currentTemperature = "N/A"; // Fallback value
       }
     },
-    async fetchEvents() {
-      const database = new Databases(appw);
-      try {
-        const eventsData = await database.listDocuments(config.website_db, config.events_collection, [
-          Query.orderDesc("event_date"),
-          Query.limit(5) // Limit to 5 recent events
-        ]);
-        this.events = eventsData.documents.map(doc => ({
-          title: doc.title,
-          date: moment(doc.event_date).format('YYYY-MM-DD'),
-          description: doc.description,
-          image: doc.image // Assuming each document has an `image` field with the URL
-        }));
-      } catch (error) {
-        console.error("Error fetching recent events:", error);
-      }
+    getImageUrl(fileId) {
+      return this.storage.getFileView(config.website_images, fileId).toString();
     }
   },
   mounted() {
-    this.fetchSlides();
+    this.fetchContent();
     this.fetchNewsItems();
     this.fetchTemperature();
-    this.fetchEvents();
 
     this.updateTime();
-    setInterval(this.updateTime, 1000); // Update time every second
+    setInterval(this.updateTime, 1000);
     
     setInterval(() => {
       if (this.slides.length > 0) {
         this.currentSlide = (this.currentSlide + 1) % this.slides.length;
       }
-    }, 15000); // Change slide every 15 seconds
+    }, 15000);
 
-    // Polling for new slides every 30 seconds
-    setInterval(this.fetchSlides, 30000); // Adjust interval time as needed
+    setInterval(this.fetchContent, 30000);
   }
 }
 </script>
@@ -207,34 +221,5 @@ export default {
 
 .animate-marquee {
   animation: marquee 30s linear infinite;
-}
-
-/* Bounce Animation */
-.animate-bounce {
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-/* Pulse Animation */
-.animate-pulse {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Fade Slide Animation */
-.fade-slide-enter-active, .fade-slide-leave-active {
-  transition: opacity 1s, transform 1s;
-}
-.fade-slide-enter, .fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
 }
 </style>

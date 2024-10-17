@@ -11,7 +11,7 @@ appw
 
 
 const user=new Account(appw);
-function check()
+async function check()
 {
 
 const loading=useLoadingStore();
@@ -19,6 +19,7 @@ let loggedIn=false;
 //console.log(user.get());
 const promise = user.get();
 let accountloaded;
+
 promise.then(function (response) {
 
         console.log(response); // Success

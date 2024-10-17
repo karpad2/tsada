@@ -125,7 +125,7 @@
             async new_stuff()
         {
             const database = new Databases(appw);
-            const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":this.$route.params.category});
+            const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":this.$route.params.id});
             this.$router.push("/admin/document/"+l.$id);
         },
             async load_documents_base(){
