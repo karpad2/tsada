@@ -3,20 +3,19 @@
         <div class="container px-5 py-20 mx-auto">
             <div class="w-full mb-20">
                 <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('sponsors') }}</h1>
+                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ _title }}</h1>
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
             
             </div>
             <div class=" w-full ">
                 <swiper
-                    
                     class=""
                     :slidesPerView="aaa()"
                     :spaceBetween="30"
                     :autoplay="true"
                     :loop="true"
-                    :pagination="{ clickable: true }"
+                    
                     :modules="modules"
                 >
                     <swiper-slide class="" v-for="link in links">
@@ -35,7 +34,7 @@
 <script >
 
 
-import { Client, Databases, ID,Storage } from "appwrite";
+import { Client, Databases, ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian} from "@/lang";
 import 'swiper/css';
@@ -52,12 +51,25 @@ export default {
     },
     mounted()
     {
-        this.load_links_base();
+        if(this.mode=="sponsors")
+    {  this.load_links_base_sponsors();
+        this._title=this.$t("sponsors");
+     }
+    else 
+    {
+        this.load_links_base_usefullinks();
+        this._title=this.$t("usefullinks");
+    }
+        
         //this.l=aaa();
        
     },
+    props:{
+        mode:String
+    },
     data: () => ({
         l:3,
+        _title:"",
         links: [
             {
                 img: 'https://dummyimage.com/720x400',
@@ -76,13 +88,13 @@ export default {
         ),
     
     methods:{
-        async load_links_base()
+        async load_links_base_sponsors()
         {
         this.links=[];
             //console.log();
         const database = new Databases(appw);
         const storage = new Storage(appw);
-        let l= await database.listDocuments(config.website_db, config.sponsors_db);
+        let l= await database.listDocuments(config.website_db, config.sponsors_db,[Query.orderAsc("sorrend")]);
         
         l.documents.forEach(element => {
             let a={link:"",img:""};
@@ -103,6 +115,38 @@ export default {
                 'webp'               // output webp format
                 ).href;
            // =storage.getFileView(config.website_images,element.sponsor_img);
+            this.links.push(a);
+        });
+        },
+        async load_links_base_usefullinks()
+        {
+        this.links=[];
+            //console.log();
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
+        let l= await database.listDocuments(config.website_db, config.usefullinks,[Query.orderAsc("sorrend")]);
+        
+        l.documents.forEach(element => {
+            let a={link:"",img:""};
+            a.link=element.link;
+            a.img=storage.getFilePreview(
+                config.website_images,           // bucket ID
+                element.logo,       // file ID
+                200,               // width, will be resized using this value.
+                0,                  // height, ignored when 0
+                'center',           // crop center
+                90,               // slight compression
+                0,                  // border width
+                'FFFFFF',           // border color
+                0,                 // border radius
+                1,                  // full opacity
+                0,                  // no rotation
+                'FFFFFF',           // background color
+                'webp'               // output webp format
+                ).href;
+            //a.img=storage.getFileView(config.website_images,element.logo);
+            //a.img=storage.getFilePreview(config.website_images,element.logo,output="webp")
+               
             this.links.push(a);
         });
         },

@@ -224,7 +224,7 @@ return {
     },
     async checkingstuff()
     {
-        //this.checkForUpdates();
+        this.checkForUpdates();
         this.checkServerConnection();
 
     },
@@ -248,10 +248,22 @@ return {
 
       setTimeout( ()=>{
         
-        window.location.href = newUrl;
+        this.clearCache();
       },1000);
         // Reloads the page with a unique query string
     },
+    clearCache() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+            window.location.reload(true); // Reloads page after clearing service worker
+          });
+        } else {
+          window.location.reload(true); // Fallback for hard reload
+        }
+      }
     }
     
 }

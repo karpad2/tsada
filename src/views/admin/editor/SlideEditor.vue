@@ -2,14 +2,14 @@
   <div class="container mx-auto py-8">
     <!-- Slide Management Section -->
     <section class="mb-12 p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-4">{{ currentSlideId ? 'Edit Slide' : 'Add New Slide' }}</h2>
+      <h2 class="text-2xl font-bold mb-4">{{ $t("edit_slide") }}</h2>
       
-      <v-text-field v-model="title" label="Slide Title" counter="100" hide-details></v-text-field>
+      <v-text-field v-model="title" :label="$t('title')" counter="100" hide-details></v-text-field>
       <ckeditor v-model="content"></ckeditor>
       
       <v-file-input @change="fileUpload" v-model="fileLink" accept="image/*" label="Slide Image Upload"></v-file-input>
       <div v-if="img" class="my-4">
-        <span>Preview:</span>
+        <span>{{ $t("preview") }}:</span>
         <img class="h-40 w-auto rounded" :src="img" alt="Slide Image">
       </div>
 
@@ -40,7 +40,7 @@
 
     <!-- Event Management Section -->
     <section class="mt-12 p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-4">{{ currentEventId ? 'Edit Event' : 'Add New Event' }}</h2>
+      <h2 class="text-2xl font-bold mb-4">{{$t("edit_events")}}</h2>
       
       <v-text-field v-model="eventTitle" label="Event Title" counter="100" hide-details></v-text-field>
       <v-text-field v-model="eventDate" label="Event Date" type="date" hide-details></v-text-field>
@@ -52,11 +52,11 @@
         <img class="h-40 w-auto rounded" :src="eventImg" alt="Event Image">
       </div>
 
-      <v-btn @click="saveEvent" class="mt-5">{{ currentEventId ? 'Save Changes' : 'Add Event' }}</v-btn>
+      <v-btn @click="saveEvent" class="mt-5">{{ currentEventId ? $t("save") : 'Add Event' }}</v-btn>
     </section>
 
     <section>
-      <h2 class="text-2xl font-bold mb-4">Recent Events</h2>
+      <h2 class="text-2xl font-bold mb-4">{{ $t("events") }}</h2>
       <v-data-table :items="events" :headers="eventHeaders">
         <template v-slot:item.actions="{ item, index }">
           <div class="flex space-x-2">

@@ -201,10 +201,7 @@
           this.$i18n.locale=cc.language;
           document.title=this.$t("school_name");
           this.checker();
-          this.getDocumentsCategories();
-          this.getAbouts();
-          this.getErasmus();
-          this.getStudents();
+          
           this.languages.forEach(element => {
               if(element.code==cc.language)
               this.lang=element.country;
@@ -225,6 +222,10 @@
         async checker()
         {
             check();
+          this.getDocumentsCategories();
+          this.getAbouts();
+          this.getErasmus();
+          this.getStudents();
         },
         menuopener()
         {

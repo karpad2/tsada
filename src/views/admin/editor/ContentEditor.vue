@@ -72,6 +72,13 @@
             <QuillEditor v-if="false" content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
         </div>
     </div>
+    <v-text-field
+            v-model="yt_video"
+            :counter="100"
+            @change="save"
+            :label="$t('yt_video')"
+            hide-details
+          ></v-text-field>
 
     <div>
             <v-switch v-model="documents_flag" @change="documents_load" :label="$t('documents_flag')"></v-switch>
@@ -139,6 +146,7 @@ data()
         content_rs:"",
         content_hu:"",
         content_en:"",
+        yt_video:"",
         show_date:false,
         srb_flag:true,
         hun_flag:true,
@@ -209,7 +217,7 @@ methods:{
                 
                     this.title_en=k.documents[0].title_en;
                     this.content_en=k.documents[0].text_en;
-
+                    this.yt_video=k.documents[0].yt_video;
                     this.visible=k.documents[0].visible;
                     this.notNews=k.documents[0].notNews;
                     this.show_date=k.documents[0].show_date;
@@ -311,6 +319,7 @@ methods:{
             "isSerbian":this.srb_flag,
             "isEnglish":this.en_flag,
             "visible":this.visible,
+            "yt_video":this.yt_video,
             "has_documents":this.documents_flag,
             "has_gallery":this.album_flag,
             "gallery":this.gallery_id,

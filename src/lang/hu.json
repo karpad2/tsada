@@ -169,7 +169,11 @@
     "order":"Sorrend",
     "title":"Cím",
     "presentation_editor":"Prezentáció szerkesztő",
-    "show_date":"Dátum mutatása"
+    "show_date":"Dátum mutatása",
+    "yt_video":"Youtube videó:",
+    "noevents":"Nincs esemény a bázisban.",
+    "events":"Események",
+    "edit_events":"Események szerkesztése"
 
 
 

@@ -35,6 +35,10 @@
 <div ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
+<div  v-if="yt_video!=null&&yt_video!=''" class="p-5">
+    <iframe class="w-1/2 mx-auto h-64" :src="yt_video_link"></iframe>
+</div>
+
 <div v-if="gallery_flag">
     <AlbumViewer :caption="false" :id="gallery_id" />
 </div>
@@ -110,6 +114,8 @@ export default {
             newsmode:false,
             video_id:"",
             video_link:"",
+            yt_video:null,
+            yt_video_link:"",
             edumode:false,
             admin:false,
             not_fotos:false,
@@ -180,6 +186,16 @@ export default {
             
             let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
                 this.has_documents=k.documents[0].has_documents;
+                if(k.documents[0].yt_video==""||k.documents[0].yt_video==null)
+                {this.yt_video=null;
+
+                }
+                else 
+                {
+                    this.yt_video=k.documents[0].yt_video;
+                    this.yt_video_link=this.getytvideo();
+                }
+                
                 if(cc.language=="sr"||cc.language=="rs")
                 {
                     this.title=convertifserbian(k.documents[0].title_rs);
@@ -230,12 +246,15 @@ export default {
             this.gallery_flag=k.documents[0].has_gallery;
             this.show_date=k.documents[0].show_date;
             this.has_documents=k.documents[0].has_documents;
+            if (this.has_documents)
+            {
             try{
             this.gallery_id=k.documents[0].gallery.$id;
             }
             catch(ex)
             {
                 console.log(ex);
+            }
             }
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
@@ -271,6 +290,7 @@ export default {
                 this.synchronize_documents();
             }
         },
+       
         editmode()
         {
             this.$router.push("/admin/edit/"+this.$route.params.mode+"/"+this.$route.params.id);   
@@ -390,7 +410,17 @@ export default {
 
                     }
                     return moment(a).format("LL");
-                },   
-    }
+                },
+                getytvideo()
+        {
+        let url=this.yt_video;    
+        //var url = "https://www.youtube.com/watch?v=sGbxmsDFVnE";
+        var id = url.split("?v=")[1]; //sGbxmsDFVnE
+
+        var embedlink = "http://www.youtube.com/embed/" + id;
+        return embedlink;
+        }   
+    },
+    
 }   
 </script>

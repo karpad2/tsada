@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="ml-auto pr-8 text-3xl">
-        {{ currentTemperature ? `${currentTemperature}°C` : 'Loading...' }}
+        {{ currentTemperature ? `${currentTemperature}°C` : $t("loading") }}
       </div>
     </div>
 
@@ -47,8 +47,8 @@
 
     <!-- Recent Events Section -->
     <div class="absolute top-0 right-0 mt-16 mr-8 w-1/4 bg-gray-800 bg-opacity-70 p-4 rounded-lg shadow-lg">
-      <h3 class="text-4xl font-bold mb-4 text-white">Recent Events</h3>
-      <div v-if="events.length === 0" class="text-lg text-gray-300">No recent events available.</div>
+      <h3 class="text-4xl font-bold mb-4 text-white">{{ $t("events") }}</h3>
+      <div v-if="events.length === 0" class="text-lg text-gray-300">{{ $t("noevents") }}</div>
       <div v-for="(event, index) in events" :key="index" class="mb-4 border-b border-gray-700 pb-4">
         <!-- Event Image or Placeholder -->
         <img 
@@ -58,7 +58,7 @@
           class="w-full h-32 object-cover rounded-lg mb-2" 
         />
         <div v-else class="w-full h-32 bg-gray-600 flex items-center justify-center text-gray-300 rounded-lg mb-2">
-          <span>No Image Available</span>
+          <span>{{ $t("noimage") }}</span>
         </div>
         <h4 class="text-2xl font-semibold" v-html="event.title"></h4>
         <p class="text-gray-400 text-sm">{{ event.date }}</p>
