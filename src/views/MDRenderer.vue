@@ -36,7 +36,7 @@
 </div>
 
 <div  v-if="yt_video!=null&&yt_video!=''" class="p-5">
-    <iframe class="w-1/2 mx-auto h-64" :src="yt_video_link"></iframe>
+    <iframe class="mx-auto" width="560" height="315" :src="yt_video_link" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <div v-if="gallery_flag">
