@@ -417,7 +417,7 @@ export default {
         //var url = "https://www.youtube.com/watch?v=sGbxmsDFVnE";
         var id = url.split("?v=")[1]; //sGbxmsDFVnE
 
-        var embedlink = "http://www.youtube.com/embed/" + id;
+        var embedlink = "https://www.youtube.com/embed/" + id;
         return embedlink;
         }   
     },
