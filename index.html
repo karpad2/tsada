@@ -25,26 +25,50 @@
     <script type="module" src="/src/main.ts"></script>
     <noscript>You need to enable Javascript to run this website.</noscript>
     
-    <!-- Error Message for Cache Issues -->
+    <!-- Error Message for Cache Issues with Countdown -->
     <div id="loadError" style="display: none; background: #ffcccb; padding: 10px; margin: 10px 0; text-align: center;">
-      <p>It looks like the page didn't load correctly. <button onclick="clearCache()">Clear Cache and Reload</button></p>
+      <p>
+        It looks like the page didn't load correctly. 
+        <button onclick="clearCache()">Clear Cache and Reload Now</button>
+      </p>
+      <p id="countdown"></p>
     </div>
     
     <script>
+      let countdownInterval;
+      let countdownTime = 3; // seconds before auto reload
+
       // Check if SPA loaded within a reasonable time
       window.addEventListener('load', function() {
         setTimeout(function() {
           const essentialElement = document.querySelector('#app');
           if (!essentialElement || essentialElement.innerHTML === '') {
             document.getElementById('loadError').style.display = 'block';
+            startCountdown(); // Start countdown to automated repair
           }
-        }, 5000); // 5-second timeout, adjust as necessary
+        }, 3000); // 5-second timeout, adjust as necessary
       });
 
+      function startCountdown() {
+        const countdownElement = document.getElementById('countdown');
+        countdownElement.innerText = `The page will automatically attempt to repair in ${countdownTime} seconds.`;
+
+        countdownInterval = setInterval(() => {
+          countdownTime--;
+          countdownElement.innerText = `The page will automatically attempt to repair in ${countdownTime} seconds.`;
+
+          if (countdownTime <= 0) {
+            clearInterval(countdownInterval);
+            clearCache(); // Auto clear cache and reload after countdown
+          }
+        }, 1000); // 1-second countdown interval
+      }
+
       function clearCache() {
+        clearInterval(countdownInterval); // Stop the countdown if manual clear happens
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
+            for (let registration of registrations) {
               registration.unregister();
             }
             window.location.reload(true); // Reloads page after clearing service worker
