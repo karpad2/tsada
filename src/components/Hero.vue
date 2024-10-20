@@ -55,7 +55,7 @@ import { Client, Databases, ID,Storage } from "appwrite";
 import {appw,config} from "@/appwrite";
 import { VaButton } from 'vuestic-ui/web-components';
 import gsap from "gsap";
-import video from "@a/videoplayback.webm"
+//import video from "@a/videoplayback.webm"
 
 
 
@@ -93,7 +93,7 @@ export default {
         swiper: null,
         images:[],
         modules:[EffectFade, Navigation, Pagination],
-        integrated_video:video,
+        integrated_video:config.default_video,
         options: {
             mouseControls: true,
             touchControls: true,
@@ -114,6 +114,8 @@ export default {
             this.images.push(storage.getFileView(config.website_images,element.file_id));
         });
         },
+        
+       
         }
     }
 
