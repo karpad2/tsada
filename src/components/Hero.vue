@@ -15,28 +15,9 @@
                 {{ $t('whycomehere') }} 
                 <span class="font-medium text-sky-400">{{ $t("msc") }}</span>.
                 </p>
-                <div v-if="false" class="flex justify-center">
-                    
-                    <button  v-if="false" class="inline-flex text-white bg-sky-500/100 border-0 py-2 px-6 focus:outline-none hover:bg-sky-500/100 rounded text-lg">
-                        
-                    </button>
-                    
-                </div>
+                
             </div>
-            <div v-if="false" class="lg:max-w-lg lg:w-full md:w-2/3 w-5/6 rounded-lg">
-                <swiper
-                    
-                    class="object-cover object-center rounded"
-                    :effect="'fade'"
-                    :navigation="true"
-                    :autoplay="true"
-                    :slidesPerView="1"
-                    :modules="modules"
-                >
-                    <swiper-slide v-for="image in images"><img class="transition duration-300 ease-in-out " :src="image" /></swiper-slide>
-                    <swiper-slide v-for="image in images"><img class="transition duration-300 ease-in-out hover" :src="image" /></swiper-slide>
-                </swiper>
-            </div>
+           
         </div>
        
     </section>
@@ -52,7 +33,7 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Client, Databases, ID,Storage } from "appwrite";
-import {appw,config} from "@/appwrite";
+import {appw,config,randomIntFromInterval} from "@/appwrite";
 import { VaButton } from 'vuestic-ui/web-components';
 import gsap from "gsap";
 //import video from "@a/videoplayback.webm"
@@ -75,6 +56,7 @@ export default {
     mounted() {
         
        this.load_mp_images_from_base();
+       this.load_mp_videos_from_base();
 
     gsap.fromTo(
     "#hero-heading-text",
@@ -114,6 +96,16 @@ export default {
             this.images.push(storage.getFileView(config.website_images,element.file_id));
         });
         },
+        async load_mp_videos_from_base()
+        {
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
+        let l= await database.listDocuments(config.website_db, config.hero_videos);
+        
+        let k= randomIntFromInterval(0,l.documents.length-1);
+        this.integrated_video=l.documents[k].link;
+        },
+
         
        
         }
