@@ -1,6 +1,6 @@
 <template>
     <!-- Top Hero -->
-    <video-background :src="integrated_video" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
+    <video-background v-if="loaded" :src="integrated_video" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
     <section class="text-gray-600 body-font" id="about">
        
         <div class="container mx-auto text-white flex px-5 py-5 md:flex-row flex-col items-center">
@@ -76,6 +76,7 @@ export default {
         images:[],
         modules:[EffectFade, Navigation, Pagination],
         integrated_video:config.default_video,
+        loaded:false,
         options: {
             mouseControls: true,
             touchControls: true,
@@ -104,6 +105,7 @@ export default {
         
         let k= randomIntFromInterval(0,l.documents.length-1);
         this.integrated_video=l.documents[k].link;
+        this.loaded=true;
         },
 
         
