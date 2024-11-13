@@ -6,13 +6,13 @@
                 <img src="@/assets/tsada_logo.png" class="size-16 text-white p-2 bg-sky-300/50 rounded-full" alt="Logo">
                 <span class="ml-3 text-xl">{{ $t('school_name') }}</span>
             </a>
-            <p class="text-sm text-gray-400 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-800 sm:py-2 sm:mt-0 mt-4">©
+            <div class="text-sm text-gray-400 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-800 sm:py-2 sm:mt-0 mt-4">©
                 {{ year }}
                 {{ $t('school_name') }}
                 <a href="https://karpad2.github.io" class="text-gray-500 ml-1" target="_blank"
                     rel="noopener noreferrer">Designed by <span class="hover:text-sky-400">Kovács Árpád</span></a>
-                    <span>App version: {{ _version }}</span>
-            </p>
+                    <div> App version: {{ _version }}</div>
+            </div>
             
             <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
                 <a href="https://www.facebook.com/p/Msc-Kultura-100063626860924" class="ml-2 text-gray-400 hover:text-sky-400">
