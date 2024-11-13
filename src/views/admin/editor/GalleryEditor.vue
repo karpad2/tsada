@@ -278,7 +278,7 @@ methods:{
                     text: this.$t('file_uploaded')
                 });
                 setTimeout(()=>{
-        this.getMD();
+        //this.getMD();
     },500)
     
             });
@@ -290,6 +290,7 @@ methods:{
 
     //this.$notify(this.$t('file_uploaded'));
     this.uploading=false;
+    this.getMD();
     },
     set_as_default(aa:string)
     {

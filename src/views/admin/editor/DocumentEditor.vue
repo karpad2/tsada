@@ -17,20 +17,14 @@
 </div>
 </div>
         <div>
-          
-            
             <div >
             <v-text-field
             @change="save"
             v-model="title_rs"
             :counter="100"
             :label="$t('srb_title')"
-            hide-details
-            
+            hide-details  
           ></v-text-field>
-        
-
-           
         </div>
     </div>
         <div>
@@ -67,6 +61,7 @@
 import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
 
+
 import {useLoadingStore} from "@/stores/loading";
 
 export default{
@@ -83,7 +78,11 @@ data()
         uploading:false
     }
 },
+props:{
+    modded:String
+},
 components:{
+    
 },
 mounted()
 {
@@ -96,18 +95,27 @@ onBeforeUnmount()
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
 },
 methods:{
+    getDocumentsDB()
+    {
+        let k="";
+        if (this.modded=="documents_db")
+        k=config.documents_db;
+        else if(this.modded=="st_documents")
+        k=config.st_documents;
+        else if(this.modded=="text_documents")
+        k=config.text_documents;
+        else {}
+        return k;
+    },
     async getMD()
         {
             
             const database = new Databases(appw);
             const storage = new Storage(appw);
-            
             const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
-           
-            
-            let k= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("$id",this.$route.params.id)]);
+            let k= await database.listDocuments(config.website_db, this.getDocumentsDB(),[Query.equal("$id",this.$route.params.id)]);
             
                 
                     this.title_rs=k.documents[0].document_title_rs;
@@ -169,12 +177,12 @@ methods:{
     {   
         const database = new Databases(appw);
         //const storage = new Storage(appw);
-        let k= await database.listDocuments(config.website_db, config.documents_db,[Query.equal("$id",this.$route.params.id)]);  
+        let k= await database.listDocuments(config.website_db, this.getDocumentsDB(),[Query.equal("$id",this.$route.params.id)]);  
 
         
         const result = await database.updateDocument(
         config.website_db, // databaseId
-        config.documents_db, // collectionId
+        this.getDocumentsDB(), // collectionId
         this.$route.params.id, // documentId
         {
             "document_title_rs":this.title_rs,
@@ -216,14 +224,14 @@ methods:{
             console.warn(ex)
         }
         try{
-        let k= await database.deleteDocument(config.website_db, config.documents_db,this.$route.params.id);  
+        let k= await database.deleteDocument(config.website_db, this.getDocumentsDB(),this.$route.params.id);  
         }
         catch(ex)
         {
             console.warn(ex)
         }
         this.$notify(this.$t('deleted'));
-        this.router.push("/home");
+        this.$router.push("/home");
     },
     async file_upload()
     {
@@ -244,9 +252,10 @@ methods:{
     this.file_link // file
     // permissions (optional)
     );
+
     this.document_id= await result.$id;
     this.save();
-    this.getMD();
+    
     this.$notify(this.$t('file_uploaded'));
     this.uploading=false;
     }

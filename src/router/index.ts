@@ -111,17 +111,20 @@ const router = createRouter({
     {
       path:'/admin/document/:id',
       name:'document_editor',
-      component: () => import('../views/admin/editor/DocumentEditor.vue')      
+      component: () => import('../views/admin/editor/DocumentEditor.vue'),
+      props:{modded:"documents_db"}       
     },
     {
       path:'/admin/text-document-editor/:id',
       name:'text_document_editor',
-      component: () => import('../views/admin/editor/TextDocumentEditor.vue')      
+      component: () => import('../views/admin/editor/DocumentEditor.vue'),
+      props:{modded:"text_documents"}      
     },
     {
       path:'/admin/studentdocument/:id',
       name:'student_document_editor',
-      component: () => import('../views/admin/editor/StudentDocumentEditor.vue')      
+      component: () => import('../views/admin/editor/DocumentEditor.vue'),
+      props:{modded:"st_documents"}       
     },
     {
       path:'/admin/gallery-edit/:id',

@@ -44,27 +44,8 @@
 </div>
 
 <div v-if="has_documents">
-                <div   class="m-auto w-full">
-   
-      
-   <v-data-table  height="400" :headers="headers" :items="documents">
-     <template v-slot:item.date="{ item }">
-     {{ rt_time(item.date) }}
-     </template>
- 
-   <template v-slot:item.open="{ item }">
-     <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
-    
-   </template>
-
-   <template v-slot:item.edit="{ item }">
-     <router-link :to="'/admin/text-document-editor/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
-    
-   </template>
-
-   <template #bottom></template>
-     </v-data-table>
-     
+    <div   class="m-auto w-full">
+      <DocLister :_id="id"/>
  </div>
 </div>
 
@@ -90,6 +71,7 @@ import moment from 'moment/min/moment-with-locales';
 import Loading from "@/components/Loading.vue";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import DocLister from "@/components/DocLister.vue";
 
 
 
@@ -97,11 +79,12 @@ export default {
     components: {
         Swiper,SwiperSlide,
         AlbumViewer,
-        Loading
+        Loading,
+        DocLister
     },
     data() {
         return {
-            
+            id:"",
             chtml:'',
             gallery:[],
             title:'',
@@ -128,7 +111,7 @@ export default {
         }
     },
     mounted()
-    {
+    {   this.id=this.$route.params.id;
         this.getMD();
         const cc=useLoadingStore();
         this.admin=cc.userLoggedin;
@@ -246,10 +229,10 @@ export default {
             this.gallery_flag=k.documents[0].has_gallery;
             this.show_date=k.documents[0].show_date;
             this.has_documents=k.documents[0].has_documents;
-            if (this.has_documents)
+            if (this.gallery_flag)
             {
             try{
-            this.gallery_id=k.documents[0].gallery.$id;
+            this.gallery_id= await k.documents[0].gallery.$id;
             }
             catch(ex)
             {

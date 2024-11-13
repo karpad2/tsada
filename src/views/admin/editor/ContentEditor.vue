@@ -83,10 +83,10 @@
     <div>
             <v-switch v-model="documents_flag" @change="documents_load" :label="$t('documents_flag')"></v-switch>
             <div v-if="documents_flag">
-                <div   class="m-auto w-full">
+                <div  v-if="false"  class="m-auto w-full">
    
       
-   <v-data-table  height="400" :headers="headers" :items="documents">
+   <v-data-table   height="400" :headers="headers" :items="documents">
      <template v-slot:item.date="{ item }">
      {{ rt_time(item.date) }}
      </template>
@@ -105,6 +105,7 @@
      </v-data-table>
      <v-btn @click="new_stuff()" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
  </div>
+ <DocLister :_id="id" />
             
         </div>
     </div>
@@ -129,17 +130,17 @@
 import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
 import axios from "axios";
-import moment from 'moment/min/moment-with-locales';
+
 import {useLoadingStore} from "@/stores/loading";
 import AlbumViewer from "@/components/AlbumViewer.vue";
 import { convertifserbian } from "@/lang";
-
+import DocLister from "@/components/DocLister.vue";
 
 export default{
 data()
 {
     return{
-        
+        id:"",
         title_en:"",
         title_hu:"",
         title_rs:"",
@@ -170,9 +171,11 @@ data()
 },
 components:{
     AlbumViewer,
+    DocLister
 },
 mounted()
 {
+    this.id=this.$route.params.id;
     this.getMD();
     this.headers= [
                     { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
@@ -302,11 +305,15 @@ methods:{
         const database = new Databases(appw);
         //const storage = new Storage(appw);
         let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);  
-
+        if(!this.album_flag)
+        {
+            this.gallery_id=null;
+        }   
         
         const result = await database.updateDocument(
         config.website_db, // databaseId
         config.about_us_db, // collectionId
+       
         this.$route.params.id, // documentId
         {
             "title_rs":this.title_rs,
@@ -370,26 +377,6 @@ async gallery_change()
     //console.log(this.gallery_id);
  //if(this.gallery_id)
 }, 
-rt_time(a)
-                {   const loadingStore = useLoadingStore();
-                    let local=loadingStore.language;
-                    if(local=="rs"||local=="sr")
-                    {
-                        moment.locale('sr');
-                    }
-                    else if(local=="hu")
-                    {
-                        moment.locale('hu');
-                    }
-                    else if(local=="en")
-                    {
-                        moment.locale('en');
-                    }
-                    else {
-
-                    }
-                    return moment(a).format("LLL");
-                },
 
     async new_stuff()
         {
@@ -400,7 +387,9 @@ rt_time(a)
         async new_gallery()
         {
             const database = new Databases(appw);
-            const l= await database.createDocument(config.website_db, config.gallery,ID.unique(),{"visible":false});
+            const l= await database.createDocument(config.website_db, config.gallery,ID.unique(),{"visible":false, "title_rs":this.title_rs,
+            "title_hu":this.title_hu,
+            "title_en":this.title_en});
             return l.$id;
             //this.$router.push("/admin/gallery-edit/"+l.$id);
         },
@@ -454,7 +443,7 @@ rt_time(a)
         //const storage = new Storage(appw);
         let k= await database.deleteDocument(config.website_db, config.about_us_db,this.$route.params.id);  
         this.$notify(this.$t('deleted'));
-        this.$router.push("home");
+        this.$router.push("/home");
     },
     async file_upload()
     {
@@ -476,9 +465,6 @@ rt_time(a)
     this.default_image=result.$id;
     this.save();
     
-    this.getMD();
-
-
     this.$notify(this.$t('file_uploaded'));
     this.uploading=false;
     }
