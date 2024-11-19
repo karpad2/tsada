@@ -110,7 +110,7 @@ export default {
              try{
              if(local=="rs"||local=="sr")
             {
-               a.role=convertifserbian(c.title_rs);
+               a.role=c.title_rs;
                a.chief=convertifserbian(b.worker_name_rs);
             }
             else if(local=="hu")
