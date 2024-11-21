@@ -129,7 +129,7 @@ export default {
           .getFilePreview(
             config.gallery_pictures_storage,
             element.image_id,
-            700,
+            968,
             0,
             "center",
             90,

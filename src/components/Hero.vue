@@ -5,8 +5,7 @@
        
         <div class="container mx-auto text-white flex px-5 py-5 md:flex-row flex-col items-center">
             <div
-                class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center"
-            >
+                class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
                 <h1 id="hero-heading-text" class="title-font py-8 sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
                     {{ $t('cometous') }}
                     <br class="hidden lg:inline-block" />
@@ -17,9 +16,7 @@
                 </p>
                 
             </div>
-           
         </div>
-       
     </section>
     </video-background>
 </template>
@@ -40,13 +37,6 @@ import gsap from "gsap";
 
 
 
-/*
-<video-background 
-            src="https://raw.githubusercontent.com/karpad2/tsada/media/src/assets/videos/videoplayback.mp4"
-        
-        style="max-height: 400px;">
-        </video-background>
-*/
 export default {
     components: {
     Swiper,
@@ -107,9 +97,6 @@ export default {
         this.integrated_video=l.documents[k].link;
         this.loaded=true;
         },
-
-        
-       
         }
     }
 

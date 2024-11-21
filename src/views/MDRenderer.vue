@@ -8,7 +8,7 @@
                     <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
                 <p v-if="show_date||admin" class="align-bottom  ml-3 leading-relaxed text-white">
-                    <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
+                    <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }} | <strong>{{ $t("last_modified") }}</strong>: {{ rt_time(last_modified) }}
                 </p>
                 
             </div>
@@ -20,7 +20,7 @@
                 </div>
                 <p v-if="show_date||admin" class=" align-bottom ml-3 leading-relaxed text-white">
                     
-                    <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }}
+                    <strong>{{ $t("date") }}</strong>: {{ rt_time(date) }} | <strong>{{ $t("last_modified") }}</strong>: {{ rt_time(last_modified) }}
                     
                 </p>
             </video-background>
@@ -106,6 +106,7 @@ export default {
             headers:[],
             colDefs:[],
             documents:[],
+            last_modified:null,
             has_documents:false,
             _loading:true
         }
@@ -169,6 +170,7 @@ export default {
             
             let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
                 this.has_documents=k.documents[0].has_documents;
+                this.last_modified=k.documents[0].$updatedAt;
                 if(k.documents[0].yt_video==""||k.documents[0].yt_video==null)
                 {this.yt_video=null;
 

@@ -13,7 +13,6 @@ export default {
             type: String,
             required: true
         },
-        
     },
     data: () => ({
         image: '',
@@ -36,6 +35,5 @@ export default {
         }
     }
     }
-
 }
 </script>

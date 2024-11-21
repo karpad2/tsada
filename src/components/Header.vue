@@ -26,10 +26,7 @@
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52  ">
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
-                      
-                      
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
-                      
                       <li ><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
                       <li v-if="false" ><router-link to="/about/birthday">{{ $t("birthday") }}</router-link></li>
                   </ul>
@@ -47,7 +44,6 @@
                         <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                             <li><router-link to="/renderer/education/mechanical_technician">{{ $t("mechanical_technician") }}</router-link></li>
                             <li><router-link to="/renderer/education/cnc_miller">{{ $t("cnc_miller") }}</router-link></li>
-                            
                         </ul>
                         </details>
                         </li>
@@ -64,7 +60,6 @@
                         <summary >{{ $t("civil_engineering") }} </summary>
                         <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                             <li><router-link to="/renderer/education/primary_construction_works_operator">{{ $t("primary_construction_works_operator") }}</router-link></li>
-                            
                         </ul>
                         </details>
                         </li>
@@ -90,8 +85,6 @@
                     </ul>
                   </div>
                   
-                  
-                  
                   <div class="dropdown dropdown-hover">
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer ">{{  $t('documents') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52">
@@ -100,7 +93,6 @@
                       <li  ><router-link to="/docs/leases">{{ $t("lease") }}</router-link></li>   
                     </ul>
                   </div>
-
 
                   <router-link to="/renderer/education/adult_education" class="btn btn-ghost  cursor-pointer ">{{ $t('adult_education') }}</router-link>
   
@@ -156,9 +148,7 @@
   export default
   {
       name: 'Header',
-      components:{
-        
-      },
+      
       data()
       {
           return {
@@ -187,16 +177,6 @@
       },
       mounted()
       {
-          
-          //cc=useLoadingStore();
-          //this.erasmusflag=cc.isErasmus;
-          
-          //this.language=cc.language;
-          
-          /*if(this.language==null)
-          {
-              this.language='sr';
-          }*/
           const cc=useLoadingStore();
           this.$i18n.locale=cc.language;
           document.title=this.$t("school_name");
@@ -246,14 +226,9 @@
              
               //i am want to cry, but i cant
   
-              /*await this.$router.push("/home");
-              this.reload.value=false;
-              await  nextTick()
-              this.reload.value=true;
-              this.getDocumentsCategories();
-              this.getAbouts();*/
+             
               window.location.reload();
-              //this.language=lang;
+              
           },
           async logout()
           {
@@ -331,7 +306,6 @@
               {
   
               }
-  
               a.id=element.$id;
               this.abouts.push(a);
           }
