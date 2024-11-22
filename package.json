@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "1.0.22rc",
+  "version": "1.0.23rc",
   "private": true,
   "type": "module",
   "scripts": {

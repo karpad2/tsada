@@ -24,6 +24,9 @@
                 <a href="https://www.youtube.com/@MSCTVada" class="ml-2 text-gray-400 hover:text-sky-400">
                     <i class="pi pi-youtube"></i>
                 </a>
+                <a href="https://www.tiktok.com/@muszaki_iskola_ada" class="ml-2 text-gray-400 hover:text-sky-400">
+                    <i class="pi pi-tiktok"></i>
+                </a>
                 <!-- Dark/Light Mode Toggle -->
                 <label class="swap swap-rotate ml-2 text-gray-400 hover:text-sky-400">
                     <!-- hidden checkbox controls the state -->

@@ -207,30 +207,30 @@ methods:{
             let mode="";
            
             
-            let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
+            let k= await database.getDocument(config.website_db, config.about_us_db,this.$route.params.id);
             
                 
-                    this.title_rs=k.documents[0].title_rs;
-                    this.content_rs=k.documents[0].text_rs;
+                    this.title_rs=k.title_rs;
+                    this.content_rs=k.text_rs;
                 
-                    this.title_hu=k.documents[0].title_hu;
-                    this.content_hu=k.documents[0].text_hu;
+                    this.title_hu=k.title_hu;
+                    this.content_hu=k.text_hu;
                     //this.$router.push("/home");
                     
                 
-                    this.title_en=k.documents[0].title_en;
-                    this.content_en=k.documents[0].text_en;
-                    this.yt_video=k.documents[0].yt_video;
-                    this.visible=k.documents[0].visible;
-                    this.notNews=k.documents[0].notNews;
-                    this.show_date=k.documents[0].show_date;
+                    this.title_en=k.title_en;
+                    this.content_en=k.text_en;
+                    this.yt_video=k.yt_video;
+                    this.visible=k.visible;
+                    this.notNews=k.notNews;
+                    this.show_date=k.show_date;
 
-                    if(k.documents[0].default_image==null||k.documents[0].default_image=='')
+                    if(k.default_image==null||k.default_image=='')
                     {
                         this.img="https://dummyimage.com/720x400";
                     }
                     else
-                    this.img=storage.getFileView(config.website_images,k.documents[0].default_image).toString();
+                    this.img=storage.getFileView(config.website_images,k.default_image).toString();
                 
 
                
@@ -242,9 +242,9 @@ methods:{
             /*if(this.$route.params.node=="news")
             {
                 this.newsmode=true;
-                if(k.documents[0].author!="")
-                this.author= convertifserbian(k.documents[0].author);
-                this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
+                if(k.author!="")
+                this.author= convertifserbian(k.author);
+                this.date= moment(k.$createdAt).locale(cc.language).format('LL');
             }
 
             if(this.$route.params.node=="education")
@@ -252,9 +252,9 @@ methods:{
                 this.edumode=true;
             }*/
 
-            //this.title=convertifserbian(k.documents[0].title);
-            this.gallery_id=k.documents[0].gallery;
-            //console.log(k.documents[0].gallery);
+            //this.title=convertifserbian(k.title);
+            this.gallery_id=k.gallery;
+            //console.log(k.gallery);
             
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
@@ -270,15 +270,15 @@ methods:{
             //console.log(k.documents[0]);
             */
 /*
-            this.video_id=k.documents[0].video;
+            this.video_id=k.video;
             let v2="659d5e6949ae7294f9f1";
             this.video_id=v2;
             this.video_link=storage.getFileView(config.website_images,this.video_id).href;
             console.log(this.video_link);
             this.video_link=config.default_video;
             this.loaded=true;*/
-            this.documents_flag=k.documents[0].has_documents;
-            this.album_flag=k.documents[0].has_gallery;
+            this.documents_flag=k.has_documents;
+            this.album_flag=k.has_gallery;
             
                
             

@@ -4,7 +4,7 @@
         <Header v-if="!__hideheaders" class="no_print" />
         
         <vue-particles
-        v-if="animation_flag"
+        v-if="animation_flag&&false"
             id="tsparticles"
             class="no_print"
             :particlesLoaded="particlesLoaded"

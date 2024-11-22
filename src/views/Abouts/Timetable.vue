@@ -174,28 +174,28 @@
                     
                 }*/
                 
-                let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);
+                let k= await database.getDocument(config.website_db, config.about_us_db,this.$route.params.id);
                 
                     if(cc.language=="sr"||cc.language=="rs")
                     {
-                        this.title=convertifserbian(k.documents[0].title_rs);
-                        this.chtml=k.documents[0].text_rs;
-                        document.title=convertifserbian(k.documents[0].title_rs);
+                        this.title=convertifserbian(k.title_rs);
+                        this.chtml=k.text_rs;
+                        document.title=convertifserbian(k.title_rs);
                         
                     }
                     else if(cc.language=="hu")
                     {
-                        this.title=k.documents[0].title_hu;
-                        this.chtml=k.documents[0].text_hu;
-                        document.title=k.documents[0].title_hu;
+                        this.title=k.title_hu;
+                        this.chtml=k.text_hu;
+                        document.title=k.title_hu;
                         //this.$router.push("/home");
                         
                     }
                     else if(cc.language=="en")
                     {
-                        this.title=k.documents[0].title_en;
-                        this.chtml=k.documents[0].text_en;
-                        document.title=k.documents[0].title_en;
+                        this.title=k.title_en;
+                        this.chtml=k.text_en;
+                        document.title=k.title_en;
                     }
     
                     else 
@@ -210,9 +210,9 @@
                 /*if(this.$route.params.node=="news")
                 {
                     this.newsmode=true;
-                    if(k.documents[0].author!="")
-                    this.author= convertifserbian(k.documents[0].author);
-                    this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
+                    if(k.author!="")
+                    this.author= convertifserbian(k.author);
+                    this.date= moment(k.$createdAt).locale(cc.language).format('LL');
                 }
     
                 if(this.$route.params.node=="education")
@@ -220,9 +220,9 @@
                     this.edumode=true;
                 }*/
     
-                //this.title=convertifserbian(k.documents[0].title);
-                let gal=k.documents[0].gallery;
-                console.log(k.documents[0].gallery);
+                //this.title=convertifserbian(k.title);
+                let gal=k.gallery;
+                console.log(k.gallery);
                 /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
                 
                 
@@ -237,7 +237,7 @@
                 //console.log(k.documents[0]);
                 */
     
-                this.video_id=k.documents[0].video;
+                this.video_id=k.video;
                 let v2="659d5e6949ae7294f9f1";
                 this.video_id=v2;
                 //let v2="659d5e6949ae7294f9f1";

@@ -115,19 +115,19 @@ methods:{
             const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
-            let k= await database.listDocuments(config.website_db, this.getDocumentsDB(),[Query.equal("$id",this.$route.params.id)]);
+            let k= await database.getDocument(config.website_db, this.getDocumentsDB(),this.$route.params.id);
             
                 
-                    this.title_rs=k.documents[0].document_title_rs;
+                    this.title_rs=k.document_title_rs;
                     
                 
-                    this.title_hu=k.documents[0].document_title_hu;
+                    this.title_hu=k.document_title_hu;
                     
                     //this.$router.push("/home");
                     
                 
-                    this.title_en=k.documents[0].document_title_en;
-                    this.document_id=k.documents[0].document_id;
+                    this.title_en=k.document_title_en;
+                    this.document_id=k.document_id;
                
            /* if(this.chtml=="---")
             {
@@ -137,9 +137,9 @@ methods:{
             /*if(this.$route.params.node=="news")
             {
                 this.newsmode=true;
-                if(k.documents[0].author!="")
-                this.author= convertifserbian(k.documents[0].author);
-                this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
+                if(k.author!="")
+                this.author= convertifserbian(k.author);
+                this.date= moment(k.$createdAt).locale(cc.language).format('LL');
             }
 
             if(this.$route.params.node=="education")
@@ -147,9 +147,9 @@ methods:{
                 this.edumode=true;
             }*/
 
-            //this.title=convertifserbian(k.documents[0].title);
-            let gal=k.documents[0].gallery;
-            console.log(k.documents[0].gallery);
+            //this.title=convertifserbian(k.title);
+            let gal=k.gallery;
+            console.log(k.gallery);
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             
@@ -164,7 +164,7 @@ methods:{
             //console.log(k.documents[0]);
             */
 /*
-            this.video_id=k.documents[0].video;
+            this.video_id=k.video;
             let v2="659d5e6949ae7294f9f1";
             this.video_id=v2;
             this.video_link=storage.getFileView(config.website_images,this.video_id).href;
