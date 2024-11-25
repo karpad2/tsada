@@ -1,0 +1,1 @@
+import{_ as s,c as t,a as o,j as r,o as a}from"./index-_uDDhlm_.js";const c="/assets/profileBanner_dzuderbbkat91-Dd9TNYXo.webp",n={},_={class:"mx-auto"};function d(i,e){return a(),t("div",_,e[0]||(e[0]=[o("img",{src:c},null,-1),r("óó ")]))}const m=s(n,[["render",d]]);export{m as default};
