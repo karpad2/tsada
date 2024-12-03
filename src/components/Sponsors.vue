@@ -13,7 +13,7 @@
                     class=""
                     :slidesPerView="aaa()"
                     :spaceBetween="30"
-                    :autoplay="true"
+                    :autoplay="_autoplay"
                     :loop="true"
                     
                     :modules="modules"
@@ -41,8 +41,9 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import { EffectFade, Navigation, Pagination } from 'swiper/modules';
+import { EffectFade, Navigation, Pagination,Autoplay } from 'swiper/modules';
 
 export default {
     name: 'UsefulLinks',
@@ -70,13 +71,19 @@ export default {
     data: () => ({
         l:3,
         _title:"",
+        _autoplay:{
+            
+    delay: 2500,
+    disableOnInteraction: false,
+  
+        },
         links: [
             {
                 img: 'https://dummyimage.com/720x400',
                 subtitle: 'SUBTITLE',
                 title: 'First',
                 text: 'Lorem ipsum dolor sit'}],
-                modules:[EffectFade, Navigation, Pagination],
+                modules:[EffectFade, Navigation, Pagination,Autoplay],
         options: {
             mouseControls: true,
             touchControls: true,

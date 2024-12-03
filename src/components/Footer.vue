@@ -36,6 +36,10 @@
                     <!-- moon icon -->
                     <i class="swap-on pi pi-moon"></i>
                 </label>
+
+                <a v-if="false" @click="random_theme" class="ml-2 text-gray-400 hover:text-sky-400">
+                    <i class="pi pi-palette"></i>
+                </a>
             </span>
         </div>
         <Cookie />
@@ -47,6 +51,7 @@ import Cookie from "@/components/Cookie.vue";
 import moment from 'moment';
 import vv from "../../package.json";
 import { useTheme } from 'vuetify'
+import themes from "@/themes/store.json";
 import {useLoadingStore} from "@/stores/loading";
 
 export default {
@@ -83,6 +88,27 @@ export default {
            
            this.themeprovider.global.name.value= this.isDarkMode?"dark":"light";
         },
+        random_theme() {
+    let theme = "";
+    let t=themes.themes; // Variable to hold the selected theme
+    let k = t.length; // Get the length of the themes array
+    
+    console.log(k);
+    if (k > 0) {
+        // Randomly select a theme from the array
+        let randomIndex = Math.floor(Math.random() * k);
+        theme = t[randomIndex];
+    } else {
+        console.error("Themes array is empty");
+        return;
+    }
+
+    // Apply the theme
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Persist the theme in localStorage
+    localStorage.setItem('theme', theme);
+}
     },
     mounted() {
         // Load the saved theme from localStorage on page load

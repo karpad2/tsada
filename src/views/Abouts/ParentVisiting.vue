@@ -10,25 +10,13 @@
             </div>
            
             <v-data-table  height="400" :headers="headers" :items="classes" :items-per-page="-1">
-                    
-    
-      
-
                 <template #bottom></template>
             </v-data-table>
-
-
-                
-           
-               
-            
         </div>
         <Loading v-else />
     </section>
 </template>
 <script lang="ts">
-
-
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
@@ -46,17 +34,12 @@ export default {
                     { title: this.$t("name"), align: 'start', sortable: false, key: 'chief',width: '200px' },
                     { title: this.$t("class"), align: 'start', key: '_class',width: '300px' },
                     { title: this.$t("classroom_chief_receiving_hour"), align: 'start', key: 'receiving_hour',width: '300px' },
-                    
-                    
-                    
                     ];
 
         document.title=this.$t("parentsvisiting");
         const cc=useLoadingStore();
         this.load_courses_base();
         this.admin=cc.userLoggedin;
-
-       
     },
     data: () => ({
         admin:false,
@@ -130,13 +113,10 @@ export default {
         {
             console.log(ex);
         }
-            
-
             //a.imga=element.default_image.toString();
             this.classes.push(a);
         }
         console.log(this.classes);
-        
         this.loaded=true;
         },
         isHidden(a)

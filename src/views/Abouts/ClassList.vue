@@ -10,15 +10,11 @@
             <div class="flex flex-wrap -m-4 grid-cols-3">
                 <div v-if="admin" @click="new_stuff"  class="xl:w-1/5 md:w-96 sm:w-full p-4 cursor-pointer becsuszo_kep">
                     <div  style="min-width: 273px; min-height: 276px;"  class="transition delay-150 bg-slate-100/80 backdrop-filter hover:bg-sky-600/60  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-                        
                         <img  class="size-16 m-auto rounded center object-cover object-center mb-6 transition duration-300 ease-in-out "
                             src="@/assets/add-plus-new.svg" alt="content">
                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ $t("add_new_class") }}</h2>
                     </div>
                 </div>
-
-
-
                 <div  v-for="_class in classes" :key="_class.id" class="card glass bg-primary text-primary-content w-96 m-2">
                     <div  class="card-body">
                         <h2 class="card-title"> {{ roman_number(_class.year) }}-{{ _class.designation  }} {{ $t("class") }}</h2>
@@ -38,8 +34,6 @@
     </section>
 </template>
 <script lang="ts">
-
-
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
@@ -56,8 +50,6 @@ export default {
         const cc=useLoadingStore();
         this.load_courses_base();
         this.admin=cc.userLoggedin;
-
-       
     },
     data: () => ({
         admin:false,
@@ -69,18 +61,15 @@ export default {
     
     methods:{
         async load_courses_base()
-        {
-            
+        {    
         this.classes=[];
-           // console.log();
+        
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const cc=useLoadingStore();
         let l;
         l= await database.listDocuments(config.website_db, config.classlist,[Query.orderAsc("year"),Query.orderAsc("designation")]);
-     
         let local=cc.language;
-        //console.log(l);
         for (let kk=0;kk<l.total;kk++)
         {
             let a={year:1,designation:"",role:"",chief:"",imga:"",language:"",id:"",receiving_hour:""};
@@ -127,9 +116,6 @@ export default {
         {
             console.log(ex);
         }
-            
-
-            //a.imga=element.default_image.toString();
             this.classes.push(a);
         }
         console.log(this.classes);

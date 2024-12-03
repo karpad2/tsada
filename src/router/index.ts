@@ -198,7 +198,7 @@ const router = createRouter({
       component: () => import('../views/Presentation.vue')      
     },
     {
-      path:'/tvview',
+      path:'/tv',
       name:'tvpresentation',
       component: () => import('../views/TV/TVView.vue')      
     },
