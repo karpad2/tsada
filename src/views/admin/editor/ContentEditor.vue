@@ -8,7 +8,6 @@
             <v-btn class="m-5" @click="delete_content">{{ $t('delete') }}</v-btn>
             <v-btn class="m-5" @click="share_fb">{{ $t('fb_share') }}</v-btn>
         </div>
-        
 
         <div>
             <v-file-input @change="file_upload" v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
@@ -17,8 +16,6 @@
 
 <div  class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
     <div   class="bg-slate-100/30 hover:bg-sky-600/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-        
-        
             <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
                             :src="img" alt="content">
         </div>
@@ -110,20 +107,28 @@
         </div>
     </div>
 
-    <div>
-            <v-switch v-model="album_flag" @change="gallery_change" :label="$t('album_flag')"></v-switch>
+    <div >
+        <v-switch v-model="album_flag" @change="save" :label="$t('album_flag')"></v-switch>
+                       
             <div v-if="album_flag">
-                <AlbumViewer :caption="false" :id="gallery_id" />
+            <v-btn class="m-5" @click="gallery_change">{{ $t('create_a_new_album') }}</v-btn> 
+            
+            <v-select
+            :items="galleries"
+            v-model="gallery_id"
+            :label="$t('gallery')"
+            item-value="id"
+            item-text="title"
+            @update:modelValue="g_save"
+            ></v-select>
+
+            <div v-if="_update">
+                <AlbumViewer  :caption="false" :id="gallery_id" />
              </div>
+            </div>
+
     </div>
 
-    <div>
-      
-       <div>
-            
-            
-        </div>
-    </div>
     </div>
 </template>
 <script lang="ts">
@@ -155,6 +160,8 @@ data()
         visible:false,
         documents_flag:false,
         album_flag:false,
+        choosen_gallery:false,
+        galleries:[],
         default_img_link:"",
         gallery_id:"",
         file_link:null,
@@ -166,7 +173,8 @@ data()
         documents:[],
         doc_loaded:false,
         notNews:true,
-        uploading:false
+        uploading:false,
+        _update:true
     }
 },
 components:{
@@ -189,7 +197,7 @@ mounted()
         
             this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
             this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
-        
+    this.load_galleries();
             window.addEventListener('beforeunload', this.handleBeforeUnload);
 },
 onBeforeUnmount()
@@ -197,6 +205,12 @@ onBeforeUnmount()
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
 },
 methods:{
+    async g_save()
+    {
+        this._update=false;
+        await this.save();
+        this._update=true;
+    },
     async getMD()
         {
             
@@ -231,52 +245,9 @@ methods:{
                     }
                     else
                     this.img=storage.getFileView(config.website_images,k.default_image).toString();
-                
-
-               
-           /* if(this.chtml=="---")
-            {
-                this.$router.push("/home");
-            }*/
-
-            /*if(this.$route.params.node=="news")
-            {
-                this.newsmode=true;
-                if(k.author!="")
-                this.author= convertifserbian(k.author);
-                this.date= moment(k.$createdAt).locale(cc.language).format('LL');
-            }
-
-            if(this.$route.params.node=="education")
-            {
-                this.edumode=true;
-            }*/
-
-            //this.title=convertifserbian(k.title);
-            this.gallery_id=k.gallery;
-            //console.log(k.gallery);
             
-            /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
-            
-            
-            console.log(m);
-            m.documents.forEach(element=>
-            {
-                let af={img:""};
-                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id).toString();
-                this.gallery.push(af);
-                this.image_cnt++;
-            });
-            //console.log(k.documents[0]);
-            */
-/*
-            this.video_id=k.video;
-            let v2="659d5e6949ae7294f9f1";
-            this.video_id=v2;
-            this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_link);
-            this.video_link=config.default_video;
-            this.loaded=true;*/
+            this.gallery_id=k.gallery.$id;
+          
             this.documents_flag=k.has_documents;
             this.album_flag=k.has_gallery;
             
@@ -305,10 +276,10 @@ methods:{
         const database = new Databases(appw);
         //const storage = new Storage(appw);
         let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);  
-        if(!this.album_flag)
+       /* if(!this.album_flag)
         {
             this.gallery_id=null;
-        }   
+        }*/   
         
         const result = await database.updateDocument(
         config.website_db, // databaseId
@@ -377,6 +348,52 @@ async gallery_change()
     //console.log(this.gallery_id);
  //if(this.gallery_id)
 }, 
+async load_galleries()
+{
+    const database = new Databases(appw);
+    let  l= await database.listDocuments(config.website_db, config.gallery,[Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(25)]);
+    this.galleries=[];
+    const cc=useLoadingStore();
+    let local=cc.language;     
+    l.documents.forEach(element => {
+            let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
+            //console.log(element);
+            a.id=element.$id;
+            a.visible=element.visible;
+            if(local=="en")
+            {
+                a.title=element.title_en;
+                a.subtitle=element.short_en;
+                //a.text=element.course_en_detail;
+            }
+            else if(local=="hu")
+            {
+                a.title=element.title_hu;
+                a.subtitle=element.short_hu;
+                //a.text=element.course_hu_detail;
+            }
+            else if(local=="rs"||local=="sr")
+            {
+                a.title=convertifserbian(element.title_rs);
+                a.subtitle=convertifserbian(element.short_rs);
+                //a.text=convertifserbian(element.course_rs_detail);
+            }
+            if(element.code==""||element.code==null)
+            a.en=element.title_en;
+            else a.en=element.code;
+            //console.log(element.course_img);
+        
+            //=storage.getFileView(,).toString();
+            //a.imga=element.default_image.toString();
+            this.galleries.push(a);
+        });
+
+},
+
+async exist_new_gallery_change()
+{
+    this.gallery_change();
+},
 
     async new_stuff()
         {

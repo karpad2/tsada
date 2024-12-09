@@ -95,6 +95,7 @@ export default {
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const cc=useLoadingStore();
+        let local=cc.language;
         let l;
         if(!cc.userLoggedin)
         {
@@ -105,7 +106,7 @@ export default {
             l= await database.listDocuments(config.website_db, config.gallery,[Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(25)]);
          
         }
-        let local=cc.language;
+        
         l.documents.forEach(element => {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
             //console.log(element);
