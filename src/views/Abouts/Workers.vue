@@ -38,7 +38,7 @@ import {useLoadingStore} from "@/stores/loading";
 import {reactive,ref} from "vue";
 import gsap from "gsap";
 import Loading from "@/components/Loading.vue";
-
+import { yapping } from "@/uwu";
 
 export default {
     name: 'Workers',
@@ -153,7 +153,7 @@ export default {
         //loadingStore.setLoading(true);
         this.workers=[];
         this.roles=[];
-        //console.log();
+        //yapping();
         const database = new Databases(appw);
         const storage = new Storage(appw);
 
@@ -171,11 +171,11 @@ export default {
         let el1=k.documents[i];
       //   k.documents.forEach(async (el1) => {
             let _works=[];
-            //console.log(el1);
+            //yapping(el1);
             let l= await database.listDocuments(config.website_db, config.workers,[Query.select(["worker_name_hu","worker_name_rs","contact","worker_img","$id"]),
                 Query.equal("roles",[el1.$id])
         ]);
-        //console.log(l);
+        //yapping(l);
             let name="";
             if(local=="en")
             {
@@ -189,7 +189,7 @@ export default {
             {
                 name=convertifserbian(el1.role_rs);
             }
-            //console.log(l);
+            //yapping(l);
             await l.documents.forEach(async el2 => {
             let a={name:"",contact:"",img:"",id:""};
             a.id=el2.$id;
@@ -223,12 +223,12 @@ export default {
         this.roles.push(b);
 //        });
       }
-        console.log(this.roles);
+        yapping(this.roles);
         //loadingStore.setLoading(false);
         this.loaded=true;
         },
         onReady(params) {
-                console.log('onReady');
+                yapping('onReady');
 
                 //this.api = params.api;
                 //this.calculateRowCount();

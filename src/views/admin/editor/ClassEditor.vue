@@ -80,7 +80,7 @@
 <script lang="ts">
 import {Client,Databases,ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
-
+import { yapping } from "@/uwu";
 import {useLoadingStore} from "@/stores/loading";
 import { convertifserbian } from "@/lang";
 import { data } from "autoprefixer";
@@ -144,7 +144,7 @@ methods:{
 
             for (let index = 0; index < k.total; index++) {
                 const element = k.documents[index];
-                //console.log(element);
+                //yapping(element);
                 let a={title:"",id:""};
                 try{
                 a.title=element.worker_name_hu;
@@ -159,7 +159,7 @@ methods:{
             }
             catch(ex)
             {
-                console.log(ex);
+                yapping(ex);
             }
                 
             }
@@ -186,20 +186,20 @@ methods:{
                 this.courses.push(a);
                 }
                 k=await database.getDocument(config.website_db,config.classlist,this.$route.params.id);
-                console.log(k); 
+                yapping(k); 
                 
                 this.year=k.year;
                 this.delegation=k.designation;
                 try{
                 this.masterchief=k.workers.$id;
-                }catch(ex){console.log(ex)}
+                }catch(ex){yapping(ex)}
                 try{
                 this.course=k.courses.$id;
-                }catch(ex){console.log(ex)}
+                }catch(ex){yapping(ex)}
                 this.language=k.language;
                 this.recepient_hour=k.receiving_hour;
             this.loading=false;
-            //console.log(this.workers);
+            //yapping(this.workers);
         },
 
     async save()

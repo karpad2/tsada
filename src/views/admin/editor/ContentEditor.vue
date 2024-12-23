@@ -135,7 +135,7 @@
 import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
 import axios from "axios";
-
+import { yapping } from "@/uwu";
 import {useLoadingStore} from "@/stores/loading";
 import AlbumViewer from "@/components/AlbumViewer.vue";
 import { convertifserbian } from "@/lang";
@@ -229,9 +229,7 @@ methods:{
                 
                     this.title_hu=k.title_hu;
                     this.content_hu=k.text_hu;
-                    //this.$router.push("/home");
-                    
-                
+                  
                     this.title_en=k.title_en;
                     this.content_en=k.text_en;
                     this.yt_video=k.yt_video;
@@ -250,13 +248,7 @@ methods:{
           
             this.documents_flag=k.has_documents;
             this.album_flag=k.has_gallery;
-            
-               
-            
-            
-
-
-
+        
             this.synchronize_documents();
         },
     handleBeforeUnload(event){
@@ -330,7 +322,7 @@ methods:{
         published: true  // If 'makePrivate' is true, set published to false
       }
     );
-    console.log(response);
+    yapping(response);
 },
 async documents_load()
 {
@@ -345,7 +337,7 @@ async gallery_change()
         this.gallery_id=await this.new_gallery();
     }
     this.save();
-    //console.log(this.gallery_id);
+    //yapping(this.gallery_id);
  //if(this.gallery_id)
 }, 
 async load_galleries()
@@ -357,7 +349,7 @@ async load_galleries()
     let local=cc.language;     
     l.documents.forEach(element => {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
-            //console.log(element);
+            //yapping(element);
             a.id=element.$id;
             a.visible=element.visible;
             if(local=="en")
@@ -381,7 +373,7 @@ async load_galleries()
             if(element.code==""||element.code==null)
             a.en=element.title_en;
             else a.en=element.code;
-            //console.log(element.course_img);
+            //yapping(element.course_img);
         
             //=storage.getFileView(,).toString();
             //a.imga=element.default_image.toString();
@@ -469,8 +461,8 @@ async exist_new_gallery_change()
             console.warn("no file");
             return;
         } 
-    console.log("file_upload");
-    //console.log(this.file_link[0]);
+    yapping("file_upload");
+    //yapping(this.file_link[0]);
     this.uploading=true;
     const storage = new Storage(appw);
     const result = await storage.createFile(

@@ -53,6 +53,7 @@ import vv from "../../package.json";
 import { useTheme } from 'vuetify'
 import themes from "@/themes/store.json";
 import {useLoadingStore} from "@/stores/loading";
+import { yapping } from "@/uwu";
 
 export default {
     name: 'Footer',
@@ -93,13 +94,13 @@ export default {
     let t=themes.themes; // Variable to hold the selected theme
     let k = t.length; // Get the length of the themes array
     
-    console.log(k);
+    yapping(k);
     if (k > 0) {
         // Randomly select a theme from the array
         let randomIndex = Math.floor(Math.random() * k);
         theme = t[randomIndex];
     } else {
-        console.error("Themes array is empty");
+        yapping("Themes array is empty");
         return;
     }
 

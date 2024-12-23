@@ -135,6 +135,7 @@ import {useLoadingStore} from "@/stores/loading";
 import { Fireworks } from '@fireworks-js/vue'
 import NoInternet from '@/components/NoInternet.vue';
 import vv from "../../package.json";
+import { yapping } from "@/uwu";
 import axios from 'axios';
 import { version } from 'vite';
 
@@ -159,7 +160,7 @@ return {
     mounted()
     {
         this.checkingstuff();
-       //console.log( app.config.globalProperties.$loading);
+       //yapping( app.config.globalProperties.$loading);
        
     
             
@@ -167,7 +168,7 @@ return {
     computed: {
         isLoading() {
         const cc=useLoadingStore();
-        console.log('isLoading:', cc.isLoading);
+        yapping('isLoading:', cc.isLoading);
         this._loading=cc.isLoading;
            return cc.isLoading;
             
@@ -242,7 +243,7 @@ return {
       }
     },
     refreshApp() {
-      console.log('New version detected. Reloading the app with cache bypass...');
+      yapping('New version detected. Reloading the app with cache bypass...');
       const currentUrl = window.location.href;
       const newUrl = currentUrl.split('?')[0] + '?v=' + new Date().getTime();
 

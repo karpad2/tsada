@@ -166,7 +166,7 @@
                 const database = new Databases(appw);
                 //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
                 const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":true});
-                console.log(l);
+                yapping(l);
 
                 this.load_workers_base();
             },
@@ -176,7 +176,7 @@
                 const database = new Databases(appw);
                 //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
                 const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":false});
-                console.log(l);
+                yapping(l);
 
                 this.load_workers_base();
             },
@@ -192,7 +192,7 @@
             //loadingStore.setLoading(true);
             this.workers=[];
             this.roles=[];
-            //console.log();
+            //yapping();
             const database = new Databases(appw);
             const storage = new Storage(appw);
     
@@ -214,11 +214,11 @@
             let el1=k.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
-                //console.log(el1);
+                //yapping(el1);
                 let l= await database.listDocuments(config.website_db, config.documents_db,[
                     Query.equal("documentCategories",[el1.$id])
             ]);
-            //console.log(l);
+            //yapping(l);
                 let name="";
                 if(local=="en")
                 {
@@ -232,7 +232,7 @@
                 {
                     name=el1.category_name_rs;
                 }
-                //console.log(l);
+                //yapping(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 a.id=el2.$id;
@@ -277,11 +277,11 @@
             let el1=n.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
-                //console.log(el1);
+                //yapping(el1);
                 let l= await database.listDocuments(config.website_db, config.documents_db,[
                     Query.equal("documentCategories",[el1.$id])
             ]);
-            //console.log(l);
+            //yapping(l);
                 let name="";
                 if(local=="en")
                 {
@@ -296,7 +296,7 @@
                     name=convertifserbian(el1.category_name_rs);
                 }
                 name+=` ~ ${this.$t("archived")}`;
-                //console.log(l);
+                //yapping(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 a.id=el2.$id;
@@ -336,12 +336,12 @@
           }
         }
 
-            console.log(this.roles);
+            yapping(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
             },
             onReady(params) {
-                    console.log('onReady');
+                    yapping('onReady');
     
                     //this.api = params.api;
                     //this.calculateRowCount();

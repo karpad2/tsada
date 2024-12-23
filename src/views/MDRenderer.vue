@@ -57,6 +57,7 @@
 
 import {Client,Databases,ID,Storage,Query,Account } from "appwrite";
 import {useLoadingStore} from "@/stores/loading";
+import { yapping } from "@/uwu";
 import {appw,config} from "@/appwrite";
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -119,7 +120,7 @@ export default {
         if(this.admin)
         {
             let kkk=new Account(appw);
-            console.log(kkk.client);
+            yapping(kkk.client);
         }
 
         this.headers= [
@@ -227,7 +228,7 @@ export default {
 
             //this.title=convertifserbian(k.title);
             let gal=k.gallery;
-            console.log(k.gallery);
+            yapping(k.gallery);
             this.gallery_flag=k.has_gallery;
             this.show_date=k.show_date;
             this.has_documents=k.has_documents;
@@ -238,13 +239,13 @@ export default {
             }
             catch(ex)
             {
-                console.log(ex);
+                yapping(ex);
             }
             }
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             
-            console.log(m);
+            yapping(m);
             m.documents.forEach(element=>
             {
                 let af={img:""};
@@ -252,7 +253,7 @@ export default {
                 this.gallery.push(af);
                 this.image_cnt++;
             });
-            //console.log(k.documents[0]);
+            //yapping(k.documents[0]);
             */
 
             this.video_id=k.video;
@@ -266,7 +267,7 @@ export default {
                 this.video_link=this.video_id;
             }
             //this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_link);
+            yapping(this.video_link);
             //if(this.video_id==""||this.video_id==null||this.video_id=="659d5e6949ae7294f9f1")
             
             this.loaded=true;
@@ -300,7 +301,7 @@ export default {
                 }
                 catch (ex)
                  {
-                    console.log(ex);
+                    yapping(ex);
                  }
                 if(local=="en"||local=="hu")
                 {

@@ -104,7 +104,7 @@
 <script lang="ts">
 import {Client,Databases,ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
-
+import { yapping } from "@/uwu";
 import {useLoadingStore} from "@/stores/loading";
 
 export default{
@@ -253,14 +253,14 @@ methods:{
             console.warn("no file");
             return;
         } 
-    console.log("file_upload");
+    yapping("file_upload");
     this.uploading=true;
     await this.file_link.forEach(async element => {
         this.$notify({
                     type: 'info',
                     text: this.$t('file_upload_started')
                 });
-        console.log(element);
+        yapping(element);
         const result = await storage.createFile(
     config.gallery_pictures_storage, // bucketId
     ID.unique(), // fileId
@@ -269,7 +269,7 @@ methods:{
     );
     let add_file_to_album=await database.createDocument(config.website_db, config.album_images,ID.unique(),{"image_id":result.$id,
     "gallery":this.gallery_id});
-    console.log(add_file_to_album);
+    yapping(add_file_to_album);
     
     //this.default_image=result.$id;
     //this.save();
@@ -282,7 +282,7 @@ methods:{
     },500)
     
             });
-    //console.log(this.file_link[0]);
+    //yapping(this.file_link[0]);
     
     
     
@@ -294,7 +294,7 @@ methods:{
     },
     set_as_default(aa:string)
     {
-        console.log(aa);
+        yapping(aa);
         this.default_image=aa;
         this.save();
         this.getMD();
@@ -309,14 +309,14 @@ methods:{
     }
     catch(ex)
     {
-        console.log("hiba a törlésnél");
+        yapping("hiba a törlésnél");
     }
     try{
     let k= database.deleteDocument(config.website_db, config.album_images,bb);
 }
     catch(ex)
     {
-        console.log("hiba a törlésnél");
+        yapping("hiba a törlésnél");
     }
     this.getMD();
 }

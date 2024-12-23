@@ -154,7 +154,7 @@
             //loadingStore.setLoading(true);
             this.workers=[];
             this.roles=[];
-            //console.log();
+            //yapping();
             const database = new Databases(appw);
             const storage = new Storage(appw);
     
@@ -172,11 +172,11 @@
             let el1=k.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
-                //console.log(el1);
+                //yapping(el1);
                 let l= await database.listDocuments(config.website_db, config.st_documents,[
                     Query.equal("stDocumentCategories",[el1.$id])
             ]);
-            //console.log(l);
+            //yapping(l);
                 let name="";
                 if(local=="en")
                 {
@@ -190,7 +190,7 @@
                 {
                     name=convertifserbian(el1.category_name_rs);
                 }
-                //console.log(l);
+                //yapping(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 a.id=el2.$id;
@@ -227,12 +227,12 @@
             this.roles.push(b);
     //        });
           }
-            console.log(this.roles);
+            yapping(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
             },
             onReady(params) {
-                    console.log('onReady');
+                    yapping('onReady');
     
                     //this.api = params.api;
                     //this.calculateRowCount();

@@ -76,6 +76,7 @@
 
 <script lang="ts">
 import { ref } from 'vue';
+import { yapping } from "@/uwu";
 import {Client,Databases,ID,Storage,Query,Account } from "appwrite";
 //import { Client, Account } from "appwrite";
 import {appw,config,user} from "@/appwrite";
@@ -111,7 +112,7 @@ export default {
       }
 
      // if(checkUser()) this.router.push("/home");
-       console.log("login");
+       yapping("login");
     },  
     methods:{
 
@@ -122,7 +123,7 @@ export default {
           const account = new Account(appw);
           try{
           const result = await account.get();
-          console.log(result);
+          yapping(result);
           cc.setUserLoggedin(true);
           }
           catch(e)
@@ -157,7 +158,7 @@ export default {
           
           const cc=useLoadingStore();
           cc.setAnimation(this.animation_backgound);
-          console.log("setted_animation");
+          yapping("setted_animation");
           /*const database = new Databases(appw);
           let n= await database.listDocuments(config.website_db, config.users_settings,[Query.equal("uid",cc.uid),Query.equal("setting","animation"),Query.select(["$id"])]);
           let k= await database.updateDocument(config.website_db,config.users_settings,n.documents[0].$id,
@@ -173,14 +174,14 @@ export default {
             const promise = user.createEmailPasswordSession(this.email,this.password);
             const cc=useLoadingStore();
             promise.then( (response)=>{
-                console.log(response);
+                yapping(response);
                 
                 this.$notify(this.$t('success'));
                 
                 const lo=useLoadingStore();
                 
                 lo.setUserLoggedin(true);
-                console.log(response);
+                yapping(response);
                 cc.setuid(response.userId);
                
 
@@ -193,7 +194,7 @@ export default {
                  // takarodjá befelé
             }, (error)=>{
                 this.$notify(this.$t('login_failure'));
-                console.log(error); // Failure
+                yapping(error); // Failure
             });
         
           

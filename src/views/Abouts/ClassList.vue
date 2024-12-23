@@ -38,6 +38,7 @@ import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
+import { yapping } from "@/uwu";
 import gsap from "gsap";
 export default {
     name: 'ClassList',
@@ -73,7 +74,7 @@ export default {
         for (let kk=0;kk<l.total;kk++)
         {
             let a={year:1,designation:"",role:"",chief:"",imga:"",language:"",id:"",receiving_hour:""};
-            console.log(l.documents[kk]);
+            yapping(l.documents[kk]);
             a.id=l.documents[kk].$id;
             //a.role=l[kk].role;
             a.designation=l.documents[kk].designation;
@@ -87,14 +88,14 @@ export default {
              }
              catch(ex)
              {
-                console.log(ex);
+                yapping(ex);
              }
              let c=null;            
              try{
              c =l.documents[kk].courses;
              }
              catch(ex){
-                console.log(ex);
+                yapping(ex);
              }
              try{
              if(local=="rs"||local=="sr")
@@ -114,16 +115,16 @@ export default {
         }
         catch (ex)
         {
-            console.log(ex);
+            yapping(ex);
         }
             this.classes.push(a);
         }
-        console.log(this.classes);
+        yapping(this.classes);
         
         },
         isHidden(a)
         {
-            //console.log(a);
+            //yapping(a);
             return !a;
         },
         classopen(a)

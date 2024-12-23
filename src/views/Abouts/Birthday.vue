@@ -67,11 +67,11 @@ export default{
               try{
               this.people = await promise.documents;
               this.loading = false; // Success
-              console.log(promise.documents);
+              yapping(promise.documents);
               }
               catch(e)
               {
-                console.log(e);
+                yapping(e);
                 setTimeout(
                 this.selfloading(),10000);
               }

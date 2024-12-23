@@ -1,5 +1,6 @@
 import { Client,Account } from 'appwrite';
 import config from './config.json';
+import { yapping } from '@/uwu';
 const appw = new Client();
 
 
@@ -16,13 +17,13 @@ async function check()
 
 const loading=useLoadingStore();
 let loggedIn=false;
-//console.log(user.get());
+//yapping(user.get());
 const promise = user.get();
 let accountloaded;
 
 promise.then(function (response) {
 
-        console.log(response); // Success
+        yapping(response); // Success
         if(response.status==true){
            accountloaded=response; 
             loading.setUserLoggedin(true);
@@ -30,7 +31,7 @@ promise.then(function (response) {
         else
         loggedIn= false;
     }, function (error) {
-        console.log(error); // Failure
+        yapping(error); // Failure
         loading.setUserLoggedin(false);
     });
 }

@@ -134,7 +134,7 @@
                 //loadingStore.setLoading(true);
                 this.workers=[];
                 this.roles=[];
-                //console.log();
+                //yapping();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
                 let llll= await database.getDocument(config.website_db, config.document_categories_db,this.$route.params.category);
@@ -182,7 +182,7 @@
                         //a.email=el2.email;
                     this.documents.push(a);
                     });
-                console.log(this.messages)
+                yapping(this.messages)
                 //n.documents.forEach()
                 
             

@@ -51,6 +51,7 @@ import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
 import gsap from "gsap";
+import { yapping } from "@/uwu";
 export default {
     name: 'SlideModules',
     components: {
@@ -92,7 +93,7 @@ export default {
         async load_courses_base()
         {
         this.courses=[];
-           // console.log();
+           // yapping();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const cc=useLoadingStore();
@@ -119,7 +120,7 @@ export default {
         let local=cc.language;
         l.documents.forEach(element => {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
-            //console.log(element);
+            //yapping(element);
             a.id=element.$id;
             
             a.visible=element.visible;
@@ -144,7 +145,7 @@ export default {
             if(element.code==""||element.code==null)
             a.en=element.title_en;
             else a.en=element.code;
-            //console.log(element.course_img);
+            //yapping(element.course_img);
             if(element.default_image==null||element.default_image=='')
             {
                 a.img="https://dummyimage.com/720x400";
@@ -174,15 +175,15 @@ export default {
         },
         isHidden(a)
         {
-            //console.log(a);
+            //yapping(a);
             return !a;
         },
         courseopen(a)
         {
-            console.log(a);
+            yapping(a);
             let b=a.toLowerCase();
             b=b.replaceAll(" ","");
-            console.log(b);
+            yapping(b);
             this.$router.push("/renderer/"+this.mode+"/"+b);
         },
         async new_stuff()

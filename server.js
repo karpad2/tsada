@@ -60,12 +60,12 @@ app.use('*', async (req, res) => {
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
   } catch (e) {
     vite?.ssrFixStacktrace(e)
-    console.log(e.stack)
+    yapping(e.stack)
     res.status(500).end(e.stack)
   }
 })
 
 // Start http server
 app.listen(port, () => {
-  console.log(`Server started at http://localhost:${port}`)
+  yapping(`Server started at http://localhost:${port}`)
 })

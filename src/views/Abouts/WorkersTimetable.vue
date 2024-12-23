@@ -26,6 +26,7 @@
     import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
+    import { yapping } from "@/uwu";
     import gsap from "gsap";
     
     
@@ -133,7 +134,7 @@
             //loadingStore.setLoading(true);
             this.workers=[];
             this.roles=[];
-            //console.log();
+            //yapping();
             const database = new Databases(appw);
             const storage = new Storage(appw);
     
@@ -151,11 +152,11 @@
             let el1=k.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
-                //console.log(el1);
+                //yapping(el1);
                 let l= await database.listDocuments(config.website_db, config.workers,[
                     Query.equal("roles",[el1.$id])
             ]);
-            //console.log(l);
+            //yapping(l);
                 let name="";
                 if(local=="en")
                 {
@@ -169,11 +170,11 @@
                 {
                     name=convertifserbian(el1.role_rs);
                 }
-                //console.log(l);
+                //yapping(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",contact:"",img:"",id:"",p_receiving_hour:"",u_receiving_hour:""};
                 a.id=el2.$id;
-                console.log(el2);
+                yapping(el2);
 
                 if(el2.p_receiving_hour!=""||el2.p_receiving_hour!=null)
                     a.p_receiving_hour=el2.p_receiving_hour;
@@ -215,12 +216,12 @@
             this.roles.push(b);
     //        });
           }
-            console.log(this.roles);
+            yapping(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
             },
             onReady(params) {
-                    console.log('onReady');
+                    yapping('onReady');
     
                     //this.api = params.api;
                     //this.calculateRowCount();

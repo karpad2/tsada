@@ -5,6 +5,7 @@ import { createApp  } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
+import { yapping } from './uwu'
 import App from './App.vue'
 import router from './router'
 //import Particles from "vue3-particles";
@@ -58,7 +59,7 @@ const vuetify = createVuetify({
   })
 app.component('QuillEditor', QuillEditor)
 
-//console.log(messages);
+//yapping(messages);
 
 app.use(CKEditor);
 const i18n = createI18n({
@@ -87,6 +88,7 @@ app.use(VueViewer, {
       zIndex: 9999
     }
   });
+app.mixin({methods:{yapping}});
 app.component('VueCookieComply', VueCookieComply)
 //app.use(gsap);
 app.use(router);

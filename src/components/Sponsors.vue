@@ -98,7 +98,7 @@ export default {
         async load_links_base_sponsors()
         {
         this.links=[];
-            //console.log();
+            //yapping();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l= await database.listDocuments(config.website_db, config.sponsors_db,[Query.orderAsc("sorrend")]);
@@ -128,7 +128,7 @@ export default {
         async load_links_base_usefullinks()
         {
         this.links=[];
-            //console.log();
+            //yapping();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         let l= await database.listDocuments(config.website_db, config.usefullinks,[Query.orderAsc("sorrend")]);
@@ -165,7 +165,7 @@ export default {
         {
             let l= window.innerWidth;
             let k=0;
-            //console.log(l);
+            //yapping(l);
             if(l<=480)
             k=2;
             else if(l<=768)

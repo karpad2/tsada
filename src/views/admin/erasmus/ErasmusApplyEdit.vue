@@ -87,7 +87,7 @@ export default {
 
                 // Notify the user of success
                 this.$notify(this.$t('apply_saved'));
-                console.log('Save successful:', result);
+                yapping('Save successful:', result);
             } catch (error) {
                 // Handle any errors during the document update
                 console.error('Error saving data:', error);
@@ -159,7 +159,7 @@ export default {
                 this.location = n.erasmusLocation.$id;
             }
             
-            console.log('Form data loaded:', n);
+            yapping('Form data loaded:', n);
         }
     },
     mounted() {

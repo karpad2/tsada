@@ -27,10 +27,10 @@ export default {
         try {
             const fileInfo = await storage.getFileInfo(this.img);
             this.image = await storage.getFileView(config.website_images, this.img);
-            console.log(this.image);
+            yapping(this.image);
             this.load = false;
         } catch (error) {
-            console.log('File does not exist', error);
+            yapping('File does not exist', error);
             this.load = true;
         }
     }

@@ -187,8 +187,8 @@ import { AgXToneMapping, CubeCamera } from "three";
                     return;
                 } 
             this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
-            //console.log(this.file_link[0]);
+            yapping("file_upload");
+            //yapping(this.file_link[0]);
 
             const storage = new Storage(appw);
             const result = await storage.createFile(
@@ -212,8 +212,8 @@ import { AgXToneMapping, CubeCamera } from "three";
                     return;
                 } 
             this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
-            //console.log(this.file_motivation_letter);
+            yapping("file_upload");
+            //yapping(this.file_motivation_letter);
 
             const storage = new Storage(appw);
             const result = await storage.createFile(
@@ -239,8 +239,8 @@ import { AgXToneMapping, CubeCamera } from "three";
             k= await database.getDocument(config.website_db,config.general_settings,"erasmus_apply_on");
             this.erasmus_apply_on=k.setting_status;
             //this.erasmus_list=l.setting_status;
-            //console.log(l);
-            //console.log(k);
+            //yapping(l);
+            //yapping(k);
 
           }  
         },

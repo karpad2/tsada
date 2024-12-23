@@ -122,11 +122,11 @@ methods:{
 
             //this.title=convertifserbian(k.documents[0].title);
             /*let gal=k.documents[0].gallery;
-            console.log(k.documents[0].gallery);*/
+            yapping(k.documents[0].gallery);*/
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             
-            console.log(m);
+            yapping(m);
             m.documents.forEach(element=>
             {
                 let af={img:""};
@@ -134,14 +134,14 @@ methods:{
                 this.gallery.push(af);
                 this.image_cnt++;
             });
-            //console.log(k.documents[0]);
+            //yapping(k.documents[0]);
             */
 /*
             this.video_id=k.documents[0].video;
             let v2="659d5e6949ae7294f9f1";
             this.video_id=v2;
             this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_link);
+            yapping(this.video_link);
             this.video_link=config.default_video;
             this.loaded=true;*/
         },

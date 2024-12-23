@@ -9,5 +9,5 @@ const route = useRoute()
 let l=route.params.id;
 
 
-//console.log(l);
+//yapping(l);
 </script>
