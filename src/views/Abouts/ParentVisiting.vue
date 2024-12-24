@@ -22,7 +22,6 @@ import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
 import gsap from "gsap";
-import { yapping } from "@/uwu";
 import Loading from "@/components/Loading.vue";
 export default {
     name: 'PClassList',
@@ -57,7 +56,7 @@ export default {
         {
             
         this.classes=[];
-           // yapping();
+           // console.log();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const cc=useLoadingStore();
@@ -65,11 +64,11 @@ export default {
         l= await database.listDocuments(config.website_db, config.classlist,[Query.orderAsc("year"),Query.orderAsc("designation")]);
      
         let local=cc.language;
-        //yapping(l);
+        //console.log(l);
         for (let kk=0;kk<l.total;kk++)
         {
             let a={year:1,designation:"",role:"",chief:"",imga:"",language:"",id:"",receiving_hour:"",_class:""};
-            yapping(l.documents[kk]);
+            console.log(l.documents[kk]);
             a.id=l.documents[kk].$id;
             //a.role=l[kk].role;
             a.designation=l.documents[kk].designation;
@@ -85,14 +84,14 @@ export default {
              }
              catch(ex)
              {
-                yapping(ex);
+                console.log(ex);
              }
              let c=null;            
              try{
              c =l.documents[kk].courses;
              }
              catch(ex){
-                yapping(ex);
+                console.log(ex);
              }
              try{
              if(local=="rs"||local=="sr")
@@ -112,17 +111,17 @@ export default {
         }
         catch (ex)
         {
-            yapping(ex);
+            console.log(ex);
         }
             //a.imga=element.default_image.toString();
             this.classes.push(a);
         }
-        yapping(this.classes);
+        console.log(this.classes);
         this.loaded=true;
         },
         isHidden(a)
         {
-            //yapping(a);
+            //console.log(a);
             return !a;
         },
         class_designation(a,b)

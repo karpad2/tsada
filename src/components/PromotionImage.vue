@@ -7,7 +7,6 @@
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import { data } from "autoprefixer";
-import { yapping } from "@/uwu";
 import gsap from "gsap";
 export default
 {
@@ -42,7 +41,7 @@ methods:{
         const database= new Databases(appw);
         const storage = new Storage(appw);
         const res= await database.getDocument(config.website_db,config.general_settings,"668533c5a2c3747d18f6");
-        //yapping(res);
+        //console.log(res);
 
         this.img=storage.getFilePreview(
                 config.website_images,           // bucket ID

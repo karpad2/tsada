@@ -73,7 +73,6 @@ import { onMounted } from 'vue';
 import moment from 'moment';
 import { Databases, Query, Storage } from 'appwrite';
 import { config, appw } from "@/appwrite"; 
-import { yapping } from '@/uwu';
 
 export default {
   data() {
@@ -138,7 +137,7 @@ export default {
         });
 
       } catch (error) {
-        yapping("Error fetching content:", error);
+        console.error("Error fetching content:", error);
       }
     },
     async fetchNewsItems() {
@@ -147,7 +146,7 @@ export default {
         const newsData = await database.listDocuments(config.website_db, config.tv_slides);
         this.newsItems = newsData.documents.map(doc => doc.news_text);
       } catch (error) {
-        yapping("Error fetching news:", error);
+        console.error("Error fetching news:", error);
       }
     },
     async fetchTemperature() {
@@ -156,7 +155,7 @@ export default {
         let k = await database.getDocument(config.website_db, config.general_settings, "temperature");
         this.currentTemperature = k.setting_data;
       } catch (error) {
-        yapping("Error fetching temperature:", error);
+        console.error("Error fetching temperature:", error);
         this.currentTemperature = "N/A"; // Fallback value
       }
     },

@@ -135,7 +135,7 @@
             //loadingStore.setLoading(true);
             this.workers=[];
             this.roles=[];
-            //yapping();
+            //console.log();
             const database = new Databases(appw);
             const storage = new Storage(appw);
     
@@ -153,11 +153,11 @@
             let el1=k.documents[i];
           //   k.documents.forEach(async (el1) => {
                 let _works=[];
-                //yapping(el1);
+                //console.log(el1);
                 let l= await database.listDocuments(config.website_db, config.erasmus_applies,[
                     Query.equal("erasmusLocation",[el1.$id])
             ]);
-            //yapping(l);
+            //console.log(l);
                 let name="";
                 if(local=="en")
                 {
@@ -171,7 +171,7 @@
                 {
                     name=el1.location_rs;
                 }
-                //yapping(l);
+                //console.log(l);
                 await l.documents.forEach(async el2 => {
                 let a={name:"",score:"",_class:""};
                 a.id=el2.$id;
@@ -190,12 +190,12 @@
             this.roles.push(b);
     //        });
           }
-            yapping(this.roles);
+            console.log(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
             },
             onReady(params) {
-                    yapping('onReady');
+                    console.log('onReady');
     
                     //this.api = params.api;
                     //this.calculateRowCount();

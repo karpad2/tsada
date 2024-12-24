@@ -252,7 +252,7 @@
           let l= await database.listDocuments(config.website_db, config.document_categories_db);
           //let local=localStorage.getItem("lang");
           l.documents.forEach(async element => {
-              //yapping(element);
+              //console.log(element);
               let a={name:"",id:""};
               if(cc.language=="en")
               {
@@ -280,14 +280,14 @@
           const storage = new Storage(appw);
           let l;
           const cc=useLoadingStore();
-          //yapping(this.language);//show_at_the_header_from_about
+          //console.log(this.language);//show_at_the_header_from_about
           if(cc.language=="sr")
           {
               l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
           }
           else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
           //let local=localStorage.getItem("lang");
-          //yapping(l);
+          //console.log(l);
           for (let i=0;i<l.documents.length;i++)
 
           
@@ -318,14 +318,14 @@
           const database = new Databases(appw);
           const storage = new Storage(appw);
           let l;
-          //yapping(cc.language);
+          //console.log(cc.language);
           if(cc.language=="sr")
           {
               l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
           }
           else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
           //let local=localStorage.getItem("lang");
-          //yapping(l);
+          //console.log(l);
           l.documents.forEach(async element => {
               let a={title:"",id:""};
               if(cc.language=="sr")
@@ -356,10 +356,10 @@
           const storage = new Storage(appw);
           const cc=useLoadingStore();
           let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","erasmus"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          //yapping(l);
+          //console.log(l);
           //let local=localStorage.getItem("lang");
           l.documents.forEach(async element => {
-              //yapping(element);
+              //console.log(element);
               let a={name:"",id:""};
               if(cc.language=="en")
               {
@@ -386,10 +386,10 @@
           const storage = new Storage(appw);
           const cc=useLoadingStore();
           let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","students"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          //yapping(l);
+          //console.log(l);
           //let local=localStorage.getItem("lang");
           l.documents.forEach(async element => {
-              //yapping(element);
+              //console.log(element);
               let a={name:"",id:""};
               if(cc.language=="en")
               {
@@ -421,8 +421,8 @@
             k= await database.getDocument(config.website_db,config.general_settings,"erasmus_apply_on");
             this.erasmus_apply_on=k.setting_status;
             this.erasmus_list=l.setting_status;
-            //yapping(l);
-            //yapping(k);
+            //console.log(l);
+            //console.log(k);
 
           }
 

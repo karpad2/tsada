@@ -127,7 +127,7 @@
             let docs=[];
             k.documents.forEach(async el1 => {
                 
-                //yapping(el1);
+                //console.log(el1);
                 let l= await database.listDocuments(config.website_db, config.documents_db,[
                     Query.equal("documentCategories",this.$route.params.category),
                     Query.orderDesc("upload_date")
@@ -161,12 +161,12 @@
             
             this.documents.push({docs});
 
-            yapping(this.documents);
+            console.log(this.documents);
             
             //await nextTick();
             //this.loaded=true;
             //=docs;    
-            //yapping(this.roles);
+            //console.log(this.roles);
             //loadingStore.setLoading(false);
             setTimeout(() => {
                 this.loaded=true;

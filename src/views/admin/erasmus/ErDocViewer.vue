@@ -38,8 +38,8 @@ export default {
         }
     },
     mounted() {
-        yapping("started loading docviewer")
-        yapping(this.$route.params.id);
+        console.log("started loading docviewer")
+        console.log(this.$route.params.id);
 
         this.loadpdf();
     },
@@ -50,13 +50,13 @@ export default {
             
             let tmp=await storage.getFileView(config.fs_erasmus,this.$route.params.id);
             this.pdf_file=tmp.href;
-            yapping(this.pdf_file);
+            console.log(this.pdf_file);
             //this.pdf_link=pdf;
            /* const loadingTask = createLoadingTask(this.pdf_file)
       loadingTask.promise.then((pdf) => {
         numOfPages.value = pdf.numPages
       });*/
-            yapping(tmp);
+            console.log(tmp);
             this.loading=false;
         
         }

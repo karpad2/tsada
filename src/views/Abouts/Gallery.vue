@@ -46,7 +46,6 @@
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
-import { yapping } from "@/uwu";
 import {useLoadingStore} from "@/stores/loading";
 import gsap from "gsap";
 export default {
@@ -92,7 +91,7 @@ export default {
         {
             
         this.courses=[];
-           // yapping();
+           // console.log();
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const cc=useLoadingStore();
@@ -110,7 +109,7 @@ export default {
         
         l.documents.forEach(element => {
             let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
-            //yapping(element);
+            //console.log(element);
             a.id=element.$id;
             a.visible=element.visible;
             if(local=="en")
@@ -134,7 +133,7 @@ export default {
             if(element.code==""||element.code==null)
             a.en=element.title_en;
             else a.en=element.code;
-            //yapping(element.course_img);
+            //console.log(element.course_img);
             a.img= storage.getFilePreview(
                 config.gallery_pictures_storage,           // bucket ID
                 element.default_image,       // file ID
@@ -159,15 +158,15 @@ export default {
         },
         isHidden(a)
         {
-            //yapping(a);
+            //console.log(a);
             return !a;
         },
         courseopen(a)
         {
-            yapping(a);
+            console.log(a);
             let b=a.toLowerCase();
             b=b.replaceAll(" ","");
-            yapping(b);
+            console.log(b);
             this.$router.push("/album/"+b);
         },
         async new_stuff()

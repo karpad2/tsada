@@ -117,7 +117,7 @@
                 //loadingStore.setLoading(true);
                 this.workers=[];
                 this.roles=[];
-                //yapping();
+                //console.log();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
                 const loadingStore = useLoadingStore();
@@ -136,7 +136,7 @@
                         a.other_document=el2.link_other_document;
                     this.messages.push(a);
                     });
-                yapping(this.messages)
+                console.log(this.messages)
                 //n.documents.forEach()
                 
             

@@ -92,7 +92,7 @@
                 //loadingStore.setLoading(true);
                 this.workers=[];
                 this.roles=[];
-                //yapping();
+                //console.log();
                 const database = new Databases(appw);
                 const storage = new Storage(appw);
                 let local=loadingStore.language;
@@ -105,7 +105,7 @@
                         a.email=el2.email;
                     this.messages.push(a);
                     });
-                yapping(this.messages)
+                console.log(this.messages)
                 //n.documents.forEach()
                 
             

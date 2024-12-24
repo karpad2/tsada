@@ -90,7 +90,6 @@
     import {convertifserbian} from "@/lang";
     import moment from 'moment/min/moment-with-locales';
     import gsap from "gsap";
-    import { yapping } from "@/uwu";
     
     export default {
         components: {
@@ -223,11 +222,11 @@
     
                 //this.title=convertifserbian(k.title);
                 let gal=k.gallery;
-                yapping(k.gallery);
+                console.log(k.gallery);
                 /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
                 
                 
-                yapping(m);
+                console.log(m);
                 m.documents.forEach(element=>
                 {
                     let af={img:""};
@@ -235,7 +234,7 @@
                     this.gallery.push(af);
                     this.image_cnt++;
                 });
-                //yapping(k.documents[0]);
+                //console.log(k.documents[0]);
                 */
     
                 this.video_id=k.video;
@@ -243,7 +242,7 @@
                 this.video_id=v2;
                 //let v2="659d5e6949ae7294f9f1";
                 
-                yapping(this.video_link);
+                console.log(this.video_link);
                 this.video_link=config.default_video;
                 this.loaded=true;
             },
@@ -255,7 +254,7 @@
                 let local=loadingStore.language;
                 let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
                 Query.equal("texts","timetable")]);
-                yapping(documents_cucc);
+                console.log(documents_cucc);
                 await documents_cucc.documents.forEach(async (el2) => {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 try
@@ -264,7 +263,7 @@
                 }
                 catch (ex)
                  {
-                    yapping(ex);
+                    console.log(ex);
                  }
                 if(local=="en"||local=="hu")
                 {

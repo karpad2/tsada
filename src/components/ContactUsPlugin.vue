@@ -38,7 +38,6 @@
 
 import { Client, Databases, ID } from "appwrite";
 import {appw,config} from "@/appwrite";
-import { yapping } from "@/uwu";
 import { Form, Field, ErrorMessage } from 'vee-validate';
 export default {
     name: 'ContactUsPlugin2',
@@ -67,9 +66,9 @@ export default {
                 name: this.name,
                 message: this.message
             }).then(response => {
-                yapping(response);
+                console.log(response);
             }).catch(error => {
-                yapping(error);
+                console.log(error);
             
             });
 

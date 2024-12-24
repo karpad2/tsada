@@ -149,11 +149,11 @@ methods:{
 
             //this.title=convertifserbian(k.title);
             let gal=k.gallery;
-            yapping(k.gallery);
+            console.log(k.gallery);
             /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
             
-            yapping(m);
+            console.log(m);
             m.documents.forEach(element=>
             {
                 let af={img:""};
@@ -161,14 +161,14 @@ methods:{
                 this.gallery.push(af);
                 this.image_cnt++;
             });
-            //yapping(k.documents[0]);
+            //console.log(k.documents[0]);
             */
 /*
             this.video_id=k.video;
             let v2="659d5e6949ae7294f9f1";
             this.video_id=v2;
             this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            yapping(this.video_link);
+            console.log(this.video_link);
             this.video_link=config.default_video;
             this.loaded=true;*/
         },
@@ -242,8 +242,8 @@ methods:{
         }
         this.uploading=true;
         this.$notify(this.$t('file_upload_in_progress'));
-    yapping("file_upload");
-    //yapping(this.file_link[0]);
+    console.log("file_upload");
+    //console.log(this.file_link[0]);
 
     const storage = new Storage(appw);
     const result = await storage.createFile(

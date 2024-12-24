@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import {useLoadingStore} from "@/stores/loading";
 import HomeView from '../views/HomeView.vue'
-import { yapping } from "@/uwu";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -214,7 +213,7 @@ router.beforeEach((to, from, next) => {
   // Show loading screen
   const loadingStore = useLoadingStore();
   loadingStore.setLoading(true);
-  //yapping();
+  //console.log();
   let b=to.fullPath;
   try{
   //check();
