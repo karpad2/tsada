@@ -71,6 +71,7 @@
                     <li ><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
                     <li ><router-link to="/about/parentvisiting">{{ $t("parentsvisiting") }}</router-link></li>
                     <li><router-link to="/renderer/education/examslist">{{ $t("examslist") }}</router-link></li> 
+                    <li><router-link to="renderer/education/textbooks">{{ $t("textbooks") }}</router-link></li> 
                   </ul>
                   </div>
   
@@ -90,7 +91,8 @@
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52">
                       <li  ><router-link to="/documents">{{ $t("school_documents") }}</router-link></li> 
                       <li  ><router-link to="/docs/public_procurements">{{ $t("public_procurements") }}</router-link></li> 
-                      <li  ><router-link to="/docs/leases">{{ $t("lease") }}</router-link></li>   
+                      <li  ><router-link to="/docs/leases">{{ $t("lease") }}</router-link></li>
+                      <li><router-link to="renderer/education/67b4d43f0017f6a974b8">{{ $t("duplicates_of_diplomas") }}</router-link></li>    
                     </ul>
                   </div>
 

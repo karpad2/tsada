@@ -175,7 +175,9 @@
     "noevents":"Nincs esemény a bázisban.",
     "events":"Események",
     "edit_events":"Események szerkesztése",
-    "last_modified":"Utoljára frissítve"
+    "last_modified":"Utoljára frissítve",
+    "textbooks":"Tankönyvek",
+    "duplicates_of_diplomas":"Az bizonyítványok és diplomák másodlatának kiállításának eljárása"
 
 
 
