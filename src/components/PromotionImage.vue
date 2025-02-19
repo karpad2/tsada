@@ -1,6 +1,7 @@
 <template>
-    <div class="container mx-auto ">
-        <img id="promo-img" class="m-auto" :src="img" alt="promo_image"/>
+    <div class="container mx-auto md:flex lg:flex xs:block sm:block ">
+        <img id="promo-img1" class="m-auto p-5  md:w-1/2 lg:w-1/2 xs:w-full sm:w-full" :src="img1" alt="promo_image"/>
+        <img v-if="!promoimage2off" id="promo-img2" class="m-auto p-5 md:w-1/2 lg:w-1/2 xs:w-full sm:w-full" :src="img2" alt="promo_image"/>
     </div>
 </template>
 <script lang="ts">
@@ -32,7 +33,9 @@ mounted()
 data()
 {
 return{
-img:""
+img1:"",
+img2:"",
+promoimage2off:false
 }
 },
 methods:{
@@ -40,13 +43,33 @@ methods:{
     {
         const database= new Databases(appw);
         const storage = new Storage(appw);
-        const res= await database.getDocument(config.website_db,config.general_settings,"668533c5a2c3747d18f6");
+        const res= await database.getDocument(config.website_db,config.general_settings,"promoimage1");
+        const res2= await database.getDocument(config.website_db,config.general_settings,"promoimage2");
+        const res3= await database.getDocument(config.website_db,config.general_settings,"promoimage2_turn_off");
+        
+        this.promoimage2_turn_off=res3.setting_status;
         //console.log(res);
 
-        this.img=storage.getFilePreview(
+        this.img1=storage.getFilePreview(
                 config.website_images,           // bucket ID
                 res.setting_data,       // file ID
-                700,               // width, will be resized using this value.
+                550,               // width, will be resized using this value.
+                0,                  // height, ignored when 0
+                'center',           // crop center
+                90,               // slight compression
+                5,                  // border width
+                'FFFFFF',           // border color
+                15,                 // border radius
+                1,                  // full opacity
+                0,                  // no rotation
+                'FFFFFF',           // background color
+                'webp'               // output webp format
+                ).href;
+          
+                this.img2=storage.getFilePreview(
+                config.website_images,           // bucket ID
+                res2.setting_data,       // file ID
+                550,               // width, will be resized using this value.
                 0,                  // height, ignored when 0
                 'center',           // crop center
                 90,               // slight compression
