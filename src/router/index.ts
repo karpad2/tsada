@@ -138,6 +138,12 @@ const router = createRouter({
       component: () => import('../views/admin/erasmus/ErDocViewer.vue')      
     },
     {
+      path:'/sterasmus/docviewer/:id',
+      name:'STErDocViewer',
+      component: () => import('../views/admin/erasmus/ErDocViewer.vue')      
+    },
+
+    {
       path:'/admin/mrow',
       name:'mrrp',
       component: () => import('../components/mrrp.vue')      

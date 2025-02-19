@@ -10,7 +10,8 @@
                 </video-background>
 
                 
-<div class="pb-2 w-full dark:text-white" v-if="erasmus_apply_on&&!erasmus_applied">
+<div class="pb-2 w-full dark:text-white" v-if="erasmus_apply_on">
+  <span v-if="ErasmusApplied!=''">{{ $t("active_apply_edit") }} </span>
     
   <v-form @submit.prevent="submit" ref="form" v-model="isFormValid">
     <v-text-field
@@ -61,8 +62,10 @@
 
     <v-file-input required @change="upload_motivation_letter" v-model="file_motivation_letter"  accept=".pdf" :label="$t('motivation_letter')"></v-file-input>
 
+    <div v-if="link_motivation_letter!=null"><router-link target="_blank" :to="'/sterasmus/docviewer/'+link_motivation_letter"><i class="pi pi-book icon_size" ></i></router-link></div>
     <v-file-input @change="upload_positive_document" v-model="file_positive_document"  accept=".pdf" :label="$t('other_positive_documents')"></v-file-input>
 
+    <div v-if="link_positive_document!=null"><router-link target="_blank" :to="'/sterasmus/docviewer/'+link_positive_document"><i class="pi pi-book icon_size" ></i></router-link></div>
     <v-checkbox
       required
       v-model="accept_law"
@@ -108,6 +111,7 @@
     import moment from "moment";
     import gsap from "gsap";
 import { AgXToneMapping, CubeCamera } from "three";
+import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
     
     export default {
         components: {
@@ -141,7 +145,8 @@ import { AgXToneMapping, CubeCamera } from "three";
                 isFormValid:false,
                 mark:null,
                 accept_law:false,
-                items:[]
+                items:[],
+                ErasmusApplied:""
             }
         },
         mounted()
@@ -154,24 +159,60 @@ import { AgXToneMapping, CubeCamera } from "three";
             const storage = new Storage(appw);
             document.title=this.$t("erasmus_apply");
             this.getErasmusSettings();
+            if(cc.ErasmusAppliedID==null)
+            {
+
+            }
+            else 
+            {
+              this.ErasmusApplied=cc.ErasmusAppliedID;
+              this.queriing();
+            }
             //this.video_link=storage.getFileView(config.website_images,v2).href;
            
         },
         methods:{
-            
-            async submit()
+            async queriing()
             {
               const database = new Databases(appw);
+              const cc=useLoadingStore();
+              let l= await database.getDocument(config.website_db, config.erasmus_applies,cc.ErasmusAppliedID);
+              this.name=l.name;
+              this.email=l.email;
+              this.phone=l.phone;
+              this.born_year=l.age;
+              this.link_motivation_letter=l.link_motivation_letter;
+              this.link_positive_document=l.link_positive_document;
+              this.which_class=l.class;
+              this.mark_avg=l.mark;
+            },  
+
+            async submit()
+            {
+              const cc=useLoadingStore();
+              const database = new Databases(appw);
+              if(!cc.ErasmusAppliedID)
+            {
               const l= await database.createDocument(config.website_db, config.erasmus_applies,ID.unique(),
               {"name":this.name,"email":this.email,"age":this.born_year,"class":this.which_class,"phone":this.phone,"mark":this.mark_avg,
               "link_motivation_letter":this.link_motivation_letter,"link_other_document":this.link_positive_document}
 
             );
-
+            cc.setErasmusAppliedID(l.$id);
+            this.ErasmusApplied=l.$id;
+            }
+            else{
+            
+            const l=await database.updateDocument(config.website_db, config.erasmus_applies,cc.ErasmusAppliedID,{"name":this.name,"email":this.email,"age":this.born_year,"class":this.which_class,"phone":this.phone,"mark":this.mark_avg,
+            "link_motivation_letter":this.link_motivation_letter,"link_other_document":this.link_positive_document});
+            }
+            
 
             this.$notify(this.$t('apply_saved'));
-            const cc=useLoadingStore();
-            cc.setErasmusAppliedSetting(true);
+           
+            //cc.setErasmusAppliedSetting(true);
+            this.queriing();
+
             this.erasmus_applied=true;
             },
             age()
