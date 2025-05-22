@@ -9,8 +9,7 @@
             
             </div>
             <div class="flex flex-wrap -m-4">
-
-                
+               
                     <div   v-if="admin" @click="new_stuff" class="card card-compact cursor-pointer glass m-3 w-full  sm:w-1/5 md:w-1/5 lg:w-1/5  transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 shadow-xl">
                         <figure class="h-40">
                         <img  class="size-16 m-auto rounded center object-cover object-center mb-6 transition duration-300 ease-in-out "
@@ -27,7 +26,7 @@
                     <div v-for="course in courses"  @click="courseopen(course.id)" class="card card-compact cursor-pointer glass m-3  w-full  sm:w-1/5 md:w-1/5 lg:w-1/5  transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 shadow-xl">
                         <figure>
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                            :src="course.img" alt="content">
+                            v-lazy="{ src: course.img, loading:'@/assets/Loading.gif' }" alt="content">
                         </figure>
                         <div class="card-body">
 
@@ -50,6 +49,7 @@ import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import {convertifserbian,getStatus} from "@/lang";
 import {useLoadingStore} from "@/stores/loading";
+
 import gsap from "gsap";
 export default {
     name: 'SlideModules',
@@ -58,6 +58,7 @@ export default {
     },
     mounted()
     {
+        
         const cc=useLoadingStore();
         this.load_courses_base();
         this.admin=cc.userLoggedin;
@@ -99,12 +100,12 @@ export default {
         let l;
         if(this.mode=="news"&&cc.userLoggedin)
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.select(["$createdAt","title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
          
         }
         else if(this.mode=="news"&&!cc.userLoggedin)
         {
-            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","$createdAt","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
+            l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type",this.mode),Query.or([Query.isNull("notNews"),Query.equal("notNews",false)]),Query.equal(getStatus(),true),Query.equal("visible",true),Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible","notNews"]),Query.limit(50),Query.orderDesc("$createdAt")]);
 
         }
         else if(!cc.userLoggedin)

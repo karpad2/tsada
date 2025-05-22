@@ -32,18 +32,18 @@
 
 
 
-<div ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
+<div v-lazy ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
-<div  v-if="yt_video!=null&&yt_video!=''" class="p-5">
+<div v-lazy  v-if="yt_video!=null&&yt_video!=''" class="p-5">
     <iframe class="mx-auto" width="560" height="315" :src="yt_video_link" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
-<div v-if="gallery_flag">
+<div v-lazy v-if="gallery_flag">
     <AlbumViewer :caption="false" :id="gallery_id" />
 </div>
 
-<div v-if="has_documents">
+<div v-lazy  v-if="has_documents">
     <div   class="m-auto w-full">
       <DocLister :_id="id"/>
  </div>

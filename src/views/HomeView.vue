@@ -31,14 +31,47 @@ export default{
 
 <template>
   <main class=" ">
+    <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
     <Hero />
-    <PromotionImage />
-
-    <SlideModules mode="courses"  />
+  </v-lazy>
+    <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
+    <PromotionImage  />
+  </v-lazy>
+    <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
+    <SlideModules  mode="courses"  />
+  </v-lazy>
+  <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
     <SlideModules mode="news"  />
+  </v-lazy>
+  <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
     <Map />
-    <Sponsors mode="sponsors" />
-    <Sponsors mode="usefullinks" />
-    
+  </v-lazy>
+  <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
+    <Sponsors  mode="sponsors" />
+  </v-lazy>
+  <v-lazy
+      :options="{'threshold':0.5}"
+      transition="fade-transition"
+    >
+    <Sponsors  mode="usefullinks" />
+  </v-lazy>
   </main>
 </template>

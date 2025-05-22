@@ -11,7 +11,7 @@ import router from './router'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-
+import VueLazyLoad from 'vue3-lazyload'
 import 'primeicons/primeicons.css'; //icons
 import VueCookieComply from '@ipaat/vue3-tailwind3-cookie-comply'
 import LImage from "@/components/LImage.vue";
@@ -71,6 +71,9 @@ client
 //app.use(CkeditorPlugin);
 app.use(Notifications);
 app.use(vuetify);
+app.use(VueLazyLoad, {
+  // options...
+});
 app.use(PrimeVue, {
   theme: {
       preset: Aura

@@ -15,7 +15,7 @@
                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ $t("add_new_class") }}</h2>
                     </div>
                 </div>
-                <div  v-for="_class in classes" :key="_class.id" class="card glass bg-primary text-primary-content w-96 m-2">
+                <div v-lazy  v-for="_class in classes" :key="_class.id" class="card glass bg-primary text-primary-content w-96 m-2">
                     <div  class="card-body">
                         <h2 class="card-title"> {{ roman_number(_class.year) }}-{{ _class.designation  }} {{ $t("class") }}</h2>
                         <p>{{ _class.role }}</p>

@@ -13,10 +13,8 @@
                     <VBtn class="m-5"  @click="deletebrokenimages">{{ $t("delete_broken_images") }}</VBtn>
             </div>
             <div class="flex flex-wrap -m-4">
-                
-                    
-                
-                </div>
+              
+            </div>
             <viewer :images="images"
             @inited="inited"
             class="flex flex-wrap flex-row"
@@ -27,15 +25,13 @@
             
                 <div v-for="src in scope.images"  :key="src"  class="card card-compact cursor-pointer glass m-3  w-full  sm:w-1/5 md:w-1/5 lg:w-1/5  transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 shadow-xl">
                 <figure>
-                    <img @load="loaded(src)" style="height: 272px;" class="object-contain " :src="src" />
+                    <img style="height: 272px;" class="object-contain " v-lazy="{ src: src, loading: LoadingImage }"  />
                 </figure>
                 </div>
                 
             </template>
             </viewer>
             </div>
-            
-       
     </section>
 </template>
 <script lang="ts">
@@ -43,11 +39,12 @@ import { Client, Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian, getStatus } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
+import LoadingImage from "@/components/LoadingImage.vue";
 import gsap from "gsap";
 
 export default {
   name: "SlideModules",
-  components: {},
+  components: {LoadingImage},
   mounted() {
     const cc = useLoadingStore();
     this.admin = cc.userLoggedin;
@@ -118,15 +115,14 @@ export default {
       document.title = this.title;
 
       let l = await database.listDocuments(config.website_db, config.album_images, [
-        Query.equal("gallery", this.id),
+        Query.equal("gallery", this.id),Query.limit(100)
       ]);
 
       for (const element of l.documents) {
         let a = { img: "", id: "" };
         let b = { src: "", id: "" };
 
-        a.img = await storage
-          .getFilePreview(
+        a.img = await storage.getFilePreview(
             config.gallery_pictures_storage,
             element.image_id,
             968,
@@ -140,14 +136,12 @@ export default {
             0,
             "FFFFFF",
             "webp"
-          )
-          .href;
+          ).href;
 
         a.id = element.image_id; // Image ID from the storage
 
         b.src = await storage
-          .getFilePreview(
-            config.gallery_pictures_storage,
+          .getFilePreview(config.gallery_pictures_storage,
             element.image_id,
             700,
             0,
@@ -160,8 +154,7 @@ export default {
             0,
             "FFFFFF",
             "webp"
-          )
-          .href;
+          ).href;
 
         this.courses.push({ img: a.img, id: element.$id }); // Storing both image and document id
         this.images.push(a.img);

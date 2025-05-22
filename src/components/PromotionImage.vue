@@ -1,16 +1,18 @@
 <template>
-    <div class="container mx-auto md:flex lg:flex xs:block sm:block ">
-        <img id="promo-img1" class="m-auto p-5  md:w-1/2 lg:w-1/2 xs:w-full sm:w-full" :src="img1" alt="promo_image"/>
-        <img v-if="!promoimage2off" id="promo-img2" class="m-auto p-5 md:w-1/2 lg:w-1/2 xs:w-full sm:w-full" :src="img2" alt="promo_image"/>
+    <div class="container mx-auto md:flex lg:flex xs:block sm:block " style="min-height: 1020px;">
+        <img id="promo-img1" class="m-auto p-5  md:w-1/2 lg:w-1/2 xs:w-full sm:w-full"   v-lazy="{ src: img1, loading:LoadingImage }" alt="promo_image"/>
+        <img v-if="!promoimage2off" id="promo-img2" class="m-auto p-5 md:w-1/2 lg:w-1/2 xs:w-full sm:w-full" v-lazy="{ src: img2, loading:LoadingImage  }"  alt="promo_image"/>
     </div>
 </template>
 <script lang="ts">
 import { Client, Databases, ID,Storage, Query} from "appwrite";
 import {appw,config} from "@/appwrite";
 import { data } from "autoprefixer";
+import LoadingImage from "@/components/LoadingImage.vue";
 import gsap from "gsap";
 export default
 {
+components:{LoadingImage},
 name: 'PromoImage',
 mounted()
 {
@@ -34,6 +36,7 @@ data()
 {
 return{
 img1:"",
+
 img2:"",
 promoimage2off:false
 }
