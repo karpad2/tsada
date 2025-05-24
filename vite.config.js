@@ -13,6 +13,7 @@ export default defineConfig({
       cleanupOutdatedCaches: true,
       skipWaiting: true,
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // például 5 MiB
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,

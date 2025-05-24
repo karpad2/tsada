@@ -1,232 +1,135 @@
 <template>
-   
-  <div class="">
-    <div v-if="!isLoggedin">
-      <div class=" font-[sans-serif]">
-      <div class="min-h-screen flex flex-col items-center justify-center  px-4">
-        <div class="max-w-md w-full ">
-          
-          
-          <div class="p-8 rounded-2xl dark:bg-slate-700 shadow">
-            <h2 class="text-gray-800 text-center text-2xl font-bold dark:text-white">{{ $t("login") }}</h2>
-            <form @submit.prevent="login_by_app" class="mt-8 space-y-4">
-              <div>
-                <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('email') }}</label>
-                <div class="relative flex items-center">
-                  <v-text-field
-                  class="ctextfield"
-                  type="email"
-                  v-model="email"
-                  :label="$t('email')"
-                ></v-text-field>
-                  
-                  <InputText v-if="false" v-model.lazy="email" name="email" type="text" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('email')" />
-                  
-                  
-                </div>
-              </div>
-
-              <div>
-                <label v-if="false" class="text-gray-800 text-sm mb-2 block">{{ $t('password') }}</label>
-                <div class="relative flex items-center">
-                  <v-text-field
-                  class="ctextfield"
-                  type="password"
-                  v-model="password"
-                  :label="$t('password')"
-                ></v-text-field>
-                  <InputText v-if="false" @keyup.enter="login_by_app" v-model.lazy="password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" :placeholder="$t('password')" />
-                  
-                </div>
-              </div>
-
-              <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center">
-                  
-                </div>
-                <div class="text-sm">
-                  
-                </div>
-              </div>
-
-              <div class="!mt-8">
-                <v-btn type="submit"   @click="login_by_app" >{{ $t('login') }}</v-btn>
-                <button v-if="false" type="submit" @click="login_by_app"  class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-                  {{ $t("login") }}
-                </button>
-              </div>
-              </form>
-          </div>
+  <div>
+    <!-- Login form -->
+    <div v-if="!isLoggedin" class="min-h-screen flex flex-col items-center justify-center px-4">
+      <div class="max-w-md w-full">
+        <div class="p-8 rounded-2xl dark:bg-slate-700 shadow">
+          <h2 class="text-center text-2xl font-bold dark:text-white text-gray-800">{{ $t("login") }}</h2>
+          <form @submit.prevent="login_by_app" class="mt-8 space-y-6">
+            <v-text-field
+              class="ctextfield"
+              type="email"
+              v-model="email"
+              :label="$t('email')"
+              required
+            ></v-text-field>
+            <v-text-field
+              class="ctextfield"
+              type="password"
+              v-model="password"
+              :label="$t('password')"
+              required
+            ></v-text-field>
+            <v-btn type="submit" color="primary" block>{{ $t("login") }}</v-btn>
+          </form>
         </div>
       </div>
     </div>
-  </div>
-  <div v-else class="w-1/2 h-full m-auto p-40" >
-        <h1 class="ctextfield">{{ $t("Account page") }}</h1>
-        <h2 class="ctextfield">{{ $t("welcome") }} {{  }} !</h2>
 
-        <div>
-          <v-switch class="ctextfield" @change="set_user_setting" v-model="animation_backgound" :label="$t('disable_animation_background')"></v-switch>
-        </div>
-        <VBtn @click="logout">{{ $t("logout") }}</VBtn>
+    <!-- Logged in view -->
+    <div v-else class="w-full max-w-xl m-auto p-10">
+      <h1 class="text-2xl font-bold mb-4">{{ $t("Account page") }}</h1>
+      <h2 class="mb-6">{{ $t("welcome") }} {{ username }}!</h2>
+
+      <v-switch
+        class="ctextfield mb-6"
+        v-model="animation_backgound"
+        :label="$t('disable_animation_background')"
+        @change="set_user_setting"
+      ></v-switch>
+
+      <v-btn color="error" @click="logout">{{ $t("logout") }}</v-btn>
     </div>
-</div>
-
+  </div>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import {Client,Databases,ID,Storage,Query,Account } from "appwrite";
-//import { Client, Account } from "appwrite";
-import {appw,config,user} from "@/appwrite";
-import router from '@/router';
-import TextEmphasisPosition from 'autoprefixer/lib/hacks/text-emphasis-position';
-import {useLoadingStore} from "@/stores/loading";
+import { ref, computed, onMounted } from "vue";
+import { Account } from "appwrite";
+import { appw, user } from "@/appwrite";
+import { useLoadingStore } from "@/stores/loading";
+import router from "@/router";
+
 export default {
-    name: 'Login',
-    data()
-    {
-      return {
-        animation_backgound:false,
-        user_name:"",
-        uid:""
+  name: "Login",
+  setup() {
+    const email = ref("");
+    const password = ref("");
+    const animation_backgound = ref(false);
+    const username = ref("");
+    const loadingStore = useLoadingStore();
+
+    const isLoggedin = computed(() => loadingStore.userLoggedin);
+
+    const checkLogin = async () => {
+      try {
+        const account = new Account(appw);
+        const session = await account.get();
+        loadingStore.setUserLoggedin(true);
+        username.value = session.name || session.email;
+        loadingStore.setuid(session.$id);
+        getUserSettings();
+      } catch {
+        loadingStore.setUserLoggedin(false);
       }
-    },
-    setup() {
-        const email = ref('');
-        const password = ref('');
-        return {
-            email,
-            password
-        }
-    },
-    mounted()
-    {
-      const cc=useLoadingStore();
-      document.title=this.$t("login");
-      this.checklogin();
-      if(cc.isLoggedin)
-      {
-        this.get_user_settings();
+    };
+
+    const login_by_app = async () => {
+      try {
+        const response = await user.createEmailPasswordSession(email.value, password.value);
+        loadingStore.setUserLoggedin(true);
+        loadingStore.setuid(response.userId);
+        username.value = response.email;
+        getUserSettings();
+        // Optional: redirect
+        // router.push("/home");
+      } catch (err) {
+        console.error("Login failed", err);
+        alert("Login failed: " + err.message);
       }
+    };
 
-     // if(checkUser()) this.router.push("/home");
-       console.log("login");
-    },  
-    methods:{
+    const logout = async () => {
+      const account = new Account(appw);
+      await account.deleteSession("current");
+      loadingStore.setUserLoggedin(false);
+      loadingStore.setuid("");
+      router.push("/home");
+    };
 
-        async checklogin()
-        {
-          const cc=useLoadingStore();
-            cc.setUserLoggedin(false);
-          const account = new Account(appw);
-          try{
-          const result = await account.get();
-          console.log(result);
-          cc.setUserLoggedin(true);
-          }
-          catch(e)
-          {
-            cc.setUserLoggedin(false);
-          }
-          
-        },
-        async get_user_settings()
-        {
-          /*const cc=useLoadingStore();
-          const database = new Databases(appw);
-          let k= await database.listDocuments(config.website_db, config.users_settings,[Query.equal("uid",cc.uid),Query.equal("setting","animation")]);
-          
-           if(k.total!=0)
-           {
-           this.animation_backgound=k.documents[0].value;
-           cc.setAnimation(this.animation_backgound);
-           }
-           else
-           {
-           await database.createDocument(config.website_db,config.users_settings,ID.unique(),{
-              "uid":this.uid,
-              "setting":"animation",
-              "value":true
-            });
-           }*/
+    const getUserSettings = async () => {
+      // optional: implement Appwrite settings read from DB
+      // for now we just simulate:
+      animation_backgound.value = false;
+      loadingStore.setAnimation(animation_backgound.value);
+    };
 
-        },
-        async set_user_setting()
-        {
-          
-          const cc=useLoadingStore();
-          cc.setAnimation(this.animation_backgound);
-          console.log("setted_animation");
-          /*const database = new Databases(appw);
-          let n= await database.listDocuments(config.website_db, config.users_settings,[Query.equal("uid",cc.uid),Query.equal("setting","animation"),Query.select(["$id"])]);
-          let k= await database.updateDocument(config.website_db,config.users_settings,n.documents[0].$id,
-            {
-              "value":this.animation_backgound
-            }
-          );
-          */
-        },
-        login_by_app()
-        {
-            
-            const promise = user.createEmailPasswordSession(this.email,this.password);
-            const cc=useLoadingStore();
-            promise.then( (response)=>{
-                console.log(response);
-                
-                this.$notify(this.$t('success'));
-                
-                const lo=useLoadingStore();
-                
-                lo.setUserLoggedin(true);
-                console.log(response);
-                cc.setuid(response.userId);
-               
+    const set_user_setting = () => {
+      loadingStore.setAnimation(animation_backgound.value);
+      console.log("Animation background changed:", animation_backgound.value);
+    };
 
-                
-               /* setTimeout(()=>
-              {
-                router.push("/home");
-              },300);*/
-            
-                 // takarodjá befelé
-            }, (error)=>{
-                this.$notify(this.$t('login_failure'));
-                console.log(error); // Failure
-            });
-        
-          
-          },
-          
-          async logout()
-          {
-            const cc=useLoadingStore();
-            cc.setUserLoggedin(false);
+    onMounted(() => {
+      document.title = "Login";
+      checkLogin();
+    });
 
-            const account = new Account(appw);
-            const result = await account.deleteSession('current');
-            
-            
-            
-            console.warn("logout");
-            router.push("/home");
-            //window.location.reload();
-        },
-        animation_setting()
-        {
-
-        }
-    },
-    computed:{
-      isLoggedin()
-          {
-            const cc=useLoadingStore();
-            return cc.userLoggedin;
-          },
-    }
-}
-
-
-
+    return {
+      email,
+      password,
+      login_by_app,
+      logout,
+      isLoggedin,
+      animation_backgound,
+      set_user_setting,
+      username,
+    };
+  },
+};
 </script>
+
+<style scoped>
+.ctextfield {
+  margin-bottom: 1rem;
+}
+</style>

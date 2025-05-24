@@ -40,21 +40,34 @@
                 class="object-contain"
                 v-lazy="src"
                 @load="loaded(src)"
+                @error="handleError(src)"
+                :alt="`Image: ${title}`"
               />
             </figure>
           </div>
         </template>
       </viewer>
 
-      <div v-if="isLoading" class="text-center py-4 text-gray-500">
-        {{ $t("loading") }}...
+      <!-- Skeleton loader -->
+      <div v-if="isLoading" class="flex flex-wrap gap-4 justify-center mt-4">
+        <div
+          v-for="n in limit"
+          :key="'skeleton-' + n"
+          class="card card-compact w-full sm:w-1/5 bg-gray-200 dark:bg-gray-700 animate-pulse h-[272px]"
+        ></div>
       </div>
     </div>
   </section>
 </template>
 
 <script lang="ts">
-import { Databases, Storage, Query, ImageGravity, ImageFormat } from "appwrite";
+import {
+  Databases,
+  Storage,
+  Query,
+  ImageGravity,
+  ImageFormat
+} from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
@@ -89,8 +102,8 @@ export default {
   methods: {
     async load_courses_base() {
       if (this.isLoading || this.noMoreImages) return;
-
       this.isLoading = true;
+
       const database = new Databases(appw);
       const storage = new Storage(appw);
       const cc = useLoadingStore();
@@ -102,6 +115,7 @@ export default {
           this.id,
           [Query.select(["title_hu", "title_en", "title_rs"])]
         );
+
         const local = cc.language;
         this.title =
           local === "en"
@@ -109,6 +123,7 @@ export default {
             : local === "hu"
             ? doc.title_hu
             : convertifserbian(doc.title_rs);
+
         document.title = this.title;
       }
 
@@ -171,6 +186,10 @@ export default {
       }
     },
 
+    handleError(src: string) {
+      console.warn(`Image load error: ${src}`);
+    },
+
     async deletebrokenimages() {
       const brokenImages = this.images.filter((img) => !this.showed.includes(img));
       const storage = new Storage(appw);
@@ -205,6 +224,5 @@ export default {
 </script>
 
 <style>
-/* Optional animation class if needed */
-.becsuszo_kep {}
+/* Optional animations can go here */
 </style>
