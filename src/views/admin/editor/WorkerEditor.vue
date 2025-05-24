@@ -15,7 +15,7 @@
         
         
             <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                            :src="img" alt="content">
+                            v-lazy="img" alt="content">
         </div>
     </div>
 </div>

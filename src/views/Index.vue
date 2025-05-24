@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div class="dark:blue-gray-900;" >
        
         <Header v-if="!__hideheaders" class="no_print" />
         
@@ -96,7 +96,7 @@
             
             }"
         />
-        <div :class="{ bg_image: light_theme }" class="min-h-screen dark:bg-slate-600/50 bg-slate-50">
+        <div :class="{ bg_image: light_theme }" class="min-h-screen dark:bg-slate-900/80 bg-slate-50">
          
         <div v-if="checking">
             <Loading />
@@ -127,6 +127,7 @@
 </template>
 
 <script lang="ts">
+//
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
 import Loading from '@/components/Loading.vue';
@@ -277,13 +278,7 @@ return {
         
     }
 
-    .bg_image
-    {
-        background-image: url("@a/waves.svg");
-        background-repeat: no-repeat;
-        
-        
-    }
+    
 
    
 </style>

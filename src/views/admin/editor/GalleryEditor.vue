@@ -13,7 +13,7 @@
         <div v-for="image in images" class="card card-compact bg-base-100 w-96 shadow-xl m-5 flex" style="max-width: 400px;">
         <figure>
             <img
-            :src="image.img"
+            v-lazy="image.img"
             alt="mrow" />
         </figure>
         <div class="card-body">

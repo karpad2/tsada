@@ -1,5 +1,5 @@
 <template>
-    <section class="text-gray-600 body-font mt-5 mb-5 min-h-screen" id="courses">
+    <section class="text-gray-600 body-font  min-h-screen" id="courses">
         <div class="container px-5 mx-auto ">
             <div class="flex flex-wrap w-full mb-20">
                 <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
@@ -15,7 +15,7 @@
                        <h2 class="text-lg text-gray-900 font-medium title-font mb-4 dark:text-white">{{ $t("add_new_class") }}</h2>
                     </div>
                 </div>
-                <div v-lazy  v-for="_class in classes" :key="_class.id" class="card glass bg-primary text-primary-content w-96 m-2">
+                <div  v-for="_class in classes" :key="_class.id" class="card glass bg-primary text-primary-content w-96 m-2">
                     <div  class="card-body">
                         <h2 class="card-title"> {{ roman_number(_class.year) }}-{{ _class.designation  }} {{ $t("class") }}</h2>
                         <p>{{ _class.role }}</p>

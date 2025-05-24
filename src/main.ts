@@ -1,5 +1,5 @@
 import './assets/main.css'
-
+import Loading from "@/assets/Loading.gif"
 import { createApp  } from 'vue'
 
 import { createPinia } from 'pinia'
@@ -15,6 +15,7 @@ import VueLazyLoad from 'vue3-lazyload'
 import 'primeicons/primeicons.css'; //icons
 import VueCookieComply from '@ipaat/vue3-tailwind3-cookie-comply'
 import LImage from "@/components/LImage.vue";
+import LoadingImg from "@/assets/loading.gif";
 import { createI18n } from 'vue-i18n'
 import {messages} from '@/lang';
 import Notifications from '@kyvg/vue3-notification';
@@ -72,6 +73,7 @@ client
 app.use(Notifications);
 app.use(vuetify);
 app.use(VueLazyLoad, {
+  loading:LoadingImg
   // options...
 });
 app.use(PrimeVue, {

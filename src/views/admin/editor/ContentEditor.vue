@@ -1,5 +1,5 @@
 <template>
-    <div class="relative mb-4 container  px-5  mx-auto bg-white" >
+    <div class="relative pb-5 container  px-5  mx-auto bg-white" >
         <div>
             <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
             <v-switch @change="save" v-model="notNews" :label="$t('not_news')"></v-switch>
@@ -17,7 +17,7 @@
 <div  class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
     <div   class="bg-slate-100/30 hover:bg-sky-600/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
             <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                            :src="img" alt="content">
+                            v-lazy="img" alt="content">
         </div>
     </div>
 </div>

@@ -10,7 +10,7 @@
       <v-file-input @change="fileUpload" v-model="fileLink" accept="image/*" label="Slide Image Upload"></v-file-input>
       <div v-if="img" class="my-4">
         <span>{{ $t("preview") }}:</span>
-        <img class="h-40 w-auto rounded" :src="img" alt="Slide Image">
+        <img class="h-40 w-auto rounded" v-lazy="img" alt="Slide Image">
       </div>
 
       <v-btn @click="saveSlide" class="mt-5">{{ currentSlideId ? 'Save Changes' : 'Add Slide' }}</v-btn>

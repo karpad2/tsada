@@ -1,7 +1,7 @@
 <template>
 
 <section class="text-gray-600 min-h-screen ">
-    <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50 mb-5  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" v-if="loaded" style="min-height: 70vh;">
+    <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50   dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" v-if="loaded" style="min-height: 70vh;">
             <div v-if="video_id==''" class="flex flex-wrap w-full mb-20 p-2 rounded">
                 <div class="w-full mb-6 lg:mb-0">
                     <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">{{ title }}</h1>
@@ -32,18 +32,18 @@
 
 
 
-<div v-lazy ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
+<div  ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
-<div v-lazy  v-if="yt_video!=null&&yt_video!=''" class="p-5">
+<div   v-if="yt_video!=null&&yt_video!=''" class="p-5">
     <iframe class="mx-auto" width="560" height="315" :src="yt_video_link" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
-<div v-lazy v-if="gallery_flag">
+<div v-if="gallery_flag">
     <AlbumViewer :caption="false" :id="gallery_id" />
 </div>
 
-<div v-lazy  v-if="has_documents">
+<div   v-if="has_documents">
     <div   class="m-auto w-full">
       <DocLister :_id="id"/>
  </div>

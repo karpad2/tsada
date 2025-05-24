@@ -115,9 +115,11 @@ export default {
         const savedTheme = localStorage.getItem("theme");
         if (savedTheme === "dark") {
             this.isDarkMode = true;
+           // console.log(document.documentElement.classList);
             document.documentElement.classList.add("dark");
         } else {
             this.isDarkMode = false;
+           // console.log(document.documentElement.classList);
             document.documentElement.classList.remove("dark");
         }
     },

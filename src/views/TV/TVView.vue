@@ -53,7 +53,7 @@
         <!-- Event Image or Placeholder -->
         <img 
           v-if="event.image" 
-          :src="event.image" 
+          v-lazy="event.image" 
           alt="Event Image" 
           class="w-full h-32 object-cover rounded-lg mb-2" 
         />

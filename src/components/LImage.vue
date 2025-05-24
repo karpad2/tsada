@@ -1,5 +1,5 @@
 <template>
-<img v-if="!load" :src="image" alt="Content" class="transition duration-300 ease-in-out " />
+<img v-if="!load" v-lazy="image" alt="Content" class="transition duration-300 ease-in-out " />
 <img v-else src="https://dummyimage.com/720x400" alt="Content" class="transition duration-300 ease-in-out " />
 </template>
 <script>

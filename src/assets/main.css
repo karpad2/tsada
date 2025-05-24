@@ -8,7 +8,7 @@ body {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color:rgba(255, 255, 255, 0.5);
+  background-color:rgba(255, 255, 255, 0.041);
 }
 
 * {
@@ -36,3 +36,74 @@ body {
     @apply text-black;
   }
 }
+.print_content table{
+  @apply table;
+  @apply table-zebra;
+}
+.print_content a{
+  /*@apply text-lg;*/
+  @apply text-sky-400;
+  @apply font-medium;
+}
+
+.print_content strong{
+  /*@apply text-lg;*/
+
+  @apply text-sky-600;
+  @apply font-medium;
+  @apply dark:text-sky-400;
+}
+
+.print_content a:hover{
+  /*@apply text-lg;*/
+  @apply text-sky-600;
+  @apply font-medium;
+  @apply underline;
+}
+.btn-ghost:hover{
+  @apply dark:bg-sky-600/50;
+}
+.table-zebra{
+  @apply dark:text-white;
+}
+
+.table tr.active, .table tr.active:nth-child(even), .table-zebra tbody tr:nth-child(even)
+{
+  @apply dark:text-black;
+}
+
+.print_content table tbody tr:nth-child(even)
+{
+  @apply dark:text-black;
+}
+
+.v-table__wrapper
+{
+  @apply  dark:bg-gray-900;
+  @apply dark:text-white;
+}
+
+
+.v-data-table__th:hover, v-data-table-header__content:hover
+{
+  @apply dark:text-sky-400;
+}
+
+.v-table td
+{
+  @apply dark:outline-slate-50;
+}
+
+  img[lazy=loading] {
+    margin: auto;
+    width: 64px;
+    height: 64px;
+    /*your style here*/
+  }
+
+
+  .bg_image
+    {
+        background-image: url("@a/waves.svg");
+        background-repeat: no-repeat;
+    }

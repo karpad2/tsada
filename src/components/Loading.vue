@@ -2,8 +2,8 @@
     <div class="loading1 text-black dark:text-white ">
         
         <div>
-            <span  class=" w-28 h-28 loading loading-ring "></span>
-            <h2 class=" text-2xl">{{ $t("getting_ready") }}</h2>
+            <span  class=" w-28 h-28 loading loading-ring dark:text-white"></span>
+            <h2 class="dark:text-white text-2xl">{{ $t("getting_ready") }}</h2>
         </div>
     </div>
 </template>

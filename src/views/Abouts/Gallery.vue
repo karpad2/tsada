@@ -25,7 +25,7 @@
                     <div v-for="course in courses" @click="courseopen(course.id)" class="card card-compact cursor-pointer glass m-3  w-full  sm:w-1/5 md:w-1/5 lg:w-1/5  transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60  dark:bg-slate-300/30 shadow-xl">
                         <figure>
                         <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                            :src="course.img" alt="content">
+                            v-lazy="course.img" alt="content">
                         </figure>
                         <div class="card-body">
                             <h3 class="tracking-widest text-sky-500 text-s font-medium title-font ">{{ course.subtitle }} <span v-if="isHidden(course.visible)">{{ $t('invisible') }}</span></h3>
