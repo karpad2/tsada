@@ -188,16 +188,7 @@ const router = createRouter({
       name:'erasmus_results',
       component: () => import('../views/Erasmus/ErasmusList.vue')      
     },
-    {
-      path:'/education',
-      name:'educationprofiles',
-      component: () => import('../views/EducationProfiles.vue')      
-    },
-    {
-      path:'/education/profiles/:id',
-      name:'educationprofiles',
-      component: () => import('../views/EducationProfile.vue')      
-    },
+  
     {
       path:'/presentation',
       name:'presentation',
