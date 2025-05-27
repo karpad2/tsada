@@ -26,6 +26,13 @@
         </div>
   
         <!-- Actual content -->
+        
+        <div v-else-if="easterEggActive">
+          <iframe src="https://elgoog.im/t-rex/" class="w-full min-h-screen border-0">
+
+          </iframe>
+
+        </div>
         <div v-else>
           <main class="min-h-screen">
             <slot />
@@ -47,6 +54,7 @@
   import NoInternet from "@/components/NoInternet.vue";
   import axios from "axios";
   import pkg from "../../package.json";
+import { onBeforeUnmount } from "vue";
   
   export default {
     name: "AppLayout",
@@ -64,7 +72,9 @@
       const isLoading = computed(() => store.isLoading);
       const __hideheaders = computed(() => store.hideheaders);
       const currentVersion = pkg.version;
-  
+      const easterEggActive = ref(false);
+
+
       const checkConnection = async () => {
         try {
           const response = await axios.get("https://share.tsada.edu.rs/ping");
@@ -87,6 +97,7 @@
           console.warn("Update check failed:", err);
         }
       };
+
   
       const clearCacheAndReload = () => {
         if ("serviceWorker" in navigator) {
@@ -98,23 +109,35 @@
           location.reload();
         }
       };
+
+      const handleKeydown = (e) => {
+  if (e.ctrlKey && e.shiftKey && e.altKey && e.key.toLowerCase() === 'w') {
+    easterEggActive.value = true;
+    //alert('🎉 Easter Egg Activated with Ctrl+Shift+Alt+W!');
+  }
+};
   
       onMounted(() => {
         store.isLoading = true;
         checkConnection();
         checkForUpdates();
-  
+        window.addEventListener('keydown', handleKeydown);
         // hide progress bar after 1s for visual effect
         setTimeout(() => {
           store.isLoading = false;
         }, 1000);
       });
+      onBeforeUnmount(()=>{
+        window.removeEventListener('keydown', handleKeydown);
+      });
+      
   
       return {
         checking,
         weHaveNet,
         isLoading,
         __hideheaders,
+        easterEggActive
       };
     },
   };

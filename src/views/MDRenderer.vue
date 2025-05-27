@@ -35,8 +35,8 @@
 <div  ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
-<div   v-if="yt_video!=null&&yt_video!=''" class="p-5">
-    <iframe class="mx-auto" width="560" height="315" :src="yt_video_link" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div  v-for="yt_video in yt_videos"  class="p-5">
+    <iframe class="mx-auto" width="560" height="315" :src="getytvideo(yt_video)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <div v-if="gallery_flag">
@@ -97,7 +97,7 @@ export default {
             newsmode:false,
             video_id:"",
             video_link:"",
-            yt_video:null,
+            yt_videos:null,
             yt_video_link:"",
             edumode:false,
             admin:false,
@@ -177,8 +177,8 @@ export default {
                 }
                 else 
                 {
-                    this.yt_video=k.yt_video;
-                    this.yt_video_link=this.getytvideo();
+                    this.yt_videos=k.yt_video;
+                    //this.yt_video_link=this.getytvideo();
                 }
                 
                 if(cc.language=="sr"||cc.language=="rs")
@@ -396,9 +396,9 @@ export default {
                     }
                     return moment(a).format("LL");
                 },
-                getytvideo()
+        getytvideo(a)
         {
-        let url=this.yt_video;    
+        let url=a;    
         //var url = "https://www.youtube.com/watch?v=sGbxmsDFVnE";
         var id = url.split("?v=")[1]; //sGbxmsDFVnE
 
