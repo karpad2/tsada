@@ -1,77 +1,45 @@
-<script >
-import { ref, computed, nextTick } from 'vue'
-import SlideModules from '@/components/SlideModules.vue';
-import Hero from '@/components/Hero.vue';
-import Map from '@/components/Map.vue'
-
-
-import Sponsors from '@/components/Sponsors.vue';
-import PromotionImage from '@/components/PromotionImage.vue';
-import { useI18n } from 'vue-i18n';
-
-//const { t } = useI18n();
-export default{
-  components:{
-    Hero,
-    PromotionImage,
-    SlideModules,
-    Map,
-    Sponsors,
-    
-  },
-  mounted()
-  {
-    document.title=this.$t("school_name");
-  }
-}
-//document.title=t("msc");
-
-
-</script>
-
 <template>
-  <main class=" ">
-    <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <Hero />
-  </v-lazy>
-    <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <PromotionImage  />
-  </v-lazy>
-    <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <SlideModules  mode="courses"  />
-  </v-lazy>
-  <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <SlideModules mode="news"  />
-  </v-lazy>
-  <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <Map />
-  </v-lazy>
-  <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <Sponsors  mode="sponsors" />
-  </v-lazy>
-  <v-lazy
-      :options="{'threshold':0.5}"
-      transition="fade-transition"
-    >
-    <Sponsors  mode="usefullinks" />
-  </v-lazy>
+  <main
+    class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-all"
+    role="main"
+    aria-label="Main school site content"
+  >
+    <LazyWrapper><Hero /></LazyWrapper>
+    <LazyWrapper><PromotionImage /></LazyWrapper>
+    <LazyWrapper><SlideModules mode="courses" /></LazyWrapper>
+    <LazyWrapper><SlideModules mode="news" /></LazyWrapper>
+    <LazyWrapper><Map /></LazyWrapper>
+    <LazyWrapper><Sponsors mode="sponsors" /></LazyWrapper>
+    <LazyWrapper><Sponsors mode="usefullinks" /></LazyWrapper>
   </main>
 </template>
+
+<script setup>
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+// Lazy load wrapper
+import LazyWrapper from '@/components/LazyWrapper.vue'
+
+// Fő komponensek
+import Hero from '@/components/Hero.vue'
+import PromotionImage from '@/components/PromotionImage.vue'
+import SlideModules from '@/components/SlideModules.vue'
+import Map from '@/components/Map.vue'
+import Sponsors from '@/components/Sponsors.vue'
+
+// i18n kezelés
+const { t } = useI18n()
+
+// Oldalcím beállítása
+onMounted(() => {
+  document.title = t('school_name')
+})
+</script>
+
+<style scoped>
+main {
+  min-height: 100vh;
+  padding: 0;
+}
+</style>

@@ -12,8 +12,9 @@
               </div>
               <router-link to="/home" class=" flex flex-row items-center title-font font-medium  text-gray-900 mb-4 md:mb-0  ">
                   <img src="@a/tsada_logo.png" alt="logo" class="size-20 text-white p-1 bg-sky-400/15 rounded-full">
-              <span class="ml-3  max-sm:hidden text-xl dark:text-white" >{{ $t('school_name') }}</span>
-              <img src="@a/certop_logo.png"  alt="certop" class="w-36 h-12 text-white p-2 ">
+              <span class="ml-1  max-sm:hidden text-xl dark:text-white" >{{ $t('school_name') }}</span>
+              
+              <Certop class="h-28 w-28"/>
               
               <img src="@a/Erasmus_Logo.svg"  alt="erasmus+" class="w-36 h-12 text-white p-2 " v-if="erasmusflag">
             </router-link>
@@ -147,10 +148,13 @@
   import {appw,config,check} from "@/appwrite";
   import { ref,nextTick } from "vue";
   import {useLoadingStore} from "@/stores/loading";
+  import Certop from "./Certop.vue";
   export default
   {
       name: 'Header',
-      
+      components:{
+        Certop
+      },
       data()
       {
           return {
@@ -195,6 +199,7 @@
   
   
       },
+
       methods:{
         onResize()
         {

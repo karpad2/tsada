@@ -156,7 +156,9 @@
     "last_modified":"Последњи пут ажурирано",
     "textbooks":"Уџбеници",
     "duplicates_of_diplomas":"Процедура издавања дупликата сведочанстава и диплома",
-    "active_apply_edit":"Уређивање активне пријаве"
+    "active_apply_edit":"Уређивање активне пријаве",
+    "certified":"Sertifikovan",
+    "system":"Sistem"
     
   }
   
