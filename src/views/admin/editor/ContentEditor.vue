@@ -26,6 +26,10 @@
         v-model:content="content.rs"
         @save="save"
       />
+      <v-btn @click="new_stuff()" class="m-5">
+          {{ $t('add_new_document_in_that_category') }}
+      </v-btn>
+
   
       <LanguageEditor
         lang="hu"
@@ -33,6 +37,11 @@
         v-model:content="content.hu"
         @save="save"
       />
+      <v-btn @click="new_stuff()" class="m-5">
+          {{ $t('add_new_document_in_that_category') }}
+      </v-btn>
+
+      
   
       <LanguageEditor
         lang="en"
@@ -40,6 +49,10 @@
         v-model:content="content.en"
         @save="save"
       />
+      
+      <v-btn @click="new_stuff()" class="m-5">
+          {{ $t('add_new_document_in_that_category') }}
+      </v-btn>
   
       <YoutubeInput
         :videos="yt_videos"
@@ -120,6 +133,7 @@
         doc_loaded: false,
         headers: [],
         colDefs: [],
+        chtmls:[],
         _update: true
       };
     },
@@ -151,6 +165,9 @@
         this.title = { rs: k.title_rs, hu: k.title_hu, en: k.title_en };
         this.content = { rs: k.text_rs, hu: k.text_hu, en: k.text_en };
         this.yt_video = k.yt_video;
+        let nyaa=await database.listDocuments(config.website_db,config.text_components,[Query.equal("doc_id",this.$route.params.id),Query.equal("lang",cc.language),Query.orderAsc("order")]);
+        this.chtmls=nyaa.documents;
+
         this.yt_videos = Array.isArray(k.yt_video) ? k.yt_video : (k.yt_video ? [k.yt_video] : []);
         this.flags.visible = k.visible;
         this.flags.notNews = k.notNews;
@@ -242,6 +259,13 @@
           texts: this.id
         });
         this.$router.push("/admin/text-document-editor/" + l.$id);
+      },
+      async new_part()
+      {
+        const database = new Databases(appw);
+        const l = await database.createDocument(config.website_db, config.text_documents, ID.unique(), {
+          texts: this.id
+        });
       },
       async synchronize_documents() {
         const database = new Databases(appw);

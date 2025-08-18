@@ -14,7 +14,7 @@
       <Header v-if="!__hideheaders" class="no_print" />
   
       <!-- Main Container -->
-      <div class="min-h-screen dark:bg-slate-900/80 bg-slate-50">
+      <div class="min-h-screen bg-slate-50 dark:bg-slate-900/80 ">
         <!-- Initial checking -->
         <div v-if="checking">
           <Loading />
@@ -24,14 +24,9 @@
         <div v-else-if="!weHaveNet" class="container m-auto w-60 mt-5">
           <NoInternet />
         </div>
-  
-        <!-- Actual content -->
-        
+          <!-- Actual content -->    
         <div v-else-if="easterEggActive">
-          <iframe src="https://elgoog.im/t-rex/" class="w-full min-h-screen border-0">
-
-          </iframe>
-
+          <iframe src="https://elgoog.im/t-rex/" class="w-full min-h-screen border-0"></iframe>
         </div>
         <div v-else>
           <main class="min-h-screen">

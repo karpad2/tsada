@@ -26,7 +26,8 @@ body {
 @media print{
   body 
   {
-    @apply bg-white;
+    /*@apply bg-white;*/
+    
   }
   .no_print{
       display: none;
@@ -107,4 +108,13 @@ body {
         background-image: url("@a/waves.svg");
         background-repeat: no-repeat;
     }
-   
+   .menu-elem
+   {
+    @apply dark:bg-slate-900;
+    @apply dark:text-white;
+   }
+   .menu-elem li:hover
+   {
+    @apply dark:bg-sky-600;
+    @apply dark:text-white;
+   }

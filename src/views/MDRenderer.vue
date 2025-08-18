@@ -35,6 +35,9 @@
 <div  ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="chtml">
 </div>
 
+<div  v-for="_chtml in chtmls" :key="_chtml" ref="pdfContent" class="w-full p-5 dark:text-white print_content" v-html="_chtml.text">
+</div>
+
 <div  v-for="yt_video in yt_videos"  class="p-5">
     <iframe class="mx-auto" width="560" height="315" :src="getytvideo(yt_video)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
@@ -72,6 +75,7 @@ import Loading from "@/components/Loading.vue";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import DocLister from "@/components/DocLister.vue";
+import { data } from "autoprefixer";
 
 
 
@@ -106,6 +110,7 @@ export default {
             headers:[],
             colDefs:[],
             documents:[],
+            chtmls:[],
             last_modified:null,
             has_documents:false,
             _loading:true
@@ -151,22 +156,9 @@ export default {
             const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
-            /*
-            switch(this.$route.params.mode)
-            {
-                case "about":
-                    mode=config.about_us_db;
-                 break;
-                case "erasmus":
-                    mode=config.about_us_db;
-                 break;
-                 case "education":
-                    mode=config.about_us_db;
-                 break;
-                case "news":
-                    mode=config.about_us_db; break;
-                
-            }*/
+            let nyaa=await database.listDocuments(config.website_db,config.text_components,[Query.equal("doc_id",this.$route.params.id),Query.equal("lang",cc.language),Query.orderAsc("order")]);
+            this.chtmls=nyaa.documents;
+            //console.log(nyaa);
             
             let k= await database.getDocument(config.website_db, config.about_us_db,this.$route.params.id);
                 this.has_documents=k.has_documents;
@@ -207,25 +199,7 @@ export default {
             {
                 console.warn("reading error");
             }
-           /* if(this.chtml=="---")
-            {
-                this.$router.push("/home");
-            }*/
-
-            /*if(this.$route.params.node=="news")
-            {
-                this.newsmode=true;
-                if(k.author!="")
-                this.author= convertifserbian(k.author);
-                this.date= moment(k.$createdAt).locale(cc.language).format('LL');
-            }
-
-            if(this.$route.params.node=="education")
-            {
-                this.edumode=true;
-            }*/
-
-            //this.title=convertifserbian(k.title);
+           
             let gal=k.gallery;
             console.log(k.gallery);
             this.gallery_flag=k.has_gallery;
@@ -241,19 +215,7 @@ export default {
                 console.log(ex);
             }
             }
-            /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
             
-            
-            console.log(m);
-            m.documents.forEach(element=>
-            {
-                let af={img:""};
-                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id).toString();
-                this.gallery.push(af);
-                this.image_cnt++;
-            });
-            //console.log(k.documents[0]);
-            */
 
             this.video_id=k.video;
             this.date=k.$createdAt;
@@ -399,7 +361,6 @@ export default {
         getytvideo(a)
         {
         let url=a;    
-        //var url = "https://www.youtube.com/watch?v=sGbxmsDFVnE";
         var id = url.split("?v=")[1]; //sGbxmsDFVnE
 
         var embedlink = "https://www.youtube.com/embed/" + id;

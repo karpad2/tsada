@@ -76,7 +76,7 @@
             ? convertifserbian(category.category_name_rs)
             : locale.value === "hu"
             ? category.category_name_hu
-            : category.category_name_en;
+            : category.category_name_rs;
   
         const docs = await db.listDocuments(config.website_db, config.documents_db, [
           Query.equal("documentCategories", route.params.id as string),
@@ -92,7 +92,7 @@
               ? convertifserbian(doc.document_title_rs)
               : locale.value === "hu"
               ? doc.document_title_hu
-              : doc.document_title_en,
+              : doc.document_title_rs,
         }));
   
         loaded.value = true;

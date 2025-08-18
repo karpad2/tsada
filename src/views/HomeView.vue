@@ -1,6 +1,6 @@
 <template>
   <main
-    class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-all"
+    class=" text-gray-900 dark:text-white transition-all"
     role="main"
     aria-label="Main school site content"
   >

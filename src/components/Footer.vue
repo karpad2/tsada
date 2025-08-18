@@ -29,16 +29,61 @@
           </a>
   
           <!-- Dark/Light Mode Toggle -->
-          <label class="swap swap-rotate ml-2 text-gray-400 hover:text-sky-400">
-            <input type="checkbox" @change="toggleDarkMode" :checked="isDarkMode" />
+          <label  class="swap theme-controller swap-rotate ml-2 text-gray-400 hover:text-sky-400">
+            <input type="checkbox" value="synthwave" @change="toggleDarkMode" :checked="isDarkMode" />
             <i class="swap-off pi pi-sun"></i>
             <i class="swap-on pi pi-moon"></i>
           </label>
   
-          <!-- Optional random theme trigger -->
-          <a v-if="false" @click="random_theme" class="ml-2 text-gray-400 hover:text-sky-400">
-            <i class="pi pi-palette"></i>
-          </a>
+    <!-- Optional random theme trigger -->
+          <div v-if="false"  class="ml-2 text-gray-400 hover:text-sky-400 dropdown dropdown-top dropdown-hover">
+            <div tabindex="0" role="button" ><i class="pi pi-palette"></i></div>
+            <ul   tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52  ">
+                      
+      <li>
+      <input
+        type="radio"
+        name="theme-dropdown"
+        class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+        aria-label="Default"
+        value="default" />
+    </li>
+    <li>
+      <input
+        type="radio"
+        name="theme-dropdown"
+        class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+        aria-label="Retro"
+        value="retro" />
+    </li>
+    <li>
+      <input
+        type="radio"
+        name="theme-dropdown"
+        class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+        aria-label="Cyberpunk"
+        value="cyberpunk" />
+    </li>
+    <li>
+      <input
+        type="radio"
+        name="theme-dropdown"
+        class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+        aria-label="Valentine"
+        value="valentine" />
+    </li>
+    <li>
+      <input
+        type="radio"
+        name="theme-dropdown"
+        class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+        aria-label="Aqua"
+        value="aqua" />
+    </li>
+                  </ul>
+          </div>
+
+        
         </span>
       </div>
       <Cookie />
