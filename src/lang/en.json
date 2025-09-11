@@ -161,7 +161,26 @@
     "duplicates_of_diplomas":"Procedure for issuing duplicate certificates and diplomas",
     "active_apply_edit":"Apply edit",
     "certified":"Certified",
-    "system":"System"
+    "system":"System",
+    "student_parliament": "Student Council",
+  "sp_subtitle": "Representatives and leadership of the student council",
+  
+  "last_update": "Last update",
+  "loading_data": "Loading data...",
+  "members_heading": "Student council members",
+  "members_subheading": "List of all representatives",
+  
+  "role": "Role",
+  "unknown": "Unknown",
+  "no_parliament_members_found": "No council members found",
+  "no_members_paragraph": "Student council members haven’t been registered yet.",
+  "reload": "Reload",
+  "error_loading_data": "An error occurred while loading data",
+  "role.president": "President",
+  "role.vice_president": "Vice President",
+  "role.secretary": "Secretary",
+  "role.treasurer": "Treasurer",
+  "role.member": "Member"
 
 
 

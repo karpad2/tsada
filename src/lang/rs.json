@@ -159,7 +159,26 @@
     "active_apply_edit":"Уређивање активне пријаве",
     "certified":"Sertifikovan",
     "system":"Sistem",
-    "joinus":"Упис"
+    "joinus":"Упис",
+    "student_parliament": "Ученички парламент",
+  "sp_subtitle": "Представници и руководство ученичког парламента",
+  
+  "last_update": "Последње ажурирање",
+  "loading_data": "Учитавање података...",
+  "members_heading": "Чланови ученичког парламента",
+  "members_subheading": "Списак свих представника",
+  
+  "role": "Улога",
+  "unknown": "Непознато",
+  "no_parliament_members_found": "Нема пронађених чланова ученичког парламента",
+  "no_members_paragraph": "Представници ученичког парламента још нису регистровани у систему.",
+  "reload": "Поново учитај",
+  "error_loading_data": "Дошло је до грешке при учитавању података",
+  "role.president": "Председник",
+  "role.vice_president": "Потпредседник",
+  "role.secretary": "Секретар",
+  "role.treasurer": "Благајник",
+  "role.member": "Члан"
     
   }
   

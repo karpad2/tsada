@@ -1,361 +1,689 @@
 <template>
     <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30" >
-                <div class="flex flex-wrap w-full mb-20">
-                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('documents') }}</h1>
-                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                    </div>
-                
+        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
+            <div class="flex flex-wrap w-full mb-20">
+                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
+                    <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
+                        {{ $t('documents') }}
+                    </h1>
+                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
-                <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-                <v-data-table  height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
-                    <template v-slot:item.date="{ item }">
-        {{ rt_time(item.date) }}
-        </template>
-    
-      <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book icon_size"></i></router-link>
-       
-      </template>
+            </div>
 
-      <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/document/'+item.id"><i class="pi pi-cloud-upload icon_size"></i></router-link>
-       
-      </template>
+            <div v-if="!loaded">
+                <Loading />
+            </div>
 
-      <template #bottom></template>
+            <div v-else class="space-y-8">
+                <!-- Add New Category Button -->
+                <div v-if="admin" class="mb-6">
+                    <v-btn @click="showNewCategoryDialog = true" color="success" class="m-2">
+                        <i class="pi pi-plus mr-2"></i>
+                        {{ $t('add_new_category') }}
+                    </v-btn>
+                </div>
+
+                <div v-for="role in roles" :key="role.id" class="popups">
+                    <h2 class="sm:text-2xl text-lg font-medium mb-3 text-gray-900 dark:text-white">
+                        {{ role.role }}
+                    </h2>
+                    
+                    <v-data-table 
+                        height="400" 
+                        :headers="headers" 
+                        :items="role.workers" 
+                        :items-per-page="-1"
+                    >
+                        <template v-slot:item.date="{ item }">
+                            {{ rt_time(item.date) }}
+                        </template>
+
+                        <template v-slot:item.open="{ item }">
+                            <router-link :to="`/document/${item.doc_id}`">
+                                <i class="pi pi-book icon_size text-blue-600 hover:text-blue-800 transition-colors"></i>
+                            </router-link>
+                        </template>
+
+                        <template v-slot:item.edit="{ item }" v-if="admin">
+                            <router-link :to="`/admin/document/${item.id}`">
+                                <i class="pi pi-cloud-upload icon_size text-green-600 hover:text-green-800 transition-colors"></i>
+                            </router-link>
+                        </template>
+
+                        <template #bottom></template>
                     </v-data-table>
-                    <div v-if="admin">
-                        <v-btn  @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
-                        <v-btn v-if="!role.archived"  @click="archive_stuff(role.id)" class="m-5">{{ $t('archive_category') }}</v-btn>
-                        <v-btn v-else  @click="restore_stuff(role.id)" class="m-5">{{ $t('restore') }}</v-btn>
-                </div>    
-                </div>
-                <div v-else>
-                    <Loading />
-                </div>
-                <div>
-                    <v-btn v-if=" loaded && !archived" @click="open_archive" class="m-5">{{ $t('show_archive') }}</v-btn>
-                </div>
-    </div>
-    </section>
-    
-    
-    </template>
-    <script lang="ts">
-    
-    import { Client, Databases, ID,Storage,Query } from "appwrite";
-    import {appw,config} from "@/appwrite";
-    import { convertifserbian } from "@/lang";
-    import {useLoadingStore} from "@/stores/loading";
-    import {reactive,ref} from "vue";
-    import gsap from "gsap";
-    import moment from 'moment/min/moment-with-locales';
-    import Loading from "@/components/Loading.vue";
-    
-    export default {
-        name: 'Workers',
-        components: {
-            Loading
-        },
-        setup()
-        {
-    
-        },
-        mounted()
-        {
-            const loadingStore = useLoadingStore();
-            this.admin=loadingStore.userLoggedin;
-            document.title=this.$t("documents");
-    
-            gsap.fromTo(
-        "#render_title",
-        {
-          opacity: 0,
-          x: "50%",
-        },
-        {
-          duration: 1.5,
-          opacity: 1,
-          x: 0,
-        }
-      );
-    
-     
-    
-    
-            //loadingStore.setLoading(true);
-            
-            this.load_workers_base();
-            
-            this.headers= [
-                    { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                    { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    
-                    { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
-                    
-                    ];
-        
 
-        if(this.admin)
-        {
-            this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
-            this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
+                    <div v-if="admin" class="flex gap-3 mt-4 flex-wrap">
+                        <v-btn @click="new_stuff(role.id)" color="primary" class="m-2">
+                            {{ $t('add_new_document_in_that_category') }}
+                        </v-btn>
+                        <v-btn @click="editCategory(role)" color="info" class="m-2">
+                            <i class="pi pi-pencil mr-2"></i>
+                            {{ $t('edit_category') }}
+                        </v-btn>
+                        <v-btn 
+                            v-if="!role.archived" 
+                            @click="archive_stuff(role.id)" 
+                            color="warning"
+                            class="m-2"
+                        >
+                            {{ $t('archive_category') }}
+                        </v-btn>
+                        <v-btn 
+                            v-else 
+                            @click="restore_stuff(role.id)" 
+                            color="success"
+                            class="m-2"
+                        >
+                            {{ $t('restore') }}
+                        </v-btn>
+                        <v-btn 
+                            @click="confirmDeleteCategory(role)" 
+                            color="error"
+                            class="m-2"
+                        >
+                            <i class="pi pi-trash mr-2"></i>
+                            {{ $t('delete_category') }}
+                        </v-btn>
+                    </div>
+                </div>
+
+                <div v-if="loaded && !archived" class="mt-8">
+                    <v-btn @click="open_archive" color="secondary" class="m-5">
+                        {{ $t('show_archive') }}
+                    </v-btn>
+                </div>
+            </div>
+
+            <!-- New Category Dialog -->
+            <v-dialog v-model="showNewCategoryDialog" max-width="600px" persistent>
+                <v-card>
+                    <v-card-title>
+                        <span class="text-h5">{{ $t('add_new_category') }}</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-container>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="newCategory.category_name_rs"
+                                        :label="$t('category_name_serbian')"
+                                        required
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="newCategory.category_name_en"
+                                        :label="$t('category_name_english')"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="newCategory.category_name_hu"
+                                        :label="$t('category_name_hungarian')"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="newCategory.listasorrend"
+                                        :label="$t('sort_order')"
+                                        type="number"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue-darken-1" variant="text" @click="closeNewCategoryDialog">
+                            {{ $t('cancel') }}
+                        </v-btn>
+                        <v-btn color="blue-darken-1" variant="text" @click="createNewCategory" :disabled="!newCategory.category_name_rs">
+                            {{ $t('save') }}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
+            <!-- Edit Category Dialog -->
+            <v-dialog v-model="showEditCategoryDialog" max-width="600px" persistent>
+                <v-card>
+                    <v-card-title>
+                        <span class="text-h5">{{ $t('edit_category') }}</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-container>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="editingCategory.category_name_rs"
+                                        :label="$t('category_name_serbian')"
+                                        required
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="editingCategory.category_name_en"
+                                        :label="$t('category_name_english')"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="editingCategory.category_name_hu"
+                                        :label="$t('category_name_hungarian')"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        v-model="editingCategory.listasorrend"
+                                        :label="$t('sort_order')"
+                                        type="number"
+                                        variant="outlined"
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue-darken-1" variant="text" @click="closeEditCategoryDialog">
+                            {{ $t('cancel') }}
+                        </v-btn>
+                        <v-btn color="blue-darken-1" variant="text" @click="updateCategory" :disabled="!editingCategory.category_name_rs">
+                            {{ $t('save') }}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
+            <!-- Delete Confirmation Dialog -->
+            <v-dialog v-model="showDeleteConfirmDialog" max-width="500px" persistent>
+                <v-card>
+                    <v-card-title class="text-h5">
+                        {{ $t('confirm_delete') }}
+                    </v-card-title>
+                    <v-card-text>
+                        <p>{{ $t('delete_category_warning') }}</p>
+                        <p class="font-bold mt-2">{{ categoryToDelete?.role }}</p>
+                        <p class="text-red-600 mt-2">{{ $t('delete_permanent_warning') }}</p>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue-darken-1" variant="text" @click="closeDeleteConfirmDialog">
+                            {{ $t('cancel') }}
+                        </v-btn>
+                        <v-btn color="red-darken-1" variant="text" @click="deleteCategory">
+                            {{ $t('delete') }}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </div>
+    </section>
+</template>
+
+<script lang="ts">
+import { Databases, ID, Query } from "appwrite";
+import { appw, config } from "@/appwrite";
+import { convertifserbian } from "@/lang";
+import { useLoadingStore } from "@/stores/loading";
+import gsap from "gsap";
+import moment from 'moment/min/moment-with-locales';
+import Loading from "@/components/Loading.vue";
+
+interface DocumentItem {
+    id: string;
+    doc_id: string;
+    name: string;
+    date: string;
+    contact?: string;
+}
+
+interface RoleItem {
+    id: string;
+    role: string;
+    archived: boolean;
+    workers: DocumentItem[];
+    originalData?: any; // Store original category data for editing
+}
+
+interface CategoryData {
+    category_name_rs: string;
+    category_name_en: string;
+    category_name_hu: string;
+    listasorrend: number;
+}
+
+export default {
+    name: 'Documents',
+    components: {
+        Loading
+    },
+    
+    data: () => ({
+        roles: [] as RoleItem[],
+        loaded: false,
+        headers: [] as any[],
+        admin: false,
+        archived: false,
+        showNewCategoryDialog: false,
+        showEditCategoryDialog: false,
+        showDeleteConfirmDialog: false,
+        newCategory: {
+            category_name_rs: '',
+            category_name_en: '',
+            category_name_hu: '',
+            listasorrend: 1
+        } as CategoryData,
+        editingCategory: {
+            category_name_rs: '',
+            category_name_en: '',
+            category_name_hu: '',
+            listasorrend: 1
+        } as CategoryData,
+        editingCategoryId: '',
+        categoryToDelete: null as RoleItem | null
+    }),
+
+    async mounted() {
+        const loadingStore = useLoadingStore();
+        this.admin = loadingStore.userLoggedin;
+        document.title = this.$t("documents");
+
+        // Initialize headers
+        this.headers = [
+            { title: this.$t("name"), align: 'start', sortable: false, key: 'name', width: '300px' },
+            { title: this.$t("date"), align: 'start', key: 'date', width: '200px' },
+            { title: this.$t("open_document"), align: 'start', key: 'open', width: '100px' }
+        ];
+
+        if (this.admin) {
+            this.headers.push({ 
+                title: this.$t("edit_document"), 
+                align: 'start', 
+                key: 'edit', 
+                width: '100px' 
+            });
         }
-    
-    
-                        gsap.fromTo(
-                        ".popups",
-                        {
+
+        // Title animation
+        gsap.fromTo("#render_title", {
+            opacity: 0,
+            x: "50%",
+        }, {
+            duration: 1.5,
+            opacity: 1,
+            x: 0,
+        });
+
+        await this.load_workers_base();
+    },
+
+    methods: {
+        rt_time(dateString: string): string {
+            const loadingStore = useLoadingStore();
+            let local = loadingStore.language;
+            
+            if (local === "rs" || local === "sr") {
+                moment.locale('sr');
+            } else if (local === "hu") {
+                moment.locale('hu');
+            } else if (local === "en") {
+                moment.locale('en');
+            }
+            
+            return moment(dateString).format("LLL");
+        },
+
+        async new_stuff(categoryId: string): Promise<void> {
+            try {
+                const database = new Databases(appw);
+                const newDoc = await database.createDocument(
+                    config.website_db, 
+                    config.documents_db,
+                    ID.unique(),
+                    { "documentCategories": categoryId }
+                );
+                this.$router.push(`/admin/document/${newDoc.$id}`);
+            } catch (error) {
+                console.error('Error creating new document:', error);
+            }
+        },
+
+        async archive_stuff(categoryId: string): Promise<void> {
+            try {
+                const database = new Databases(appw);
+                await database.updateDocument(
+                    config.website_db,
+                    config.document_categories_db,
+                    categoryId,
+                    { "archived": true }
+                );
+                await this.load_workers_base();
+            } catch (error) {
+                console.error('Error archiving category:', error);
+            }
+        },
+
+        async restore_stuff(categoryId: string): Promise<void> {
+            try {
+                const database = new Databases(appw);
+                await database.updateDocument(
+                    config.website_db,
+                    config.document_categories_db,
+                    categoryId,
+                    { "archived": false }
+                );
+                await this.load_workers_base();
+            } catch (error) {
+                console.error('Error restoring category:', error);
+            }
+        },
+
+        async open_archive(): Promise<void> {
+            this.archived = true;
+            await this.load_workers_base();
+        },
+
+        // New Category Methods
+        closeNewCategoryDialog(): void {
+            this.showNewCategoryDialog = false;
+            this.newCategory = {
+                category_name_rs: '',
+                category_name_en: '',
+                category_name_hu: '',
+                listasorrend: 1
+            };
+        },
+
+        async createNewCategory(): Promise<void> {
+            try {
+                const database = new Databases(appw);
+                await database.createDocument(
+                    config.website_db,
+                    config.document_categories_db,
+                    ID.unique(),
+                    {
+                        category_name_rs: this.newCategory.category_name_rs,
+                        category_name_en: this.newCategory.category_name_en,
+                        category_name_hu: this.newCategory.category_name_hu,
+                        listasorrend: this.newCategory.listasorrend,
+                        archived: false
+                    }
+                );
+                
+                this.closeNewCategoryDialog();
+                await this.load_workers_base();
+                
+                // Success notification (you might want to add a toast/snackbar here)
+                console.log('Category created successfully');
+                
+            } catch (error) {
+                console.error('Error creating new category:', error);
+                // Error notification (you might want to add a toast/snackbar here)
+            }
+        },
+
+        // Edit Category Methods
+        editCategory(role: RoleItem): void {
+            this.editingCategoryId = role.id;
+            this.editingCategory = {
+                category_name_rs: role.originalData?.category_name_rs || '',
+                category_name_en: role.originalData?.category_name_en || '',
+                category_name_hu: role.originalData?.category_name_hu || '',
+                listasorrend: role.originalData?.listasorrend || 1
+            };
+            this.showEditCategoryDialog = true;
+        },
+
+        closeEditCategoryDialog(): void {
+            this.showEditCategoryDialog = false;
+            this.editingCategoryId = '';
+            this.editingCategory = {
+                category_name_rs: '',
+                category_name_en: '',
+                category_name_hu: '',
+                listasorrend: 1
+            };
+        },
+
+        async updateCategory(): Promise<void> {
+            try {
+                const database = new Databases(appw);
+                await database.updateDocument(
+                    config.website_db,
+                    config.document_categories_db,
+                    this.editingCategoryId,
+                    {
+                        category_name_rs: this.editingCategory.category_name_rs,
+                        category_name_en: this.editingCategory.category_name_en,
+                        category_name_hu: this.editingCategory.category_name_hu,
+                        listasorrend: this.editingCategory.listasorrend
+                    }
+                );
+                
+                this.closeEditCategoryDialog();
+                await this.load_workers_base();
+                
+                // Success notification
+                console.log('Category updated successfully');
+                
+            } catch (error) {
+                console.error('Error updating category:', error);
+                // Error notification
+            }
+        },
+
+        // Delete Category Methods
+        confirmDeleteCategory(role: RoleItem): void {
+            this.categoryToDelete = role;
+            this.showDeleteConfirmDialog = true;
+        },
+
+        closeDeleteConfirmDialog(): void {
+            this.showDeleteConfirmDialog = false;
+            this.categoryToDelete = null;
+        },
+
+        async deleteCategory(): Promise<void> {
+            if (!this.categoryToDelete) return;
+
+            try {
+                const database = new Databases(appw);
+                
+                // First, check if category has any documents
+                const documentsResponse = await database.listDocuments(
+                    config.website_db, 
+                    config.documents_db,
+                    [Query.equal("documentCategories", [this.categoryToDelete.id])]
+                );
+
+                // If category has documents, delete them first or handle as needed
+                if (documentsResponse.documents.length > 0) {
+                    // Option 1: Delete all documents in the category
+                    for (const doc of documentsResponse.documents) {
+                        await database.deleteDocument(
+                            config.website_db,
+                            config.documents_db,
+                            doc.$id
+                        );
+                    }
+                    
+                    // Option 2: You could also move documents to another category
+                    // or prevent deletion if documents exist
+                }
+
+                // Delete the category
+                await database.deleteDocument(
+                    config.website_db,
+                    config.document_categories_db,
+                    this.categoryToDelete.id
+                );
+                
+                this.closeDeleteConfirmDialog();
+                await this.load_workers_base();
+                
+                // Success notification
+                console.log('Category deleted successfully');
+                
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                // Error notification
+            }
+        },
+
+        getLocalizedCategoryName(category: any): string {
+            const loadingStore = useLoadingStore();
+            let local = loadingStore.language;
+            
+            if (local === "en") {
+                return category.category_name_en || '';
+            } else if (local === "hu") {
+                return category.category_name_hu || '';
+            } else if (local === "rs" || local === "sr") {
+                return convertifserbian(category.category_name_rs || '');
+            }
+            return category.category_name_rs || '';
+        },
+
+        getLocalizedDocumentTitle(document: any): string {
+            const loadingStore = useLoadingStore();
+            let local = loadingStore.language;
+            
+            if (local === "en" || local === "hu") {
+                return document.document_title_hu || '';
+            } else if (local === "rs" || local === "sr") {
+                return convertifserbian(document.document_title_rs || '');
+            }
+            return document.document_title_rs || '';
+        },
+
+        async processDocuments(categoryId: string): Promise<DocumentItem[]> {
+            try {
+                const database = new Databases(appw);
+                const documentsResponse = await database.listDocuments(
+                    config.website_db, 
+                    config.documents_db,
+                    [
+                        Query.equal("documentCategories", [categoryId]),
+                        Query.orderDesc("$createdAt")
+                    ]
+                );
+
+                return documentsResponse.documents.map(doc => ({
+                    id: doc.$id,
+                    doc_id: doc.document_id || '',
+                    name: this.getLocalizedDocumentTitle(doc),
+                    date: doc.$createdAt,
+                    contact: doc.contact || ''
+                }));
+            } catch (error) {
+                console.error('Error loading documents for category:', categoryId, error);
+                return [];
+            }
+        },
+
+        async load_workers_base(): Promise<void> {
+            try {
+                this.loaded = false;
+                this.roles = [];
+                
+                const database = new Databases(appw);
+
+                // Load active categories
+                const activeCategories = await database.listDocuments(
+                    config.website_db, 
+                    config.document_categories_db,
+                    [Query.orderAsc("listasorrend"), Query.equal("archived", false)]
+                );
+
+                // Process active categories
+                for (const category of activeCategories.documents) {
+                    const documents = await this.processDocuments(category.$id);
+                    const categoryName = this.getLocalizedCategoryName(category);
+                    
+                    this.roles.push({
+                        id: category.$id,
+                        role: categoryName,
+                        archived: false,
+                        workers: documents,
+                        originalData: category
+                    });
+                }
+
+                // Load archived categories if needed
+                if (this.archived) {
+                    const archivedCategories = await database.listDocuments(
+                        config.website_db, 
+                        config.document_categories_db,
+                        [Query.orderAsc("listasorrend"), Query.equal("archived", true)]
+                    );
+
+                    for (const category of archivedCategories.documents) {
+                        const documents = await this.processDocuments(category.$id);
+                        let categoryName = this.getLocalizedCategoryName(category);
+                        categoryName += ` ~ ${this.$t("archived")}`;
+                        
+                        this.roles.push({
+                            id: category.$id,
+                            role: categoryName,
+                            archived: true,
+                            workers: documents,
+                            originalData: category
+                        });
+                    }
+                }
+
+                this.loaded = true;
+
+                // Animate elements after loading
+                this.$nextTick(() => {
+                    gsap.fromTo(".popups", {
                         opacity: 0,
                         y: "50%",
-                        },
-                        {
-                        duration: 1.5,
+                    }, {
+                        duration: 1.2,
                         opacity: 1,
                         y: 0,
-                        }
-                    );                
-        },
-        data: () => ({
-            workers: [
-                {
-                    img: 'https://dummyimage.com/720x400',
-                    name: 'SUBTITLE',
-                    role: 'First',
-                    contact: 'Lorem ipsum dolor sit'}],
-                    roles:[],
-                    colDefs:[],
-                    loaded:false,
-                    headers:[],
-                    admin:false,
-                    archived:false
-                    
-                }),
-        methods:{
-            rt_time(a)
-                {   const loadingStore = useLoadingStore();
-                    let local=loadingStore.language;
-                    if(local=="rs"||local=="sr")
-                    {
-                        moment.locale('sr');
-                    }
-                    else if(local=="hu")
-                    {
-                        moment.locale('hu');
-                    }
-                    else if(local=="en")
-                    {
-                        moment.locale('en');
-                    }
-                    else {
+                        stagger: 0.1
+                    });
+                });
 
-                    }
-                    return moment(a).format("LLL");
-                },
-            async new_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                this.$router.push("/admin/document/"+l.$id);
-            },
-            async archive_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":true});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async restore_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":false});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async open_archive()
-            {
-                this.archived=true;
-                this.load_workers_base();
-            },
-            async load_workers_base(){
-            this.loaded=false;
-            const loadingStore = useLoadingStore();
-            //loadingStore.setLoading(true);
-            this.workers=[];
-            this.roles=[];
-            //console.log();
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
-    
-            let local=loadingStore.language;
-    
-            //let missing_picture=storage.getFileView(config.website_images,config.missing_worker_picture).href;
-            
-            //this is f voodoo, and sucks, but it works
-            let k,n;
-            
-            k= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",false)]);
-            
-            if(this.archived)
-            {
-                n= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",true)]);
+            } catch (error) {
+                console.error('Error loading categories and documents:', error);
+                this.loaded = true;
             }
-            for (let i=0;i<k.documents.length;i++)
-            {
-            let el1=k.documents[i];
-          //   k.documents.forEach(async (el1) => {
-                let _works=[];
-                //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
-            ]);
-            //console.log(l);
-                let name="";
-                if(local=="en")
-                {
-                    name=el1.category_name_en;
-                }
-                else if(local=="hu")
-                {
-                    name=el1.category_name_hu;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    name=el1.category_name_rs;
-                }
-                //console.log(l);
-                await l.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=el2.document_title_rs;
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                if(el2.worker_img==""||el2.worker_img==null)
-                {
-                //a.img=missing_picture;
-                }
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                _works.push(a);
-            });
-            let b={role:"",workers:[],id:"",archived:false};
-            b.id=el1.$id;
-            b.role=name;
-            b.archived=el1.archived;
-            b.workers=_works;
-            this.roles.push(b);
-    //        });
-          }
-          if(this.archived)
-          {
-          for (let i=0;i<n.documents.length;i++)
-            {
-            let el1=n.documents[i];
-          //   k.documents.forEach(async (el1) => {
-                let _works=[];
-                //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
-            ]);
-            //console.log(l);
-                let name="";
-                if(local=="en")
-                {
-                    name=el1.category_name_en;
-                }
-                else if(local=="hu")
-                {
-                    name=el1.category_name_hu;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    name=convertifserbian(el1.category_name_rs);
-                }
-                name+=` ~ ${this.$t("archived")}`;
-                //console.log(l);
-                await l.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=convertifserbian(el2.document_title_rs);
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                if(el2.worker_img==""||el2.worker_img==null)
-                {
-                //a.img=missing_picture;
-                }
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                _works.push(a);
-            });
-            let b={role:"",workers:[],id:"",archived:false};
-            b.id=el1.$id;
-            b.role=name;
-            b.archived=el1.archived;
-            b.workers=_works;
-            this.roles.push(b);
-    //        });
-          }
         }
+    }
+}
+</script>
 
-            console.log(this.roles);
-            //loadingStore.setLoading(false);
-            this.loaded=true;
-            },
-            onReady(params) {
-                    console.log('onReady');
-    
-                    //this.api = params.api;
-                    //this.calculateRowCount();
-                    //this.load_workers_base();
-                    //this.api.sizeColumnsToFit();
-                }
-           
-        },
-        
-        
-    }
-    </script>
-    <style>
-    .icon_size{
-        /*font-size: 3em;;*/
-    }
+<style scoped>
+.popups {
+    transition: all 0.4s ease;
+}
+
+.icon_size {
+    font-size: 1.5rem;
+}
+
+.pi:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+.v-dialog .v-card {
+    overflow: visible;
+}
+
+.v-text-field {
+    margin-bottom: 8px;
+}
 </style>

@@ -53,6 +53,12 @@ const router = createRouter({
       component: () => import('../views/Abouts/Timetable.vue')
     },
     {
+      path: '/about/studentcouncil',
+      name: 'studentcouncil',
+     
+      component: () => import('../views/Abouts/StudentCouncil.vue')
+    },
+    {
       path:'/document/:id',
       name:'document',
       component: () => import('../views/documents/DocViewer.vue')      

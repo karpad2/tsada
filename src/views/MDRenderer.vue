@@ -370,3 +370,105 @@ export default {
     
 }   
 </script>
+
+<style scoped>
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.content-section {
+    line-height: 1.7;
+}
+
+.content-section :deep(h1),
+.content-section :deep(h2),
+.content-section :deep(h3) {
+    @apply font-semibold text-gray-800 dark:text-white mb-4;
+}
+
+.content-section :deep(h1) {
+    @apply text-2xl;
+}
+
+.content-section :deep(h2) {
+    @apply text-xl;
+}
+
+.content-section :deep(h3) {
+    @apply text-lg;
+}
+
+.content-section :deep(p) {
+    @apply mb-4 text-gray-700 dark:text-gray-200;
+}
+
+.content-section :deep(ul),
+.content-section :deep(ol) {
+    @apply mb-4 pl-6;
+}
+
+.content-section :deep(li) {
+    @apply mb-2 text-gray-700 dark:text-gray-200;
+}
+
+.content-section :deep(a) {
+    @apply text-blue-600 hover:text-blue-800 underline;
+}
+
+.content-section :deep(img) {
+    @apply rounded-lg shadow-md max-w-full h-auto mx-auto my-6;
+}
+
+.video-container {
+    @apply mb-8;
+}
+
+.gallery-section,
+.documents-section {
+    @apply border-t border-gray-200 dark:border-gray-700;
+}
+
+.documents-table {
+    @apply rounded-lg;
+}
+
+.documents-table :deep(.v-data-table-header) {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.documents-table :deep(th) {
+    @apply font-semibold text-gray-700 dark:text-gray-200;
+}
+
+.documents-table :deep(tbody tr:hover) {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
+
+/* Print styles */
+@media print {
+    .no_print {
+        display: none !important;
+    }
+    
+    .print_content {
+        @apply text-black;
+    }
+}
+
+/* Responsive video */
+@media (max-width: 768px) {
+    .video-container iframe {
+        height: 200px;
+    }
+}
+</style>

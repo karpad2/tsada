@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "1.0.36beta",
+  "version": "1.0.37beta",
   "private": true,
   "type": "module",
   "scripts": {
@@ -36,6 +36,7 @@
     "viewerjs": "^1.11.6",
     "vue": "^3.5.12",
     "vue-country-flag-next": "^2.3.2",
+    "vue-gtag": "^3.5.2",
     "vue-i18n": "^10.0.4",
     "vue-responsive-video-background-player": "^2.3.1",
     "vue-router": "^4.4.5",

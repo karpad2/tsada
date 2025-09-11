@@ -1,5 +1,5 @@
 {
-    "school_name":"Műszaki Iskola Ada",
+    "school_name":"Adai Műszaki Iskola",
     "cometous":"Korszerű szakmával tudást és jövőt építesz",
     "whycomehere":"Válasz a szakképzést! Válaszd a tudást, a ",
     "applynow":"Jelentkezz!",
@@ -186,7 +186,26 @@
     "active_apply_edit":"Jelentkezés szerkesztése",
     "certified":"Tanúsított",
     "system":"Rendszer",
-    "joinus":"BEÍRATKOZÁS"
+    "joinus":"BEÍRATKOZÁS",
+    "student_parliament": "Diákparlament",
+  "sp_subtitle": "A diákparlament képviselői és vezetősége",
+  
+  "last_update": "Utolsó frissítés",
+  "loading_data": "Adatok betöltése...",
+  "members_heading": "Diákparlament tagjai",
+  "members_subheading": "Összes képviselő listája",
+  "role": "Szerep",
+  "unknown": "Ismeretlen",
+  "no_parliament_members_found": "Nem találhatók diákparlament tagok",
+  "no_members_paragraph": "A diákparlament képviselői még nincsenek regisztrálva a rendszerben.",
+  "reload": "Újratöltés",
+  "error_loading_data": "Hiba történt az adatok betöltésekor",
+  "role.president": "Elnök",
+  "role.vice_president": "Alelnök",
+  "role.secretary": "Titkár",
+  "role.treasurer": "Pénztáros",
+  "role.member": "Tag",
+  "add_new_category":"Új kategória hozzáadása"
 
 
 

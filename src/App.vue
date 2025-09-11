@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-  <Index class="dark:blue-gray-900 bg-slate-50">
+  <Index class=" dark:bg-gray-600 bg-slate-50">
     <notifications position="top right"/> 
     <RouterView  :key="$route.path" />
   </Index>

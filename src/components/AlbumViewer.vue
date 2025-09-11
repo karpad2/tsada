@@ -5,55 +5,56 @@
     id="courses"
   >
     <div class="container px-5 mx-auto">
-      <div class="flex flex-wrap w-full mb-10" v-if="caption">
+      <div v-if="caption" class="flex flex-wrap w-full mb-10">
         <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
           <h1
             class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white"
           >
             {{ title }}
           </h1>
-          <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+          <div class="h-1 w-20 bg-sky-500 rounded"></div>
         </div>
       </div>
 
-      <div class="mb-5 mt-5" v-if="admin">
-        <VBtn class="m-2" @click="editmode">{{ $t("edit_gallery") }}</VBtn>
-        <VBtn class="m-2" @click="deletebrokenimages">{{ $t("delete_broken_images") }}</VBtn>
+      <div v-if="isAdmin" class="mb-5 mt-5 flex gap-2">
+        <VBtn @click="editMode">{{ $t('edit_gallery') }}</VBtn>
+        <VBtn @click="deleteBrokenImages">{{ $t('delete_broken_images') }}</VBtn>
       </div>
 
       <viewer
         :images="images"
         @inited="inited"
         ref="viewer"
-        :options="options_for_image_viewer"
-        class="flex flex-wrap gap-4 justify-center"
+        :options="viewerOptions"
+        class="grid grid-cols-1 sm:grid-cols-5 gap-4"
       >
-        <template #default="scope">
+        <template #default="{ images }">
           <div
-            v-for="src in scope.images"
+            v-for="(src, index) in images"
             :key="src"
-            class="card card-compact cursor-pointer glass w-full sm:w-1/5 transition delay-150 bg-slate-100/30 backdrop-filter hover:bg-sky-400/60 dark:bg-slate-300/30 shadow-xl"
+            class="card card-compact cursor-pointer glass bg-slate-100/30 hover:bg-sky-400/60 dark:bg-slate-300/30 shadow-xl transition-colors duration-150"
           >
             <figure>
               <img
-                style="height: 272px;"
+                :src="src"
+                :data-fullsize="courses[index]?.fullsize"
+                style="height: 272px"
                 class="object-contain"
-                v-lazy="src"
-                @load="loaded(src)"
-                @error="handleError(src)"
+                loading="lazy"
                 :alt="`Image: ${title}`"
+                @load="onImageLoad(src)"
+                @error="onImageError(src)"
               />
             </figure>
           </div>
         </template>
       </viewer>
 
-      <!-- Skeleton loader -->
-      <div v-if="isLoading" class="flex flex-wrap gap-4 justify-center mt-4">
+      <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-5 gap-4 mt-4">
         <div
           v-for="n in limit"
-          :key="'skeleton-' + n"
-          class="card card-compact w-full sm:w-1/5 bg-gray-200 dark:bg-gray-700 animate-pulse h-[272px]"
+          :key="`skeleton-${n}`"
+          class="card card-compact bg-gray-200 dark:bg-gray-700 animate-pulse h-[272px]"
         ></div>
       </div>
     </div>
@@ -61,168 +62,193 @@
 </template>
 
 <script lang="ts">
-import {
-  Databases,
-  Storage,
-  Query,
-  ImageGravity,
-  ImageFormat
-} from "appwrite";
-import { appw, config } from "@/appwrite";
-import { convertifserbian } from "@/lang";
-import { useLoadingStore } from "@/stores/loading";
+import { defineComponent } from 'vue';
+import { Databases, Storage, Query, ImageGravity, ImageFormat } from 'appwrite';
+import { appw, config } from '@/appwrite';
+import { useLoadingStore } from '@/stores/loading';
 
-export default {
-  name: "SlideModules",
+export default defineComponent({
+  name: 'SlideModules',
   props: {
-    mode: String,
-    caption: Boolean,
-    id: String,
+    mode: { type: String, default: '' },
+    caption: { type: Boolean, default: false },
+    id: { type: String, required: true },
   },
   data: () => ({
-    admin: false,
-    images: [],
-    showed: [],
-    title: "",
+    isAdmin: false,
+    images: [] as string[],
+    showed: [] as string[],
+    title: '',
     page: 0,
     limit: 10,
     isLoading: false,
     noMoreImages: false,
-    options_for_image_viewer: { title: false },
-    courses: [],
+    viewerOptions: {
+      title: false,
+      url: 'data-fullsize', // Use the data-fullsize attribute for the full-size image in viewer
+    },
+    courses: [] as Array<{ img: string; fullsize: string; id: string; img_id: string }>,
   }),
   mounted() {
-    this.admin = useLoadingStore().userLoggedin;
-    this.load_courses_base();
-    window.addEventListener("scroll", this.handleScroll);
+    this.isAdmin = useLoadingStore().userLoggedin;
+    this.loadCourses();
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
   },
   beforeUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
-    async load_courses_base() {
+    async loadCourses() {
       if (this.isLoading || this.noMoreImages) return;
       this.isLoading = true;
 
-      const database = new Databases(appw);
-      const storage = new Storage(appw);
-      const cc = useLoadingStore();
+      try {
+        const database = new Databases(appw);
+        const storage = new Storage(appw);
 
-      if (this.page === 0) {
-        const doc = await database.getDocument(
+        if (this.page === 0) {
+          const { title_hu, title_en, title_rs } = await database.getDocument(
+            config.website_db,
+            config.gallery,
+            this.id,
+            [Query.select(['title_hu', 'title_en', 'title_rs'])]
+          );
+
+          const { language } = useLoadingStore();
+          this.title =
+            language === 'en'
+              ? title_en
+              : language === 'hu'
+              ? title_hu
+              : title_rs;
+          document.title = this.title;
+        }
+
+        const { documents } = await database.listDocuments(
           config.website_db,
-          config.gallery,
-          this.id,
-          [Query.select(["title_hu", "title_en", "title_rs"])]
+          config.album_images,
+          [
+            Query.equal('gallery', this.id),
+            Query.offset(this.page * this.limit),
+            Query.limit(this.limit),
+          ]
         );
 
-        const local = cc.language;
-        this.title =
-          local === "en"
-            ? doc.title_en
-            : local === "hu"
-            ? doc.title_hu
-            : convertifserbian(doc.title_rs);
+        if (!documents.length) {
+          this.noMoreImages = true;
+          return;
+        }
 
-        document.title = this.title;
-      }
+        const newImages = await Promise.all(
+          documents.map(async ({ $id, image_id }) => {
+            // Low-resolution thumbnail for gallery (700px)
+            const thumbnail = await storage.getFilePreview(
+              config.gallery_pictures_storage,
+              image_id,
+              700, // Smaller width for thumbnails
+              0,
+              ImageGravity.Center,
+              90,
+              5,
+              'FFFFFF',
+              15,
+              1,
+              0,
+              'FFFFFF',
+              ImageFormat.Webp
+            ).href;
 
-      const result = await database.listDocuments(config.website_db, config.album_images, [
-        Query.equal("gallery", this.id),
-        Query.offset(this.page * this.limit),
-        Query.limit(this.limit),
-      ]);
+            // Higher-resolution image for viewer (1200px)
+            const fullsize = await storage.getFilePreview(
+              config.gallery_pictures_storage,
+              image_id,
+              1200, // Larger width for full-size view
+              0,
+              ImageGravity.Center,
+              90,
+              5,
+              'FFFFFF',
+              15,
+              1,
+              0,
+              'FFFFFF',
+              ImageFormat.Webp
+            ).href;
 
-      if (result.documents.length === 0) {
-        this.noMoreImages = true;
+            return { img: thumbnail, fullsize, id: $id, img_id: image_id };
+          })
+        );
+
+        this.courses.push(...newImages);
+        this.images.push(...newImages.map(({ img }) => img));
+        this.page++;
+      } catch (error) {
+        console.error('Failed to load courses:', error);
+      } finally {
         this.isLoading = false;
-        return;
       }
-
-      for (const element of result.documents) {
-        const preview = await storage.getFilePreview(
-          config.gallery_pictures_storage,
-          element.image_id,
-          700,
-          0,
-          ImageGravity.Center,
-          90,
-          5,
-          "FFFFFF",
-          15,
-          1,
-          0,
-          "FFFFFF",
-          ImageFormat.Webp
-        ).href;
-
-        this.courses.push({
-          img: preview,
-          id: element.$id,
-          img_id: element.image_id,
-        });
-
-        this.images.push(preview);
-      }
-
-      this.page++;
-      this.isLoading = false;
     },
 
     handleScroll() {
       if (this.isLoading || this.noMoreImages) return;
 
       const nearBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200;
 
       if (nearBottom) {
-        this.load_courses_base();
+        this.loadCourses();
       }
     },
 
-    loaded(src: string) {
+    onImageLoad(src: string) {
       if (!this.showed.includes(src)) {
         this.showed.push(src);
       }
     },
 
-    handleError(src: string) {
+    onImageError(src: string) {
       console.warn(`Image load error: ${src}`);
     },
 
-    async deletebrokenimages() {
+    async deleteBrokenImages() {
       const brokenImages = this.images.filter((img) => !this.showed.includes(img));
       const storage = new Storage(appw);
       const database = new Databases(appw);
 
-      for (const brokenImage of brokenImages) {
-        const course = this.courses.find((course) => course.img === brokenImage);
+      try {
+        await Promise.all(
+          brokenImages.map(async (brokenImage) => {
+            const course = this.courses.find(({ img }) => img === brokenImage);
+            if (!course?.id || !course.img_id) return;
 
-        if (course && course.id && course.img_id) {
-          try {
-            await database.deleteDocument(config.website_db, config.album_images, course.id);
-            await storage.deleteFile(config.gallery_pictures_storage, course.img_id);
+            await Promise.all([
+              database.deleteDocument(config.website_db, config.album_images, course.id),
+              storage.deleteFile(config.gallery_pictures_storage, course.img_id),
+            ]);
 
             this.images = this.images.filter((img) => img !== brokenImage);
-            this.courses = this.courses.filter((c) => c.id !== course.id);
-          } catch (error) {
-            console.error("Failed to delete broken image: ", error);
-          }
-        }
+            this.courses = this.courses.filter(({ id }) => id !== course.id);
+          })
+        );
+      } catch (error) {
+        console.error('Failed to delete broken images:', error);
       }
     },
 
-    editmode() {
-      this.$router.push("/admin/gallery-edit/" + this.id);
+    editMode() {
+      this.$router.push(`/admin/gallery-edit/${this.id}`);
     },
 
     inited() {
-      // Optional: called when viewer is ready
+      // Viewer initialized
     },
   },
-};
+});
 </script>
 
-<style>
-/* Optional animations can go here */
+<style scoped>
+.card {
+  transition: background-color 0.15s ease-in-out;
+}
 </style>

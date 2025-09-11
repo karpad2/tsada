@@ -34,6 +34,7 @@ import CountryFlag from 'vue-country-flag-next'
 //import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
+import { createGtag } from "vue-gtag";
 
 import gsap from "gsap";
 const app = createApp(App)
@@ -42,6 +43,10 @@ const pinia =createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 app.use(router);
+
+const gtag = createGtag({
+  tagId: "G-FZYC1503VB"
+})
 
 const vuetify = createVuetify({
     components,
@@ -92,6 +97,8 @@ app.use(VueViewer, {
       zIndex: 9999
     }
   });
+
+  app.use(gtag);
 app.component('VueCookieComply', VueCookieComply)
 //app.use(gsap);
 app.use(router);

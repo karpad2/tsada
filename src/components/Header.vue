@@ -24,7 +24,7 @@
                   <router-link to="/home" class=" btn btn-ghost cursor-pointer dark:text-white">{{ $t('home') }}</router-link>
                   <div class="dropdown dropdown-hover">
                   <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost cursor-pointer dark:text-white ">{{ $t('aboutus') }}<i class="pi pi-angle-down"></i></div>
-                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52 menu-elem">
+                  <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52 ">
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
                       <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
@@ -80,7 +80,8 @@
                   <div class="dropdown dropdown-hover">
                   <div tabindex="0" role="button" class="btn btn-ghost  cursor-pointer  dark:text-white ">{{ $t('for_students') }} <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content  z-[1] menu p-2  bg-base-100 rounded-box w-52  ">
-                      <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
+                    <li  ><router-link to="/about/studentcouncil">{{ $t("student_parliament") }}</router-link></li>   
+                    <li v-for="doccategory in _students" :key="doccategory.id"><router-link :to="'/renderer/students/'+doccategory.id">{{ doccategory.name }}</router-link></li>
                       <li  ><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li> 
                       <li  ><a href="https://moodle.tsada.edu.rs">{{ $t("eclassroom") }}</a></li>  
                     </ul>
