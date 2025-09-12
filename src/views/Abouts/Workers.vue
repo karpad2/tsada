@@ -73,7 +73,7 @@
                         <i :class="getContactIcon(worker.contact)" class="mr-2 text-sky-500"></i>
                         {{ worker.contact }}
                       </span>
-                      <span v-else class="text-gray-400 dark:text-gray-500 italic">Nincs elérhetőség</span>
+                      <span v-else class="text-gray-400 dark:text-gray-500 italic">{{ $t("no_contact_info") }}</span>
                     </div>
                   </td>
                   <td v-if="isAdmin" class="px-8 py-6">

@@ -180,7 +180,8 @@
   "role.vice_president": "Vice President",
   "role.secretary": "Secretary",
   "role.treasurer": "Treasurer",
-  "role.member": "Member"
+  "role.member": "Member",
+  "no_contact_info":"---"
 
 
 

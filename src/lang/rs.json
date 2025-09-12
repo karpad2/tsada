@@ -178,7 +178,8 @@
   "role.vice_president": "Потпредседник",
   "role.secretary": "Секретар",
   "role.treasurer": "Благајник",
-  "role.member": "Члан"
+  "role.member": "Члан",
+  "no_contact_info":"---"
     
   }
   

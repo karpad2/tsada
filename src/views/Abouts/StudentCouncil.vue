@@ -96,7 +96,7 @@
                                 <!-- Name -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <div class="text-base font-semibold text-gray-900">{{ getDisplayName(member) }}</div>
+                                        <div class="text-base font-semibold text-gray-900">{{ member.name }}</div>
                                         <div v-if="member.is_president" class="flex items-center" :aria-label="$t('role.president')">
                                             <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -170,16 +170,13 @@
 import { Client, Databases, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
-import { convertifserbian } from "@/lang";
 
 interface ParliamentMember {
     id: string;
-    name_hu: string;
-    name_rs: string;
+    name: string;
     is_president: boolean;
     position: string;
-    description_hu: string;
-    description_rs: string;
+    description: string;
     classList: any;
 }
 
@@ -214,7 +211,7 @@ export default {
                 const bPos = positionOrder.indexOf(b.position);
                 if (aPos !== bPos) return aPos - bPos;
 
-                return this.getDisplayName(a).localeCompare(this.getDisplayName(b));
+                return a.name.localeCompare(b.name);
             });
         }
     },
@@ -273,12 +270,10 @@ export default {
 
                 this.parliamentMembers = response.documents.map((doc: any) => ({
                     id: doc.$id,
-                    name_hu: doc.member_name_hu || '',
-                    name_rs: doc.member_name_rs || '',
+                    name: doc.member_name || '',
                     is_president: doc.is_president || false,
                     position: doc.position || 'member',
-                    description_hu: doc.description_hu || '',
-                    description_rs: doc.description_rs || '',
+                    description: doc.description || '',
                     classList: doc.classList
                 }));
             } catch (error) {
@@ -298,22 +293,6 @@ export default {
                 return classData ? classData.name : this.$t('unknown') as string;
             }
             return this.$t('unknown') as string;
-        },
-
-        getDisplayName(member: ParliamentMember): string {
-            const cc = useLoadingStore();
-            if (cc.language === 'rs' || cc.language === 'sr') {
-                return member.name_rs ? convertifserbian(member.name_rs) : member.name_hu;
-            }
-            return member.name_hu;
-        },
-
-        getDisplayDescription(member: ParliamentMember): string {
-            const cc = useLoadingStore();
-            if (cc.language === 'rs' || cc.language === 'sr') {
-                return member.description_rs ? convertifserbian(member.description_rs) : member.description_hu;
-            }
-            return member.description_hu;
         },
 
         getRoleTitle(member: ParliamentMember): string {
