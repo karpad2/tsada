@@ -238,7 +238,7 @@
             <!-- Üzenet, ha nincs parlament tag -->
             <v-card v-else-if="!loading">
                 <v-card-text class="text-center text-gray-500">
-                    {{ $t('no_parliament_members') }}
+                    {{ $t('no_parliament_members_found') }}
                 </v-card-text>
             </v-card>
         </div>
@@ -585,12 +585,12 @@ export default {
                 
                 this.parliament_members = k.documents.map(doc => ({
                     id: doc.$id,
-                    name_hu: doc.member_name_hu || "",
-                    name_rs: doc.member_name_rs || "",
+                    name_hu: doc.parliament_member_name_hu || "",  // Javított név
+                    name_rs: doc.parliament_member_name_rs || "",  // Javított név
                     is_president: doc.is_president || false,
                     position: this.getPositionTitle(doc.position) || "Tag",
-                    description_hu: doc.description_hu || "",
-                    description_rs: doc.description_rs || ""
+                    description_hu: doc.parliament_description_hu || "",  // Javított név
+                    description_rs: doc.parliament_description_rs || ""   // Javított név
                 }));
             } catch (ex) {
                 console.error('Parliament members betöltési hiba:', ex);
@@ -629,12 +629,13 @@ export default {
             
             try {
                 const documentData = {
-                    "member_name_hu": this.parliament_member_name_hu.trim(),
-                    "member_name_rs": this.parliament_member_name_rs?.trim() || "",
+                    // Javított attribútum nevek, hogy illeszkedjenek az adatbázis sémához:
+                    "parliament_member_name_hu": this.parliament_member_name_hu.trim(),
+                    "parliament_member_name_rs": this.parliament_member_name_rs?.trim() || "",
                     "is_president": this.is_president,
                     "position": this.parliament_position || "member",
-                    "description_hu": this.parliament_description_hu?.trim() || "",
-                    "description_rs": this.parliament_description_rs?.trim() || "",
+                    "parliament_description_hu": this.parliament_description_hu?.trim() || "",
+                    "parliament_description_rs": this.parliament_description_rs?.trim() || "",
                     "classList": this.$route.params.id
                 };
 
@@ -705,4 +706,5 @@ export default {
             this.editing_member_id = null;
         }
     }
-}</script>
+}
+</script>

@@ -154,6 +154,7 @@ export default {
             const database = new Databases(appw);
             const storage = new Storage(appw);
             const cc=useLoadingStore();
+            //if(cc.language=="sr"||cc.language=="rs")
             //just fucking kill me
             let mode="";
             let nyaa=await database.listDocuments(config.website_db,config.text_components,[Query.equal("doc_id",this.$route.params.id),Query.equal("lang",cc.language),Query.orderAsc("order")]);

@@ -188,7 +188,7 @@ methods:{
                         0,                  // no rotation
                         'FFFFFF',           // background color
                         'webp'               // output webp format
-                ).href;
+                );
                 this.images.push(a);
                     });
 

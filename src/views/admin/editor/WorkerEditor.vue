@@ -350,7 +350,7 @@ export default {
                 }
 
                 if (doc.worker_img == null || doc.worker_img == '') {
-                    this.img = storage.getFileView(config.website_images, config.missing_worker_picture).href;
+                    this.img = storage.getFileView(config.website_images, config.missing_worker_picture);
                 } else {
                     this.img = storage.getFileView(config.website_images, doc.worker_img).toString();
                 }

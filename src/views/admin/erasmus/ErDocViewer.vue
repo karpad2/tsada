@@ -49,7 +49,7 @@ export default {
             const storage = new Storage(appw);
             
             let tmp=await storage.getFileView(config.fs_erasmus,this.$route.params.id);
-            this.pdf_file=tmp.href;
+            this.pdf_file=tmp;
             console.log(this.pdf_file);
             //this.pdf_link=pdf;
            /* const loadingTask = createLoadingTask(this.pdf_file)

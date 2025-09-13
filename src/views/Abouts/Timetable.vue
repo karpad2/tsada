@@ -180,7 +180,7 @@ export default {
 
     const storage = new Storage(appw);
     const fallbackVideoId = "659d5e6949ae7294f9f1";
-    this.video_link = storage.getFileView(config.website_images, fallbackVideoId).href;
+    this.video_link = storage.getFileView(config.website_images, fallbackVideoId);
 
     // Enhanced animation
     gsap.timeline()

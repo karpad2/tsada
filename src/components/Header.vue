@@ -26,7 +26,9 @@
                   <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost cursor-pointer dark:text-white ">{{ $t('aboutus') }}<i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52 ">
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
-                      <li v-if="reload"  v-for="about in abouts"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
+                      <li v-if="false" ><router-link to="/about/parentscouncil">{{ $t("parents_council") }}</router-link></li>
+                      
+                      <li v-if="reload"  v-for="about in abouts" :key="about.id"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
                       <li ><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
                   </ul>
@@ -102,11 +104,11 @@
                   <div v-if="!mobile_view" class="dropdown dropdown-hover">
                   <div tabindex="0" role="button" class="btn btn-ghost cursor-pointer   dark:text-white"><country-flag :country='lang' size='small'/> <i class="pi pi-angle-down"></i></div>
                   <ul tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box w-52  ">
-                      <li v-for="lang in languages" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
+                      <li v-for="lang in languages" :key="lang.code" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/> {{ lang.name }}  </a></li>
                   </ul>
                   </div>
                   <div v-if="mobile_view" role="button" class=" btn btn-ghost  cursor-pointer  ">
-                    <button v-for="lang in languages" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
+                    <button v-for="lang in languages" :key="lang.code" class="m-5 w-10" ><a @click="changeLanguage(lang.code)"><country-flag :country='lang.country' size='small'/>  </a></button>
                   </div>
   
                   <div class="dropdown dropdown-hover">
@@ -140,350 +142,269 @@
               </nav>               
           </div>
       </header>
-  </template>
-  <script lang="ts">
-  import { Client, Databases, ID,Storage,Query,Account } from "appwrite";
-  import {convertifserbian} from "@/lang";
-  import NavigationMenu from "@/components/HeaderComponents/NavigationMenu.vue"
-  
-  import {appw,config,check} from "@/appwrite";
-  import { ref,nextTick } from "vue";
-  import {useLoadingStore} from "@/stores/loading";
-  import Certop from "./Certop.vue";
-  export default
-  {
-      name: 'Header',
-      components:{
-        Certop,
-        NavigationMenu
-      },
-      data()
-      {
-          return {
-              language: null,
-              languages: [
-                  {name: 'Српски', code: 'sr',country:"srb"},
-                  {name: 'Magyar', code: 'hu',country:"hun"},
-                  {name: 'English', code: 'en',country:"gbr"}
-              ],
-              doccategories:[],
-              _erasmus:[],
-              abouts:[],
-              reload:ref(true),
-              menu_opened:false,
-              mobile_view:false,
-              _students:[],
-              logged_in:false,
-              lang:"",
-              tablet_view:false,
-              erasmus_list:false,
-              erasmus_apply_on:false,
+</template>
 
-              loa:null
-          }
-      },
-      mounted()
-      {
-          const cc=useLoadingStore();
-          this.$i18n.locale=cc.language;
-          document.title=this.$t("school_name");
-          this.checker();
-          
-          this.languages.forEach(element => {
-              if(element.code==cc.language)
-              this.lang=element.country;
-          });
-        this.onResize();
-        this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize);
-    })
-  
-  
-      },
+<script lang="ts">
+import { Client, Databases, ID, Storage, Query, Account } from "appwrite";
+import { convertifserbian } from "@/lang";
+import NavigationMenu from "@/components/HeaderComponents/NavigationMenu.vue";
+import { appw, config, check } from "@/appwrite";
+import { ref } from "vue";
+import { useLoadingStore } from "@/stores/loading";
+import Certop from "./Certop.vue";
 
-      methods:{
-        onResize()
-        {
-          this.mobile_view=window.innerWidth<=1276;
-          this.tablet_view=window.innerWidth>=1276&&window.innerWidth<=1550;
-        },
-        async checker()
-        {
-            check();
-          this.getDocumentsCategories();
-          this.getAbouts();
-          this.getErasmus();
-          this.getStudents();
-        },
-        menuopener()
-        {
-          this.menu_opened=!this.menu_opened;
-        },
-          changeLanguage(code)
-          {
-              const cc=useLoadingStore();
-              cc.setLanguage(code)
-              //await localStorage.setItem('lang', code);
-              this.$i18n.locale=code;
-  
-              this.languages.forEach(element => {
-              if(element.code==cc.language)
-              this.lang=element.country;
-          });
-              
-             
-              //i am want to cry, but i cant
-  
-             
-              window.location.reload();
-              
-          },
-          async logout()
-          {
-              const account = new Account(appw);
-              const result = await account.deleteSession(
-      'current' // sessionId
-  );
-              const cc=useLoadingStore();
-              cc.setUserLoggedin(false);
-              console.warn("logout");
-              window.location.reload();
-          },
-         
+interface LanguageItem {
+  name: string;
+  code: string;
+  country: string;
+}
 
+interface MenuItem {
+  name?: string;
+  title?: string;
+  id: string;
+}
+
+export default {
+  name: 'Header',
+  components: {
+    Certop,
+    NavigationMenu
+  },
+  
+  data() {
+    return {
+      languages: [
+        { name: 'Српски', code: 'sr', country: "srb" },
+        { name: 'Magyar', code: 'hu', country: "hun" },
+        { name: 'English', code: 'en', country: "gbr" }
+      ] as LanguageItem[],
       
-          async getDocumentsCategories()
-          {
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          const cc=useLoadingStore();
-          let l= await database.listDocuments(config.website_db, config.document_categories_db);
-          //let local=localStorage.getItem("lang");
-          l.documents.forEach(async element => {
-              //console.log(element);
-              let a={name:"",id:""};
-              if(cc.language=="en")
-              {
-                  a.name=element.category_name_en;
-                  
-              }
-              else if(cc.language=="hu")
-              {
-                  a.name=element.category_name_hu;
-                  
-              }
-              else if(cc.language=="rs"||cc.language=="sr")
-              {
-                  a.name=convertifserbian(element.category_name_rs);
-              }
-  
-              a.id=element.$id;
-              this.doccategories.push(a);
-          });
-  
-          },
-          async getAbouts()
-          {
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          let l;
-          const cc=useLoadingStore();
-          //console.log(this.language);//show_at_the_header_from_about
-          if(cc.language=="sr")
-          {
-              l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
-          }
-          else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("show_at_the_header_from_about",true),Query.select(["title_hu","title_en","title_rs","$id"]),Query.orderAsc("sorrend")]);
-          //let local=localStorage.getItem("lang");
-          //console.log(l);
-          for (let i=0;i<l.documents.length;i++)
-
-          
-          {
-            let element=l.documents[i];    
-              let a={title:"",id:""};
-              if(cc.language=="sr")
-              a.title=convertifserbian(element.title_rs);
-              else if(cc.language=="rs")   
-              a.title=element.title_rs;
-              else if(cc.language=="hu")
-              a.title=element.title_hu;
-              else if(cc.language=="en")
-              a.title=element.title_en;
-              else 
-              {
-  
-              }
-              a.id=element.$id;
-              this.abouts.push(a);
-          }
-  
-          },
-  
-          async getCourses()
-          {
-          const cc=useLoadingStore();
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          let l;
-          //console.log(cc.language);
-          if(cc.language=="sr")
-          {
-              l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          }
-          else l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("aboutCategories","about"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          //let local=localStorage.getItem("lang");
-          //console.log(l);
-          l.documents.forEach(async element => {
-              let a={title:"",id:""};
-              if(cc.language=="sr")
-              a.title=convertifserbian(element.title_rs);
-              else if(cc.language=="rs")   
-              a.title=element.title_rs;
-              else if(cc.language=="hu")
-              a.title=element.title_hu;
-              else if(cc.language=="en")
-              a.title=element.title_hu;
-              else 
-              {
-  
-              }
-              if( a.title=="") return;
-            if( a.title!="---")
-              {
-              a.id=element.$id;
-              this.abouts.push(a);
-              }
-          });
-  
-          },
-          async getErasmus()
-          {
-          this.getErasmusSettings();
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          const cc=useLoadingStore();
-          let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","erasmus"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          //console.log(l);
-          //let local=localStorage.getItem("lang");
-          l.documents.forEach(async element => {
-              //console.log(element);
-              let a={name:"",id:""};
-              if(cc.language=="en")
-              {
-                  a.name=element.title_en;  
-              }
-              else if(cc.language=="hu")
-              {
-                  a.name=element.title_hu;
-                  
-              }
-              else if(cc.language=="rs"||cc.language=="sr")
-              {
-                  a.name=convertifserbian(element.title_rs);
-              }
-              if( a.name=="") return;
-              a.id=element.$id;
-              this._erasmus.push(a);
-          });
-  
-          },
-          async getStudents()
-          {
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          const cc=useLoadingStore();
-          let l= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("type","students"),Query.select(["title_hu","title_en","title_rs","$id"])]);
-          //console.log(l);
-          //let local=localStorage.getItem("lang");
-          l.documents.forEach(async element => {
-              //console.log(element);
-              let a={name:"",id:""};
-              if(cc.language=="en")
-              {
-                  a.name=element.title_en;  
-              }
-              else if(cc.language=="hu")
-              {
-                  a.name=element.title_hu;
-                  
-              }
-              else if(cc.language=="rs"||cc.language=="sr")
-              {
-                  a.name=convertifserbian(element.title_rs);
-              }
-              if( a.name=="") return;
-              a.id=element.$id;
-              this._students.push(a);
-          });
-  
-          },
-
-          async getErasmusSettings()
-          {
-            const cc=useLoadingStore();
-            const database = new Databases(appw);
-
-            let l,k;
-            l= await database.getDocument(config.website_db,config.general_settings,"erasmus_list");
-            k= await database.getDocument(config.website_db,config.general_settings,"erasmus_apply_on");
-            this.erasmus_apply_on=k.setting_status;
-            this.erasmus_list=l.setting_status;
-            //console.log(l);
-            //console.log(k);
-
-          }
-
-      },
-      computed:{
-          erasmus()
-          {
-              const cc=useLoadingStore();
-              if(cc.language=="sr")
-              {
-                  this.$router.push("/renderer/erasmus/erasmus_rs");  
-              }
-              else
-              this.$router.push("/renderer/erasmus/");
-          },
-          erasmusflag()
-          {
-              const cc=useLoadingStore();
-              return cc.isErasmus;
-          },
-          mobile_mode()
-          {
-            /*f(!this.mobile_view&&window.innerWidth<=768)
-            return false;
-              */
-            return this.menu_opened&&this.mobile_view||!this.mobile_view;
-
-          },
-
-
-          style_computed_for_mobile()
-          {
-            return this.mobile_view&&!this.mobile_mode;
-          },
-
-          
+      doccategories: [] as MenuItem[],
+      _erasmus: [] as MenuItem[],
+      abouts: [] as MenuItem[],
+      _students: [] as MenuItem[],
       
-          isLoggedin()
-          {
-              const cc=useLoadingStore();
-              return cc.userLoggedin;
-          },
-          notMobile()
-          {
-            return !this.mobile_mode;
-          }
-      }
-  
+      reload: ref(true),
+      menu_opened: false,
+      mobile_view: false,
+      tablet_view: false,
+      logged_in: false,
+      lang: "",
+      
+      erasmus_list: false,
+      erasmus_apply_on: false,
+    }
+  },
+
+  async mounted() {
+    const cc = useLoadingStore();
+    this.$i18n.locale = cc.language;
+    document.title = this.$t("school_name");
     
+    // Set current language flag
+    this.setCurrentLanguageFlag(cc.language);
+    
+    this.onResize();
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    });
+
+    // Initialize data
+    await this.initializeData();
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('resize', this.onResize);
+  },
+
+  computed: {
+    erasmusflag() {
+      const cc = useLoadingStore();
+      return cc.isErasmus;
+    },
+    
+    mobile_mode() {
+      return this.menu_opened && this.mobile_view || !this.mobile_view;
+    },
+
+    style_computed_for_mobile() {
+      return this.mobile_view && !this.mobile_mode;
+    },
+    
+    isLoggedin() {
+      const cc = useLoadingStore();
+      return cc.userLoggedin;
+    }
+  },
+
+  methods: {
+    onResize() {
+      this.mobile_view = window.innerWidth <= 1276;
+      this.tablet_view = window.innerWidth >= 1276 && window.innerWidth <= 1550;
+    },
+
+    setCurrentLanguageFlag(language: string) {
+      const lang = this.languages.find(l => l.code === language);
+      this.lang = lang?.country || "";
+    },
+
+    async initializeData() {
+      try {
+        check();
+        await Promise.all([
+          this.getDocumentsCategories(),
+          this.getAbouts(),
+          this.getErasmus(),
+          this.getStudents()
+        ]);
+      } catch (error) {
+        console.error('Error initializing data:', error);
+      }
+    },
+
+    menuopener() {
+      this.menu_opened = !this.menu_opened;
+    },
+
+    changeLanguage(code: string) {
+      const cc = useLoadingStore();
+      cc.setLanguage(code);
+      this.$i18n.locale = code;
+      this.setCurrentLanguageFlag(code);
+      window.location.reload();
+    },
+
+    async logout() {
+      try {
+        const account = new Account(appw);
+        await account.deleteSession('current');
+        const cc = useLoadingStore();
+        cc.setUserLoggedin(false);
+        console.warn("logout");
+        window.location.reload();
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    },
+
+    getLocalizedTitle(element: any, cc: any): string {
+      if (cc.language === "en") return element.title_en || element.category_name_en || "";
+      if (cc.language === "hu") return element.title_hu || element.category_name_hu || "";
+      if (cc.language === "rs" || cc.language === "sr") {
+        return convertifserbian(element.title_rs || element.category_name_rs || "");
+      }
+      return "";
+    },
+
+    async getDocumentsCategories() {
+      try {
+        const database = new Databases(appw);
+        const cc = useLoadingStore();
+        const result = await database.listDocuments(config.website_db, config.document_categories_db);
+        
+        this.doccategories = result.documents.map(element => ({
+          name: this.getLocalizedTitle(element, cc),
+          id: element.$id
+        })).filter(item => item.name);
+      } catch (error) {
+        console.error('Error fetching document categories:', error);
+      }
+    },
+
+    async getAbouts() {
+      try {
+        const database = new Databases(appw);
+        const cc = useLoadingStore();
+        
+        const result = await database.listDocuments(
+          config.website_db,
+          config.about_us_db,
+          [
+            Query.equal("show_at_the_header_from_about", true),
+            Query.select(["title_hu", "title_en", "title_rs", "$id"]),
+            Query.orderAsc("sorrend")
+          ]
+        );
+
+        this.abouts = result.documents.map(element => ({
+          title: this.getLocalizedTitle(element, cc),
+          id: element.$id
+        })).filter(item => item.title);
+      } catch (error) {
+        console.error('Error fetching abouts:', error);
+      }
+    },
+
+    async getErasmus() {
+      try {
+        await this.getErasmusSettings();
+        
+        const database = new Databases(appw);
+        const cc = useLoadingStore();
+        
+        const result = await database.listDocuments(
+          config.website_db,
+          config.about_us_db,
+          [
+            Query.equal("type", "erasmus"),
+            Query.select(["title_hu", "title_en", "title_rs", "$id"])
+          ]
+        );
+
+        this._erasmus = result.documents.map(element => ({
+          name: this.getLocalizedTitle(element, cc),
+          id: element.$id
+        })).filter(item => item.name);
+      } catch (error) {
+        console.error('Error fetching Erasmus data:', error);
+      }
+    },
+
+    async getStudents() {
+      try {
+        const database = new Databases(appw);
+        const cc = useLoadingStore();
+        
+        const result = await database.listDocuments(
+          config.website_db,
+          config.about_us_db,
+          [
+            Query.equal("type", "students"),
+            Query.select(["title_hu", "title_en", "title_rs", "$id"])
+          ]
+        );
+
+        this._students = result.documents.map(element => ({
+          name: this.getLocalizedTitle(element, cc),
+          id: element.$id
+        })).filter(item => item.name);
+      } catch (error) {
+        console.error('Error fetching student data:', error);
+      }
+    },
+
+    async getErasmusSettings() {
+      try {
+        const database = new Databases(appw);
+        
+        const [listSetting, applySetting] = await Promise.all([
+          database.getDocument(config.website_db, config.general_settings, "erasmus_list"),
+          database.getDocument(config.website_db, config.general_settings, "erasmus_apply_on")
+        ]);
+        
+        this.erasmus_list = listSetting.setting_status;
+        this.erasmus_apply_on = applySetting.setting_status;
+      } catch (error) {
+        console.error('Error fetching Erasmus settings:', error);
+      }
+    }
   }
-  </script>
-  <style>
-.mobile_force{
-    max-height: 80px;
+}
+</script>
+
+<style>
+.mobile_force {
+  max-height: 80px;
 }
 </style>

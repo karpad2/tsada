@@ -1738,10 +1738,10 @@ anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-appwrite@^15:
-  version "15.0.0"
-  resolved "https://registry.npmjs.org/appwrite/-/appwrite-15.0.0.tgz"
-  integrity sha512-rzmo+87tizYLs3YnRLets+vMUF85S/OHkgiGgp0UKcKJj0U1RktAsuIecFqRROKfkqs0fKzggRAIs3RCoYQQwA==
+appwrite@^20:
+  version "20.0.0"
+  resolved "https://registry.npmjs.org/appwrite/-/appwrite-20.0.0.tgz"
+  integrity sha512-1uUWLCHT2ByJORz5+NORNk74HW02csg8Jm6lUKUog2DU9WnepqzbLnlD7BC22+XVo5tFp29dreinJk/doVTeTw==
 
 arg@^5.0.2:
   version "5.0.2"

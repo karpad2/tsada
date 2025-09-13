@@ -113,7 +113,7 @@ setup() {
       
       // Get file view URL
       const fileView = await storage.getFileView(config.documents_storage, documentId)
-      pdfUrl.value = fileView.href
+      pdfUrl.value = fileView
       
       // Try to get document metadata for better title
       try {

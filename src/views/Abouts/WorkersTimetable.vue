@@ -321,7 +321,7 @@ export default defineComponent({
       const local = loadingStore.language;
 
       try {
-        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture).href;
+        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture);
         const rolesRes = await database.listDocuments(config.website_db, config.roles_db, [
           Query.orderAsc('listasorrend'),
           Query.equal('has_receiving_hour', true),
@@ -384,7 +384,7 @@ export default defineComponent({
               name: local === 'en' || local === 'hu' ? worker.worker_name_hu : convertifserbian(worker.worker_name_rs),
               contact: worker.contact || '',
               img: worker.worker_img
-                ? storage.getFileView(config.website_images, worker.worker_img).href
+                ? storage.getFileView(config.website_images, worker.worker_img)
                 : missingPicture,
               p_receiving_schedules,
               u_receiving_schedules,

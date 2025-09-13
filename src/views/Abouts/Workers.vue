@@ -275,7 +275,7 @@ export default defineComponent({
         const database = new Databases(appw);
         const storage = new Storage(appw);
         const local = loadingStore.language;
-        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture).href;
+        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture);
 
         const roleDocs = await database.listDocuments(config.website_db, config.roles_db, [
           Query.orderAsc('listasorrend'),
@@ -298,7 +298,7 @@ export default defineComponent({
             id: worker.$id,
             name: local === 'rs' || local === 'sr' ? convertifserbian(worker.worker_name_rs) : worker.worker_name_hu,
             contact: worker.contact,
-            img: worker.worker_img ? storage.getFileView(config.website_images, worker.worker_img).href : missingPicture,
+            img: worker.worker_img ? storage.getFileView(config.website_images, worker.worker_img) : missingPicture,
           }));
 
           return { id: role.$id, role: roleName, workers };

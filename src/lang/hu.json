@@ -194,7 +194,7 @@
   "loading_data": "Adatok betöltése...",
   "members_heading": "Diákparlament tagjai",
   "members_subheading": "Összes képviselő listája",
-  "role": "Szerep",
+  
   "unknown": "Ismeretlen",
   "no_parliament_members_found": "Nem találhatók diákparlament tagok",
   "no_members_paragraph": "A diákparlament képviselői még nincsenek regisztrálva a rendszerben.",
@@ -205,8 +205,105 @@
   "role.secretary": "Titkár",
   "role.treasurer": "Pénztáros",
   "role.member": "Tag",
-  "add_new_category":"Új kategória hozzáadása"
+  "add_new_category":"Új kategória hozzáadása",
+  "no_contact_info":"Nincs elérhetőség",
+  "receiving_hours_settings":"Fogadó óra beállításai",
+  "class_receiving_hour":"Az osztály fogadóórája",
+  "add_schedule":"Beosztás hozzáadása",
+  "parliament_members":"Parlament tagok",
+  "add_parliament_member":"Parlament tagok hozzáadása",
+  "parliament_member_name_hu":"Tag magyar neve",
+  "parliament_member_name_rs":"Tag szerb neve",
+  "is_parliament_president":"Diákparlament Elnöke?",
+  "parliament_description_hu":"Parlamenti funkció egyéb megjegyzése magyar (jobb ha üres)",
+  "parliament_description_rs":"Parlamenti funkció egyéb megjegyzése szerb (jobb ha üres)",
+  "no_receiving_hour":"Nincs fogadóóra a rendszerben",
+  "image":"kép",
+  "gallery_end":"Galéria vége",
+  "no_image_here":"Kép nem található",
+  "this_gallery_empty":"A galéria üres",
+  "level_up_classes": "Osztályok áthelyezése",
+    "parents_council": "Szülők Tanácsa",
+    "add_parent_council_member": "Szülők tanácsa tag hozzáadása",
+    "edit_parent_council_member": "Szülők tanácsa tag szerkesztése",
+    "current_parent_council_members": "Jelenlegi szülők tanácsa tagok",
+    "no_parent_council_members_found": "Nem találhatók szülők tanácsa tagok",
+    "parent_member_name_hu": "Szülő neve (magyar)",
+    "parent_member_name_rs": "Szülő neve (szerb)",
+    "parent_council_position": "Pozíció a szülők tanácsában",
+    "child_name": "Gyerek neve",
+    "phone_number": "Telefonszám",
+    
+    "parent_description_hu": "Leírás (magyar)",
+    "parent_description_rs": "Leírás (szerb)",
+    
+    "child": "Gyerek",
+   
+    "day": "Nap",
+    "lesson_period": "Tanóra",
+    
+    "edit_parliament_member": "Parlament tag szerkesztése",
+    "current_parliament_members": "Jelenlegi parlament tagok",
+    
+    "parliament_position": "Pozíció a parlamentben",
+    
+    "president": "Elnök",
+    "vice_president": "Alelnök",
+    "update_member": "Tag frissítése",
+    "cancel": "Mégse",
+    
+    "confirm_delete": "Biztosan törli?",
+   
+  "parent_council_subtitle": "Az iskola szülői közösségének képviselői",
+  "add_new_member": "Új tag hozzáadása",
+  "add_first_member": "Első tag hozzáadása",
+  "edit_member": "Tag szerkesztése",
+  "delete_member": "Tag törlése",
+  "delete_member_confirm": "Biztosan törölni szeretnéd ezt a tagot?",
+  "name_hungarian": "Név (Magyar)",
+  "name_serbian": "Név (Szerb)",
+  "full_name_hungarian": "Teljes név magyarul",
+  "full_name_serbian": "Teljes név szerbül",
+  
+  "select_class": "Válassz osztályt...",
+  "position": "Tisztség",
+  "description_hungarian": "Leírás (Magyar)",
+  "description_serbian": "Leírás (Szerb)",
+  "short_description_member": "Rövid leírás a tagról...",
+  "short_description_member_sr": "Kratki opis o članu...",
+  
+  "add": "Hozzáadás",
+  "update": "Frissítés",
+  "saving": "Mentés...",
+  "deleting": "Törlés...",
+  "retry": "Újrapróbálás",
+  "role": {
+    "president": "Elnök / Predsednik",
+    "vice_president": "Alelnök / Potpredsednik",
+    "secretary": "Titkár / Sekretar",
+    "treasurer": "Pénztáros / Blagajnik",
+    "member": "Tag / Član"
+  },
 
+  "error_occurred": "Hiba történt",
+  "class_load_error": "Osztályok betöltési hiba",
+  "members_load_error": "Szülői tanács tagok betöltési hiba",
+  "delete_error": "Törlési hiba",
+  "save_error": "Mentési hiba",
+ 
+  "members_count": "tag",
+  
+  "nameless": "Névtelen",
+  "unknown_class": "Ismeretlen osztály",
+  "no_class": "Nincs osztály",
+  "no_council_members_found": "Nincsenek szülői tanács tagok",
+  "no_council_members_paragraph": "Még nincsenek felvéve szülői tanács tagok.",
+  "treasurer":"Pénztáros",
+  "member":"Tag",
+  "Role":"Beosztás",
+  "pc_subtitle":"A szülök tanácsa.",
+  "no_receiving_hours":"Nincs fogadóóra még a rendszerben."
+    
 
 
  }
