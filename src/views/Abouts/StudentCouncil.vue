@@ -90,7 +90,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xl font-bold">{{ $t('members_heading') }}</h3>
-                                <p class="text-gray-300 text-sm">{{ sortedMembers.length }} tag</p>
+                                <p class="text-gray-300 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
                             </div>
                         </div>
                         <button 
@@ -111,7 +111,7 @@
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">#</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('name') }}</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('class') }}</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('role') }}</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('_role') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">

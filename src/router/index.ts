@@ -59,6 +59,18 @@ const router = createRouter({
       component: () => import('../views/Abouts/ParentsCouncil.vue')
     },
     {
+      path: '/about/pepsi',
+      name: 'pepsi',
+     
+      component: () => import('../views/Abouts/Pepsi.vue')
+    },
+    {
+      path: '/about/schoolboard',
+      name: 'SchoolBoard',
+     
+      component: () => import('../views/Abouts/SchoolBoard.vue')
+    },
+    {
       path: '/about/studentcouncil',
       name: 'studentcouncil',
      

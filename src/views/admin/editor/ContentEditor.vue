@@ -1,494 +1,530 @@
 <template>
-  <div class="relative mb-4 container  px-5  mx-auto bg-white" >
-      <div>
-          <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
-          <v-switch @change="save" v-model="notNews" :label="$t('not_news')"></v-switch>
-          <v-switch @change="save" v-model="show_date" :label="$t('show_date')"></v-switch>
-          <v-btn class="m-5" @click="save" >{{ $t('save') }}</v-btn>
-          <v-btn class="m-5" @click="delete_content">{{ $t('delete') }}</v-btn>
-          <v-btn class="m-5" @click="share_fb">{{ $t('fb_share') }}</v-btn>
+  <div class="relative mb-4 container px-5 mx-auto bg-white">
+    <!-- Main Controls -->
+    <section class="control-section mb-6">
+      <div class="flex flex-wrap gap-4 mb-4">
+        <v-switch 
+          v-model="formData.visible" 
+          :label="$t('visible')" 
+          @change="save" 
+        />
+        <v-switch 
+          v-model="formData.notNews" 
+          :label="$t('not_news')" 
+          @change="save" 
+        />
+        <v-switch 
+          v-model="formData.show_date" 
+          :label="$t('show_date')" 
+          @change="save" 
+        />
       </div>
-
-      <div>
-          <v-file-input @change="file_upload" v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
-          {{ $t("preview") }}
-<div class="flex flex-wrap -m-4">
-
-<div  class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
-  <div   class="bg-slate-100/30 hover:bg-sky-600/30  dark:bg-slate-300/30 p-6 rounded-lg  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-          <img class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out "
-                          :src="img" alt="content">
-      </div>
-  </div>
-</div>
-</div>
-      <div>
-          <v-switch @change="save" v-model="srb_flag" :label="$t('srb')"></v-switch>
-          
-          <div v-if="srb_flag">
-          <v-text-field
-          @change="save"
-          v-model="title_rs"
-          :counter="100"
-          :label="$t('srb_title')"
-          hide-details
-          
-        ></v-text-field>
       
-        <ckeditor v-model="content_rs"></ckeditor>
-          <QuillEditor v-if="false"  @textChange="save" content-type="html"  style="min-height:200px;"  v-model:content="content_rs" toolbar="full" theme="snow" />
+      <div class="action-buttons flex gap-2 mb-4">
+        <v-btn @click="save">{{ $t('save') }}</v-btn>
+        <v-btn @click="deleteContent" color="error">{{ $t('delete') }}</v-btn>
+        <v-btn @click="shareFacebook" color="primary">{{ $t('fb_share') }}</v-btn>
       </div>
-  </div>
-      <div>
-          <v-switch v-model="hun_flag" @change="save" :label="$t('hu')"></v-switch>
-          <div v-if="hun_flag">
+    </section>
+
+    <!-- Image Upload Section -->
+    <section class="image-section mb-6">
+      <v-file-input 
+        v-model="file_link" 
+        accept="image/*" 
+        :label="$t('fileupload')" 
+        @change="handleFileUpload" 
+      />
+      
+      <div class="preview-section">
+        <h3>{{ $t("preview") }}</h3>
+        <div class="flex flex-wrap -m-4">
+          <div class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
+            <div class="bg-slate-100/30 hover:bg-sky-600/30 dark:bg-slate-300/30 p-6 rounded-lg shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
+              <img 
+                class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out"
+                :src="img" 
+                alt="content preview"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language Sections -->
+    <section class="language-sections">
+      <!-- Serbian -->
+      <div class="language-section mb-6">
+        <v-switch 
+          v-model="formData.srb_flag" 
+          :label="$t('srb')" 
+          @change="save" 
+        />
+        <div v-if="formData.srb_flag" class="language-content mt-4">
           <v-text-field
-          v-model="title_hu"
-          :counter="100"
-          @change="save"
-          :label="$t('hu_title')"
-          hide-details
-          
-        ></v-text-field>
-        <ckeditor v-model="content_hu"></ckeditor>
-        <QuillEditor v-if="false"  content-type="html"  @textChange="save" style="min-height:200px;" v-model:content="content_hu" toolbar="full" theme="snow" />
+            v-model="formData.title_rs"
+            :counter="100"
+            :label="$t('srb_title')"
+            hide-details
+            @change="save"
+          />
+          <div class="mt-4">
+            <ckeditor v-model="formData.content_rs" />
+          </div>
+        </div>
       </div>
-  </div>
-      <div>
-          <v-switch v-model="en_flag" @change="save" :label="$t('en')"></v-switch>
-          <div v-if="en_flag">
+
+      <!-- Hungarian -->
+      <div class="language-section mb-6">
+        <v-switch 
+          v-model="formData.hun_flag" 
+          :label="$t('hu')" 
+          @change="save" 
+        />
+        <div v-if="formData.hun_flag" class="language-content mt-4">
           <v-text-field
-          v-model="title_en"
-          :counter="100"
-          @change="save"
-          :label="$t('en_title')"
-          hide-details
-          
-        ></v-text-field>
-        <ckeditor v-model="content_en"></ckeditor>
-          <QuillEditor v-if="false" content-type="html" @textChange="save"  style="min-height:200px;"  v-model:content="content_en" toolbar="full" theme="snow" />
+            v-model="formData.title_hu"
+            :counter="100"
+            :label="$t('hu_title')"
+            hide-details
+            @change="save"
+          />
+          <div class="mt-4">
+            <ckeditor v-model="formData.content_hu" />
+          </div>
+        </div>
       </div>
-  </div>
-  <v-text-field
-          v-model="yt_video"
-          :counter="100"
-          @change="save"
-          :label="$t('yt_video')"
-          hide-details
-        ></v-text-field>
 
-  <div>
-          <v-switch v-model="documents_flag" @change="documents_load" :label="$t('documents_flag')"></v-switch>
-          <div v-if="documents_flag">
-              <div  v-if="false"  class="m-auto w-full">
- 
-    
- <v-data-table   height="400" :headers="headers" :items="documents">
-   <template v-slot:item.date="{ item }">
-   {{ rt_time(item.date) }}
-   </template>
-
- <template v-slot:item.open="{ item }">
-   <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
-  
- </template>
-
- <template v-slot:item.edit="{ item }">
-   <router-link :to="'/admin/text-document-editor/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
-  
- </template>
-
- <template #bottom></template>
-   </v-data-table>
-   <v-btn @click="new_stuff()" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
-</div>
-<DocLister :_id="id" />
-          
+      <!-- English -->
+      <div class="language-section mb-6">
+        <v-switch 
+          v-model="formData.en_flag" 
+          :label="$t('en')" 
+          @change="save" 
+        />
+        <div v-if="formData.en_flag" class="language-content mt-4">
+          <v-text-field
+            v-model="formData.title_en"
+            :counter="100"
+            :label="$t('en_title')"
+            hide-details
+            @change="save"
+          />
+          <div class="mt-4">
+            <ckeditor v-model="formData.content_en" />
+          </div>
+        </div>
       </div>
-  </div>
+    </section>
 
-  <div >
-      <v-switch v-model="album_flag" @change="save" :label="$t('album_flag')"></v-switch>
-                     
-          <div v-if="album_flag">
-          <v-btn class="m-5" @click="gallery_change">{{ $t('create_a_new_album') }}</v-btn> 
-          
-          <v-select
+    <!-- YouTube Video -->
+    <section class="youtube-section mb-6">
+      <v-text-field
+        v-model="formData.yt_video"
+        :counter="100"
+        :label="$t('yt_video')"
+        hide-details
+        @change="save"
+      />
+    </section>
+
+    <!-- Documents Section -->
+    <section class="documents-section mb-6">
+      <v-switch 
+        v-model="formData.documents_flag" 
+        :label="$t('documents_flag')" 
+        @change="handleDocumentsToggle" 
+      />
+      <div v-if="formData.documents_flag" class="mt-4">
+        <DocLister :_id="id" />
+      </div>
+    </section>
+
+    <!-- Album Section -->
+    <section class="album-section mb-6">
+      <v-switch 
+        v-model="formData.album_flag" 
+        :label="$t('album_flag')" 
+        @change="save" 
+      />
+      <div v-if="formData.album_flag" class="mt-4">
+        <v-btn class="mb-4" @click="handleCreateGallery">
+          {{ $t('create_a_new_album') }}
+        </v-btn>
+        
+        <v-select
+          v-model="formData.gallery_id"
           :items="galleries"
-          v-model="gallery_id"
           :label="$t('gallery')"
           item-value="id"
           item-text="title"
-          @update:modelValue="g_save"
-          ></v-select>
+          @update:modelValue="handleGalleryChange"
+        />
 
-          <div v-if="_update">
-              <AlbumViewer  :caption="false" :id="gallery_id" />
-           </div>
-          </div>
-
-  </div>
-
+        <div v-if="showAlbumViewer" class="mt-4">
+          <AlbumViewer :caption="false" :id="formData.gallery_id" />
+        </div>
+      </div>
+    </section>
   </div>
 </template>
+
 <script lang="ts">
-import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
-import {appw,config} from "@/appwrite";
-import axios from "axios";
+import { defineComponent, reactive, ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Client, Databases, ID, Storage, Query } from "appwrite"
+import { appw, config } from "@/appwrite"
+import axios from "axios"
+import { useLoadingStore } from "@/stores/loading"
+import AlbumViewer from "@/components/AlbumViewer.vue"
+import { convertifserbian } from "@/lang"
+import DocLister from "@/components/DocLister.vue"
 
-import {useLoadingStore} from "@/stores/loading";
-import AlbumViewer from "@/components/AlbumViewer.vue";
-import { convertifserbian } from "@/lang";
-import DocLister from "@/components/DocLister.vue";
+interface FormData {
+  title_en: string
+  title_hu: string
+  title_rs: string
+  content_rs: string
+  content_hu: string
+  content_en: string
+  yt_video: string
+  show_date: boolean
+  srb_flag: boolean
+  hun_flag: boolean
+  en_flag: boolean
+  visible: boolean
+  documents_flag: boolean
+  album_flag: boolean
+  gallery_id: string
+  notNews: boolean
+}
 
-export default{
-data()
-{
-  return{
-      id:"",
-      title_en:"",
-      title_hu:"",
-      title_rs:"",
-      content_rs:"",
-      content_hu:"",
-      content_en:"",
-      yt_video:"",
-      show_date:false,
-      srb_flag:true,
-      hun_flag:true,
-      en_flag:false,
-      visible:false,
-      documents_flag:false,
-      album_flag:false,
-      choosen_gallery:false,
-      galleries:[],
-      default_img_link:"",
-      gallery_id:"",
-      file_link:null,
-      fb_message:"",
-      fb_public:false,
-      img:"",
-      headers:[],
-      colDefs:[],
-      documents:[],
-      doc_loaded:false,
-      notNews:true,
-      uploading:false,
-      _update:true
-  }
-},
-components:{
-  AlbumViewer,
-  DocLister
-},
-mounted()
-{
-  this.id=this.$route.params.id;
-  this.getMD();
-  this.headers= [
-                  { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                  { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                  
-                  { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
-                  
-                  ];
-      
-
-      
-          this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
-          this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
-  this.load_galleries();
-          window.addEventListener('beforeunload', this.handleBeforeUnload);
-},
-onBeforeUnmount()
-{
-  window.removeEventListener('beforeunload', this.handleBeforeUnload);
-},
-methods:{
-  async g_save()
-  {
-      this._update=false;
-      await this.save();
-      this._update=true;
+export default defineComponent({
+  name: 'ContentEditor',
+  components: {
+    AlbumViewer,
+    DocLister
   },
-  async getMD()
-      {
-          
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
-          const cc=useLoadingStore();
-          //just fucking kill me
-          let mode="";
-         
-          
-          let k= await database.getDocument(config.website_db, config.about_us_db,this.$route.params.id);
-          
-              
-                  this.title_rs=k.title_rs;
-                  this.content_rs=k.text_rs;
-              
-                  this.title_hu=k.title_hu;
-                  this.content_hu=k.text_hu;
-                  //this.$router.push("/home");
-                  
-              
-                  this.title_en=k.title_en;
-                  this.content_en=k.text_en;
-                  this.yt_video=k.yt_video;
-                  this.visible=k.visible;
-                  this.notNews=k.notNews;
-                  this.show_date=k.show_date;
+  setup() {
+    const route = useRoute()
+    const router = useRouter()
+    
+    // Reactive state
+    const id = ref<string>(route.params.id as string)
+    const file_link = ref(null)
+    const img = ref<string>("https://dummyimage.com/720x400")
+    const galleries = ref([])
+    const default_image = ref<string>("")
+    const uploading = ref<boolean>(false)
+    const _update = ref<boolean>(true)
+    
+    const formData = reactive<FormData>({
+      title_en: "",
+      title_hu: "",
+      title_rs: "",
+      content_rs: "",
+      content_hu: "",
+      content_en: "",
+      yt_video: "",
+      show_date: false,
+      srb_flag: true,
+      hun_flag: true,
+      en_flag: false,
+      visible: false,
+      documents_flag: false,
+      album_flag: false,
+      gallery_id: "",
+      notNews: true
+    })
 
-                  if(k.default_image==null||k.default_image=='')
-                  {
-                      this.img="https://dummyimage.com/720x400";
-                  }
-                  else
-                  this.img=storage.getFileView(config.website_images,k.default_image).toString();
-          
-          this.gallery_id=k.gallery.$id;
+    const showAlbumViewer = computed(() => _update.value && formData.gallery_id)
+
+    // Database instances
+    const database = new Databases(appw)
+    const storage = new Storage(appw)
+
+    // Methods
+    const loadContent = async (): Promise<void> => {
+      try {
+        const document = await database.getDocument(
+          config.website_db, 
+          config.about_us_db, 
+          id.value
+        )
         
-          this.documents_flag=k.has_documents;
-          this.album_flag=k.has_gallery;
-          
-             
-          
-          
-
-
-
-          this.synchronize_documents();
-      },
-  handleBeforeUnload(event){
-    if (this.uploading) {
-      event.preventDefault();
-      this.$notify({
-                  type: 'error',
-                  text: this.$t('file_still_uploading')
-              });
-      event.returnValue = '';
-      return '';
+        // Map document data to form
+        Object.assign(formData, {
+          title_rs: document.title_rs || "",
+          content_rs: document.text_rs || "",
+          title_hu: document.title_hu || "",
+          content_hu: document.text_hu || "",
+          title_en: document.title_en || "",
+          content_en: document.text_en || "",
+          yt_video: document.yt_video || "",
+          visible: document.visible || false,
+          notNews: document.notNews || true,
+          show_date: document.show_date || false,
+          documents_flag: document.has_documents || false,
+          album_flag: document.has_gallery || false,
+          gallery_id: document.gallery?.$id || ""
+        })
+        
+        // Set image
+        if (document.default_image) {
+          img.value = storage.getFileView(config.website_images, document.default_image).toString()
+        }
+        
+      } catch (error) {
+        console.error('Failed to load content:', error)
+      }
     }
-  
-  },
-  async save()
-  {   
-      const database = new Databases(appw);
-      //const storage = new Storage(appw);
-      let k= await database.listDocuments(config.website_db, config.about_us_db,[Query.equal("$id",this.$route.params.id)]);  
-     /* if(!this.album_flag)
-      {
-          this.gallery_id=null;
-      }*/   
-      
-      const result = await database.updateDocument(
-      config.website_db, // databaseId
-      config.about_us_db, // collectionId
-     
-      this.$route.params.id, // documentId
-      {
-          "title_rs":this.title_rs,
-          "title_hu":this.title_hu,
-          "title_en":this.title_en,
-          "text_en":this.content_en,
-          "text_hu":this.content_hu,
-          "text_rs":this.content_rs,
-          "isHungarian":this.hun_flag,
-          "isSerbian":this.srb_flag,
-          "isEnglish":this.en_flag,
-          "visible":this.visible,
-          "yt_video":this.yt_video,
-          "has_documents":this.documents_flag,
-          "has_gallery":this.album_flag,
-          "gallery":this.gallery_id,
-          "default_image":this.default_image,
-          "notNews":this.notNews,
-          "show_date":this.show_date
 
-      }, // data (optional)
-  //["read("any)"] // permissions (optional)
-  );
-  this.$notify(this.$t('saved'));
-  
-  //this.getMD();
-
-  },
-  async share_fb() {
-//const functions = new Functions(appw);
-const database = new Databases(appw);
-
-let kk=await database.getDocument(config.website_db,config.users_settings,"fb_access_token");
-// Prepare the URL to share
-let x = `https://share.tsada.edu.rs/${this.$route.params.id}`;
-
-const response = await axios.post(
-    `https://graph.facebook.com/v20.0/${config.pan}/feed`,
-    {
-      message: null,  // Custom message from the request
-      link: x,  // Link to share
-      access_token: kk.parameter,
-      published: true  // If 'makePrivate' is true, set published to false
+    const save = async (): Promise<void> => {
+      try {
+        await database.updateDocument(
+          config.website_db,
+          config.about_us_db,
+          id.value,
+          {
+            title_rs: formData.title_rs,
+            title_hu: formData.title_hu,
+            title_en: formData.title_en,
+            text_en: formData.content_en,
+            text_hu: formData.content_hu,
+            text_rs: formData.content_rs,
+            isHungarian: formData.hun_flag,
+            isSerbian: formData.srb_flag,
+            isEnglish: formData.en_flag,
+            visible: formData.visible,
+            yt_video: formData.yt_video,
+            has_documents: formData.documents_flag,
+            has_gallery: formData.album_flag,
+            gallery: formData.gallery_id || null,
+            default_image: default_image.value,
+            notNews: formData.notNews,
+            show_date: formData.show_date
+          }
+        )
+        
+        // Show success notification (assuming $notify is available)
+        // this.$notify(this.$t('saved'))
+        
+      } catch (error) {
+        console.error('Failed to save:', error)
+      }
     }
-  );
-  console.log(response);
-},
-async documents_load()
-{
-  this.save();
-  this.synchronize_documents();
-  
-},
-async gallery_change()
-{
-  if(this.gallery_id==null)
-  {
-      this.gallery_id=await this.new_gallery();
-  }
-  this.save();
-  //console.log(this.gallery_id);
-//if(this.gallery_id)
-}, 
-async load_galleries()
-{
-  const database = new Databases(appw);
-  let  l= await database.listDocuments(config.website_db, config.gallery,[Query.select(["title_hu","title_en","title_rs","short_en","short_hu","short_rs","$id","default_image","visible"]),Query.limit(25)]);
-  this.galleries=[];
-  const cc=useLoadingStore();
-  let local=cc.language;     
-  l.documents.forEach(element => {
-          let a={title:"",subtitle:"",text:"",img:"",imga:"",en:"",id:"",visible:false};
-          //console.log(element);
-          a.id=element.$id;
-          a.visible=element.visible;
-          if(local=="en")
+
+    const deleteContent = async (): Promise<void> => {
+      try {
+        await database.deleteDocument(config.website_db, config.about_us_db, id.value)
+        // this.$notify(this.$t('deleted'))
+        router.push("/home")
+      } catch (error) {
+        console.error('Failed to delete:', error)
+      }
+    }
+
+    const shareFacebook = async (): Promise<void> => {
+      try {
+        const settings = await database.getDocument(config.website_db, config.users_settings, "fb_access_token")
+        const shareUrl = `https://share.tsada.edu.rs/${id.value}`
+        
+        const response = await axios.post(
+          `https://graph.facebook.com/v20.0/${config.pan}/feed`,
           {
-              a.title=element.title_en;
-              a.subtitle=element.short_en;
-              //a.text=element.course_en_detail;
+            message: null,
+            link: shareUrl,
+            access_token: settings.parameter,
+            published: true
           }
-          else if(local=="hu")
-          {
-              a.title=element.title_hu;
-              a.subtitle=element.short_hu;
-              //a.text=element.course_hu_detail;
-          }
-          else if(local=="rs"||local=="sr")
-          {
-              a.title=convertifserbian(element.title_rs);
-              a.subtitle=convertifserbian(element.short_rs);
-              //a.text=convertifserbian(element.course_rs_detail);
-          }
-          if(element.code==""||element.code==null)
-          a.en=element.title_en;
-          else a.en=element.code;
-          //console.log(element.course_img);
+        )
+        
+        console.log('Facebook share response:', response)
+      } catch (error) {
+        console.error('Failed to share on Facebook:', error)
+      }
+    }
+
+    const handleFileUpload = async (): Promise<void> => {
+      if (!file_link.value) {
+        console.warn("No file selected")
+        return
+      }
       
-          //=storage.getFileView(,).toString();
-          //a.imga=element.default_image.toString();
-          this.galleries.push(a);
-      });
+      try {
+        uploading.value = true
+        
+        const result = await storage.createFile(
+          config.website_images,
+          ID.unique(),
+          file_link.value
+        )
+        
+        default_image.value = result.$id
+        img.value = storage.getFileView(config.website_images, result.$id).toString()
+        
+        await save()
+        // this.$notify(this.$t('file_uploaded'))
+        
+      } catch (error) {
+        console.error('Failed to upload file:', error)
+      } finally {
+        uploading.value = false
+      }
+    }
 
-},
+    const handleDocumentsToggle = (): void => {
+      save()
+      // Additional document synchronization logic if needed
+    }
 
-async exist_new_gallery_change()
-{
-  this.gallery_change();
-},
+    const handleCreateGallery = async (): Promise<void> => {
+      if (!formData.gallery_id) {
+        formData.gallery_id = await createNewGallery()
+      }
+      await save()
+    }
 
-  async new_stuff()
-      {
-          const database = new Databases(appw);
-          const l= await database.createDocument(config.website_db, config.text_documents,ID.unique(),{"texts":this.$route.params.id});
-          this.$router.push("/admin/text-document-editor/"+l.$id);
-      },
-      async new_gallery()
-      {
-          const database = new Databases(appw);
-          const l= await database.createDocument(config.website_db, config.gallery,ID.unique(),{"visible":false, "title_rs":this.title_rs,
-          "title_hu":this.title_hu,
-          "title_en":this.title_en});
-          return l.$id;
-          //this.$router.push("/admin/gallery-edit/"+l.$id);
-      },
+    const handleGalleryChange = async (): Promise<void> => {
+      _update.value = false
+      await save()
+      _update.value = true
+    }
 
-      async synchronize_documents()
-      {
-          const database = new Databases(appw);
-          if(this.documents_flag)
+    const createNewGallery = async (): Promise<string> => {
+      try {
+        const result = await database.createDocument(
+          config.website_db,
+          config.gallery,
+          ID.unique(),
           {
-              this.doc_loaded=false;
-          this.documents=[];
-              const loadingStore = useLoadingStore();
-              let local=loadingStore.language;
-              let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
-              Query.equal("texts",[this.$route.params.id])]);
-
-              await documents_cucc.documents.forEach(async el2 => {
-              let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-              a.id=el2.$id;
-              if(local=="en"||local=="hu")
-              {
-                  a.name=el2.document_title_hu;
-                  //a.role=el2.role;
-                  a.contact=el2.contact;
-              }
-              else if(local=="rs"||local=="sr")
-              {
-                  a.name=convertifserbian(el2.document_title_rs);
-                  //a.role=convertifserbian(el2.role);
-                  a.contact=el2.contact;
-              }
-              
-              else
-              {
-  
-              //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-              }
-              a.id=el2.$id;
-              a.doc_id=el2.document_id;
-              a.date=el2.$createdAt;    
-              this.documents.push(a);
-              });
-              this.doc_loaded=true;
+            visible: false,
+            title_rs: formData.title_rs,
+            title_hu: formData.title_hu,
+            title_en: formData.title_en
           }
-      },
+        )
+        return result.$id
+      } catch (error) {
+        console.error('Failed to create gallery:', error)
+        return ""
+      }
+    }
+
+    const loadGalleries = async (): Promise<void> => {
+      try {
+        const result = await database.listDocuments(
+          config.website_db, 
+          config.gallery,
+          [
+            Query.select(["title_hu", "title_en", "title_rs", "short_en", "short_hu", "short_rs", "$id", "default_image", "visible"]),
+            Query.limit(25)
+          ]
+        )
+        
+        const loadingStore = useLoadingStore()
+        const local = loadingStore.language
+        
+        galleries.value = result.documents.map(element => {
+          let title = ""
+          
+          switch (local) {
+            case "en":
+              title = element.title_en
+              break
+            case "hu":
+              title = element.title_hu
+              break
+            case "rs":
+            case "sr":
+              title = convertifserbian(element.title_rs)
+              break
+          }
+          
+          return {
+            id: element.$id,
+            title,
+            visible: element.visible
+          }
+        })
+        
+      } catch (error) {
+        console.error('Failed to load galleries:', error)
+      }
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent): void => {
+      if (uploading.value) {
+        event.preventDefault()
+        // this.$notify({ type: 'error', text: this.$t('file_still_uploading') })
+        event.returnValue = ''
+      }
+    }
+
+    // Lifecycle hooks
+    onMounted(() => {
+      loadContent()
+      loadGalleries()
+      window.addEventListener('beforeunload', handleBeforeUnload)
+    })
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    })
+
+    return {
+      // State
+      id,
+      file_link,
+      img,
+      galleries,
+      formData,
+      uploading,
+      showAlbumViewer,
       
-
-  async delete_content()
-  {
-      const database = new Databases(appw);
-      //const storage = new Storage(appw);
-      let k= await database.deleteDocument(config.website_db, config.about_us_db,this.$route.params.id);  
-      this.$notify(this.$t('deleted'));
-      this.$router.push("/home");
-  },
-  async file_upload()
-  {
-      if (!this.file_link)
-      {
-          console.warn("no file");
-          return;
-      } 
-  console.log("file_upload");
-  //console.log(this.file_link[0]);
-  this.uploading=true;
-  const storage = new Storage(appw);
-  const result = await storage.createFile(
-  config.website_images, // bucketId
-  ID.unique(), // fileId
-  this.file_link // file
-  // permissions (optional)
-  );
-  this.default_image=result.$id;
-  this.save();
-  
-  this.$notify(this.$t('file_uploaded'));
-  this.uploading=false;
+      // Methods
+      save,
+      deleteContent,
+      shareFacebook,
+      handleFileUpload,
+      handleDocumentsToggle,
+      handleCreateGallery,
+      handleGalleryChange
+    }
   }
-}
-
-  
-}
-
-
+})
 </script>
+
+<style scoped>
+.content-editor {
+  @apply max-w-full;
+}
+
+.control-section {
+  @apply border-b border-gray-200 pb-4;
+}
+
+.language-section {
+  @apply border border-gray-200 rounded-lg p-4;
+}
+
+.language-content {
+  @apply space-y-4;
+}
+
+.action-buttons {
+  @apply flex-wrap;
+}
+
+.preview-section {
+  @apply mt-4;
+}
+
+.image-section,
+.youtube-section,
+.documents-section,
+.album-section {
+  @apply border border-gray-200 rounded-lg p-4;
+}
+</style>

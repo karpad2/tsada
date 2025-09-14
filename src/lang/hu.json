@@ -302,7 +302,47 @@
   "member":"Tag",
   "Role":"Beosztás",
   "pc_subtitle":"A szülök tanácsa.",
-  "no_receiving_hours":"Nincs fogadóóra még a rendszerben."
+  "no_receiving_hours":"Nincs fogadóóra még a rendszerben.",
+  "_role":"Beosztás",
+
+  "school_board":"Iskolaszék",
+  "add_a_member":"Tag hozzáadása",
+  
+    "services": "Pedagógiai-pszichológiai szolgálat",
+    "edit_services": "Szolgálat szerkesztése",
+    "add_new_service": "Új beosztás hozzáadása",
+    "select_worker": "Munkatárs kiválasztása",
+    "choose_worker": "Válassz munkatársat",
+    "function": "Beosztás (HU)",
+    "function_rs": "Beosztás (SR)",
+    "function_en": "Beosztás (EN)",
+    "function_placeholder": "Írd be a magyar beosztást",
+    "function_rs_placeholder": "Írd be a szerb beosztást",
+    "function_en_placeholder": "Írd be az angol beosztást",
+    "contact_info": "Elérhetőség",
+    "contact_placeholder": "Írd be az elérhetőséget (email, telefon stb.)",
+    "receiving_hours": "Fogadóóra",
+    "select_day": "Nap kiválasztása",
+    "select_period": "Időszak kiválasztása",
+    
+    "add_service": "Beosztás hozzáadása",
+    "existing_services": "Meglévő beosztások",
+    
+    "no_services_available": "Nincsenek megjeleníthető beosztások",
+    "no_services_description": "Jelenleg nincs megjeleníthető pedagógiai-pszichológiai beosztás.",
+    "please_fill_required_fields": "Kérlek, töltsd ki a kötelező mezőket!",
+    "service_added_successfully": "Beosztás sikeresen hozzáadva",
+    "error_adding_service": "Hiba történt a beosztás hozzáadásakor",
+    "confirm_delete_service": "Biztosan törlöd ezt a beosztást?",
+    "service_deleted_successfully": "Beosztás sikeresen törölve",
+    "error_deleting_service": "Hiba történt a beosztás törlésekor",
+    "error_field_too_long": "A beosztás mező túl hosszú, rövidítsd!",
+    "sb_subtitle":"",
+    "services_subtitle":"",
+    "no_board_members_found": "Nem találhatók iskolaszék tagok",
+    "no_board_members_paragraph": "Az iskolaszék tagjai még nincsenek regisztrálva a rendszerben.",
+    "edit_category":"Kategória szerkesztése",
+    "delete_category":"Kategória törlése"
     
 
 

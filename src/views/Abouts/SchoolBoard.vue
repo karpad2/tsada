@@ -1,7 +1,7 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-green-100">
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <!-- Hero Header -->
-        <div class="relative bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-900 overflow-hidden">
+        <div class="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
             <div class="absolute inset-0 bg-black/20"></div>
             <!-- Background decoration -->
             <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
@@ -10,20 +10,15 @@
             <div class="relative container mx-auto px-6 py-12">
                 <div class="max-w-4xl">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl ">
-                            <svg v-if="false" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                             </svg>
-                            <div class="w-12 h-12 flex items-center justify-center">
-                                <i class="pi pi-users text-[5rem]"></i>
-
-</div>
-                            
                         </div>
-                        <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('parents_council') }}</h1>
+                        <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('school_board') }}</h1>
                     </div>
-                    <p class="text-emerald-100 text-lg mb-6 leading-relaxed">
-                        {{ $t('pc_subtitle') }}
+                    <p class="text-blue-100 text-lg mb-6 leading-relaxed">
+                        {{ $t('sb_subtitle') }}
                     </p>
                     <div class="flex gap-4">
                         <button 
@@ -46,12 +41,12 @@
             <div class="bg-gray-100 rounded-lg p-4 text-sm">
                 <h3 class="font-bold mb-2">Debug Info:</h3>
                 <p><strong>Loading:</strong> {{ loading }}</p>
-                <p><strong>Members count:</strong> {{ councilMembers.length }}</p>
+                <p><strong>Members count:</strong> {{ boardMembers.length }}</p>
                 <p><strong>Current locale:</strong> {{ currentLocale }}</p>
                 <p><strong>Admin:</strong> {{ admin }}</p>
-                <div v-if="councilMembers.length > 0">
+                <div v-if="boardMembers.length > 0">
                     <p><strong>First member:</strong></p>
-                    <pre>{{ JSON.stringify(councilMembers[0], null, 2) }}</pre>
+                    <pre>{{ JSON.stringify(boardMembers[0], null, 2) }}</pre>
                 </div>
             </div>
         </div>
@@ -61,8 +56,8 @@
             <!-- Loading State -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-20">
                 <div class="relative">
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200"></div>
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-emerald-600 border-t-transparent absolute top-0 left-0"></div>
+                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
+                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
                 </div>
                 <p class="mt-4 text-gray-600 font-medium">{{ $t('loading_data') }}</p>
             </div>
@@ -79,7 +74,7 @@
                     <p class="text-gray-600 mb-4">{{ error }}</p>
                     <button 
                         @click="loadData"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors duration-200"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors duration-200"
                     >
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -89,7 +84,7 @@
                 </div>
             </div>
 
-            <!-- Parent Council Members Table -->
+            <!-- School Board Members Table -->
             <div v-if="!loading && !error && sortedMembers.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 <!-- Table Header -->
                 <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 text-white px-6 py-5">
@@ -97,11 +92,11 @@
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-white/10 rounded-lg">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">{{ $t('parents_council') }}</h3>
+                                <h3 class="text-xl font-bold">{{ $t('school_board') }}</h3>
                                 <p class="text-gray-300 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
                             </div>
                         </div>
@@ -116,7 +111,6 @@
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">#</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('name') }}</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('role') }}</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('other_info') }}</th>
                                 <th v-if="admin" class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t("operations") }}</th>
                             </tr>
                         </thead>
@@ -124,13 +118,12 @@
                             <tr 
                                 v-for="(member, index) in sortedMembers" 
                                 :key="member.$id || member.id"
-                                class="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 transition-all duration-200 group"
+                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group"
                             >
                                 <!-- Number -->
                                 <td class="px-6 py-4">
                                     <div 
-                                        class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                                        :class="member.is_president ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'"
+                                        class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm"
                                     >
                                         {{ index + 1 }}
                                     </div>
@@ -138,50 +131,16 @@
                                 
                                 <!-- Name -->
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-base font-semibold text-gray-900">
-                                            {{ getDisplayName(member) }}
-                                        </div>
-                                        <div v-if="member.is_president" class="flex items-center">
-                                            <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div v-if="getDisplayDescription(member)" class="text-sm text-gray-600 mt-1">
-                                        {{ getDisplayDescription(member) }}
+                                    <div class="text-base font-semibold text-gray-900">
+                                        {{ getDisplayName(member) }}
                                     </div>
                                 </td>
                                 
                                 <!-- Role -->
                                 <td class="px-6 py-4">
-                                    <span 
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold border-2 transition-all duration-200"
-                                        :class="getRoleBadgeClass(member)"
-                                    >
-                                        <svg v-if="member.is_president" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                        </svg>
-                                        {{ $t(member.position) }}
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-2 border-blue-300">
+                                        {{ getDisplayRole(member) }}
                                     </span>
-                                </td>
-
-                                <!-- Contact -->
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-600">
-                                        <div v-if="member.email" class="flex items-center gap-1">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                            </svg>
-                                            <a :href="`mailto:${member.email}`" class="text-emerald-600 hover:text-emerald-700">{{ member.email }}</a>
-                                        </div>
-                                        <div v-if="member.phone" class="flex items-center gap-1 mt-1">
-                                            <svg  class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                                            </svg>
-                                            <a :href="`tel:${member.phone}`" class="text-emerald-600 hover:text-emerald-700">{{ member.phone }}</a>
-                                        </div>
-                                    </div>
                                 </td>
 
                                 <!-- Actions -->
@@ -217,18 +176,18 @@
             <div v-if="!loading && !error && sortedMembers.length === 0" class="text-center py-20">
                 <div class="max-w-md mx-auto">
                     <div class="text-gray-400 mb-6">
-                        <svg v-if="false" class="mx-auto h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        <svg class="mx-auto h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $t('no_council_members_found') }}</h3>
-                    <p class="text-gray-600 mb-6">{{ $t("no_council_members_paragraph") }}</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $t('no_board_members_found') }}</h3>
+                    <p class="text-gray-600 mb-6">{{ $t("no_board_members_paragraph") }}</p>
                     <div v-if="admin" class="flex gap-4 justify-center">
                         <button 
                             @click="showEditor = true"
-                            class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors duration-200"
+                            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors duration-200"
                         >
-                            <svg  class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                             </svg>
                             {{ $t("add_a_member") }}
@@ -242,7 +201,7 @@
         <div v-if="showEditor && admin" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-6 py-4 rounded-t-2xl">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-2xl">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xl font-bold">
                             {{ editingMember ? 'Tag szerkesztése' : 'Új tag hozzáadása' }}
@@ -268,7 +227,7 @@
                                 v-model="memberForm.name_hu"
                                 type="text" 
                                 required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                                 placeholder="Teljes név magyarul"
                             >
                         </div>
@@ -277,7 +236,7 @@
                             <input 
                                 v-model="memberForm.name_rs"
                                 type="text" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                                 placeholder="Teljes név szerbül"
                             >
                         </div>
@@ -285,51 +244,14 @@
 
                     <!-- Role -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tisztség</label>
-                        <select 
-                            v-model="memberForm.position"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                        >
-                            <option value="member">{{ $t("member") }}</option>
-                            <option value="president">{{ $t("president") }}</option>
-                            <option value="vice_president">{{ $t("vicepresident") }}</option>
-                           
-                        </select>
-                    </div>
-
-                    <!-- President checkbox -->
-                    <div class="flex items-center gap-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Szerep/Pozíció *</label>
                         <input 
-                            v-model="memberForm.is_president"
-                            type="checkbox" 
-                            id="is_president"
-                            class="w-5 h-5 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                            v-model="memberForm.role"
+                            type="text" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                            placeholder="pl. Igazgató, Igazgatóhelyettes, Tanár, stb."
                         >
-                        <label for="is_president" class="text-sm font-semibold text-gray-700">Elnök</label>
-                    </div>
-
-                   
-
-                    <!-- Description Fields -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Leírás (Magyar)</label>
-                            <textarea 
-                                v-model="memberForm.description_hu"
-                                rows="3"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                                placeholder="Rövid leírás a tagról..."
-                            ></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Leírás (Szerb)</label>
-                            <textarea 
-                                v-model="memberForm.description_rs"
-                                rows="3"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                                placeholder="Kratki opis o članu..."
-                            ></textarea>
-                        </div>
                     </div>
 
                     <!-- Modal Footer -->
@@ -343,8 +265,8 @@
                         </button>
                         <button 
                             type="submit"
-                            :disabled="saving || !memberForm.name_hu.trim()"
-                            class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            :disabled="saving || !memberForm.name_hu.trim() || !memberForm.role.trim()"
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
                             <svg v-if="saving" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -374,7 +296,7 @@
                     </div>
                     <div v-if="memberToDelete" class="bg-gray-50 rounded-lg p-4 mb-6">
                         <p class="font-semibold">{{ getDisplayName(memberToDelete) }}</p>
-                        <p class="text-sm text-gray-600">{{ getRoleTitle(memberToDelete) }}</p>
+                        <p class="text-sm text-gray-600">{{ getDisplayRole(memberToDelete) }}</p>
                     </div>
                     <div class="flex gap-3 justify-end">
                         <button 
@@ -406,46 +328,34 @@ import { Client, Databases, Query, ID } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 
-
-interface CouncilMember {
+interface BoardMember {
     $id?: string;
     id?: string;
-    is_president: boolean;
-    position: string;
-    description: string;
     name_hu: string;
     name_rs: string;
-    description_hu: string;
-    description_rs: string;
-    email: string;
-    phone: string;
+    role: string;
 }
 
 export default {
-    name: 'ParentCouncil',
+    name: 'SchoolBoard',
     
     data() {
         return {
             loading: true,
             error: null as string | null,
             debugMode: false,
-            councilMembers: [] as CouncilMember[],
+            boardMembers: [] as BoardMember[],
             currentLocale: 'hu',
             showEditor: false,
-            editingMember: null as CouncilMember | null,
+            editingMember: null as BoardMember | null,
             saving: false,
             deleting: false,
             showDeleteConfirm: false,
-            memberToDelete: null as CouncilMember | null,
+            memberToDelete: null as BoardMember | null,
             memberForm: {
                 name_hu: '',
                 name_rs: '',
-                position: 'member',
-                is_president: false,
-                email: '',
-                phone: '',
-                description_hu: '',
-                description_rs: ''
+                role: ''
             }
         }
     },
@@ -456,21 +366,24 @@ export default {
             return cc.userLoggedin;
         },
 
-        sortedMembers(): CouncilMember[] {
-            if (!this.councilMembers.length) return [];
+        sortedMembers(): BoardMember[] {
+            if (!this.boardMembers.length) return [];
             
-            return [...this.councilMembers].sort((a, b) => {
-                // Elnökök előre
-                if (a.is_president && !b.is_president) return -1;
-                if (!a.is_president && b.is_president) return 1;
+            return [...this.boardMembers].sort((a, b) => {
+                // Sort by role importance first (you can customize this order)
+                const roleOrder = ['igazgató', 'igazgatóhelyettes', 'tanár', 'titkár'];
+                const aRoleIndex = roleOrder.findIndex(role => a.role.toLowerCase().includes(role));
+                const bRoleIndex = roleOrder.findIndex(role => b.role.toLowerCase().includes(role));
+                
+                if (aRoleIndex !== -1 && bRoleIndex !== -1) {
+                    if (aRoleIndex !== bRoleIndex) return aRoleIndex - bRoleIndex;
+                } else if (aRoleIndex !== -1) {
+                    return -1;
+                } else if (bRoleIndex !== -1) {
+                    return 1;
+                }
 
-                // Pozíciók szerint
-                const positionOrder = ['president', 'vice_president', 'secretary', 'treasurer', 'member'];
-                const aPos = positionOrder.indexOf(a.position || 'member');
-                const bPos = positionOrder.indexOf(b.position || 'member');
-                if (aPos !== bPos) return aPos - bPos;
-
-                // Név szerint
+                // Then by name
                 const aName = this.getDisplayName(a);
                 const bName = this.getDisplayName(b);
                 return aName.localeCompare(bName);
@@ -496,7 +409,7 @@ export default {
             this.error = null;
             
             try {
-                await this.loadCouncilMembers();
+                await this.loadBoardMembers();
             } catch (error: any) {
                 console.error('Data load error:', error);
                 this.error = error.message || 'Hiba az adatok betöltésében';
@@ -505,42 +418,38 @@ export default {
             }
         },
 
-        async loadCouncilMembers() {
-            if (!config.parent_council_members) {
-                throw new Error('Parent council members collection ID not configured');
+        async loadBoardMembers() {
+            if (!config.school_board) {
+                throw new Error('School board collection ID not configured');
             }
 
             const database = new Databases(appw);
             try {
                 const response = await database.listDocuments(
                     config.website_db,
-                    config.parent_council_members,
+                    config.school_board,
                     [Query.limit(200), Query.orderAsc('$createdAt')]
                 );
 
-                console.log('Raw council data:', response.documents);
+                console.log('Raw school board data:', response.documents);
 
-                this.councilMembers = response.documents.map((doc: any) => ({
+                this.boardMembers = response.documents.map((doc: any) => ({
                     $id: doc.$id,
                     id: doc.$id,
-                    is_president: Boolean(doc.is_president),
-                    position: doc.position || 'member',
-                    description: doc.description || '',
                     name_hu: doc.name_hu || '',
                     name_rs: doc.name_rs || '',
-                    description_hu: doc.description_hu || '',
-                    description_rs: doc.description_rs || '',
+                    role: doc.role || ''
                 }));
 
-                console.log('Processed council members:', this.councilMembers);
+                console.log('Processed board members:', this.boardMembers);
                 
             } catch (error: any) {
-                console.error('Members load error:', error);
-                throw new Error(`Szülői tanács tagok betöltési hiba: ${error.message}`);
+                console.error('Board members load error:', error);
+                throw new Error(`Iskolaszék tagok betöltési hiba: ${error.message}`);
             }
         },
 
-        getDisplayName(member: CouncilMember): string {
+        getDisplayName(member: BoardMember): string {
             const cc = useLoadingStore();
             if (cc.language == "sr" || cc.language == "rs") {
                 return member.name_rs || member.name_hu || 'Névtelen';
@@ -549,71 +458,23 @@ export default {
             }
         },
 
-        getDisplayDescription(member: CouncilMember): string {
-            const cc = useLoadingStore();
-            if (cc.language == "sr" || cc.language == "rs") {
-                return member.description_rs || member.description_hu || '';
-            } else {
-                return member.description_hu || member.description_rs || '';
-            }
+        getDisplayRole(member: BoardMember): string {
+            return member.role || 'Nincs megadva';
         },
 
-        getRoleTitle(member: CouncilMember): string {
-            const cc = useLoadingStore();
-            const isSerbian = cc.language == "sr" || cc.language == "rs";
-            
-            const roleMapHu: { [key: string]: string } = {
-                'president': 'Elnök',
-                'vice_president': 'Alelnök',
-                'secretary': 'Titkár',
-                'treasurer': 'Pénztáros',
-                'member': 'Tag'
-            };
-            
-            const roleMapRs: { [key: string]: string } = {
-                'president': 'Predsednik',
-                'vice_president': 'Potpredsednik',
-                'secretary': 'Sekretar',
-                'treasurer': 'Blagajnik',
-                'member': 'Član'
-            };
-            
-            const roleMap = isSerbian ? roleMapRs : roleMapHu;
-            return roleMap[member.position] || (isSerbian ? 'Član' : 'Tag');
-        },
-
-        getRoleBadgeClass(member: CouncilMember): string {
-            if (member.is_president || member.position === 'president') {
-                return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border-yellow-400 shadow-lg';
-            }
-            switch (member.position) {
-                case 'vice_president':
-                    return 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400 shadow-md';
-                case 'secretary':
-                    return 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-md';
-                case 'treasurer':
-                    return 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-400 shadow-md';
-                default:
-                    return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white border-gray-400 shadow-sm';
-            }
-        },
-
-        editMember(member: CouncilMember) {
+        editMember(member: BoardMember) {
             if (!this.admin) return;
             
             this.editingMember = member;
             this.memberForm = {
                 name_hu: member.name_hu,
                 name_rs: member.name_rs,
-                position: member.position,
-                is_president: member.is_president,
-                description_hu: member.description_hu,
-                description_rs: member.description_rs
+                role: member.role
             };
             this.showEditor = true;
         },
 
-        deleteMember(member: CouncilMember) {
+        deleteMember(member: BoardMember) {
             if (!this.admin) return;
             
             this.memberToDelete = member;
@@ -628,12 +489,12 @@ export default {
                 const database = new Databases(appw);
                 await database.deleteDocument(
                     config.website_db,
-                    config.parent_council_members,
+                    config.school_board,
                     this.memberToDelete.$id!
                 );
                 
                 // Remove from local array
-                this.councilMembers = this.councilMembers.filter(m => m.$id !== this.memberToDelete!.$id);
+                this.boardMembers = this.boardMembers.filter(m => m.$id !== this.memberToDelete!.$id);
                 
                 this.showDeleteConfirm = false;
                 this.memberToDelete = null;
@@ -651,19 +512,12 @@ export default {
             this.memberForm = {
                 name_hu: '',
                 name_rs: '',
-                position: 'member',
-                is_president: false,
-                description_hu: '',
-                description_rs: ''
+                role: ''
             };
-        },
-        getClassNameById(year: number, designation: number): string {
-            const yearMap: { [key: number]: string } = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
-            return `${yearMap[year] || year}-${designation}`;
         },
 
         async saveMember() {
-            if (!this.admin || !this.memberForm.name_hu.trim()) return;
+            if (!this.admin || !this.memberForm.name_hu.trim() || !this.memberForm.role.trim()) return;
             
             this.saving = true;
             try {
@@ -672,47 +526,41 @@ export default {
                 const memberData = {
                     name_hu: this.memberForm.name_hu.trim(),
                     name_rs: this.memberForm.name_rs.trim(),
-                    position: this.memberForm.position,
-                    is_president: this.memberForm.is_president,
-                  
-                    description_hu: this.memberForm.description_hu.trim(),
-                    description_rs: this.memberForm.description_rs.trim()
+                    role: this.memberForm.role.trim()
                 };
 
                 if (this.editingMember) {
                     // Update existing member
                     const updatedDoc = await database.updateDocument(
                         config.website_db,
-                        config.parent_council_members,
+                        config.school_board,
                         this.editingMember.$id!,
                         memberData
                     );
                     
                     // Update local array
-                    const index = this.councilMembers.findIndex(m => m.$id === this.editingMember!.$id);
+                    const index = this.boardMembers.findIndex(m => m.$id === this.editingMember!.$id);
                     if (index !== -1) {
-                        this.councilMembers[index] = {
+                        this.boardMembers[index] = {
                             ...memberData,
                             $id: updatedDoc.$id,
-                            id: updatedDoc.$id,
-                            description: memberData.description_hu || memberData.description_rs || ''
+                            id: updatedDoc.$id
                         };
                     }
                 } else {
                     // Create new member
                     const newDoc = await database.createDocument(
                         config.website_db,
-                        config.parent_council_members,
+                        config.school_board,
                         ID.unique(),
                         memberData
                     );
                     
                     // Add to local array
-                    this.councilMembers.push({
+                    this.boardMembers.push({
                         ...memberData,
                         $id: newDoc.$id,
-                        id: newDoc.$id,
-                        description: memberData.description_hu || memberData.description_rs || ''
+                        id: newDoc.$id
                     });
                 }
                 
@@ -770,7 +618,7 @@ input:invalid, select:invalid, textarea:invalid {
 }
 
 input:valid, select:valid, textarea:valid {
-    border-color: #10b981;
+    border-color: #3b82f6;
 }
 
 /* Loading spinner */

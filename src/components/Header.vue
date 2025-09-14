@@ -26,7 +26,10 @@
                   <div v-if="reload" tabindex="0" role="button" class="btn btn-ghost cursor-pointer dark:text-white ">{{ $t('aboutus') }}<i class="pi pi-angle-down"></i></div>
                   <ul  v-if="reload" tabindex="0" class="dropdown-content z-[1] menu p-2  bg-base-100 rounded-box block w-52 ">
                       <li ><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
-                      <li v-if="false" ><router-link to="/about/parentscouncil">{{ $t("parents_council") }}</router-link></li>
+                      <li  ><router-link to="/about/schoolboard">{{ $t("school_board") }}</router-link></li>
+                      <li  ><router-link to="/about/parentscouncil">{{ $t("parents_council") }}</router-link></li>
+                      <li  ><router-link to="/about/pepsi">{{ $t("services") }}</router-link></li>
+                      
                       
                       <li v-if="reload"  v-for="about in abouts" :key="about.id"><router-link :to="'/renderer/about/'+about.id">{{ about.title }}</router-link></li>
                       <li ><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
