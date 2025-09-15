@@ -16,7 +16,7 @@
               <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('services') }}</h1>
             </div>
             <p class="text-blue-100 text-lg mb-6 leading-relaxed">
-              {{ $t('services_subtitle') || 'Iskolai szolgáltatások és fogadó órák' }}
+              {{ $t('services_subtitle') }}
             </p>
             <div class="flex gap-4">
               <button

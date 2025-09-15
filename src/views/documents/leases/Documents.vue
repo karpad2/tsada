@@ -1,361 +1,217 @@
 <template>
     <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30" >
-                <div class="flex flex-wrap w-full mb-20">
-                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('documents') }}</h1>
-                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                    </div>
-                
+        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
+            <div class="flex flex-wrap w-full mb-20">
+                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
+                    <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
+                        {{ $t('documents') }}
+                    </h1>
+                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
                 </div>
-                <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
-                <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
-                <v-data-table  height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
-                    <template v-slot:item.date="{ item }">
-        {{ rt_time(item.date) }}
-        </template>
-    
-      <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book icon_size"></i></router-link>
-       
-      </template>
+            </div>
 
-      <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/document/'+item.id"><i class="pi pi-cloud-upload icon_size"></i></router-link>
-       
-      </template>
+            <div v-if="!loaded">
+                <Loading />
+            </div>
 
-      <template #bottom></template>
+            <div v-else class="space-y-8">
+                <div v-for="role in roles" :key="role.id" class="popups">
+                    <h2 class="sm:text-2xl text-lg font-medium mb-3 text-gray-900 dark:text-white">
+                        {{ role.role }}
+                    </h2>
+
+                    <v-data-table
+                        height="400"
+                        :headers="headers"
+                        :items="role.workers"
+                        :items-per-page="-1"
+                    >
+                        <template v-slot:item.date="{ item }">
+                            {{ formatTime(item.date) }}
+                        </template>
+
+                        <template v-slot:item.open="{ item }">
+                            <router-link :to="`/document/${item.doc_id}`">
+                                <i class="pi pi-book icon_size text-blue-600 hover:text-blue-800 transition-colors"></i>
+                            </router-link>
+                        </template>
+
+                        <template v-slot:item.edit="{ item }" v-if="admin">
+                            <router-link :to="`/admin/document/${item.id}`">
+                                <i class="pi pi-cloud-upload icon_size text-green-600 hover:text-green-800 transition-colors"></i>
+                            </router-link>
+                        </template>
+
+                        <template #bottom></template>
                     </v-data-table>
-                    <div v-if="admin">
-                        <v-btn  @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
-                        <v-btn v-if="!role.archived"  @click="archive_stuff(role.id)" class="m-5">{{ $t('archive_category') }}</v-btn>
-                        <v-btn v-else  @click="restore_stuff(role.id)" class="m-5">{{ $t('restore') }}</v-btn>
-                </div>    
-                </div>
-                <div v-else>
-                    <Loading />
-                </div>
-                <div>
-                    <v-btn v-if=" loaded && !archived" @click="open_archive" class="m-5">{{ $t('show_archive') }}</v-btn>
-                </div>
-    </div>
-    </section>
-    
-    
-    </template>
-    <script lang="ts">
-    
-    import { Client, Databases, ID,Storage,Query } from "appwrite";
-    import {appw,config} from "@/appwrite";
-    import { convertifserbian } from "@/lang";
-    import {useLoadingStore} from "@/stores/loading";
-    import {reactive,ref} from "vue";
-    import gsap from "gsap";
-    import moment from 'moment/min/moment-with-locales';
-    import Loading from "@/components/Loading.vue";
-    
-    export default {
-        name: 'Workers',
-        components: {
-            Loading
-        },
-        setup()
-        {
-    
-        },
-        mounted()
-        {
-            const loadingStore = useLoadingStore();
-            this.admin=loadingStore.userLoggedin;
-            document.title=this.$t("documents");
-    
-            gsap.fromTo(
-        "#render_title",
-        {
-          opacity: 0,
-          x: "50%",
-        },
-        {
-          duration: 1.5,
-          opacity: 1,
-          x: 0,
-        }
-      );
-    
-     
-    
-    
-            //loadingStore.setLoading(true);
-            
-            this.load_workers_base();
-            
-            this.headers= [
-                    { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                    { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    
-                    { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
-                    
-                    ];
-        
 
-        if(this.admin)
-        {
-            this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
-            this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
+                    <div v-if="admin" class="flex gap-3 mt-4 flex-wrap">
+                        <v-btn @click="new_stuff(role.id)" color="primary" class="m-2">
+                            {{ $t('add_new_document_in_that_category') }}
+                        </v-btn>
+                        <v-btn
+                            v-if="!role.archived"
+                            @click="archive_stuff(role.id)"
+                            color="warning"
+                            class="m-2"
+                        >
+                            {{ $t('archive_category') }}
+                        </v-btn>
+                        <v-btn
+                            v-else
+                            @click="restore_stuff(role.id)"
+                            color="success"
+                            class="m-2"
+                        >
+                            {{ $t('restore') }}
+                        </v-btn>
+                    </div>
+                </div>
+
+                <div v-if="loaded && !archived" class="mt-8">
+                    <v-btn @click="open_archive" color="secondary" class="m-5">
+                        {{ $t('show_archive') }}
+                    </v-btn>
+                </div>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script lang="ts">
+import gsap from "gsap";
+import { useLoadingStore } from "@/stores/loading";
+import Loading from "@/components/Loading.vue";
+import {
+    formatTime,
+    createNewDocument,
+    archiveCategory,
+    loadCategoriesWithDocuments,
+    type CategoryItem
+} from "@/utils/documentUtils";
+
+export default {
+    name: 'Documents',
+    components: {
+        Loading
+    },
+
+    data: () => ({
+        roles: [] as CategoryItem[],
+        loaded: false,
+        headers: [] as any[],
+        admin: false,
+        archived: false
+    }),
+
+    async mounted() {
+        const loadingStore = useLoadingStore();
+        this.admin = loadingStore.userLoggedin;
+        document.title = this.$t("documents");
+
+        // Initialize headers
+        this.headers = [
+            { title: this.$t("name"), align: 'start', sortable: false, key: 'name', width: '300px' },
+            { title: this.$t("date"), align: 'start', key: 'date', width: '200px' },
+            { title: this.$t("open_document"), align: 'start', key: 'open', width: '100px' }
+        ];
+
+        if (this.admin) {
+            this.headers.push({
+                title: this.$t("edit_document"),
+                align: 'start',
+                key: 'edit',
+                width: '100px'
+            });
         }
-    
-    
-                        gsap.fromTo(
-                        ".popups",
-                        {
+
+        // Title animation
+        gsap.fromTo("#render_title", {
+            opacity: 0,
+            x: "50%",
+        }, {
+            duration: 1.5,
+            opacity: 1,
+            x: 0,
+        });
+
+        await this.load_workers_base();
+    },
+
+    methods: {
+        formatTime,
+
+        async new_stuff(categoryId: string): Promise<void> {
+            try {
+                const newDoc = await createNewDocument(categoryId);
+                this.$router.push(`/admin/document/${newDoc.$id}`);
+            } catch (error) {
+                console.error('Error creating new document:', error);
+            }
+        },
+
+        async archive_stuff(categoryId: string): Promise<void> {
+            try {
+                await archiveCategory(categoryId, true);
+                await this.load_workers_base();
+            } catch (error) {
+                console.error('Error archiving category:', error);
+            }
+        },
+
+        async restore_stuff(categoryId: string): Promise<void> {
+            try {
+                await archiveCategory(categoryId, false);
+                await this.load_workers_base();
+            } catch (error) {
+                console.error('Error restoring category:', error);
+            }
+        },
+
+        async open_archive(): Promise<void> {
+            this.archived = true;
+            await this.load_workers_base();
+        },
+
+        async load_workers_base(): Promise<void> {
+            try {
+                this.loaded = false;
+                this.roles = await loadCategoriesWithDocuments(this.archived);
+                this.loaded = true;
+
+                // Animate elements after loading
+                this.$nextTick(() => {
+                    gsap.fromTo(".popups", {
                         opacity: 0,
                         y: "50%",
-                        },
-                        {
-                        duration: 1.5,
+                    }, {
+                        duration: 1.2,
                         opacity: 1,
                         y: 0,
-                        }
-                    );                
-        },
-        data: () => ({
-            workers: [
-                {
-                    img: 'https://dummyimage.com/720x400',
-                    name: 'SUBTITLE',
-                    role: 'First',
-                    contact: 'Lorem ipsum dolor sit'}],
-                    roles:[],
-                    colDefs:[],
-                    loaded:false,
-                    headers:[],
-                    admin:false,
-                    archived:false
-                    
-                }),
-        methods:{
-            rt_time(a)
-                {   const loadingStore = useLoadingStore();
-                    let local=loadingStore.language;
-                    if(local=="rs"||local=="sr")
-                    {
-                        moment.locale('sr');
-                    }
-                    else if(local=="hu")
-                    {
-                        moment.locale('hu');
-                    }
-                    else if(local=="en")
-                    {
-                        moment.locale('en');
-                    }
-                    else {
+                        stagger: 0.1
+                    });
+                });
 
-                    }
-                    return moment(a).format("LLL");
-                },
-            async new_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                this.$router.push("/admin/document/"+l.$id);
-            },
-            async archive_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":true});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async restore_stuff(aaa)
-            {
-                const database = new Databases(appw);
-                //const l= await database.createDocument(config.website_db, config.documents_db,ID.unique(),{"documentCategories":aaa});
-                const l= await database.updateDocument(config.website_db,config.document_categories_db,aaa,{"archived":false});
-                console.log(l);
-
-                this.load_workers_base();
-            },
-
-            async open_archive()
-            {
-                this.archived=true;
-                this.load_workers_base();
-            },
-            async load_workers_base(){
-            this.loaded=false;
-            const loadingStore = useLoadingStore();
-            //loadingStore.setLoading(true);
-            this.workers=[];
-            this.roles=[];
-            //console.log();
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
-    
-            let local=loadingStore.language;
-    
-            //let missing_picture=storage.getFileView(config.website_images,config.missing_worker_picture).href;
-            
-            //this is f voodoo, and sucks, but it works
-            let k,n;
-            
-            k= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",false)]);
-            
-            if(this.archived)
-            {
-                n= await database.listDocuments(config.website_db, config.document_categories_db,[Query.orderAsc("listasorrend"),Query.equal("archived",true)]);
+            } catch (error) {
+                console.error('Error loading categories and documents:', error);
+                this.loaded = true;
             }
-            for (let i=0;i<k.documents.length;i++)
-            {
-            let el1=k.documents[i];
-          //   k.documents.forEach(async (el1) => {
-                let _works=[];
-                //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
-            ]);
-            //console.log(l);
-                let name="";
-                if(local=="en")
-                {
-                    name=el1.category_name_en;
-                }
-                else if(local=="hu")
-                {
-                    name=el1.category_name_hu;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    name=el1.category_name_rs;
-                }
-                //console.log(l);
-                await l.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=el2.document_title_rs;
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                if(el2.worker_img==""||el2.worker_img==null)
-                {
-                //a.img=missing_picture;
-                }
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                _works.push(a);
-            });
-            let b={role:"",workers:[],id:"",archived:false};
-            b.id=el1.$id;
-            b.role=name;
-            b.archived=el1.archived;
-            b.workers=_works;
-            this.roles.push(b);
-    //        });
-          }
-          if(this.archived)
-          {
-          for (let i=0;i<n.documents.length;i++)
-            {
-            let el1=n.documents[i];
-          //   k.documents.forEach(async (el1) => {
-                let _works=[];
-                //console.log(el1);
-                let l= await database.listDocuments(config.website_db, config.documents_db,[
-                    Query.equal("documentCategories",[el1.$id])
-            ]);
-            //console.log(l);
-                let name="";
-                if(local=="en")
-                {
-                    name=el1.category_name_en;
-                }
-                else if(local=="hu")
-                {
-                    name=el1.category_name_hu;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    name=convertifserbian(el1.category_name_rs);
-                }
-                name+=` ~ ${this.$t("archived")}`;
-                //console.log(l);
-                await l.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=convertifserbian(el2.document_title_rs);
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                if(el2.worker_img==""||el2.worker_img==null)
-                {
-                //a.img=missing_picture;
-                }
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                _works.push(a);
-            });
-            let b={role:"",workers:[],id:"",archived:false};
-            b.id=el1.$id;
-            b.role=name;
-            b.archived=el1.archived;
-            b.workers=_works;
-            this.roles.push(b);
-    //        });
-          }
         }
+    }
+}
+</script>
 
-            console.log(this.roles);
-            //loadingStore.setLoading(false);
-            this.loaded=true;
-            },
-            onReady(params) {
-                    console.log('onReady');
-    
-                    //this.api = params.api;
-                    //this.calculateRowCount();
-                    //this.load_workers_base();
-                    //this.api.sizeColumnsToFit();
-                }
-           
-        },
-        
-        
-    }
-    </script>
-    <style>
-    .icon_size{
-        /*font-size: 3em;;*/
-    }
+<style scoped>
+.popups {
+    transition: all 0.4s ease;
+}
+
+.icon_size {
+    font-size: 1.5rem;
+}
+
+.pi:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
 </style>

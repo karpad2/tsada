@@ -1,0 +1,17 @@
+# Development Dockerfile for TSADA SSR with hot reload
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose development port
+EXPOSE 5173
+
+# Run development SSR server
+CMD ["npm", "run", "dev:ssr"]

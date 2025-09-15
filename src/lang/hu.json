@@ -341,9 +341,20 @@
     "services_subtitle":"",
     "no_board_members_found": "Nem találhatók iskolaszék tagok",
     "no_board_members_paragraph": "Az iskolaszék tagjai még nincsenek regisztrálva a rendszerben.",
+    "role_not_specified": "Szerep nincs megadva",
     "edit_category":"Kategória szerkesztése",
-    "delete_category":"Kategória törlése"
-    
+    "delete_category":"Kategória törlése",
+    "img_loading_error": "Kép betöltési hiba",
 
+    "new_version_available": "Új verzió elérhető",
+    "update_app_message": "Frissítsd az alkalmazást a legújabb funkciókhoz.",
+    
+    "updating": "Frissítés...",
+    "later": "Később",
+    "offline_ready": "Offline használatra kész",
+    "offline_ready_message": "Az alkalmazás mostantól offline is használható.",
+    "cache_cleared": "Cache törölve",
+    "language_changed": "Nyelv módosítva",
+    "refresh_required": "Frissítés szükséges"
 
  }

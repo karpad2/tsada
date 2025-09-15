@@ -1,121 +1,67 @@
 <template>
-  <div class="relative mb-4 container px-5 mx-auto bg-white">
-    <!-- Main Controls -->
-    <section class="control-section mb-6">
-      <div class="flex flex-wrap gap-4 mb-4">
-        <v-switch 
-          v-model="formData.visible" 
-          :label="$t('visible')" 
-          @change="save" 
-        />
-        <v-switch 
-          v-model="formData.notNews" 
-          :label="$t('not_news')" 
-          @change="save" 
-        />
-        <v-switch 
-          v-model="formData.show_date" 
-          :label="$t('show_date')" 
-          @change="save" 
-        />
-      </div>
-      
-      <div class="action-buttons flex gap-2 mb-4">
-        <v-btn @click="save">{{ $t('save') }}</v-btn>
-        <v-btn @click="deleteContent" color="error">{{ $t('delete') }}</v-btn>
-        <v-btn @click="shareFacebook" color="primary">{{ $t('fb_share') }}</v-btn>
-      </div>
-    </section>
+  <div class="content-editor container px-5 mx-auto bg-white">
+    <!-- General Controls -->
+    <GeneralControlsSection
+      :visible="formData.visible"
+      :not-news="formData.notNews"
+      :show-date-value="formData.show_date"
+      :show-not-news="true"
+      :show-date="true"
+      :show-facebook-share="true"
+      :is-loading="isLoading"
+      :is-any-loading="isAnyLoading()"
+      @save="save"
+      @delete="deleteContent"
+      @facebook-share="shareFacebook"
+      @update:visible="updateField('visible', $event)"
+      @update:notNews="updateField('notNews', $event)"
+      @update:showDate="updateField('show_date', $event)"
+    />
 
-    <!-- Image Upload Section -->
-    <section class="image-section mb-6">
-      <v-file-input 
-        v-model="file_link" 
-        accept="image/*" 
-        :label="$t('fileupload')" 
-        @change="handleFileUpload" 
-      />
-      
-      <div class="preview-section">
-        <h3>{{ $t("preview") }}</h3>
-        <div class="flex flex-wrap -m-4">
-          <div class="xl:w-1/5 md:w-1/2 p-4 cursor-pointer">
-            <div class="bg-slate-100/30 hover:bg-sky-600/30 dark:bg-slate-300/30 p-6 rounded-lg shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
-              <img 
-                class="h-40 rounded w-full object-cover object-center mb-6 transition duration-300 ease-in-out"
-                :src="img" 
-                alt="content preview"
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- File Upload Section -->
+    <FileUploadSection
+      upload-type="image"
+      :multiple="false"
+      :preview-urls="img ? [img] : []"
+      :uploaded-file-ids="default_image ? [default_image] : []"
+      :storage-id="config.website_images"
+      @files-uploaded="handleFilesUploaded"
+    />
 
     <!-- Language Sections -->
     <section class="language-sections">
-      <!-- Serbian -->
-      <div class="language-section mb-6">
-        <v-switch 
-          v-model="formData.srb_flag" 
-          :label="$t('srb')" 
-          @change="save" 
-        />
-        <div v-if="formData.srb_flag" class="language-content mt-4">
-          <v-text-field
-            v-model="formData.title_rs"
-            :counter="100"
-            :label="$t('srb_title')"
-            hide-details
-            @change="save"
-          />
-          <div class="mt-4">
-            <ckeditor v-model="formData.content_rs" />
-          </div>
-        </div>
-      </div>
+      <LanguageFieldGroup
+        language-key="srb"
+        :enabled="formData.srb_flag"
+        :title-value="formData.title_rs"
+        :content-value="formData.content_rs"
+        @update:enabled="updateField('srb_flag', $event)"
+        @update:title="updateField('title_rs', $event)"
+        @update:content="updateField('content_rs', $event)"
+        @save="handleFieldChange"
+      />
 
-      <!-- Hungarian -->
-      <div class="language-section mb-6">
-        <v-switch 
-          v-model="formData.hun_flag" 
-          :label="$t('hu')" 
-          @change="save" 
-        />
-        <div v-if="formData.hun_flag" class="language-content mt-4">
-          <v-text-field
-            v-model="formData.title_hu"
-            :counter="100"
-            :label="$t('hu_title')"
-            hide-details
-            @change="save"
-          />
-          <div class="mt-4">
-            <ckeditor v-model="formData.content_hu" />
-          </div>
-        </div>
-      </div>
+      <LanguageFieldGroup
+        language-key="hu"
+        :enabled="formData.hun_flag"
+        :title-value="formData.title_hu"
+        :content-value="formData.content_hu"
+        @update:enabled="updateField('hun_flag', $event)"
+        @update:title="updateField('title_hu', $event)"
+        @update:content="updateField('content_hu', $event)"
+        @save="handleFieldChange"
+      />
 
-      <!-- English -->
-      <div class="language-section mb-6">
-        <v-switch 
-          v-model="formData.en_flag" 
-          :label="$t('en')" 
-          @change="save" 
-        />
-        <div v-if="formData.en_flag" class="language-content mt-4">
-          <v-text-field
-            v-model="formData.title_en"
-            :counter="100"
-            :label="$t('en_title')"
-            hide-details
-            @change="save"
-          />
-          <div class="mt-4">
-            <ckeditor v-model="formData.content_en" />
-          </div>
-        </div>
-      </div>
+      <LanguageFieldGroup
+        language-key="en"
+        :enabled="formData.en_flag"
+        :title-value="formData.title_en"
+        :content-value="formData.content_en"
+        @update:enabled="updateField('en_flag', $event)"
+        @update:title="updateField('title_en', $event)"
+        @update:content="updateField('content_en', $event)"
+        @save="handleFieldChange"
+      />
     </section>
 
     <!-- YouTube Video -->
@@ -180,6 +126,11 @@ import { useLoadingStore } from "@/stores/loading"
 import AlbumViewer from "@/components/AlbumViewer.vue"
 import { convertifserbian } from "@/lang"
 import DocLister from "@/components/DocLister.vue"
+import { useEditor } from '@/composables/useEditor'
+import { LoadingManager } from '@/utils/editorUtils'
+import GeneralControlsSection from '@/components/shared/GeneralControlsSection.vue'
+import LanguageFieldGroup from '@/components/shared/LanguageFieldGroup.vue'
+import FileUploadSection from '@/components/shared/FileUploadSection.vue'
 
 interface FormData {
   title_en: string
@@ -204,12 +155,16 @@ export default defineComponent({
   name: 'ContentEditor',
   components: {
     AlbumViewer,
-    DocLister
+    DocLister,
+    GeneralControlsSection,
+    LanguageFieldGroup,
+    FileUploadSection
   },
   setup() {
     const route = useRoute()
     const router = useRouter()
-    
+    const loadingManager = new LoadingManager()
+
     // Reactive state
     const id = ref<string>(route.params.id as string)
     const file_link = ref(null)
@@ -218,7 +173,7 @@ export default defineComponent({
     const default_image = ref<string>("")
     const uploading = ref<boolean>(false)
     const _update = ref<boolean>(true)
-    
+
     const formData = reactive<FormData>({
       title_en: "",
       title_hu: "",
@@ -237,6 +192,19 @@ export default defineComponent({
       gallery_id: "",
       notNews: true
     })
+
+    // Loading helpers
+    const isLoading = (key: string) => loadingManager.isLoading(key)
+    const isAnyLoading = () => loadingManager.isAnyLoading()
+
+    // Field update helper
+    const updateField = (field: string, value: any) => {
+      (formData as any)[field] = value
+    }
+
+    const handleFieldChange = async () => {
+      await save()
+    }
 
     const showAlbumViewer = computed(() => _update.value && formData.gallery_id)
 
@@ -346,27 +314,36 @@ export default defineComponent({
       }
     }
 
+    const handleFilesUploaded = async (uploadedFiles: any[]): Promise<void> => {
+      if (uploadedFiles.length > 0) {
+        const file = uploadedFiles[0]
+        default_image.value = file.$id
+        img.value = storage.getFileView(config.website_images, file.$id).toString()
+        await save()
+      }
+    }
+
     const handleFileUpload = async (): Promise<void> => {
       if (!file_link.value) {
         console.warn("No file selected")
         return
       }
-      
+
       try {
         uploading.value = true
-        
+
         const result = await storage.createFile(
           config.website_images,
           ID.unique(),
           file_link.value
         )
-        
+
         default_image.value = result.$id
         img.value = storage.getFileView(config.website_images, result.$id).toString()
-        
+
         await save()
         // this.$notify(this.$t('file_uploaded'))
-        
+
       } catch (error) {
         console.error('Failed to upload file:', error)
       } finally {
@@ -482,15 +459,26 @@ export default defineComponent({
       formData,
       uploading,
       showAlbumViewer,
-      
+      default_image,
+
+      // Loading helpers
+      isLoading,
+      isAnyLoading,
+      updateField,
+      handleFieldChange,
+
       // Methods
       save,
       deleteContent,
       shareFacebook,
       handleFileUpload,
+      handleFilesUploaded,
       handleDocumentsToggle,
       handleCreateGallery,
-      handleGalleryChange
+      handleGalleryChange,
+
+      // Config
+      config
     }
   }
 })
@@ -498,10 +486,12 @@ export default defineComponent({
 
 <style scoped>
 .content-editor {
-  @apply max-w-full;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-.control-section {
+.language-sections {
   @apply border-b border-gray-200 pb-4;
 }
 

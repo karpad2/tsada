@@ -1,12 +1,12 @@
 import './assets/main.css'
 import Loading from "@/assets/Loading.gif"
-import { createApp  } from 'vue'
+import { createApp as createVueApp } from 'vue'
 
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
-import router from './router'
+import { createRouter } from './router'
 //import Particles from "vue3-particles";
 
 import { QuillEditor } from '@vueup/vue-quill'
@@ -35,72 +35,99 @@ import CountryFlag from 'vue-country-flag-next'
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
 import { createGtag } from "vue-gtag";
+import SEOPlugin from '@/plugins/seo'
 
 import gsap from "gsap";
-const app = createApp(App)
-//const client = new Client();
-const pinia =createPinia();
-pinia.use(piniaPluginPersistedstate);
-app.use(pinia);
-app.use(router);
 
-const gtag = createGtag({
-  tagId: "G-FZYC1503VB"
-})
+export function createApp() {
+  const app = createVueApp(App)
+  //const client = new Client();
+  const pinia = createPinia()
+  pinia.use(piniaPluginPersistedstate)
 
-const vuetify = createVuetify({
-    components,
-    directives,
-    theme: {
-      defaultTheme: 'light',
-      themes:
-      {
-        light:{
+  const router = createRouter()
 
-        },
-        dark:{}
-      }
-    }
-  })
-app.component('QuillEditor', QuillEditor)
+  app.use(pinia)
+  app.use(router)
 
-//console.log(messages);
-
-app.use(CKEditor);
-const i18n = createI18n({
-    locale: 'en', fallbackLocale: 'en',  messages, globalInjection: true  });
-/*
-client
-    .setEndpoint('https://appwrite.kasoft.co.uk/v1')
-    .setProject('653bb473ee7f6a6074e7');*/
-//app.use(VueI18n);
-//app.use(CkeditorPlugin);
-app.use(Notifications);
-app.use(vuetify);
-app.use(VueLazyLoad, {
-  loading:LoadingImg
-  // options...
-});
-app.use(PrimeVue, {
-  theme: {
-      preset: Aura
+  // Only initialize gtag on client side
+  if (typeof window !== 'undefined') {
+    const gtag = createGtag({
+      tagId: "G-FZYC1503VB"
+    })
+    app.use(gtag)
   }
-});
-app.component('country-flag', CountryFlag)
-vuetify.theme.name.primary = "#0EA5E9";
-app.component('video-background', VideoBackground);
-app.config.globalProperties.$appwrite = appw;
-app.use(Particles,{init:async engine => {await loadFull(engine)}});
-app.use(i18n);
-app.use(VueViewer, {
-    defaultOptions: {
-      zIndex: 9999
+
+  const vuetify = createVuetify({
+      components,
+      directives,
+      theme: {
+        defaultTheme: 'light',
+        themes:
+        {
+          light:{
+
+          },
+          dark:{}
+        }
+      }
+    })
+  app.component('QuillEditor', QuillEditor)
+
+  //console.log(messages);
+
+  app.use(CKEditor);
+  const i18n = createI18n({
+      locale: 'en', fallbackLocale: 'en',  messages, globalInjection: true  });
+  /*
+  client
+      .setEndpoint('https://appwrite.kasoft.co.uk/v1')
+      .setProject('653bb473ee7f6a6074e7');*/
+  //app.use(VueI18n);
+  //app.use(CkeditorPlugin);
+  app.use(Notifications);
+  app.use(vuetify);
+
+  // Only use lazy loading on client side
+  if (typeof window !== 'undefined') {
+    app.use(VueLazyLoad, {
+      loading: LoadingImg
+      // options...
+    });
+  }
+
+  app.use(PrimeVue, {
+    theme: {
+        preset: Aura
     }
   });
+  app.component('country-flag', CountryFlag)
+  vuetify.theme.name.primary = "#0EA5E9";
+  app.component('video-background', VideoBackground);
+  app.config.globalProperties.$appwrite = appw;
 
-  app.use(gtag);
-app.component('VueCookieComply', VueCookieComply)
-//app.use(gsap);
-app.use(router);
-app.mount('#app');
+  // Only use particles on client side
+  if (typeof window !== 'undefined') {
+    app.use(Particles,{init:async engine => {await loadFull(engine)}});
+  }
+
+  app.use(i18n);
+  app.use(VueViewer, {
+      defaultOptions: {
+        zIndex: 9999
+      }
+    });
+
+  app.use(SEOPlugin);
+  app.component('VueCookieComply', VueCookieComply)
+  //app.use(gsap);
+
+  return { app, router, pinia }
+}
+
+// Client-side only
+if (typeof window !== 'undefined') {
+  const { app } = createApp()
+  app.mount('#app')
+}
 

@@ -241,19 +241,45 @@ export default {
     computed: {
         sortedMembers(): ParliamentMember[] {
             if (!this.parliamentMembers.length) return [];
-            
+
             return [...this.parliamentMembers].sort((a, b) => {
-                // Elnökök előre
-                if (a.is_president && !b.is_president) return -1;
-                if (!a.is_president && b.is_president) return 1;
+                // 1. Speciális pozíciók (elnökök és tisztségviselők) előre
+                const isSpecialA = a.is_president || (a.position && a.position !== 'member');
+                const isSpecialB = b.is_president || (b.position && b.position !== 'member');
 
-                // Pozíciók szerint
-                const positionOrder = ['vice_president', 'secretary', 'treasurer', 'member'];
-                const aPos = positionOrder.indexOf(a.position || 'member');
-                const bPos = positionOrder.indexOf(b.position || 'member');
-                if (aPos !== bPos) return aPos - bPos;
+                if (isSpecialA && !isSpecialB) return -1;
+                if (!isSpecialA && isSpecialB) return 1;
 
-                // Név szerint
+                // 2. Ha mindketten speciálisak, akkor pozíciók szerint
+                if (isSpecialA && isSpecialB) {
+                    // Elnökök mindig előre
+                    if (a.is_president && !b.is_president) return -1;
+                    if (!a.is_president && b.is_president) return 1;
+
+                    // Ha mindketten elnökök vagy sem, akkor pozíciók szerint
+                    const positionOrder = ['vice_president', 'secretary', 'treasurer', 'member'];
+                    const aPos = positionOrder.indexOf(a.position || 'member');
+                    const bPos = positionOrder.indexOf(b.position || 'member');
+                    if (aPos !== bPos) return aPos - bPos;
+                }
+
+                // 3. Ha mindketten normál tagok, akkor évfolyam és osztály szerint
+                if (!isSpecialA && !isSpecialB) {
+                    const aClass = this.getClassInfo(a);
+                    const bClass = this.getClassInfo(b);
+
+                    // Évfolyam szerint növekvő sorrend
+                    if (aClass.year !== bClass.year) {
+                        return aClass.year - bClass.year;
+                    }
+
+                    // Ugyanaz az évfolyam esetén osztály szerint
+                    if (aClass.designation !== bClass.designation) {
+                        return aClass.designation - bClass.designation;
+                    }
+                }
+
+                // 4. Végső esetben név szerint
                 const aName = this.getDisplayName(a);
                 const bName = this.getDisplayName(b);
                 return aName.localeCompare(bName);
@@ -351,6 +377,23 @@ export default {
                 return classData ? classData.name : 'Ismeretlen osztály';
             }
             return 'Nincs osztály';
+        },
+
+        getClassInfo(member: ParliamentMember): { year: number, designation: number } {
+            if (member.classList && (member.classList.$id || member.classList.id)) {
+                const classId = member.classList.$id || member.classList.id;
+                const classData = this.classes.find(c => c.id === classId);
+
+                if (classData) {
+                    return {
+                        year: classData.year || 999, // 999 = ismeretlen évfolyam, hátulra kerül
+                        designation: classData.designation || 999
+                    };
+                }
+            }
+
+            // Ha nincs osztály információ, hátulra tesszük
+            return { year: 999, designation: 999 };
         },
 
         getDisplayName(member: ParliamentMember): string {

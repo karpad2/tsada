@@ -3,7 +3,7 @@ import express from 'express'
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
-const port = process.env.PORT || 5173
+const port = process.env.PORT || (isProduction ? 3000 : 5173)
 const base = process.env.BASE || '/'
 
 // Cached production assets
@@ -60,12 +60,12 @@ app.use('*', async (req, res) => {
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
   } catch (e) {
     vite?.ssrFixStacktrace(e)
-    yapping(e.stack)
+    console.error(e.stack)
     res.status(500).end(e.stack)
   }
 })
 
 // Start http server
 app.listen(port, () => {
-  yapping(`Server started at http://localhost:${port}`)
+  console.log(`Server started at http://localhost:${port}`)
 })

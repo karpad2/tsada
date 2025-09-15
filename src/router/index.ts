@@ -1,10 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import {useLoadingStore} from "@/stores/loading";
+import { createRouter as createVueRouter, createWebHistory, createMemoryHistory } from 'vue-router'
+import { useLoadingStore } from "@/stores/loading";
+import { trackPageView, trackNavigation, setUserProperties } from '@/utils/analytics';
+import { seoGuard } from './seoGuard';
 import HomeView from '../views/HomeView.vue'
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
+export function createRouter() {
+  const router = createVueRouter({
+    history: typeof window !== 'undefined' ? createWebHistory() : createMemoryHistory(),
+    routes: [
     {
       path: '/',
       name: 'home',
@@ -234,13 +237,14 @@ router.beforeEach((to, from, next) => {
   // Show loading screen
   const loadingStore = useLoadingStore();
   loadingStore.setLoading(true);
-  //console.log();
-  let b=to.fullPath;
-  try{
-  //check();
+
+  const fullPath = to.fullPath;
+
+  // Track navigation
+  if (from.fullPath && from.fullPath !== to.fullPath) {
+    trackNavigation(from.fullPath, to.fullPath, 'router');
   }
-  catch (e){console.warn(e);}
-  if(b.indexOf("erasmus") !== -1)
+  if(fullPath.indexOf("erasmus") !== -1)
   {
     loadingStore.setErasmus(true);
   }
@@ -249,32 +253,32 @@ router.beforeEach((to, from, next) => {
     loadingStore.setErasmus(false);
   }
   let k=false;
-  if(b.indexOf("admin") !== -1)
+  if(fullPath.indexOf("admin") !== -1)
     {
       k=true;
     }
-    else 
+    else
     {
       k=false;
     }
-    if(b.indexOf("/moodle") !== -1)
+    if(fullPath.indexOf("/moodle") !== -1)
       {
         window.location.replace("https://moodle.tsada.edu.rs");
       }
 
-    if(b.indexOf("/about/birthday") !== -1)
+    if(fullPath.indexOf("/about/birthday") !== -1)
       {
         loadingStore.setfireworkSetting(true);
       }
-      else 
+      else
       {
         loadingStore.setfireworkSetting(false);
       }
-      if(b.indexOf("/tvview") !== -1)
+      if(fullPath.indexOf("/tvview") !== -1)
         {
           loadingStore.sethideheaders(true);
         }
-        else 
+        else
         {
           loadingStore.sethideheaders(false);
         }
@@ -287,13 +291,71 @@ router.beforeEach((to, from, next) => {
 
 
 
-  // Wait for 1 second (for demonstration purposes)
- /* setTimeout(() => {
-    // Hide loading screen
-    loadingStore.setLoading(false);
-    // Continue with navigation
-    next()
-  }, 1000)*/
-  next()
-})
-export default router
+  // Apply SEO guard
+  seoGuard(to);
+
+  next();
+});
+
+router.afterEach((to, from) => {
+  const loadingStore = useLoadingStore();
+
+  // Set page title
+  const getPageTitle = (routeName: string): string => {
+    const titleMap: { [key: string]: string } = {
+      'home': 'Početna ~ TSADA',
+      'about': 'O nama ~ TSADA',
+      'workers': 'Zaposleni ~ TSADA',
+      'workerstimetable': 'Raspored zaposlenih ~ TSADA',
+      'classlist': 'Lista učenika ~ TSADA',
+      'parentvisiting': 'Roditeljski sastanak ~ TSADA',
+      'birthday': 'Rođendani ~ TSADA',
+      'timetable': 'Raspored časova ~ TSADA',
+      'parentscouncil': 'Savet roditelja ~ TSADA',
+      'pepsi': 'PEPSI ~ TSADA',
+      'SchoolBoard': 'Školski odbor ~ TSADA',
+      'studentcouncil': 'Učenički parlament ~ TSADA',
+      'documents': 'Dokumenti ~ TSADA',
+      'studentdocuments': 'Studentski dokumenti ~ TSADA',
+      'gallery': 'Galerija ~ TSADA',
+      'contact': 'Kontakt ~ TSADA',
+      'login': 'Prijava ~ TSADA',
+      'erasmus_apply': 'Erasmus prijava ~ TSADA',
+      'erasmus_results': 'Erasmus rezultati ~ TSADA',
+      'presentation': 'Prezentacija ~ TSADA',
+      'tvpresentation': 'TV prikaz ~ TSADA',
+      'messages': 'Poruke ~ TSADA',
+      'content_editor': 'Uređivanje sadržaja ~ TSADA',
+      'worker_editor': 'Uređivanje zaposlenih ~ TSADA',
+      'document_editor': 'Uređivanje dokumenata ~ TSADA',
+      'text_document_editor': 'Uređivanje tekstualnih dokumenata ~ TSADA',
+      'student_document_editor': 'Uređivanje studentskih dokumenata ~ TSADA',
+      'gallery_editor': 'Uređivanje galerije ~ TSADA',
+      'class_editor': 'Uređivanje klasa ~ TSADA',
+      'slide_editor': 'Uređivanje slajdova ~ TSADA',
+      'missingpage': 'Stranica nije pronađena ~ TSADA'
+    };
+
+    return titleMap[routeName] || `${routeName} ~ TSADA`;
+  };
+
+  const pageTitle = getPageTitle(to.name as string);
+  document.title = pageTitle;
+
+  // Track page view
+  trackPageView(to.fullPath, pageTitle);
+
+  // Update user properties
+  setUserProperties({
+    language: loadingStore.language,
+    user_type: loadingStore.userLoggedin ? 'admin' : 'visitor',
+    device_type: window.innerWidth <= 768 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop'
+  });
+
+  // Hide loading screen
+  loadingStore.setLoading(false);
+});
+  return router
+}
+
+export default createRouter

@@ -16,7 +16,7 @@
             </h1>
             <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
           </div>
-          <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-white">
+          <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-white dark:text-white">
             <strong>{{ $t("date") }}</strong>: {{ formatDate(state.date) }} | 
             <strong>{{ $t("last_modified") }}</strong>: {{ formatDate(state.lastModified) }}
           </p>

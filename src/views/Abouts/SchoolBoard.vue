@@ -122,23 +122,42 @@
                             >
                                 <!-- Number -->
                                 <td class="px-6 py-4">
-                                    <div 
-                                        class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm"
+                                    <div
+                                        class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                                        :class="isPresidentOrVice(member)
+                                            ? 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                                            : 'bg-gradient-to-br from-blue-500 to-blue-600'"
                                     >
-                                        {{ index + 1 }}
+                                        <svg v-if="isPresident(member)" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span v-else>{{ index + 1 }}</span>
                                     </div>
                                 </td>
-                                
+
                                 <!-- Name -->
                                 <td class="px-6 py-4">
-                                    <div class="text-base font-semibold text-gray-900">
-                                        {{ getDisplayName(member) }}
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-base font-semibold text-gray-900">
+                                            {{ getDisplayName(member) }}
+                                        </div>
+                                        <div v-if="isPresidentOrVice(member)" class="flex items-center">
+                                            <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </div>
                                     </div>
                                 </td>
-                                
+
                                 <!-- Role -->
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-2 border-blue-300">
+                                    <span
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold border-2"
+                                        :class="getRoleBadgeClass(member)"
+                                    >
+                                        <svg v-if="isPresidentOrVice(member)" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
                                         {{ getDisplayRole(member) }}
                                     </span>
                                 </td>
@@ -245,13 +264,16 @@
                     <!-- Role -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Szerep/Pozíció *</label>
-                        <input 
+                        <select
                             v-model="memberForm.role"
-                            type="text" 
                             required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                            placeholder="pl. Igazgató, Igazgatóhelyettes, Tanár, stb."
                         >
+                            <option value="">-- Válassz szerepet --</option>
+                            <option value="Elnök">Elnök</option>
+                            <option value="Alelnök">Alelnök</option>
+                            <option value="Tag">Tag</option>
+                        </select>
                     </div>
 
                     <!-- Modal Footer -->
@@ -327,6 +349,7 @@
 import { Client, Databases, Query, ID } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+import { convertifserbian } from '@/lang';
 
 interface BoardMember {
     $id?: string;
@@ -368,25 +391,32 @@ export default {
 
         sortedMembers(): BoardMember[] {
             if (!this.boardMembers.length) return [];
-            
+
             return [...this.boardMembers].sort((a, b) => {
-                // Sort by role importance first (you can customize this order)
-                const roleOrder = ['igazgató', 'igazgatóhelyettes', 'tanár', 'titkár'];
-                const aRoleIndex = roleOrder.findIndex(role => a.role.toLowerCase().includes(role));
-                const bRoleIndex = roleOrder.findIndex(role => b.role.toLowerCase().includes(role));
-                
+                // Egyszerű hierarchikus sorrend: Elnök → Alelnök → Tag
+                const roleOrder = ['elnök', 'alelnök', 'tag'];
+
+                // Keressük meg a szerepet a hierarchiában
+                const aRoleIndex = roleOrder.findIndex(role =>
+                    a.role.toLowerCase().includes(role.toLowerCase())
+                );
+                const bRoleIndex = roleOrder.findIndex(role =>
+                    b.role.toLowerCase().includes(role.toLowerCase())
+                );
+
+                // Ha mindkettő ismert pozíció
                 if (aRoleIndex !== -1 && bRoleIndex !== -1) {
-                    if (aRoleIndex !== bRoleIndex) return aRoleIndex - bRoleIndex;
-                } else if (aRoleIndex !== -1) {
-                    return -1;
-                } else if (bRoleIndex !== -1) {
-                    return 1;
+                    return aRoleIndex - bRoleIndex;
                 }
 
-                // Then by name
+                // Ha csak az egyik ismert pozíció (az ismert előre kerül)
+                if (aRoleIndex !== -1 && bRoleIndex === -1) return -1;
+                if (aRoleIndex === -1 && bRoleIndex !== -1) return 1;
+
+                // Ha egyikük sem ismert pozíció, akkor név szerint
                 const aName = this.getDisplayName(a);
                 const bName = this.getDisplayName(b);
-                return aName.localeCompare(bName);
+                return aName.localeCompare(bName, 'hu', { sensitivity: 'base' });
             });
         }
     },
@@ -452,14 +482,82 @@ export default {
         getDisplayName(member: BoardMember): string {
             const cc = useLoadingStore();
             if (cc.language == "sr" || cc.language == "rs") {
-                return member.name_rs || member.name_hu || 'Névtelen';
+                const serbianName = member.name_rs || member.name_hu || 'Névtelen';
+                return convertifserbian(serbianName);
+            } else if (cc.language == "en") {
+                return member.name_hu || member.name_rs || 'Unknown';
             } else {
                 return member.name_hu || member.name_rs || 'Névtelen';
             }
         },
 
         getDisplayRole(member: BoardMember): string {
-            return member.role || 'Nincs megadva';
+            const cc = useLoadingStore();
+            const role = member.role || '';
+
+            if (!role) return this.$t('role_not_specified');
+
+            // Role translations - check for exact matches to avoid confusion
+            const roleTranslations: { [key: string]: { [key: string]: string } } = {
+                'alelnök': {
+                    'rs': 'Заменик председника',
+                    'sr': 'Заменик председника',
+                    'hu': 'Alelnök',
+                    'en': 'Vice President'
+                },
+                'elnök': {
+                    'rs': 'Председник',
+                    'sr': 'Председник',
+                    'hu': 'Elnök',
+                    'en': 'President'
+                },
+                'tag': {
+                    'rs': 'Члан',
+                    'sr': 'Člан',
+                    'hu': 'Tag',
+                    'en': 'Member'
+                }
+            };
+
+            // Find matching role - check for exact matches first, then includes
+            const roleLower = role.toLowerCase();
+
+            // First check for alelnök (vice president) to avoid matching "elnök" within "alelnök"
+            if (roleLower.includes('alelnök')) {
+                return roleTranslations['alelnök'][cc.language] || role;
+            }
+            // Then check for elnök (president)
+            if (roleLower.includes('elnök')) {
+                return roleTranslations['elnök'][cc.language] || role;
+            }
+            // Finally check for tag (member)
+            if (roleLower.includes('tag')) {
+                return roleTranslations['tag'][cc.language] || role;
+            }
+
+            return role;
+        },
+
+        isPresident(member: BoardMember): boolean {
+            return member.role && member.role.toLowerCase().includes('elnök') && !member.role.toLowerCase().includes('helyettes');
+        },
+
+        isVicePresident(member: BoardMember): boolean {
+            return member.role && member.role.toLowerCase().includes('alelnök');
+        },
+
+        isPresidentOrVice(member: BoardMember): boolean {
+            return this.isPresident(member) || this.isVicePresident(member);
+        },
+
+        getRoleBadgeClass(member: BoardMember): string {
+            if (this.isPresident(member)) {
+                return 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300';
+            } else if (this.isVicePresident(member)) {
+                return 'bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 border-orange-300';
+            } else {
+                return 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300';
+            }
         },
 
         editMember(member: BoardMember) {

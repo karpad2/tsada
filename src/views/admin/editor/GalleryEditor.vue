@@ -1,329 +1,641 @@
 <template>
-    <div class="relative mb-4 container  px-5  mx-auto bg-white" >
-        <div>
-            <v-switch @change="save" v-model="visible" :label="$t('visible')"></v-switch>
-            <v-btn @click="save" class="m-5">{{ $t('save') }}</v-btn>
-            <v-btn @click="delete_content">{{ $t('delete') }}</v-btn>
-        </div>
+    <v-container fluid class="gallery-editor pa-6">
+        <!-- Page Header -->
+        <v-row>
+            <v-col>
+                <v-card elevation="2" class="header-card mb-6" rounded>
+                    <v-card-title class="d-flex align-center bg-primary text-white pa-4">
+                        <v-icon left size="large">mdi-image-multiple</v-icon>
+                        <span class="text-h5">{{ $t('gallery_editor') }}</span>
+                        <v-spacer />
+                        <v-chip
+                            :color="formData.visible ? 'success' : 'warning'"
+                            :prepend-icon="formData.visible ? 'mdi-eye' : 'mdi-eye-off'"
+                            variant="elevated"
+                        >
+                            {{ formData.visible ? $t('visible') : $t('hidden') }}
+                        </v-chip>
+                    </v-card-title>
 
-        <div>
-        <v-file-input @change="file_upload" multiple v-model="file_link"  accept="image/*" :label="$t('fileupload')"></v-file-input>
-                    {{ $t("preview") }}
-                    <div class=" w-full grid sm:grid-cols-3">
-        <div v-for="image in images" class="card card-compact bg-base-100 w-96 shadow-xl m-5 flex" style="max-width: 400px;">
-        <figure>
-            <img
-            v-lazy="image.img"
-            alt="mrow" />
-        </figure>
-        <div class="card-body">
-            <p v-if="default_image==image.img_id" >
-                {{ $t("default_picture") }}
-            </p>
+                    <v-card-text class="pa-4">
+                        <!-- Quick Actions -->
+                        <div class="d-flex flex-wrap gap-3 align-center">
+                            <v-switch
+                                v-model="formData.visible"
+                                :label="$t('make_visible')"
+                                color="success"
+                                inset
+                                hide-details
+                                @update:model-value="handleFieldChange"
+                            />
 
-            <div class="card-actions justify-end">
-                <v-btn v-if="default_image!=image.img_id" v-on:click="set_as_default(image.img_id)" >{{$t("set_as_default")}}</v-btn>
-                <v-btn v-on:click="delete_picture(image.img_id,image.doc_id)">{{$t("delete")}}</v-btn>
+                            <v-divider vertical class="mx-2" />
+
+                            <v-btn
+                                @click="save"
+                                :loading="isLoading('save')"
+                                :disabled="isAnyLoading()"
+                                color="success"
+                                size="large"
+                                prepend-icon="mdi-content-save"
+                                variant="elevated"
+                            >
+                                {{ $t('save_changes') }}
+                            </v-btn>
+
+                            <v-btn
+                                @click="deleteContent"
+                                :disabled="isAnyLoading()"
+                                color="error"
+                                size="large"
+                                prepend-icon="mdi-delete"
+                                variant="outlined"
+                            >
+                                {{ $t('delete_gallery') }}
+                            </v-btn>
+
+                            <v-spacer />
+
+                            <!-- Gallery Statistics -->
+                            <div class="d-flex gap-4">
+                                <v-chip color="info" prepend-icon="mdi-image">
+                                    {{ images.length }} {{ $t('images') }}
+                                </v-chip>
+                                <v-chip
+                                    v-if="formData.default_image"
+                                    color="success"
+                                    prepend-icon="mdi-star"
+                                >
+                                    {{ $t('has_default') }}
+                                </v-chip>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Main Content -->
+        <v-row>
+            <!-- File Upload Section -->
+            <v-col cols="12" lg="6">
+                <FileUploadSection
+                    upload-type="image"
+                    :multiple="true"
+                    :auto-upload="true"
+                    :max-files="20"
+                    :preview-urls="imagePreviewUrls"
+                    :uploaded-file-ids="imageFileIds"
+                    :default-image-id="formData.default_image"
+                    :storage-id="config.website_images"
+                    @files-uploaded="handleFilesUploaded"
+                    @set-default="setAsDefault"
+                    @delete-file="deletePicture"
+                />
+            </v-col>
+
+            <!-- Language Fields Section -->
+            <v-col cols="12" lg="6">
+                <v-card elevation="2" rounded class="language-card">
+                    <v-card-title class="bg-secondary text-white">
+                        <v-icon left>mdi-translate</v-icon>
+                        {{ $t('multilanguage_content') }}
+                    </v-card-title>
+
+                    <v-card-text class="pa-4">
+                        <v-tabs v-model="activeLanguageTab" color="primary" class="mb-4">
+                            <v-tab
+                                v-for="lang in supportedLanguages"
+                                :key="lang"
+                                :value="lang"
+                                class="text-capitalize"
+                            >
+                                <v-icon left>mdi-flag</v-icon>
+                                {{ $t(lang) }}
+                                <v-chip
+                                    v-if="hasContentInLanguage(lang)"
+                                    color="success"
+                                    size="x-small"
+                                    class="ml-2"
+                                >
+                                    ✓
+                                </v-chip>
+                            </v-tab>
+                        </v-tabs>
+
+                        <v-tabs-window v-model="activeLanguageTab">
+                            <v-tabs-window-item
+                                v-for="lang in supportedLanguages"
+                                :key="lang"
+                                :value="lang"
+                            >
+                                <LanguageFieldGroup
+                                    :language-key="lang"
+                                    :enabled="true"
+                                    :title-value="formData[`title_${lang}`] || ''"
+                                    :short-value="formData[`short_${lang}`] || ''"
+                                    :show-content="false"
+                                    :show-short="true"
+                                    :title-max-length="100"
+                                    :short-max-length="300"
+                                    @update:title="updateField(`title_${lang}`, $event)"
+                                    @update:short="updateField(`short_${lang}`, $event)"
+                                    @save="handleFieldChange"
+                                />
+                            </v-tabs-window-item>
+                        </v-tabs-window>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Gallery Preview Section -->
+        <v-row v-if="images.length > 0">
+            <v-col>
+                <v-card elevation="2" rounded class="gallery-preview-card">
+                    <v-card-title class="bg-info text-white">
+                        <v-icon left>mdi-view-grid</v-icon>
+                        {{ $t('gallery_preview') }}
+                        <v-spacer />
+                        <v-btn-toggle v-model="viewMode" mandatory class="bg-transparent">
+                            <v-btn
+                                value="grid"
+                                icon="mdi-view-grid"
+                                size="small"
+                                variant="text"
+                            />
+                            <v-btn
+                                value="list"
+                                icon="mdi-view-list"
+                                size="small"
+                                variant="text"
+                            />
+                        </v-btn-toggle>
+                    </v-card-title>
+
+                    <v-card-text class="pa-4">
+                        <!-- Grid View -->
+                        <div v-if="viewMode === 'grid'">
+                            <v-row>
+                                <v-col
+                                    v-for="(image, index) in images"
+                                    :key="image.$id"
+                                    cols="12" sm="6" md="4" lg="3"
+                                >
+                                    <GalleryImageCard
+                                        :image="image"
+                                        :preview-url="getFilePreview(image.image_id, config.website_images)"
+                                        :is-default="formData.default_image === image.image_id"
+                                        :loading="isLoading(`image-${image.$id}`)"
+                                        @set-default="setAsDefault(image.image_id)"
+                                        @delete="deletePicture(image.image_id)"
+                                    />
+                                </v-col>
+                            </v-row>
+                        </div>
+
+                        <!-- List View -->
+                        <div v-else>
+                            <v-list>
+                                <v-list-item
+                                    v-for="(image, index) in images"
+                                    :key="image.$id"
+                                    class="border rounded mb-3"
+                                >
+                                    <template #prepend>
+                                        <v-avatar size="60" rounded="lg">
+                                            <v-img
+                                                :src="getFilePreview(image.image_id, config.website_images, 120, 120)"
+                                                cover
+                                            />
+                                        </v-avatar>
+                                    </template>
+
+                                    <v-list-item-title>{{ image.filename || `Image ${index + 1}` }}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        {{ $t('uploaded') }}: {{ formatDate(image.$createdAt) }}
+                                    </v-list-item-subtitle>
+
+                                    <template #append>
+                                        <div class="d-flex align-center gap-2">
+                                            <v-chip
+                                                v-if="formData.default_image === image.image_id"
+                                                color="success"
+                                                size="small"
+                                                prepend-icon="mdi-star"
+                                            >
+                                                {{ $t('default') }}
+                                            </v-chip>
+
+                                            <v-btn-group density="compact">
+                                                <v-btn
+                                                    v-if="formData.default_image !== image.image_id"
+                                                    @click="setAsDefault(image.image_id)"
+                                                    size="small"
+                                                    color="primary"
+                                                    variant="tonal"
+                                                    icon="mdi-star"
+                                                />
+                                                <v-btn
+                                                    @click="deletePicture(image.image_id)"
+                                                    size="small"
+                                                    color="error"
+                                                    variant="tonal"
+                                                    icon="mdi-delete"
+                                                    :loading="isLoading(`image-${image.$id}`)"
+                                                />
+                                            </v-btn-group>
+                                        </div>
+                                    </template>
+                                </v-list-item>
+                            </v-list>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div v-if="images.length === 0" class="text-center py-12">
+                            <v-icon size="64" color="grey-lighten-1">mdi-image-off</v-icon>
+                            <h3 class="text-h6 mt-4 text-grey">{{ $t('no_images_yet') }}</h3>
+                            <p class="text-body-2 text-grey">{{ $t('upload_first_images') }}</p>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Floating Action Button -->
+        <v-btn
+            class="floating-save-btn"
+            :icon="isAnyLoading() ? 'mdi-loading mdi-spin' : 'mdi-content-save'"
+            color="success"
+            size="large"
+            elevation="6"
+            @click="save"
+            :disabled="!hasChanges || isAnyLoading()"
+            :loading="isAnyLoading()"
+        />
+
+        <!-- Loading Overlay -->
+        <v-overlay
+            v-model="showLoadingOverlay"
+            class="align-center justify-center"
+            persistent
+        >
+            <v-progress-circular
+                indeterminate
+                size="64"
+                color="primary"
+            />
+            <div class="text-center mt-4">
+                <h3>{{ $t('saving_changes') }}</h3>
+                <p class="text-body-2">{{ $t('please_wait') }}</p>
             </div>
-        </div>
-        </div>
-    </div>
-        </div>
-        
-        <div >
-        <v-text-field
-        @change="save"
-        v-model="title_rs"
-        :counter="100"
-        :label="$t('srb_title')"
-        hide-details
-        
-        ></v-text-field>
-
-        
-        <v-text-field
-        @change="save"
-        v-model="short_rs"
-        :counter="100"
-        :label="$t('srb_short')"
-        hide-details
-        
-        ></v-text-field>
-    
-
-        
-        </div>
-   
-        <div>
-            
-        <div >
-            <v-text-field
-            v-model="title_hu"
-            :counter="100"
-            @change="save"
-            :label="$t('hu_title')"
-            hide-details
-            
-          ></v-text-field>
-
-          <v-text-field
-            @change="save"
-            v-model="short_hu"
-            :counter="100"
-            :label="$t('hu_short')"
-            hide-details
-            
-          ></v-text-field>
-            
-        </div>
-    
-        <div>
-            
-           
-            <v-text-field
-            v-model="title_en"
-            :counter="100"
-            @change="save"
-            :label="$t('en_title')"
-            hide-details
-            
-          ></v-text-field>
-          <v-text-field
-            @change="save"
-            v-model="short_en"
-            :counter="100"
-            :label="$t('en_short')"
-            hide-details
-            
-          ></v-text-field>
-        </div>
-        </div>
-</div>
-
+        </v-overlay>
+    </v-container>
 </template>
+
 <script lang="ts">
-import {Client,Databases,ID,Storage,Query } from "appwrite";
-import {appw,config} from "@/appwrite";
+import { defineComponent, ref, computed, onMounted } from 'vue';
+import { Query } from 'appwrite';
+import { appwriteService } from '@/appwrite';
+import { useEditor } from '@/composables/useEditor';
+import {
+    galleryManager,
+    getFilePreview,
+    MultiLanguageManager,
+    DataParsingManager,
+    showNotification
+} from '@/utils/editorUtils';
+import { trackUserInteraction, trackGalleryInteraction, trackAdminAction } from '@/utils/analytics';
+import FileUploadSection from '@/components/shared/FileUploadSection.vue';
+import LanguageFieldGroup from '@/components/shared/LanguageFieldGroup.vue';
+import GalleryImageCard from '@/components/shared/GalleryImageCard.vue';
 
-import {useLoadingStore} from "@/stores/loading";
+export default defineComponent({
+    name: 'GalleryEditor',
+    components: {
+        FileUploadSection,
+        LanguageFieldGroup,
+        GalleryImageCard
+    },
+    setup() {
+        // Reactive state
+        const images = ref<any[]>([]);
+        const activeLanguageTab = ref('rs');
+        const viewMode = ref('grid');
+        const showLoadingOverlay = ref(false);
 
-export default{
-data()
-{
-    return{
-        title_en:"",
-        title_hu:"",
-        title_rs:"",
-        short_rs:"",
-        short_hu:"",
-        short_en:"",
-        gallery_id:"",
-        visible:false,
-        default_image:"",
-        file_link:null,
-        images:[""],
-        uploading:false
-    }
-},
-components:{
-},
-mounted()
-{
-    this.getMD();
-    this.gallery_id=this.$route.params.id;
-    window.addEventListener('beforeunload', this.handleBeforeUnload);
-},
-onBeforeUnmount()
-{
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
-},
-methods:{
-    async getMD()
-        {
-            
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
-            const cc=useLoadingStore();
-            //just fucking kill me
-            let mode="";
-           
-            
-            let k= await database.listDocuments(config.website_db, config.gallery,[Query.equal("$id",this.$route.params.id)]);
-            
-                
-                    this.title_rs=k.documents[0].title_rs;
-                    this.content_rs=k.documents[0].text_rs;
-                
-                    this.title_hu=k.documents[0].title_hu;
-                    this.content_hu=k.documents[0].text_hu;
-                    //this.$router.push("/home");
-                    
-                
-                    this.title_en=k.documents[0].title_en;
-                    this.content_en=k.documents[0].text_en;
+        const config = appwriteService.config;
+        const supportedLanguages = MultiLanguageManager.getSupportedLanguages();
 
-                    this.visible=k.documents[0].visible;
+        // Load gallery data function
+        const loadGalleryData = async (id: string) => {
+            const databases = appwriteService.getDatabases();
 
-                    this.default_image=k.documents[0].default_image;
-
-                    let l=await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",this.$route.params.id)]);
-                    this.images=[];
-                    
-
-                    l.documents.forEach(element => {
-                        let a={img:"",img_id:"",doc_id:""};
-                        a.img_id=element.image_id;
-                        a.doc_id=element.$id;
-                        a.img= storage.getFilePreview(
-                        config.gallery_pictures_storage,           // bucket ID
-                        element.image_id,       // file ID
-                        300,               // width, will be resized using this value.
-                        0,                  // height, ignored when 0
-                        'center',           // crop center
-                        90,               // slight compression
-                        5,                  // border width
-                        'FFFFFF',           // border color
-                        15,                 // border radius
-                        1,                  // full opacity
-                        0,                  // no rotation
-                        'FFFFFF',           // background color
-                        'webp'               // output webp format
+            try {
+                // Load gallery document
+                const galleryDoc = await databases.getDocument(
+                    config.website_db,
+                    config.gallery,
+                    id
                 );
-                this.images.push(a);
-                    });
 
+                // Load associated images
+                const imagesResponse = await databases.listDocuments(
+                    config.website_db,
+                    config.gallery_images || config.album_images,
+                    [Query.equal('gallery_id', id), Query.orderDesc('$createdAt')]
+                );
 
-            let gal=k.documents[0].gallery;
-            
-        },
-        handleBeforeUnload(event){
-      if (this.uploading) {
-        event.preventDefault();
-        this.$notify({
-                    type: 'error',
-                    text: this.$t('file_still_uploading')
-                });
-        event.returnValue = '';
-        return '';
-      }
-    
-    },
-    async save()
-    {   
-        const database = new Databases(appw);
-        //const storage = new Storage(appw);
-        let k= await database.listDocuments(config.website_db, config.gallery,[Query.equal("$id",this.$route.params.id)]);  
+                images.value = imagesResponse.documents;
 
-        
-        const result = await database.updateDocument(
-        config.website_db, // databaseId
-        config.gallery, // collectionId
-        this.$route.params.id, // documentId
-        {
-            "title_rs":this.title_rs,
-            "title_hu":this.title_hu,
-            "title_en":this.title_en,
-            "short_en":this.short_en,
-            "short_hu":this.short_hu,
-            "short_rs":this.short_rs,
-            "visible":this.visible,
-            "default_image":this.default_image
+                // Return multilanguage data
+                return {
+                    ...MultiLanguageManager.createLanguageFields(),
+                    title_rs: galleryDoc.title_rs || '',
+                    title_hu: galleryDoc.title_hu || '',
+                    title_en: galleryDoc.title_en || '',
+                    short_rs: galleryDoc.short_rs || '',
+                    short_hu: galleryDoc.short_hu || '',
+                    short_en: galleryDoc.short_en || '',
+                    visible: galleryDoc.visible || false,
+                    default_image: galleryDoc.default_image || ''
+                };
+            } catch (error) {
+                console.error('Error loading gallery data:', error);
+                showNotification('Error loading gallery data', 'error');
+                throw error;
+            }
+        };
 
-        }, // data (optional)
-    //["read("any)"] // permissions (optional)
-    );
-    this.$notify(this.$t('saved'));
-    //this.getMD();
+        // Use editor composable with enhanced options
+        const {
+            formData,
+            hasChanges,
+            isLoading,
+            isAnyLoading,
+            save,
+            deleteContent,
+            updateField,
+            handleFieldChange
+        } = useEditor({
+            collectionId: config.gallery,
+            databaseId: config.website_db,
+            loadDataFunction: loadGalleryData,
+            redirectAfterDelete: '/admin/galleries',
+            autoSaveDelay: 3000,
+            requiredFields: ['title_rs']
+        });
 
-    },
-    async delete_content()
-    {
-        const database = new Databases(appw);
-        //const storage = new Storage(appw);
-        let k= await database.deleteDocument(config.website_db, config.gallery,this.$route.params.id);  
-        this.$notify(this.$t('deleted'));
-        this.router.push("/home");
-    },
-    async file_upload()
-    {
-    const storage = new Storage(appw);
-    const database = new Databases(appw);
-    if (!this.file_link)
-        {
-            console.warn("no file");
-            return;
-        } 
-    console.log("file_upload");
-    this.uploading=true;
-    await this.file_link.forEach(async element => {
-        this.$notify({
-                    type: 'info',
-                    text: this.$t('file_upload_started')
-                });
-        console.log(element);
-        const result = await storage.createFile(
-    config.gallery_pictures_storage, // bucketId
-    ID.unique(), // fileId
-    element // file
-    // permissions (optional)
-    );
-    let add_file_to_album=await database.createDocument(config.website_db, config.album_images,ID.unique(),{"image_id":result.$id,
-    "gallery":this.gallery_id});
-    console.log(add_file_to_album);
-    
-    //this.default_image=result.$id;
-    //this.save();
-    this.$notify({
-                    type: 'success',
-                    text: this.$t('file_uploaded')
-                });
-                setTimeout(()=>{
-        //this.getMD();
-    },500)
-    
-            });
-    //console.log(this.file_link[0]);
-    
-    
-    
+        // Computed properties
+        const imagePreviewUrls = computed(() => {
+            return images.value.map(img =>
+                getFilePreview(img.image_id, config.website_images, 400, 300)
+            );
+        });
 
+        const imageFileIds = computed(() => {
+            return images.value.map(img => img.image_id);
+        });
 
-    //this.$notify(this.$t('file_uploaded'));
-    this.uploading=false;
-    this.getMD();
-    },
-    set_as_default(aa:string)
-    {
-        console.log(aa);
-        this.default_image=aa;
-        this.save();
-        this.getMD();
-    },
-    delete_picture(aa:string,bb:string)
-    {
-    const storage = new Storage(appw);
-    const database = new Databases(appw);
-    
-    try{
-    let l= storage.deleteFile(config.gallery_pictures_storage,aa);
+        // Methods
+        const hasContentInLanguage = (lang: string): boolean => {
+            return !!(formData[`title_${lang}`] || formData[`short_${lang}`]);
+        };
+
+        const handleFilesUploaded = async (uploadedFiles: any[]) => {
+            showLoadingOverlay.value = true;
+
+            try {
+                // Track gallery image upload
+                trackGalleryInteraction(
+                    'images_added',
+                    formData.id || 'new_gallery',
+                    uploadedFiles.length
+                );
+
+                // Add each uploaded file to gallery_images collection
+                for (const file of uploadedFiles) {
+                    await galleryManager.addImageToGallery(
+                        formData.id,
+                        file.$id,
+                        file.name
+                    );
+                }
+
+                // Reload images
+                await reloadImages();
+
+                // Set first uploaded image as default if no default exists
+                if (!formData.default_image && uploadedFiles.length > 0) {
+                    await setAsDefault(uploadedFiles[0].$id);
+                }
+
+                showNotification(
+                    `Successfully uploaded ${uploadedFiles.length} image(s)`,
+                    'success'
+                );
+
+            } catch (error: any) {
+                console.error('Error handling uploaded files:', error);
+                showNotification('Error saving uploaded files', 'error');
+            } finally {
+                showLoadingOverlay.value = false;
+            }
+        };
+
+        const reloadImages = async () => {
+            const databases = appwriteService.getDatabases();
+            const imagesResponse = await databases.listDocuments(
+                config.website_db,
+                config.gallery_images || config.album_images,
+                [Query.equal('gallery_id', formData.id), Query.orderDesc('$createdAt')]
+            );
+            images.value = imagesResponse.documents;
+        };
+
+        const setAsDefault = async (imageId: string) => {
+            try {
+                // Track setting default image
+                trackGalleryInteraction(
+                    'set_default',
+                    formData.id || 'gallery',
+                    1
+                );
+
+                await galleryManager.setDefaultImage(imageId, formData.id, config.gallery);
+                updateField('default_image', imageId);
+                await save();
+
+                showNotification('Default image updated', 'success');
+            } catch (error: any) {
+                console.error('Error setting default image:', error);
+                showNotification('Error setting default image', 'error');
+            }
+        };
+
+        const deletePicture = async (imageId: string) => {
+            if (!confirm('Are you sure you want to delete this image?')) {
+                return;
+            }
+
+            try {
+                // Track image deletion
+                trackGalleryInteraction(
+                    'image_deleted',
+                    formData.id || 'gallery',
+                    1
+                );
+
+                await galleryManager.deleteImageFromGallery(imageId, formData.id);
+
+                // Remove from local images array
+                images.value = images.value.filter(img => img.image_id !== imageId);
+
+                // Clear default if deleted image was default
+                if (formData.default_image === imageId) {
+                    updateField('default_image', '');
+                    await save();
+                }
+
+                showNotification('Image deleted successfully', 'success');
+            } catch (error: any) {
+                console.error('Error deleting image:', error);
+                showNotification('Error deleting image', 'error');
+            }
+        };
+
+        const formatDate = DataParsingManager.formatDate;
+
+        // Enhanced save function with validation
+        const saveWithValidation = async () => {
+            const errors = MultiLanguageManager.validateLanguageContent(formData, ['rs']);
+
+            if (errors.length > 0) {
+                showNotification(errors[0], 'error');
+                return;
+            }
+
+            // Track gallery save action
+            trackAdminAction(
+                'save',
+                'gallery',
+                formData.id || 'new_gallery'
+            );
+
+            await save();
+        };
+
+        return {
+            // State
+            images,
+            activeLanguageTab,
+            viewMode,
+            showLoadingOverlay,
+            supportedLanguages,
+            config,
+
+            // From useEditor
+            formData,
+            hasChanges,
+            isLoading,
+            isAnyLoading,
+            save: saveWithValidation,
+            deleteContent,
+            updateField,
+            handleFieldChange,
+
+            // Computed
+            imagePreviewUrls,
+            imageFileIds,
+
+            // Methods
+            hasContentInLanguage,
+            handleFilesUploaded,
+            setAsDefault,
+            deletePicture,
+            getFilePreview,
+            formatDate
+        };
     }
-    catch(ex)
-    {
-        console.log("hiba a törlésnél");
-    }
-    try{
-    let k= database.deleteDocument(config.website_db, config.album_images,bb);
-}
-    catch(ex)
-    {
-        console.log("hiba a törlésnél");
-    }
-    this.getMD();
-}
-}
-
-    
-}
-
-
+});
 </script>
+
+<style scoped>
+.gallery-editor {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-card,
+.language-card,
+.gallery-preview-card {
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+.gallery-preview-card .v-card-title {
+    border-radius: 0;
+}
+
+.v-tabs {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.v-tab {
+    text-transform: none !important;
+    font-weight: 500;
+}
+
+.border {
+    border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.gap-2 {
+    gap: 8px;
+}
+
+.gap-3 {
+    gap: 12px;
+}
+
+.gap-4 {
+    gap: 16px;
+}
+
+.floating-save-btn {
+    position: fixed !important;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    border-radius: 50% !important;
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+}
+
+@media (max-width: 600px) {
+    .gallery-editor {
+        padding: 12px;
+    }
+
+    .d-flex.flex-wrap.gap-3 {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .v-btn {
+        width: 100%;
+    }
+}
+
+.fade-transition-enter-active,
+.fade-transition-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-transition-enter-from,
+.fade-transition-leave-to {
+    opacity: 0;
+}
+</style>

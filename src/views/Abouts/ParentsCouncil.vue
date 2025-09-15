@@ -286,14 +286,28 @@
                     <!-- Role -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Tisztség</label>
-                        <select 
+                        <select
                             v-model="memberForm.position"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
                         >
+                            <option value="">-- Válassz tisztséget --</option>
                             <option value="member">{{ $t("member") }}</option>
                             <option value="president">{{ $t("president") }}</option>
                             <option value="vice_president">{{ $t("vicepresident") }}</option>
-                           
+                            <option value="secretary">Titkár</option>
+                            <option value="treasurer">Pénztáros</option>
+                            <option value="class_representative_1">1. osztály képviselője</option>
+                            <option value="class_representative_2">2. osztály képviselője</option>
+                            <option value="class_representative_3">3. osztály képviselője</option>
+                            <option value="class_representative_4">4. osztály képviselője</option>
+                            <option value="class_representative_5">5. osztály képviselője</option>
+                            <option value="class_representative_6">6. osztály képviselője</option>
+                            <option value="class_representative_7">7. osztály képviselője</option>
+                            <option value="class_representative_8">8. osztály képviselője</option>
+                            <option value="class_representative_9">9. osztály képviselője</option>
+                            <option value="class_representative_10">10. osztály képviselője</option>
+                            <option value="class_representative_11">11. osztály képviselője</option>
+                            <option value="class_representative_12">12. osztály képviselője</option>
                         </select>
                     </div>
 
@@ -406,327 +420,426 @@ import { Client, Databases, Query, ID } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 
-
 interface CouncilMember {
-    $id?: string;
-    id?: string;
-    is_president: boolean;
-    position: string;
-    description: string;
-    name_hu: string;
-    name_rs: string;
-    description_hu: string;
-    description_rs: string;
-    email: string;
-    phone: string;
+  $id?: string;
+  id?: string;
+  is_president: boolean;
+  position: string;
+  description: string;
+  name_hu: string;
+  name_rs: string;
+  description_hu: string;
+  description_rs: string;
+  email?: string;
+  phone?: string;
 }
 
 export default {
-    name: 'ParentCouncil',
-    
-    data() {
-        return {
-            loading: true,
-            error: null as string | null,
-            debugMode: false,
-            councilMembers: [] as CouncilMember[],
-            currentLocale: 'hu',
-            showEditor: false,
-            editingMember: null as CouncilMember | null,
-            saving: false,
-            deleting: false,
-            showDeleteConfirm: false,
-            memberToDelete: null as CouncilMember | null,
-            memberForm: {
-                name_hu: '',
-                name_rs: '',
-                position: 'member',
-                is_president: false,
-                email: '',
-                phone: '',
-                description_hu: '',
-                description_rs: ''
-            }
-        }
+  name: "ParentCouncil",
+
+  data() {
+    return {
+      loading: true,
+      error: null as string | null,
+      debugMode: false,
+      councilMembers: [] as CouncilMember[],
+      currentLocale: "hu",
+      showEditor: false,
+      editingMember: null as CouncilMember | null,
+      saving: false,
+      deleting: false,
+      showDeleteConfirm: false,
+      memberToDelete: null as CouncilMember | null,
+      memberForm: {
+        name_hu: "",
+        name_rs: "",
+        position: "member",
+        is_president: false,
+        email: "",
+        phone: "",
+        description_hu: "",
+        description_rs: "",
+      },
+    };
+  },
+
+  computed: {
+    admin(): boolean {
+      const cc = useLoadingStore();
+      return cc.userLoggedin;
     },
 
-    computed: {
-        admin(): boolean {
-            const cc = useLoadingStore();
-            return cc.userLoggedin;
-        },
+    /**
+     * Végső, nézet által használt lista:
+     * - Speciális szerepek elöl (elnök, alelnök, titkár, pénztáros)
+     * - Osztályképviselők évfolyam szerint
+     * - Majd II-1/III-4 természetes rendezés (a kijelzett nyelv szerinti description alapján)
+     * - Végül név szerint (magyar ékezetekkel)
+     */
+    sortedMembers(): CouncilMember[] {
+      if (!this.councilMembers.length) return [];
 
-        sortedMembers(): CouncilMember[] {
-            if (!this.councilMembers.length) return [];
-            
-            return [...this.councilMembers].sort((a, b) => {
-                // Elnökök előre
-                if (a.is_president && !b.is_president) return -1;
-                if (!a.is_president && b.is_president) return 1;
-
-                // Pozíciók szerint
-                const positionOrder = ['president', 'vice_president', 'secretary', 'treasurer', 'member'];
-                const aPos = positionOrder.indexOf(a.position || 'member');
-                const bPos = positionOrder.indexOf(b.position || 'member');
-                if (aPos !== bPos) return aPos - bPos;
-
-                // Név szerint
-                const aName = this.getDisplayName(a);
-                const bName = this.getDisplayName(b);
-                return aName.localeCompare(bName);
-            });
+      const romanToNumber = (roman: string): number => {
+        const map: Record<string, number> = {
+          I: 1,
+          V: 5,
+          X: 10,
+          L: 50,
+          C: 100,
+          D: 500,
+          M: 1000,
+        };
+        let res = 0,
+          prev = 0;
+        for (let i = roman.length - 1; i >= 0; i--) {
+          const v = map[roman[i].toUpperCase()] || 0;
+          res += v < prev ? -v : v;
+          prev = v;
         }
+        return res;
+      };
+
+      const parseDesc = (s: string | undefined) => {
+        if (!s) return null;
+        // Rugalmas minták: "II-1", "III – 4", "IV/2", "I. 3", "II — 1"
+        const m = s.match(/^\s*([IVXLCDM]+)\s*[-–—./]?\s*(\d+)\s*$/i);
+        if (!m) return null;
+        return { rv: romanToNumber(m[1]), n: parseInt(m[2], 10) };
+      };
+
+      const getDisplayDesc = (m: CouncilMember) => this.getDisplayDescription(m);
+
+      return [...this.councilMembers].sort((a, b) => {
+        // 1) Speciális pozíciók előre
+        const isSpecialA = a.is_president || this.isSpecialPosition(a.position);
+        const isSpecialB = b.is_president || this.isSpecialPosition(b.position);
+        if (isSpecialA && !isSpecialB) return -1;
+        if (!isSpecialA && isSpecialB) return 1;
+
+        if (isSpecialA && isSpecialB) {
+          // elnök mindig legelöl
+          if (a.is_president && !b.is_president) return -1;
+          if (!a.is_president && b.is_president) return 1;
+          const order = ["president", "vice_president", "secretary", "treasurer"];
+          const ai = order.indexOf(a.position || "member");
+          const bi = order.indexOf(b.position || "member");
+          if (ai !== -1 && bi !== -1 && ai !== bi) return ai - bi;
+        }
+
+        // 2) Osztályképviselők: ha position tartalmaz grade-et
+        const ag = this.extractGradeFromPosition(a.position);
+        const bg = this.extractGradeFromPosition(b.position);
+        if (ag && bg && ag !== bg) return ag - bg;
+        if (ag && !bg && !isSpecialB) return -1;
+        if (bg && !ag && !isSpecialA) return 1;
+
+        // 3) Természetes rendezés a description alapján (II-1 stb.)
+        const ap = parseDesc(getDisplayDesc(a));
+        const bp = parseDesc(getDisplayDesc(b));
+        if (ap && bp) {
+          if (ap.rv !== bp.rv) return ap.rv - bp.rv;
+          if (ap.n !== bp.n) return ap.n - bp.n;
+        } else if (ap && !bp) {
+          return -1; // ahol van minta, menjen előrébb
+        } else if (!ap && bp) {
+          return 1;
+        }
+
+        // 4) Végül név szerint
+        const aName = this.getDisplayName(a);
+        const bName = this.getDisplayName(b);
+        return aName.localeCompare(bName, "hu", { sensitivity: "base" });
+      });
+    },
+  },
+
+  async mounted() {
+    this.currentLocale = this.$i18n?.locale || "hu";
+    await this.loadData();
+
+    // Debug mode toggle: Ctrl+Shift+D
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "D") {
+        this.debugMode = !this.debugMode;
+      }
+    });
+  },
+
+  methods: {
+    async loadData() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        await this.loadCouncilMembers();
+      } catch (error: any) {
+        console.error("Data load error:", error);
+        this.error = error.message || "Hiba az adatok betöltésében";
+      } finally {
+        this.loading = false;
+      }
     },
 
-    async mounted() {
-        this.currentLocale = this.$i18n?.locale || 'hu';
-        await this.loadData();
-        
-        // Debug mode toggle with Ctrl+Shift+D
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-                this.debugMode = !this.debugMode;
-            }
-        });
+    async loadCouncilMembers() {
+      if (!config.parent_council_members) {
+        throw new Error("Parent council members collection ID not configured");
+      }
+
+      const database = new Databases(appw);
+      try {
+        const response = await database.listDocuments(
+          config.website_db,
+          config.parent_council_members,
+          [Query.limit(200)]
+        );
+
+        console.log("Raw council data:", response.documents);
+
+        this.councilMembers = response.documents.map((doc: any) => ({
+          $id: doc.$id,
+          id: doc.$id,
+          is_president: Boolean(doc.is_president),
+          position: doc.position || "member",
+          description: doc.description || "",
+          name_hu: doc.name_hu || "",
+          name_rs: doc.name_rs || "",
+          description_hu: doc.description_hu || "",
+          description_rs: doc.description_rs || "",
+          email: doc.email || "",
+          phone: doc.phone || "",
+        }));
+
+        console.log("Processed council members:", this.councilMembers);
+      } catch (error: any) {
+        console.error("Members load error:", error);
+        throw new Error(`Szülői tanács tagok betöltési hiba: ${error.message}`);
+      }
     },
 
-    methods: {
-        async loadData() {
-            this.loading = true;
-            this.error = null;
-            
-            try {
-                await this.loadCouncilMembers();
-            } catch (error: any) {
-                console.error('Data load error:', error);
-                this.error = error.message || 'Hiba az adatok betöltésében';
-            } finally {
-                this.loading = false;
-            }
-        },
+    getDisplayName(member: CouncilMember): string {
+      const cc = useLoadingStore();
+      if (cc.language == "sr" || cc.language == "rs") {
+        return member.name_rs || member.name_hu || "Névtelen";
+      } else {
+        return member.name_hu || member.name_rs || "Névtelen";
+      }
+    },
 
-        async loadCouncilMembers() {
-            if (!config.parent_council_members) {
-                throw new Error('Parent council members collection ID not configured');
-            }
+    getDisplayDescription(member: CouncilMember): string {
+      const cc = useLoadingStore();
+      if (cc.language == "sr" || cc.language == "rs") {
+        return member.description_rs || member.description_hu || "";
+      } else {
+        return member.description_hu || member.description_rs || "";
+      }
+    },
 
-            const database = new Databases(appw);
-            try {
-                const response = await database.listDocuments(
-                    config.website_db,
-                    config.parent_council_members,
-                    [Query.limit(200), Query.orderAsc('$createdAt')]
-                );
+    isSpecialPosition(position: string | undefined): boolean {
+      if (!position) return false;
+      const specialPositions = [
+        "president",
+        "vice_president",
+        "secretary",
+        "treasurer",
+      ];
+      return specialPositions.includes(position);
+    },
 
-                console.log('Raw council data:', response.documents);
+    extractGradeFromPosition(position: string | undefined): number | null {
+      if (!position) return null;
+      const match = position.match(/class_representative_(\d+)/);
+      return match ? parseInt(match[1]) : null;
+    },
 
-                this.councilMembers = response.documents.map((doc: any) => ({
-                    $id: doc.$id,
-                    id: doc.$id,
-                    is_president: Boolean(doc.is_president),
-                    position: doc.position || 'member',
-                    description: doc.description || '',
-                    name_hu: doc.name_hu || '',
-                    name_rs: doc.name_rs || '',
-                    description_hu: doc.description_hu || '',
-                    description_rs: doc.description_rs || '',
-                }));
+    getRoleTitle(member: CouncilMember): string {
+      const cc = useLoadingStore();
+      const isSerbian = cc.language == "sr" || cc.language == "rs";
 
-                console.log('Processed council members:', this.councilMembers);
-                
-            } catch (error: any) {
-                console.error('Members load error:', error);
-                throw new Error(`Szülői tanács tagok betöltési hiba: ${error.message}`);
-            }
-        },
-
-        getDisplayName(member: CouncilMember): string {
-            const cc = useLoadingStore();
-            if (cc.language == "sr" || cc.language == "rs") {
-                return member.name_rs || member.name_hu || 'Névtelen';
-            } else {
-                return member.name_hu || member.name_rs || 'Névtelen';
-            }
-        },
-
-        getDisplayDescription(member: CouncilMember): string {
-            const cc = useLoadingStore();
-            if (cc.language == "sr" || cc.language == "rs") {
-                return member.description_rs || member.description_hu || '';
-            } else {
-                return member.description_hu || member.description_rs || '';
-            }
-        },
-
-        getRoleTitle(member: CouncilMember): string {
-            const cc = useLoadingStore();
-            const isSerbian = cc.language == "sr" || cc.language == "rs";
-            
-            const roleMapHu: { [key: string]: string } = {
-                'president': 'Elnök',
-                'vice_president': 'Alelnök',
-                'secretary': 'Titkár',
-                'treasurer': 'Pénztáros',
-                'member': 'Tag'
-            };
-            
-            const roleMapRs: { [key: string]: string } = {
-                'president': 'Predsednik',
-                'vice_president': 'Potpredsednik',
-                'secretary': 'Sekretar',
-                'treasurer': 'Blagajnik',
-                'member': 'Član'
-            };
-            
-            const roleMap = isSerbian ? roleMapRs : roleMapHu;
-            return roleMap[member.position] || (isSerbian ? 'Član' : 'Tag');
-        },
-
-        getRoleBadgeClass(member: CouncilMember): string {
-            if (member.is_president || member.position === 'president') {
-                return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border-yellow-400 shadow-lg';
-            }
-            switch (member.position) {
-                case 'vice_president':
-                    return 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400 shadow-md';
-                case 'secretary':
-                    return 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-md';
-                case 'treasurer':
-                    return 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-400 shadow-md';
-                default:
-                    return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white border-gray-400 shadow-sm';
-            }
-        },
-
-        editMember(member: CouncilMember) {
-            if (!this.admin) return;
-            
-            this.editingMember = member;
-            this.memberForm = {
-                name_hu: member.name_hu,
-                name_rs: member.name_rs,
-                position: member.position,
-                is_president: member.is_president,
-                description_hu: member.description_hu,
-                description_rs: member.description_rs
-            };
-            this.showEditor = true;
-        },
-
-        deleteMember(member: CouncilMember) {
-            if (!this.admin) return;
-            
-            this.memberToDelete = member;
-            this.showDeleteConfirm = true;
-        },
-
-        async confirmDelete() {
-            if (!this.memberToDelete || !this.admin) return;
-            
-            this.deleting = true;
-            try {
-                const database = new Databases(appw);
-                await database.deleteDocument(
-                    config.website_db,
-                    config.parent_council_members,
-                    this.memberToDelete.$id!
-                );
-                
-                // Remove from local array
-                this.councilMembers = this.councilMembers.filter(m => m.$id !== this.memberToDelete!.$id);
-                
-                this.showDeleteConfirm = false;
-                this.memberToDelete = null;
-            } catch (error: any) {
-                console.error('Delete error:', error);
-                this.error = `Törlési hiba: ${error.message}`;
-            } finally {
-                this.deleting = false;
-            }
-        },
-
-        closeEditor() {
-            this.showEditor = false;
-            this.editingMember = null;
-            this.memberForm = {
-                name_hu: '',
-                name_rs: '',
-                position: 'member',
-                is_president: false,
-                description_hu: '',
-                description_rs: ''
-            };
-        },
-        getClassNameById(year: number, designation: number): string {
-            const yearMap: { [key: number]: string } = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
-            return `${yearMap[year] || year}-${designation}`;
-        },
-
-        async saveMember() {
-            if (!this.admin || !this.memberForm.name_hu.trim()) return;
-            
-            this.saving = true;
-            try {
-                const database = new Databases(appw);
-                
-                const memberData = {
-                    name_hu: this.memberForm.name_hu.trim(),
-                    name_rs: this.memberForm.name_rs.trim(),
-                    position: this.memberForm.position,
-                    is_president: this.memberForm.is_president,
-                  
-                    description_hu: this.memberForm.description_hu.trim(),
-                    description_rs: this.memberForm.description_rs.trim()
-                };
-
-                if (this.editingMember) {
-                    // Update existing member
-                    const updatedDoc = await database.updateDocument(
-                        config.website_db,
-                        config.parent_council_members,
-                        this.editingMember.$id!,
-                        memberData
-                    );
-                    
-                    // Update local array
-                    const index = this.councilMembers.findIndex(m => m.$id === this.editingMember!.$id);
-                    if (index !== -1) {
-                        this.councilMembers[index] = {
-                            ...memberData,
-                            $id: updatedDoc.$id,
-                            id: updatedDoc.$id,
-                            description: memberData.description_hu || memberData.description_rs || ''
-                        };
-                    }
-                } else {
-                    // Create new member
-                    const newDoc = await database.createDocument(
-                        config.website_db,
-                        config.parent_council_members,
-                        ID.unique(),
-                        memberData
-                    );
-                    
-                    // Add to local array
-                    this.councilMembers.push({
-                        ...memberData,
-                        $id: newDoc.$id,
-                        id: newDoc.$id,
-                        description: memberData.description_hu || memberData.description_rs || ''
-                    });
-                }
-                
-                this.closeEditor();
-            } catch (error: any) {
-                console.error('Save error:', error);
-                this.error = `Mentési hiba: ${error.message}`;
-            } finally {
-                this.saving = false;
-            }
+      if (member.position && member.position.startsWith("class_representative_")) {
+        const grade = this.extractGradeFromPosition(member.position);
+        if (grade) {
+          return isSerbian
+            ? `Predstavnik ${grade}. razreda`
+            : `${grade}. osztály képviselője`;
         }
-    }
-}
+      }
+
+      const roleMapHu: { [key: string]: string } = {
+        president: "Elnök",
+        vice_president: "Alelnök",
+        secretary: "Titkár",
+        treasurer: "Pénztáros",
+        member: "Tag",
+      };
+
+      const roleMapRs: { [key: string]: string } = {
+        president: "Predsednik",
+        vice_president: "Potpredsednik",
+        secretary: "Sekretar",
+        treasurer: "Blagajnik",
+        member: "Član",
+      };
+
+      const roleMap = isSerbian ? roleMapRs : roleMapHu;
+      return roleMap[member.position] || (isSerbian ? "Član" : "Tag");
+    },
+
+    getRoleBadgeClass(member: CouncilMember): string {
+      if (member.is_president || member.position === "president") {
+        return "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border-yellow-400 shadow-lg";
+      }
+      switch (member.position) {
+        case "vice_president":
+          return "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-400 shadow-md";
+        case "secretary":
+          return "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-md";
+        case "treasurer":
+          return "bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-400 shadow-md";
+        default:
+          return "bg-gradient-to-r from-gray-500 to-gray-600 text-white border-gray-400 shadow-sm";
+      }
+    },
+
+    editMember(member: CouncilMember) {
+      if (!this.admin) return;
+
+      this.editingMember = member;
+      this.memberForm = {
+        name_hu: member.name_hu,
+        name_rs: member.name_rs,
+        position: member.position,
+        is_president: member.is_president,
+        email: member.email || "",
+        phone: member.phone || "",
+        description_hu: member.description_hu,
+        description_rs: member.description_rs,
+      };
+      this.showEditor = true;
+    },
+
+    deleteMember(member: CouncilMember) {
+      if (!this.admin) return;
+
+      this.memberToDelete = member;
+      this.showDeleteConfirm = true;
+    },
+
+    async confirmDelete() {
+      if (!this.memberToDelete || !this.admin) return;
+
+      this.deleting = true;
+      try {
+        const database = new Databases(appw);
+        await database.deleteDocument(
+          config.website_db,
+          config.parent_council_members,
+          this.memberToDelete.$id!
+        );
+
+        this.councilMembers = this.councilMembers.filter(
+          (m) => m.$id !== this.memberToDelete!.$id
+        );
+
+        this.showDeleteConfirm = false;
+        this.memberToDelete = null;
+      } catch (error: any) {
+        console.error("Delete error:", error);
+        this.error = `Törlési hiba: ${error.message}`;
+      } finally {
+        this.deleting = false;
+      }
+    },
+
+    closeEditor() {
+      this.showEditor = false;
+      this.editingMember = null;
+      this.memberForm = {
+        name_hu: "",
+        name_rs: "",
+        position: "member",
+        is_president: false,
+        email: "",
+        phone: "",
+        description_hu: "",
+        description_rs: "",
+      };
+    },
+
+    getClassNameById(year: number, designation: number): string {
+      const yearMap: { [key: number]: string } = { 1: "I", 2: "II", 3: "III", 4: "IV" };
+      return `${yearMap[year] || year}-${designation}`;
+    },
+
+    async saveMember() {
+      if (!this.admin || !this.memberForm.name_hu.trim()) return;
+
+      this.saving = true;
+      try {
+        const database = new Databases(appw);
+
+        const memberData = {
+          name_hu: this.memberForm.name_hu.trim(),
+          name_rs: this.memberForm.name_rs.trim(),
+          position: this.memberForm.position,
+          is_president: this.memberForm.is_president,
+          email: this.memberForm.email?.trim() || "",
+          phone: this.memberForm.phone?.trim() || "",
+          description_hu: this.memberForm.description_hu.trim(),
+          description_rs: this.memberForm.description_rs.trim(),
+        };
+
+        if (this.editingMember) {
+          // Update
+          const updatedDoc = await database.updateDocument(
+            config.website_db,
+            config.parent_council_members,
+            this.editingMember.$id!,
+            memberData
+          );
+
+          const index = this.councilMembers.findIndex(
+            (m) => m.$id === this.editingMember!.$id
+          );
+          if (index !== -1) {
+            this.councilMembers[index] = {
+              ...this.councilMembers[index],
+              ...memberData,
+              $id: updatedDoc.$id,
+              id: updatedDoc.$id,
+              description:
+                memberData.description_hu || memberData.description_rs || "",
+            };
+          }
+        } else {
+          // Create
+          const newDoc = await database.createDocument(
+            config.website_db,
+            config.parent_council_members,
+            ID.unique(),
+            memberData
+          );
+
+          this.councilMembers.push({
+            ...memberData,
+            $id: newDoc.$id,
+            id: newDoc.$id,
+            description:
+              memberData.description_hu || memberData.description_rs || "",
+          });
+        }
+
+        this.closeEditor();
+      } catch (error: any) {
+        console.error("Save error:", error);
+        this.error = `Mentési hiba: ${error.message}`;
+      } finally {
+        this.saving = false;
+      }
+    },
+  },
+};
 </script>
+
 
 <style scoped>
 @keyframes fadeInUp {

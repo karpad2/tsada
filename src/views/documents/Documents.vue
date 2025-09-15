@@ -235,24 +235,18 @@ import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
 import gsap from "gsap";
-import moment from 'moment/min/moment-with-locales';
 import Loading from "@/components/Loading.vue";
+import {
+    formatTime,
+    getLocalizedCategoryName,
+    getLocalizedDocumentTitle,
+    createNewDocument,
+    archiveCategory,
+    loadCategoriesWithDocuments,
+    type DocumentItem,
+    type CategoryItem
+} from "@/utils/documentUtils";
 
-interface DocumentItem {
-    id: string;
-    doc_id: string;
-    name: string;
-    date: string;
-    contact?: string;
-}
-
-interface RoleItem {
-    id: string;
-    role: string;
-    archived: boolean;
-    workers: DocumentItem[];
-    originalData?: any; // Store original category data for editing
-}
 
 interface CategoryData {
     category_name_rs: string;
@@ -268,7 +262,7 @@ export default {
     },
     
     data: () => ({
-        roles: [] as RoleItem[],
+        roles: [] as CategoryItem[],
         loaded: false,
         headers: [] as any[],
         admin: false,
@@ -289,7 +283,7 @@ export default {
             listasorrend: 1
         } as CategoryData,
         editingCategoryId: '',
-        categoryToDelete: null as RoleItem | null
+        categoryToDelete: null as CategoryItem | null
     }),
 
     async mounted() {
@@ -327,30 +321,11 @@ export default {
     },
 
     methods: {
-        rt_time(dateString: string): string {
-            const loadingStore = useLoadingStore();
-            let local = loadingStore.language;
-            
-            if (local === "rs" || local === "sr") {
-                moment.locale('sr');
-            } else if (local === "hu") {
-                moment.locale('hu');
-            } else if (local === "en") {
-                moment.locale('en');
-            }
-            
-            return moment(dateString).format("LLL");
-        },
+        rt_time: formatTime,
 
         async new_stuff(categoryId: string): Promise<void> {
             try {
-                const database = new Databases(appw);
-                const newDoc = await database.createDocument(
-                    config.website_db, 
-                    config.documents_db,
-                    ID.unique(),
-                    { "documentCategories": categoryId }
-                );
+                const newDoc = await createNewDocument(categoryId);
                 this.$router.push(`/admin/document/${newDoc.$id}`);
             } catch (error) {
                 console.error('Error creating new document:', error);
@@ -359,13 +334,7 @@ export default {
 
         async archive_stuff(categoryId: string): Promise<void> {
             try {
-                const database = new Databases(appw);
-                await database.updateDocument(
-                    config.website_db,
-                    config.document_categories_db,
-                    categoryId,
-                    { "archived": true }
-                );
+                await archiveCategory(categoryId, true);
                 await this.load_workers_base();
             } catch (error) {
                 console.error('Error archiving category:', error);
@@ -374,13 +343,7 @@ export default {
 
         async restore_stuff(categoryId: string): Promise<void> {
             try {
-                const database = new Databases(appw);
-                await database.updateDocument(
-                    config.website_db,
-                    config.document_categories_db,
-                    categoryId,
-                    { "archived": false }
-                );
+                await archiveCategory(categoryId, false);
                 await this.load_workers_base();
             } catch (error) {
                 console.error('Error restoring category:', error);
@@ -432,7 +395,7 @@ export default {
         },
 
         // Edit Category Methods
-        editCategory(role: RoleItem): void {
+        editCategory(role: CategoryItem): void {
             this.editingCategoryId = role.id;
             this.editingCategory = {
                 category_name_rs: role.originalData?.category_name_rs || '',
@@ -482,7 +445,7 @@ export default {
         },
 
         // Delete Category Methods
-        confirmDeleteCategory(role: RoleItem): void {
+        confirmDeleteCategory(role: CategoryItem): void {
             this.categoryToDelete = role;
             this.showDeleteConfirmDialog = true;
         },
@@ -539,108 +502,11 @@ export default {
             }
         },
 
-        getLocalizedCategoryName(category: any): string {
-            const loadingStore = useLoadingStore();
-            let local = loadingStore.language;
-            
-            if (local === "en") {
-                return category.category_name_en || '';
-            } else if (local === "hu") {
-                return category.category_name_hu || '';
-            } else if (local === "rs" || local === "sr") {
-                return convertifserbian(category.category_name_rs || '');
-            }
-            return category.category_name_rs || '';
-        },
-
-        getLocalizedDocumentTitle(document: any): string {
-            const loadingStore = useLoadingStore();
-            let local = loadingStore.language;
-            
-            if (local === "en" || local === "hu") {
-                return document.document_title_hu || '';
-            } else if (local === "rs" || local === "sr") {
-                return convertifserbian(document.document_title_rs || '');
-            }
-            return document.document_title_rs || '';
-        },
-
-        async processDocuments(categoryId: string): Promise<DocumentItem[]> {
-            try {
-                const database = new Databases(appw);
-                const documentsResponse = await database.listDocuments(
-                    config.website_db, 
-                    config.documents_db,
-                    [
-                        Query.equal("documentCategories", [categoryId]),
-                        Query.orderDesc("$createdAt")
-                    ]
-                );
-
-                return documentsResponse.documents.map(doc => ({
-                    id: doc.$id,
-                    doc_id: doc.document_id || '',
-                    name: this.getLocalizedDocumentTitle(doc),
-                    date: doc.$createdAt,
-                    contact: doc.contact || ''
-                }));
-            } catch (error) {
-                console.error('Error loading documents for category:', categoryId, error);
-                return [];
-            }
-        },
 
         async load_workers_base(): Promise<void> {
             try {
                 this.loaded = false;
-                this.roles = [];
-                
-                const database = new Databases(appw);
-
-                // Load active categories
-                const activeCategories = await database.listDocuments(
-                    config.website_db, 
-                    config.document_categories_db,
-                    [Query.orderAsc("listasorrend"), Query.equal("archived", false)]
-                );
-
-                // Process active categories
-                for (const category of activeCategories.documents) {
-                    const documents = await this.processDocuments(category.$id);
-                    const categoryName = this.getLocalizedCategoryName(category);
-                    
-                    this.roles.push({
-                        id: category.$id,
-                        role: categoryName,
-                        archived: false,
-                        workers: documents,
-                        originalData: category
-                    });
-                }
-
-                // Load archived categories if needed
-                if (this.archived) {
-                    const archivedCategories = await database.listDocuments(
-                        config.website_db, 
-                        config.document_categories_db,
-                        [Query.orderAsc("listasorrend"), Query.equal("archived", true)]
-                    );
-
-                    for (const category of archivedCategories.documents) {
-                        const documents = await this.processDocuments(category.$id);
-                        let categoryName = this.getLocalizedCategoryName(category);
-                        categoryName += ` ~ ${this.$t("archived")}`;
-                        
-                        this.roles.push({
-                            id: category.$id,
-                            role: categoryName,
-                            archived: true,
-                            workers: documents,
-                            originalData: category
-                        });
-                    }
-                }
-
+                this.roles = await loadCategoriesWithDocuments(this.archived);
                 this.loaded = true;
 
                 // Animate elements after loading

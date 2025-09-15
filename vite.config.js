@@ -9,22 +9,37 @@ export default defineConfig({
   plugins: [
     visualizer({ open: true }),
     VitePWA({
-      registerType: 'autoUpdate',
-      cleanupOutdatedCaches: true,
-      skipWaiting: true,
+      registerType: 'prompt',
+      devOptions: {
+        enabled: true
+      },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // például 5 MiB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        cleanupOutdatedCaches: true,
+        skipWaiting: false,
+        clientsClaim: false,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'dynamic-cache',
+              cacheName: 'api-cache',
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60 // Cache for 24 hours
+                maxEntries: 100,
+                maxAgeSeconds: 5 * 60 // 5 minutes for API data
               },
-              networkTimeoutSeconds: 10 // Fallback to cache if network takes too long
+              networkTimeoutSeconds: 3
+            }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              }
             }
           }
         ]

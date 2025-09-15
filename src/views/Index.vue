@@ -43,6 +43,8 @@
   <script lang="ts">
   import { ref, computed, onMounted } from "vue";
   import { useLoadingStore } from "@/stores/loading";
+  import { useSEO } from "@/composables/useSEO";
+  import { useRoute } from "vue-router";
   import Header from "@/components/Header.vue";
   import Footer from "@/components/Footer.vue";
   import Loading from "@/components/Loading.vue";

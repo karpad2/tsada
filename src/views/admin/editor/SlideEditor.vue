@@ -1,318 +1,667 @@
 <template>
-  <div class="container mx-auto py-8">
-    <!-- Slide Management Section -->
-    <section class="mb-12 p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-4">{{ $t("edit_slide") }}</h2>
-      
-      <v-text-field v-model="title" :label="$t('title')" counter="100" hide-details></v-text-field>
-      <ckeditor v-model="content"></ckeditor>
-      
-      <v-file-input @change="fileUpload" v-model="fileLink" accept="image/*" label="Slide Image Upload"></v-file-input>
-      <div v-if="img" class="my-4">
-        <span>{{ $t("preview") }}:</span>
-        <img class="h-40 w-auto rounded" v-lazy="img" alt="Slide Image">
+  <div class="slide-editor container px-5 mx-auto bg-white">
+    <!-- Header Controls -->
+    <section class="header-section mb-6">
+      <div class="action-buttons flex gap-2 mb-4">
+        <v-btn
+          @click="saveCurrentSlide"
+          :disabled="isLoading('save')"
+          :loading="isLoading('save')"
+          color="success"
+        >
+          {{ currentSlideId ? $t('save_changes') : $t('add_slide') }}
+        </v-btn>
+        <v-btn
+          @click="resetSlideForm"
+          :disabled="isAnyLoading()"
+          color="secondary"
+        >
+          {{ $t('reset_form') }}
+        </v-btn>
       </div>
-
-      <v-btn @click="saveSlide" class="mt-5">{{ currentSlideId ? 'Save Changes' : 'Add Slide' }}</v-btn>
     </section>
 
-    <section>
-      <h2 class="text-2xl font-bold mb-4">Slides</h2>
-      <v-data-table :items="slides" :headers="slideHeaders">
-        <template v-slot:item.actions="{ item, index }">
-          <div class="flex space-x-2">
-            <v-btn @click="editSlide(item.id)" icon>
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn @click="removeSlide(item.id)" icon>
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-            <v-btn @click="moveSlideUp(index)" icon :disabled="index === 0">
-              <v-icon>mdi-arrow-up</v-icon>
-            </v-btn>
-            <v-btn @click="moveSlideDown(index)" icon :disabled="index === slides.length - 1">
-              <v-icon>mdi-arrow-down</v-icon>
-            </v-btn>
+    <!-- Slide Management Section -->
+    <section class="slide-form-section mb-6">
+      <v-card class="pa-6" elevation="2">
+        <v-card-title class="text-h6 mb-4">
+          <v-icon left>mdi-monitor-screenshot</v-icon>
+          {{ $t("edit_slide") }}
+        </v-card-title>
+
+        <v-card-text>
+          <v-text-field
+            v-model="slideForm.title"
+            :label="$t('title')"
+            counter="100"
+            outlined
+            dense
+            class="mb-4"
+            @input="handleFieldChange"
+          />
+
+          <div class="mb-4">
+            <label class="text-subtitle-2 mb-2 d-block">{{ $t('content') }}</label>
+            <ckeditor v-model="slideForm.content" @input="handleFieldChange" />
           </div>
-        </template>
-      </v-data-table>
+
+          <!-- File Upload Section -->
+          <FileUploadSection
+            upload-type="image"
+            :multiple="false"
+            :preview-urls="slideImageUrl ? [slideImageUrl] : []"
+            :uploaded-file-ids="slideForm.image ? [slideForm.image] : []"
+            :storage-id="config.website_images"
+            :show-actions="false"
+            @files-uploaded="handleSlideImageUploaded"
+          />
+        </v-card-text>
+      </v-card>
+    </section>
+
+    <!-- Slides List Section -->
+    <section class="slides-list-section mb-12">
+      <v-card elevation="2">
+        <v-card-title class="text-h6">
+          <v-icon left>mdi-view-list</v-icon>
+          {{ $t('slides_list') }}
+        </v-card-title>
+
+        <v-card-text>
+          <v-data-table
+            :items="slides"
+            :headers="slideHeaders"
+            :loading="isLoading('fetch')"
+            class="elevation-1"
+          >
+            <template v-slot:item.actions="{ item, index }">
+              <div class="d-flex gap-2">
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="editSlide(item.id)"
+                      icon
+                      small
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('edit') }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="removeSlide(item.id)"
+                      icon
+                      small
+                      color="error"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('delete') }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="moveSlideUp(index)"
+                      icon
+                      small
+                      :disabled="index === 0"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-arrow-up</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('move_up') }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="moveSlideDown(index)"
+                      icon
+                      small
+                      :disabled="index === slides.length - 1"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-arrow-down</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('move_down') }}</span>
+                </v-tooltip>
+              </div>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
     </section>
 
     <!-- Event Management Section -->
-    <section class="mt-12 p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-4">{{$t("edit_events")}}</h2>
-      
-      <v-text-field v-model="eventTitle" label="Event Title" counter="100" hide-details></v-text-field>
-      <v-text-field v-model="eventDate" label="Event Date" type="date" hide-details></v-text-field>
-      <ckeditor v-model="eventDescription"></ckeditor>
+    <section class="event-form-section mb-6">
+      <v-card class="pa-6" elevation="2">
+        <v-card-title class="text-h6 mb-4">
+          <v-icon left>mdi-calendar-edit</v-icon>
+          {{ $t("edit_events") }}
+        </v-card-title>
 
-      <v-file-input @change="eventFileUpload" v-model="eventFileLink" accept="image/*" label="Event Image Upload"></v-file-input>
-      <div v-if="eventImg" class="my-4">
-        <span>Preview:</span>
-        <img class="h-40 w-auto rounded" :src="eventImg" alt="Event Image">
-      </div>
+        <v-card-text>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <v-text-field
+              v-model="eventForm.title"
+              :label="$t('event_title')"
+              counter="100"
+              outlined
+              dense
+              @input="handleFieldChange"
+            />
 
-      <v-btn @click="saveEvent" class="mt-5">{{ currentEventId ? $t("save") : 'Add Event' }}</v-btn>
-    </section>
+            <v-text-field
+              v-model="eventForm.date"
+              :label="$t('event_date')"
+              type="date"
+              outlined
+              dense
+              @input="handleFieldChange"
+            />
+          </div>
 
-    <section>
-      <h2 class="text-2xl font-bold mb-4">{{ $t("events") }}</h2>
-      <v-data-table :items="events" :headers="eventHeaders">
-        <template v-slot:item.actions="{ item, index }">
-          <div class="flex space-x-2">
-            <v-btn @click="editEvent(item.id)" icon>
-              <v-icon>mdi-pencil</v-icon>
+          <div class="mb-4">
+            <label class="text-subtitle-2 mb-2 d-block">{{ $t('event_description') }}</label>
+            <ckeditor v-model="eventForm.description" @input="handleFieldChange" />
+          </div>
+
+          <!-- Event Image Upload -->
+          <FileUploadSection
+            upload-type="image"
+            :multiple="false"
+            :preview-urls="eventImageUrl ? [eventImageUrl] : []"
+            :uploaded-file-ids="eventForm.image ? [eventForm.image] : []"
+            :storage-id="config.website_images"
+            :show-actions="false"
+            @files-uploaded="handleEventImageUploaded"
+          />
+
+          <div class="mt-4">
+            <v-btn
+              @click="saveCurrentEvent"
+              :disabled="isLoading('save')"
+              :loading="isLoading('save')"
+              color="success"
+              class="mr-2"
+            >
+              {{ currentEventId ? $t('save_changes') : $t('add_event') }}
             </v-btn>
-            <v-btn @click="removeEvent(item.id)" icon>
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-            <v-btn @click="moveEventUp(index)" icon :disabled="index === 0">
-              <v-icon>mdi-arrow-up</v-icon>
-            </v-btn>
-            <v-btn @click="moveEventDown(index)" icon :disabled="index === events.length - 1">
-              <v-icon>mdi-arrow-down</v-icon>
+
+            <v-btn
+              @click="resetEventForm"
+              :disabled="isAnyLoading()"
+              color="secondary"
+            >
+              {{ $t('reset_form') }}
             </v-btn>
           </div>
-        </template>
-      </v-data-table>
+        </v-card-text>
+      </v-card>
+    </section>
+
+    <!-- Events List Section -->
+    <section class="events-list-section">
+      <v-card elevation="2">
+        <v-card-title class="text-h6">
+          <v-icon left>mdi-calendar-multiple</v-icon>
+          {{ $t('events_list') }}
+        </v-card-title>
+
+        <v-card-text>
+          <v-data-table
+            :items="events"
+            :headers="eventHeaders"
+            :loading="isLoading('fetch')"
+            class="elevation-1"
+          >
+            <template v-slot:item.actions="{ item, index }">
+              <div class="d-flex gap-2">
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="editEvent(item.id)"
+                      icon
+                      small
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('edit') }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-activator="{ on, attrs }">
+                    <v-btn
+                      @click="removeEvent(item.id)"
+                      icon
+                      small
+                      color="error"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('delete') }}</span>
+                </v-tooltip>
+              </div>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
     </section>
   </div>
 </template>
 
-<script>
-import { Databases, ID, Storage, Query } from "appwrite";
-import { appw, config } from "@/appwrite";
+<script lang="ts">
+import { defineComponent, ref, computed, onMounted, reactive } from 'vue';
 import moment from 'moment';
+import { config } from '@/appwrite';
+import {
+  fetchTVContent,
+  saveSlide,
+  saveEvent,
+  deleteTVContent,
+  updateSlideOrder,
+  moveArrayItem,
+  LoadingManager,
+  getFilePreview,
+  SlideData,
+  EventData
+} from '@/utils/editorUtils';
+import FileUploadSection from '@/components/shared/FileUploadSection.vue';
 
-export default {
-  data() {
-    return {
-      slides: [],
-      currentSlideId: null,
-      title: "",
-      content: "",
-      fileLink: null,
-      img: "",
-      imageId: "",
-      slideHeaders: [
-        { text: "Title", align: 'start', value: 'title' },
-        { text: "Created At", align: 'start', value: 'createdAt' },
-        { text: "Actions", align: 'end', value: 'actions', sortable: false }
-      ],
+export default defineComponent({
+  name: 'SlideEditor',
+  components: {
+    FileUploadSection
+  },
+  setup() {
+    // Reactive data
+    const slides = ref<SlideData[]>([]);
+    const events = ref<EventData[]>([]);
+    const currentSlideId = ref<string | null>(null);
+    const currentEventId = ref<string | null>(null);
+    const loadingManager = new LoadingManager();
 
-      events: [],
-      currentEventId: null,
-      eventTitle: "",
-      eventDescription: "",
-      eventDate: "",
-      eventFileLink: null,
-      eventImg: "",
-      eventImageId: "",
-      eventHeaders: [
-        { text: "Title", align: 'start', value: 'title' },
-        { text: "Date", align: 'start', value: 'date' },
-        { text: "Actions", align: 'end', value: 'actions', sortable: false }
-      ]
+    // Form data
+    const slideForm = reactive({
+      title: '',
+      content: '',
+      image: ''
+    });
+
+    const eventForm = reactive({
+      title: '',
+      description: '',
+      date: '',
+      image: ''
+    });
+
+    // Table headers
+    const slideHeaders = [
+      { text: 'Title', align: 'start', value: 'title' },
+      { text: 'Created At', align: 'start', value: 'createdAt' },
+      { text: 'Actions', align: 'end', value: 'actions', sortable: false }
+    ];
+
+    const eventHeaders = [
+      { text: 'Title', align: 'start', value: 'title' },
+      { text: 'Date', align: 'start', value: 'date' },
+      { text: 'Actions', align: 'end', value: 'actions', sortable: false }
+    ];
+
+    // Computed properties for image previews
+    const slideImageUrl = computed(() => {
+      return slideForm.image ? getFilePreview(slideForm.image, config.website_images) : null;
+    });
+
+    const eventImageUrl = computed(() => {
+      return eventForm.image ? getFilePreview(eventForm.image, config.website_images) : null;
+    });
+
+    // Loading state helpers
+    const isLoading = (key: string) => loadingManager.isLoading(key);
+    const isAnyLoading = () => loadingManager.isAnyLoading();
+
+    // Fetch content from database
+    const fetchContent = async () => {
+      loadingManager.setLoading('fetch', true);
+      try {
+        const content = await fetchTVContent();
+        slides.value = content.slides.map(slide => ({
+          ...slide,
+          createdAt: moment(slide.createdAt).format('YYYY-MM-DD')
+        }));
+        events.value = content.events.map(event => ({
+          ...event,
+          date: moment(event.date).format('YYYY-MM-DD')
+        }));
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      } finally {
+        loadingManager.setLoading('fetch', false);
+      }
     };
-  },
-  mounted() {
-    this.fetchContent();
-  },
-  methods: {
-    async fetchContent() {
-      const database = new Databases(appw);
-      const storage = new Storage(appw);
-      try {
-        const contentData = await database.listDocuments(config.website_db, config.tv_slides);
-        this.slides = [];
-        this.events = [];
 
-        for (const doc of contentData.documents) {
-          const imageUrl = doc.image ? storage.getFileView(config.website_images, doc.image).toString() : null;
-          if (doc.type === 'slide') {
-            this.slides.push({
-              id: doc.$id,
-              title: doc.title,
-              createdAt: moment(doc.$createdAt).format('YYYY-MM-DD'),
-              sorrend: parseInt(doc.sorrend),
-              image: imageUrl
-            });
-          } else if (doc.type === 'event') {
-            this.events.push({
-              id: doc.$id,
-              title: doc.title,
-              date: moment(doc.event_date).format('YYYY-MM-DD'),
-              description: doc.description,
-              image: imageUrl
-            });
-          }
-        }
-
-        this.slides.sort((a, b) => a.sorrend - b.sorrend);
-      } catch (error) {
-        console.error("Error fetching content:", error);
-      }
-    },
-    editSlide(id) {
-      const slide = this.slides.find(s => s.id === id);
+    onMounted(() => {
+      fetchContent();
+    });
+    // Slide management functions
+    const editSlide = (id: string) => {
+      const slide = slides.value.find(s => s.id === id);
       if (slide) {
-        this.currentSlideId = id;
-        this.title = slide.title;
-        this.content = slide.text;
-        this.img = slide.image;
-        this.imageId = slide.imageId;
+        currentSlideId.value = id;
+        slideForm.title = slide.title;
+        slideForm.content = slide.text || '';
+        slideForm.image = slide.image || '';
       }
-    },
-    async saveSlide() {
-      const database = new Databases(appw);
-      const slideData = {
-        type: 'slide',
-        title: this.title,
-        text: this.content,
-        image: this.imageId,
-        sorrend: this.slides.length.toString()
-      };
+    };
+
+    const saveCurrentSlide = async () => {
+      loadingManager.setLoading('save', true);
+      try {
+        const slideData = {
+          title: slideForm.title,
+          text: slideForm.content,
+          image: slideForm.image,
+          sorrend: slides.value.length
+        };
+
+        const savedId = await saveSlide(slideData, currentSlideId.value || undefined);
+        currentSlideId.value = savedId;
+        await fetchContent();
+        resetSlideForm();
+      } catch (error) {
+        console.error('Error saving slide:', error);
+      } finally {
+        loadingManager.setLoading('save', false);
+      }
+    };
+
+    const resetSlideForm = () => {
+      currentSlideId.value = null;
+      slideForm.title = '';
+      slideForm.content = '';
+      slideForm.image = '';
+    };
+
+    const removeSlide = async (id: string) => {
+      if (!confirm('Are you sure you want to delete this slide?')) return;
 
       try {
-        let slideId;
-        if (this.currentSlideId === null) {
-          const result = await database.createDocument(config.website_db, config.tv_slides, ID.unique(), slideData);
-          slideId = result.$id;
-        } else {
-          await database.updateDocument(config.website_db, config.tv_slides, this.currentSlideId, slideData);
-          slideId = this.currentSlideId;
-        }
-        this.currentSlideId = slideId;
-        this.fetchContent();
-        this.resetSlideForm();
+        await deleteTVContent(id);
+        await fetchContent();
       } catch (error) {
-        console.error("Error saving slide:", error);
+        console.error('Error deleting slide:', error);
       }
-    },
-    resetSlideForm() {
-      this.currentSlideId = null;
-      this.title = "";
-      this.content = "";
-      this.fileLink = null;
-      this.img = "";
-      this.imageId = "";
-    },
-    async removeSlide(id) {
-      const database = new Databases(appw);
-      try {
-        await database.deleteDocument(config.website_db, config.tv_slides, id);
-        this.fetchContent();
-      } catch (error) {
-        console.error("Error deleting slide:", error);
-      }
-    },
-    moveSlideUp(index) {
+    };
+
+    const moveSlideUp = (index: number) => {
       if (index > 0) {
-        const temp = this.slides[index - 1];
-        this.slides[index - 1] = this.slides[index];
-        this.slides[index] = temp;
-        this.updateSlideOrder();
+        const newSlides = moveArrayItem(slides.value, index, index - 1);
+        slides.value = newSlides;
+        updateSlideOrder(newSlides);
       }
-    },
-    moveSlideDown(index) {
-      if (index < this.slides.length - 1) {
-        const temp = this.slides[index + 1];
-        this.slides[index + 1] = this.slides[index];
-        this.slides[index] = temp;
-        this.updateSlideOrder();
-      }
-    },
-    async updateSlideOrder() {
-      const database = new Databases(appw);
-      this.slides.forEach(async (slide, index) => {
-        slide.sorrend = index.toString();
-        await database.updateDocument(config.website_db, config.tv_slides, slide.id, { sorrend: slide.sorrend });
-      });
-    },
+    };
 
-    /* Event Management Functions */
-    editEvent(id) {
-      const event = this.events.find(e => e.id === id);
+    const moveSlideDown = (index: number) => {
+      if (index < slides.value.length - 1) {
+        const newSlides = moveArrayItem(slides.value, index, index + 1);
+        slides.value = newSlides;
+        updateSlideOrder(newSlides);
+      }
+    };
+    // Event management functions
+    const editEvent = (id: string) => {
+      const event = events.value.find(e => e.id === id);
       if (event) {
-        this.currentEventId = id;
-        this.eventTitle = event.title;
-        this.eventDescription = event.description;
-        this.eventDate = event.date;
-        this.eventImg = event.image;
-        this.eventImageId = event.imageId;
+        currentEventId.value = id;
+        eventForm.title = event.title;
+        eventForm.description = event.description;
+        eventForm.date = event.date;
+        eventForm.image = event.image || '';
       }
-    },
-    async saveEvent() {
-      const database = new Databases(appw);
-      const eventData = {
-        type: 'event',
-        title: this.eventTitle,
-        description: this.eventDescription,
-        event_date: this.eventDate,
-        image: this.eventImageId
-      };
+    };
+
+    const saveCurrentEvent = async () => {
+      loadingManager.setLoading('save', true);
+      try {
+        const eventData = {
+          title: eventForm.title,
+          description: eventForm.description,
+          date: eventForm.date,
+          image: eventForm.image
+        };
+
+        const savedId = await saveEvent(eventData, currentEventId.value || undefined);
+        currentEventId.value = savedId;
+        await fetchContent();
+        resetEventForm();
+      } catch (error) {
+        console.error('Error saving event:', error);
+      } finally {
+        loadingManager.setLoading('save', false);
+      }
+    };
+
+    const resetEventForm = () => {
+      currentEventId.value = null;
+      eventForm.title = '';
+      eventForm.description = '';
+      eventForm.date = '';
+      eventForm.image = '';
+    };
+
+    const removeEvent = async (id: string) => {
+      if (!confirm('Are you sure you want to delete this event?')) return;
 
       try {
-        let eventId;
-        if (this.currentEventId === null) {
-          const result = await database.createDocument(config.website_db, config.tv_slides, ID.unique(), eventData);
-          eventId = result.$id;
-        } else {
-          await database.updateDocument(config.website_db, config.tv_slides, this.currentEventId, eventData);
-          eventId = this.currentEventId;
-        }
-        this.currentEventId = eventId;
-        this.fetchContent();
-        this.resetEventForm();
+        await deleteTVContent(id);
+        await fetchContent();
       } catch (error) {
-        console.error("Error saving event:", error);
+        console.error('Error deleting event:', error);
       }
-    },
-    resetEventForm() {
-      this.currentEventId = null;
-      this.eventTitle = "";
-      this.eventDescription = "";
-      this.eventDate = "";
-      this.eventFileLink = null;
-      this.eventImg = "";
-      this.eventImageId = "";
-    },
-    async removeEvent(id) {
-      const database = new Databases(appw);
-      try {
-        await database.deleteDocument(config.website_db, config.tv_slides, id);
-        this.fetchContent();
-      } catch (error) {
-        console.error("Error deleting event:", error);
+    };
+    // File upload handlers
+    const handleSlideImageUploaded = async (uploadedFiles: any[]) => {
+      if (uploadedFiles.length > 0) {
+        slideForm.image = uploadedFiles[0].$id;
+        handleFieldChange();
       }
-    },
-    moveEventUp(index) {
-      if (index > 0) {
-        const temp = this.events[index - 1];
-        this.events[index - 1] = this.events[index];
-        this.events[index] = temp;
-        this.updateEventOrder();
+    };
+
+    const handleEventImageUploaded = async (uploadedFiles: any[]) => {
+      if (uploadedFiles.length > 0) {
+        eventForm.image = uploadedFiles[0].$id;
+        handleFieldChange();
       }
-    },
-    moveEventDown(index) {
-      if (index < this.events.length - 1) {
-        const temp = this.events[index + 1];
-        this.events[index + 1] = this.events[index];
-        this.events[index] = temp;
-        this.updateEventOrder();
-      }
-    },
-    async updateEventOrder() {
-      const database = new Databases(appw);
-      this.events.forEach(async (event, index) => {
-        event.sorrend = index.toString();
-        await database.updateDocument(config.website_db, config.tv_slides, event.id, { sorrend: event.sorrend });
-      });
-    }
+    };
+
+    const handleFieldChange = () => {
+      // Trigger any change listeners or auto-save if needed
+    };
+
+    return {
+      slides,
+      events,
+      slideForm,
+      eventForm,
+      currentSlideId,
+      currentEventId,
+      slideHeaders,
+      eventHeaders,
+      slideImageUrl,
+      eventImageUrl,
+      isLoading,
+      isAnyLoading,
+      fetchContent,
+      editSlide,
+      saveCurrentSlide,
+      resetSlideForm,
+      removeSlide,
+      moveSlideUp,
+      moveSlideDown,
+      editEvent,
+      saveCurrentEvent,
+      resetEventForm,
+      removeEvent,
+      handleSlideImageUploaded,
+      handleEventImageUploaded,
+      handleFieldChange,
+      config
+    };
   }
-};
+});
 </script>
 
 <style scoped>
-/* Styling adjustments */
+.slide-editor {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header-section {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .header-section {
+  background-color: #111827;
+  border-color: #374151;
+}
+
+.slide-form-section,
+.event-form-section {
+  margin-bottom: 24px;
+}
+
+.slides-list-section,
+.events-list-section {
+  margin-bottom: 24px;
+}
+
+.action-buttons {
+  gap: 12px;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+/* Card hover effects */
+.v-card {
+  transition: all 0.3s ease;
+}
+
+.v-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Button styles */
+.v-btn {
+  text-transform: none;
+  font-weight: 500;
+}
+
+.v-btn.v-btn--icon {
+  transition: all 0.2s ease;
+}
+
+.v-btn.v-btn--icon:hover {
+  transform: scale(1.1);
+}
+
+/* Data table improvements */
+.v-data-table {
+  border-radius: 8px;
+}
+
+.v-data-table .v-data-table__wrapper {
+  border-radius: 8px;
+}
+
+/* Grid utilities */
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 960px) {
+  .slide-editor {
+    padding: 16px;
+  }
+
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .slide-editor {
+    padding: 12px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .d-flex {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
 </style>

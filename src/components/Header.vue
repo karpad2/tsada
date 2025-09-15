@@ -151,7 +151,7 @@
 import { Client, Databases, ID, Storage, Query, Account } from "appwrite";
 import { convertifserbian } from "@/lang";
 import NavigationMenu from "@/components/HeaderComponents/NavigationMenu.vue";
-import { appw, config, check } from "@/appwrite";
+import { appw, config, appwriteService } from "@/appwrite";
 import { ref } from "vue";
 import { useLoadingStore } from "@/stores/loading";
 import Certop from "./Certop.vue";
@@ -254,7 +254,7 @@ export default {
 
     async initializeData() {
       try {
-        check();
+        appwriteService.checkAuth();
         await Promise.all([
           this.getDocumentsCategories(),
           this.getAbouts(),
@@ -270,12 +270,39 @@ export default {
       this.menu_opened = !this.menu_opened;
     },
 
-    changeLanguage(code: string) {
+    async changeLanguage(code: string) {
       const cc = useLoadingStore();
       cc.setLanguage(code);
       this.$i18n.locale = code;
       this.setCurrentLanguageFlag(code);
-      window.location.reload();
+
+      // PWA cache törlés és frissítés
+      try {
+        if ('serviceWorker' in navigator && 'caches' in window) {
+          const cacheNames = await caches.keys();
+          const apiCaches = cacheNames.filter(name =>
+            name.includes('api-cache') ||
+            name.includes('dynamic-cache')
+          );
+
+          await Promise.all(
+            apiCaches.map(cacheName => caches.delete(cacheName))
+          );
+        }
+
+        // Adatok újratöltése cache nélkül
+        await this.initializeData();
+
+        // Force refresh minden komponens számára
+        this.reload = false;
+        await this.$nextTick();
+        this.reload = true;
+
+      } catch (error) {
+        console.error('Error during language change:', error);
+        // Fallback: hagyományos reload
+        window.location.reload();
+      }
     },
 
     async logout() {
@@ -284,10 +311,34 @@ export default {
         await account.deleteSession('current');
         const cc = useLoadingStore();
         cc.setUserLoggedin(false);
-        console.warn("logout");
-        window.location.reload();
+
+        // PWA cache törlés kijelentkezéskor
+        if ('serviceWorker' in navigator && 'caches' in window) {
+          const cacheNames = await caches.keys();
+          const userCaches = cacheNames.filter(name =>
+            name.includes('api-cache') ||
+            name.includes('dynamic-cache') ||
+            name.includes('user-data')
+          );
+
+          await Promise.all(
+            userCaches.map(cacheName => caches.delete(cacheName))
+          );
+        }
+
+        console.log("logout successful");
+        // Redirect to home instead of reload
+        this.$router.push('/home');
+
+        // Force refresh
+        this.reload = false;
+        await this.$nextTick();
+        this.reload = true;
+
       } catch (error) {
         console.error('Logout error:', error);
+        // Fallback
+        window.location.href = '/home';
       }
     },
 
