@@ -23,13 +23,13 @@
 
                     <template v-slot:item.open="{ item }">
                         <router-link :to="`/document/${item.doc_id}`">
-                            <i class="pi pi-book icon_size"></i>
+                            <i class="pi pi-book icon_size text-blue-600 hover:text-blue-800 transition-colors"></i>
                         </router-link>
                     </template>
 
                     <template v-slot:item.edit="{ item }" v-if="admin">
                         <router-link :to="`/admin/document/${item.id}`">
-                            <i class="pi pi-cloud-upload icon_size"></i>
+                            <i class="pi pi-cloud-upload icon_size text-green-600 hover:text-green-800 transition-colors"></i>
                         </router-link>
                     </template>
 
