@@ -22,6 +22,7 @@
     <FileUploadSection
       upload-type="image"
       :multiple="false"
+      :auto-upload="true"
       :preview-urls="img ? [img] : []"
       :uploaded-file-ids="default_image ? [default_image] : []"
       :storage-id="config.website_images"
@@ -190,7 +191,7 @@ export default defineComponent({
       documents_flag: false,
       album_flag: false,
       gallery_id: "",
-      notNews: true
+      notNews: false
     })
 
     // Loading helpers
@@ -231,7 +232,7 @@ export default defineComponent({
           content_en: document.text_en || "",
           yt_video: document.yt_video || "",
           visible: document.visible || false,
-          notNews: document.notNews || true,
+          notNews: document.notNews || false,
           show_date: document.show_date || false,
           documents_flag: document.has_documents || false,
           album_flag: document.has_gallery || false,
@@ -240,6 +241,7 @@ export default defineComponent({
         
         // Set image
         if (document.default_image) {
+          default_image.value = document.default_image
           img.value = storage.getFileView(config.website_images, document.default_image).toString()
         }
         
@@ -250,6 +252,7 @@ export default defineComponent({
 
     const save = async (): Promise<void> => {
       try {
+        console.log('Saving document with default_image:', default_image.value)
         await database.updateDocument(
           config.website_db,
           config.about_us_db,
@@ -274,7 +277,8 @@ export default defineComponent({
             show_date: formData.show_date
           }
         )
-        
+        console.log('Document saved successfully')
+
         // Show success notification (assuming $notify is available)
         // this.$notify(this.$t('saved'))
         
@@ -315,8 +319,10 @@ export default defineComponent({
     }
 
     const handleFilesUploaded = async (uploadedFiles: any[]): Promise<void> => {
+      console.log('Files uploaded:', uploadedFiles)
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0]
+        console.log('Setting default_image to:', file.$id)
         default_image.value = file.$id
         img.value = storage.getFileView(config.website_images, file.$id).toString()
         await save()

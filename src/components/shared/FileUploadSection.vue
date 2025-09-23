@@ -421,25 +421,35 @@ export default defineComponent({
             return errors;
         };
 
-        const handleFileChange = (newFiles: File[]) => {
-            if (!newFiles || newFiles.length === 0) {
+        const handleFileChange = (newFiles: File[] | File | null) => {
+            // Convert to array format
+            let fileArray: File[] = [];
+            if (newFiles) {
+                if (Array.isArray(newFiles)) {
+                    fileArray = newFiles;
+                } else {
+                    fileArray = [newFiles];
+                }
+            }
+
+            if (fileArray.length === 0) {
                 clearFiles();
                 return;
             }
 
             // Track file selection
             trackUserInteraction('file_select', 'file_input', {
-                file_count: newFiles.length,
-                file_types: newFiles.map(f => f.type),
-                total_size: newFiles.reduce((sum, f) => sum + f.size, 0),
+                file_count: fileArray.length,
+                file_types: fileArray.map(f => f.type),
+                total_size: fileArray.reduce((sum, f) => sum + f.size, 0),
                 upload_type: props.uploadType
             });
 
-            files.value = newFiles;
+            files.value = fileArray;
             clearMessages();
 
             // Validate files
-            const errors = validateFiles(newFiles);
+            const errors = validateFiles(fileArray);
             validationErrors.value = errors;
 
             if (errors.length === 0 && props.autoUpload) {

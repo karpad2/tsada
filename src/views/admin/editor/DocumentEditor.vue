@@ -1,5 +1,5 @@
 <template>
-    <div class="document-editor">
+    <div class="document-editor dark:bg-slate-600">
       <!-- Loading overlay -->
       <v-overlay :value="isLoading" absolute>
         <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -960,5 +960,159 @@
   
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .document-editor {
+      background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+      color: #e2e8f0;
+    }
+
+    .upload-card, .titles-card {
+      background: rgba(26, 32, 44, 0.95);
+      color: #e2e8f0;
+    }
+
+    .card-header {
+      border-bottom: 1px solid #4a5568;
+      color: #e2e8f0;
+    }
+
+    .upload-area {
+      border-color: #4a5568;
+      background: rgba(45, 55, 72, 0.8);
+      color: #e2e8f0;
+    }
+
+    .upload-area.drag-over {
+      border-color: #63b3ed;
+      background: rgba(99, 179, 237, 0.1);
+    }
+
+    .upload-area.has-file {
+      border-color: #68d391;
+      background: rgba(104, 211, 145, 0.1);
+    }
+
+    .language-progress {
+      background: rgba(26, 32, 44, 0.7);
+      border: 1px solid rgba(99, 179, 237, 0.2);
+      color: #e2e8f0;
+    }
+
+    .language-status {
+      background: rgba(45, 55, 72, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+    }
+
+    .upload-progress {
+      background: rgba(26, 32, 44, 0.9);
+      border: 1px solid #4a5568;
+      color: #e2e8f0;
+    }
+
+    /* Vuetify component overrides for dark mode */
+    .v-card {
+      background-color: rgba(26, 32, 44, 0.95) !important;
+      color: #e2e8f0 !important;
+    }
+
+    .v-text-field input {
+      color: #e2e8f0 !important;
+    }
+
+    .v-text-field .v-label {
+      color: #a0aec0 !important;
+    }
+
+    .v-text-field.v-input--is-focused .v-label {
+      color: #63b3ed !important;
+    }
+
+    .v-file-input .v-input__slot {
+      background-color: rgba(45, 55, 72, 0.8) !important;
+      border-color: #4a5568 !important;
+    }
+
+    .v-alert {
+      background-color: rgba(45, 55, 72, 0.9) !important;
+      color: #e2e8f0 !important;
+    }
+
+    .v-chip {
+      background-color: rgba(45, 55, 72, 0.9) !important;
+      color: #e2e8f0 !important;
+    }
+
+    .v-progress-linear {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  /* Force dark mode when html has dark class */
+  :global(.dark) .document-editor {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: #e2e8f0;
+  }
+
+  :global(.dark) .upload-card,
+  :global(.dark) .titles-card {
+    background: rgba(26, 32, 44, 0.95) !important;
+    color: #e2e8f0 !important;
+  }
+
+  :global(.dark) .card-header {
+    border-bottom: 1px solid #4a5568;
+    color: #e2e8f0 !important;
+  }
+
+  :global(.dark) .upload-area {
+    border-color: #4a5568;
+    background: rgba(45, 55, 72, 0.8);
+    color: #e2e8f0;
+  }
+
+  :global(.dark) .language-progress {
+    background: rgba(26, 32, 44, 0.7);
+    border: 1px solid rgba(99, 179, 237, 0.2);
+    color: #e2e8f0;
+  }
+
+  :global(.dark) .language-status {
+    background: rgba(45, 55, 72, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+
+  :global(.dark) .v-card {
+    background-color: rgba(26, 32, 44, 0.95) !important;
+    color: #e2e8f0 !important;
+  }
+
+  :global(.dark) .v-text-field input {
+    color: #e2e8f0 !important;
+  }
+
+  :global(.dark) .v-text-field .v-label {
+    color: #a0aec0 !important;
+  }
+
+  :global(.dark) .v-file-input .v-input__slot {
+    background-color: rgba(45, 55, 72, 0.8) !important;
+    border-color: #4a5568 !important;
   }
   </style>

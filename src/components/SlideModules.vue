@@ -1,13 +1,134 @@
 <template>
   <section class="text-gray-600 body-font mt-5 mb-5" id="courses">
     <div class="container px-5 mx-auto">
-      <!-- Header section with improved spacing and accessibility -->
-      <div class="flex flex-wrap mb-12">
+      <!-- Enhanced header section with statistics and filters -->
+      <div class="flex flex-wrap justify-between items-center mb-12">
         <div class="lg:w-1/2 w-full mb-6">
           <h1 class="sm:text-4xl text-3xl font-semibold title-font mb-3 text-gray-900 dark:text-white">
             {{ $t(mode) }}
           </h1>
-          <div class="h-1 w-24 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full"></div>
+          <div class="h-1 w-24 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full mb-4"></div>
+
+          <!-- Statistics badges -->
+          <div class="flex flex-wrap gap-3 mt-4">
+            <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              {{ courses.length }} {{ $t('items') }}
+            </div>
+
+            <div v-if="admin" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ visibleCount }} {{ $t('visible') }}
+            </div>
+
+            <div v-if="admin && hiddenCount > 0" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-medium">
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.5 8.5m1.378 1.378l4.242 4.242M12 3c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21m-6-6l-6-6"></path>
+              </svg>
+              {{ hiddenCount }} {{ $t('hidden') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin actions section -->
+        <div v-if="admin" class="lg:w-1/2 w-full flex flex-col lg:items-end">
+          <!-- Admin search bar -->
+          <div class="relative mb-4 w-full lg:w-96">
+            <input
+              v-model="searchQuery"
+              @input="handleSearch"
+              type="text"
+              :placeholder="$t('search_content')"
+              class="w-full px-4 py-2 pl-10 pr-4 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+            />
+            <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+
+            <!-- Clear search button -->
+            <button
+              v-if="searchQuery"
+              @click="clearSearch"
+              class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Admin filter buttons -->
+          <div class="flex gap-2 mb-4">
+            <button
+              @click="filterType = 'all'"
+              :class="[
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+                filterType === 'all'
+                  ? 'bg-sky-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ]"
+            >
+              {{ $t('all') }}
+            </button>
+
+            <button
+              @click="filterType = 'visible'"
+              :class="[
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+                filterType === 'visible'
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ]"
+            >
+              {{ $t('visible_only') }}
+            </button>
+
+            <button
+              @click="filterType = 'hidden'"
+              :class="[
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+                filterType === 'hidden'
+                  ? 'bg-yellow-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ]"
+            >
+              {{ $t('hidden_only') }}
+            </button>
+          </div>
+
+          <!-- Admin view toggle -->
+          <div v-if="false" class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <button
+              @click="viewMode = 'grid'"
+              :class="[
+                'px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200',
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              ]"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+            <button
+              @click="viewMode = 'list'"
+              :class="[
+                'px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200',
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              ]"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -163,17 +284,56 @@ export default defineComponent({
         img: string;
       }>,
       page: 0,
-      limit: 12, // Increased for better grid layout
+      limit: 24, // Significantly increased to load more items
       isLoading: false,
       isInitialLoading: true,
       hasMore: true,
       retryCount: 0,
       maxRetries: 3,
+      searchQuery: '',
+      filterType: 'all', // 'all', 'visible', 'hidden'
+      viewMode: 'grid', // 'grid', 'list'
+      allCourses: [] as Array<any>, // Store all courses for filtering
+      searchTimeout: null as any, // For debouncing search
     };
   },
+  computed: {
+    loadingStore() {
+      return useLoadingStore();
+    },
+    currentLanguage() {
+      return this.loadingStore.language;
+    },
+    visibleCount() {
+      return this.courses.filter(course => course.visible).length;
+    },
+    hiddenCount() {
+      return this.courses.filter(course => !course.visible).length;
+    },
+    filteredCourses() {
+      let filtered = [...this.allCourses];
+
+      // Apply search filter
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(course =>
+          course.title.toLowerCase().includes(query) ||
+          course.text.toLowerCase().includes(query)
+        );
+      }
+
+      // Apply visibility filter
+      if (this.filterType === 'visible') {
+        filtered = filtered.filter(course => course.visible);
+      } else if (this.filterType === 'hidden') {
+        filtered = filtered.filter(course => !course.visible);
+      }
+
+      return filtered;
+    }
+  },
   async mounted() {
-    const store = useLoadingStore();
-    this.admin = store.userLoggedin;
+    this.admin = this.loadingStore.userLoggedin;
     await this.loadCourses();
 
     window.addEventListener('scroll', this.handleScroll, { passive: true });
@@ -198,13 +358,19 @@ export default defineComponent({
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
   },
+  watch: {
+    // Watch for language changes in the Pinia store
+    async currentLanguage() {
+      // Reload content when language changes
+      await this.reloadAllContent();
+    }
+  },
   methods: {
     async loadCourses(retryOnError = true) {
       if (this.isLoading || !this.hasMore) return;
       this.isLoading = true;
 
       try {
-        const store = useLoadingStore();
         const db = new Databases(appw);
         const storage = new Storage(appw);
 
@@ -227,7 +393,7 @@ export default defineComponent({
             '$createdAt',
           ]),
           ...(this.mode === 'news' ? [Query.or([Query.isNull('notNews'), Query.equal('notNews', false)])] : []),
-          ...(!store.userLoggedin ? [Query.equal(getStatus(), true), Query.equal('visible', true)] : []),
+          ...(!this.loadingStore.userLoggedin ? [Query.equal(getStatus(), true), Query.equal('visible', true)] : []),
         ];
 
         const { documents } = await db.listDocuments(config.website_db, config.about_us_db, filters);
@@ -235,7 +401,7 @@ export default defineComponent({
         if (documents.length < this.limit) this.hasMore = false;
 
         const newCourses = documents.map((doc) => {
-          const lang = store.language;
+          const lang = this.loadingStore.language;
           return {
             id: doc.$id,
             visible: doc.visible,
@@ -273,6 +439,7 @@ export default defineComponent({
         });
 
         this.courses.push(...newCourses);
+        this.allCourses.push(...newCourses); // Store all courses for filtering
         this.page++;
         this.retryCount = 0; // Reset retry count on success
       } catch (error) {
@@ -324,6 +491,35 @@ export default defineComponent({
     },
     getPlaceholderImage(): string {
       return 'https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&h=400&q=80';
+    },
+
+    // Search and filter methods
+    handleSearch() {
+      // Debounce search for better performance
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.applyFilters();
+      }, 300);
+    },
+
+    clearSearch() {
+      this.searchQuery = '';
+      this.applyFilters();
+    },
+
+    applyFilters() {
+      // Update displayed courses based on current filters
+      this.courses = this.filteredCourses;
+    },
+
+    async reloadAllContent() {
+      // Reset pagination and reload all content for new language
+      this.page = 0;
+      this.courses = [];
+      this.allCourses = [];
+      this.hasMore = true;
+      this.isInitialLoading = true;
+      await this.loadCourses();
     },
   },
 });

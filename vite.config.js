@@ -74,5 +74,17 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@a': fileURLToPath(new URL('./src/assets', import.meta.url))
     }
+  },
+  build: {
+    target: 'esnext', // Support modern features including top-level await
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'ui': ['vuetify'],
+          'appwrite': ['appwrite']
+        }
+      }
+    }
   }
 })

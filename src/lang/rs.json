@@ -351,6 +351,26 @@
   "notNews": "Није вест",
   "fb_share": "Facebook дељење",
   "fb_public": "Facebook дељење јавно?",
-  "applies_are_closed": "Пријаве су затворене или сте већ пријављени"
-  }
+  "applies_are_closed": "Пријаве су затворене или сте већ пријављени",
+
+  "items": "ставка",
+  "search_content": "Претражи садржај...",
+  "all": "Све",
+  "visible_only": "Само видљиво",
+  "hidden_only": "Само скривено",
+  "make_visible": "Учини видљивим",
+  "save_changes": "Сачувај измене",
+  "delete_gallery": "Обриши галерију",
+  "images": "слика",
+  "has_default": "Има подразумевану",
+  "file_upload": "Постављање фајла",
+  "file_upload_started": "Постављање фајла започето",
+  "multilanguage_content": "Вишејезички садржај",
+  "serbian": "Српски",
+  "hungarian": "Мађарски",
+  "english": "Енглески",
+  "gallery_editor": "Уређивач галерије",
+  "file_uploaded": "Фајл постављен",
+  "create_a_new_album": "Направи нову галерију"
+}
   

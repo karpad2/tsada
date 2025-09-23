@@ -337,5 +337,24 @@
   "notNews": "Not News flag",
   "fb_share": "Facebook share",
   "fb_public": "Facebook share public?",
-  "applies_are_closed": "Applications are closed or you have already applied"
+  "applies_are_closed": "Applications are closed or you have already applied",
+
+  "items": "items",
+  "search_content": "Search content...",
+  "all": "All",
+  "visible_only": "Visible only",
+  "hidden_only": "Hidden only",
+  "make_visible": "Make visible",
+  "save_changes": "Save changes",
+  "delete_gallery": "Delete gallery",
+  "images": "images",
+  "has_default": "Has default",
+  "file_upload": "File upload",
+  "file_upload_started": "File upload started",
+  "multilanguage_content": "Multilingual content",
+  "serbian": "Serbian",
+  "hungarian": "Hungarian",
+  "english": "English",
+  "gallery_editor": "Gallery editor",
+  "file_uploaded": "File uploaded"
 }

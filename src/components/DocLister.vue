@@ -38,38 +38,54 @@ export default{
         admin:false
         }
     },
+    computed: {
+        loadingStore() {
+            return useLoadingStore();
+        },
+        currentLanguage() {
+            return this.loadingStore.language;
+        }
+    },
+    watch: {
+        // Watch for language changes and reload documents
+        async currentLanguage() {
+            await this.reloadDocuments();
+        }
+    },
     props:{
         _id:String
     },
     mounted()
     {
-        this.headers= [
-                    { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
-                    { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    
-                    { title: this.$t("open_document"), align: 'start', key: 'open', width:'300px' },
-                    
-                    ];
-        
-        const cc = useLoadingStore();
-        this.admin = cc.userLoggedin;
-
-            if(this.admin)
-            {
-            this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
-            this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
-            }
-            this.synchronize_documents();
+        this.setupHeaders();
+        this.admin = this.loadingStore.userLoggedin;
+        this.synchronize_documents();
     },
     methods:{
+        setupHeaders() {
+            this.headers = [
+                { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
+                { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
+                { title: this.$t("open_document"), align: 'start', key: 'open', width:'300px' },
+            ];
+
+            if(this.admin) {
+                this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
+                this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
+            }
+        },
+        async reloadDocuments() {
+            // Reload headers in case language changed the translations
+            this.setupHeaders();
+            await this.synchronize_documents();
+        },
         async synchronize_documents()
         {
             const database = new Databases(appw);
-            
+
                 this.doc_loaded=false;
                 this.documents=[];
-                const loadingStore = useLoadingStore();
-                let local=loadingStore.language;
+                let local=this.loadingStore.language;
                 let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
                 Query.equal("texts",this._id)]);
 
@@ -108,8 +124,7 @@ export default{
             this.$router.push("/admin/text-document-editor/"+l.$id);
         },
         rt_time(a)
-                {   const loadingStore = useLoadingStore();
-                    let local=loadingStore.language;
+                {   let local=this.loadingStore.language;
                     if(local=="rs"||local=="sr")
                     {
                         moment.locale('sr');

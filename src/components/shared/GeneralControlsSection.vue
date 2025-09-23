@@ -1,7 +1,7 @@
 <template>
     <section class="header-section mb-6">
         <!-- Status Controls -->
-        <div class="flex flex-wrap gap-4 mb-4" v-if="showStatusControls">
+        <div class="flex flex-wrap gap-4 mb-4 dark:text-white" v-if="showStatusControls">
             <v-switch
                 v-if="showVisible"
                 :model-value="visible"

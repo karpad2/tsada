@@ -355,6 +355,25 @@
     "offline_ready_message": "Az alkalmazás mostantól offline is használható.",
     "cache_cleared": "Cache törölve",
     "language_changed": "Nyelv módosítva",
-    "refresh_required": "Frissítés szükséges"
+    "refresh_required": "Frissítés szükséges",
+
+    "items": "elem",
+    "search_content": "Tartalom keresése...",
+    "all": "Összes",
+    "visible_only": "Csak látható",
+    "hidden_only": "Csak rejtett",
+    "make_visible": "Láthatóvá tesz",
+    "save_changes": "Változtatások mentése",
+    "delete_gallery": "Galéria törlése",
+    "images": "kép",
+    "has_default": "Van alapértelmezett",
+    "file_upload": "Fájl feltöltés",
+    "file_upload_started": "Fájl feltöltés elindult",
+    "multilanguage_content": "Többnyelvű tartalom",
+    "serbian": "Szerb",
+    "hungarian": "Magyar",
+    "english": "Angol",
+    "gallery_editor": "Galéria szerkesztő",
+    "file_uploaded": "Fájl feltöltve"
 
  }

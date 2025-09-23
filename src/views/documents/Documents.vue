@@ -286,26 +286,26 @@ export default {
         categoryToDelete: null as CategoryItem | null
     }),
 
-    async mounted() {
-        const loadingStore = useLoadingStore();
-        this.admin = loadingStore.userLoggedin;
-        document.title = this.$t("documents");
-
-        // Initialize headers
-        this.headers = [
-            { title: this.$t("name"), align: 'start', sortable: false, key: 'name', width: '300px' },
-            { title: this.$t("date"), align: 'start', key: 'date', width: '200px' },
-            { title: this.$t("open_document"), align: 'start', key: 'open', width: '100px' }
-        ];
-
-        if (this.admin) {
-            this.headers.push({ 
-                title: this.$t("edit_document"), 
-                align: 'start', 
-                key: 'edit', 
-                width: '100px' 
-            });
+    computed: {
+        loadingStore() {
+            return useLoadingStore();
+        },
+        currentLanguage() {
+            return this.loadingStore.language;
         }
+    },
+
+    watch: {
+        // Watch for language changes and reload documents
+        async currentLanguage() {
+            await this.reloadDocuments();
+        }
+    },
+
+    async mounted() {
+        this.admin = this.loadingStore.userLoggedin;
+        document.title = this.$t("documents");
+        this.setupHeaders();
 
         // Title animation
         gsap.fromTo("#render_title", {
@@ -322,6 +322,32 @@ export default {
 
     methods: {
         rt_time: formatTime,
+
+        setupHeaders() {
+            this.headers = [
+                { title: this.$t("name"), align: 'start', sortable: false, key: 'name', width: '300px' },
+                { title: this.$t("date"), align: 'start', key: 'date', width: '200px' },
+                { title: this.$t("open_document"), align: 'start', key: 'open', width: '100px' }
+            ];
+
+            if (this.admin) {
+                this.headers.push({
+                    title: this.$t("edit_document"),
+                    align: 'start',
+                    key: 'edit',
+                    width: '100px'
+                });
+            }
+        },
+
+        async reloadDocuments() {
+            // Update document title
+            document.title = this.$t("documents");
+            // Reload headers in case language changed the translations
+            this.setupHeaders();
+            // Reload all documents
+            await this.load_workers_base();
+        },
 
         async new_stuff(categoryId: string): Promise<void> {
             try {

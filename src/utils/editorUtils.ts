@@ -398,17 +398,22 @@ export class GalleryManager {
         }
     }
 
-    async addImageToGallery(galleryId: string, imageId: string, filename: string): Promise<void> {
+    async addImageToGallery(galleryId: string, imageId: string): Promise<void> {
         try {
+            console.log('GalleryManager - Adding image to gallery:', {
+                galleryId,
+                imageId,
+                collection: this.config.gallery_images || this.config.album_images
+            });
             await this.documentManager.create(
                 this.config.gallery_images || this.config.album_images,
                 {
-                    gallery_id: galleryId,
-                    image_id: imageId,
-                    filename
+                    gallery: galleryId,
+                    image_id: imageId
                 },
                 imageId
             );
+            console.log('GalleryManager - Successfully added image to gallery');
         } catch (error: any) {
             console.error('Error adding image to gallery:', error);
             throw error;
@@ -419,7 +424,7 @@ export class GalleryManager {
         try {
             const result = await this.documentManager.list(
                 this.config.gallery_images || this.config.album_images,
-                [`gallery_id=${galleryId}`]
+                [`gallery=${galleryId}`]
             );
             return result.documents;
         } catch (error: any) {
