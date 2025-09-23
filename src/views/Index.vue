@@ -85,10 +85,37 @@ import { onBeforeUnmount } from "vue";
   
       const checkForUpdates = async () => {
         try {
+          // Check if we've already checked recently (prevent infinite loop)
+          const lastCheck = localStorage.getItem('lastUpdateCheck');
+          const now = Date.now();
+          const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+
+          if (lastCheck && (now - parseInt(lastCheck)) < oneHour) {
+            console.log('Update check skipped - checked recently');
+            return;
+          }
+
+          // Store current check time
+          localStorage.setItem('lastUpdateCheck', now.toString());
+
           const res = await fetch("https://raw.githubusercontent.com/karpad2/tsada/refs/heads/main/package.json");
           const data = await res.json();
+
           if (data.version !== currentVersion && import.meta.env.PROD) {
-            clearCacheAndReload();
+            // Set a flag to prevent multiple reload attempts
+            const reloadFlag = localStorage.getItem('pendingReload');
+            if (!reloadFlag) {
+              localStorage.setItem('pendingReload', 'true');
+              console.log(`New version available: ${data.version} (current: ${currentVersion})`);
+
+              // Add a small delay before reload to ensure flag is set
+              setTimeout(() => {
+                clearCacheAndReload();
+              }, 2000);
+            }
+          } else {
+            // Clear reload flag if versions match
+            localStorage.removeItem('pendingReload');
           }
         } catch (err) {
           console.warn("Update check failed:", err);
@@ -97,6 +124,9 @@ import { onBeforeUnmount } from "vue";
 
   
       const clearCacheAndReload = () => {
+        // Clear the reload flag before reloading
+        localStorage.removeItem('pendingReload');
+
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.getRegistrations().then((regs) => {
             for (const reg of regs) reg.unregister();
@@ -117,7 +147,7 @@ import { onBeforeUnmount } from "vue";
       onMounted(() => {
         store.isLoading = true;
         checkConnection();
-        checkForUpdates();
+        //checkForUpdates();
         window.addEventListener('keydown', handleKeydown);
         // hide progress bar after 1s for visual effect
         setTimeout(() => {

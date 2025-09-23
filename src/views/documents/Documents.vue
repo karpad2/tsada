@@ -54,6 +54,26 @@
                     </v-data-table>
 
                     <div v-if="admin" class="flex gap-3 mt-4 flex-wrap">
+                        <div class="flex gap-2">
+                            <v-btn
+                                @click="moveCategoryUp(role)"
+                                color="secondary"
+                                size="small"
+                                :disabled="!canMoveUp(role)"
+                                :title="$t('move_up')"
+                            >
+                                <i class="pi pi-chevron-up"></i>
+                            </v-btn>
+                            <v-btn
+                                @click="moveCategoryDown(role)"
+                                color="secondary"
+                                size="small"
+                                :disabled="!canMoveDown(role)"
+                                :title="$t('move_down')"
+                            >
+                                <i class="pi pi-chevron-down"></i>
+                            </v-btn>
+                        </div>
                         <v-btn @click="new_stuff(role.id)" color="primary" class="m-2">
                             {{ $t('add_new_document_in_that_category') }}
                         </v-btn>
@@ -61,24 +81,24 @@
                             <i class="pi pi-pencil mr-2"></i>
                             {{ $t('edit_category') }}
                         </v-btn>
-                        <v-btn 
-                            v-if="!role.archived" 
-                            @click="archive_stuff(role.id)" 
+                        <v-btn
+                            v-if="!role.archived"
+                            @click="archive_stuff(role.id)"
                             color="warning"
                             class="m-2"
                         >
                             {{ $t('archive_category') }}
                         </v-btn>
-                        <v-btn 
-                            v-else 
-                            @click="restore_stuff(role.id)" 
+                        <v-btn
+                            v-else
+                            @click="restore_stuff(role.id)"
                             color="success"
                             class="m-2"
                         >
                             {{ $t('restore') }}
                         </v-btn>
-                        <v-btn 
-                            @click="confirmDeleteCategory(role)" 
+                        <v-btn
+                            @click="confirmDeleteCategory(role)"
                             color="error"
                             class="m-2"
                         >
@@ -551,6 +571,81 @@ export default {
             } catch (error) {
                 console.error('Error loading categories and documents:', error);
                 this.loaded = true;
+            }
+        },
+
+        // Move category methods
+        canMoveUp(category: CategoryItem): boolean {
+            const currentIndex = this.roles.findIndex(role => role.id === category.id);
+            return currentIndex > 0;
+        },
+
+        canMoveDown(category: CategoryItem): boolean {
+            const currentIndex = this.roles.findIndex(role => role.id === category.id);
+            return currentIndex < this.roles.length - 1;
+        },
+
+        async moveCategoryUp(category: CategoryItem): Promise<void> {
+            try {
+                const currentIndex = this.roles.findIndex(role => role.id === category.id);
+                if (currentIndex <= 0) return;
+
+                const previousCategory = this.roles[currentIndex - 1];
+
+                // Swap the order values
+                const database = new Databases(appw);
+
+                await Promise.all([
+                    database.updateDocument(
+                        config.website_db,
+                        config.document_categories_db,
+                        category.id,
+                        { listasorrend: previousCategory.originalData?.listasorrend || currentIndex }
+                    ),
+                    database.updateDocument(
+                        config.website_db,
+                        config.document_categories_db,
+                        previousCategory.id,
+                        { listasorrend: category.originalData?.listasorrend || (currentIndex + 1) }
+                    )
+                ]);
+
+                await this.load_workers_base();
+
+            } catch (error) {
+                console.error('Error moving category up:', error);
+            }
+        },
+
+        async moveCategoryDown(category: CategoryItem): Promise<void> {
+            try {
+                const currentIndex = this.roles.findIndex(role => role.id === category.id);
+                if (currentIndex >= this.roles.length - 1) return;
+
+                const nextCategory = this.roles[currentIndex + 1];
+
+                // Swap the order values
+                const database = new Databases(appw);
+
+                await Promise.all([
+                    database.updateDocument(
+                        config.website_db,
+                        config.document_categories_db,
+                        category.id,
+                        { listasorrend: nextCategory.originalData?.listasorrend || (currentIndex + 2) }
+                    ),
+                    database.updateDocument(
+                        config.website_db,
+                        config.document_categories_db,
+                        nextCategory.id,
+                        { listasorrend: category.originalData?.listasorrend || (currentIndex + 1) }
+                    )
+                ]);
+
+                await this.load_workers_base();
+
+            } catch (error) {
+                console.error('Error moving category down:', error);
             }
         }
     }
