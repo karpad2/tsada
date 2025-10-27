@@ -19,6 +19,32 @@ body {
 .ctextfield{
   @apply text-gray-700 dark:text-white
 }
+
+/* Dark mode styling for Vuetify text fields */
+.dark .ctextfield :deep(.v-field) {
+  background-color: rgb(71 85 105) !important;
+  border-color: rgb(100 116 139) !important;
+}
+
+.dark .ctextfield :deep(.v-field__input) {
+  color: rgb(248 250 252) !important;
+}
+
+.dark .ctextfield :deep(.v-label) {
+  color: rgb(203 213 225) !important;
+}
+
+.dark .ctextfield :deep(.v-field--focused .v-label) {
+  color: rgb(59 130 246) !important;
+}
+
+.dark .ctextfield :deep(.v-field__outline) {
+  color: rgb(100 116 139) !important;
+}
+
+.dark .ctextfield :deep(.v-field--focused .v-field__outline) {
+  color: rgb(59 130 246) !important;
+}
 .alahuz{
   @apply bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out;
 }

@@ -32,7 +32,7 @@ export const formatTime = (dateString: string): string => {
         moment.locale('en');
     }
 
-    return moment(dateString).format("LLL");
+    return moment(dateString).format("LL");
 };
 
 export const getLocalizedCategoryName = (category: any): string => {
