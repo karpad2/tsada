@@ -7,15 +7,12 @@
 </template>
 
 <script setup lang="ts">
-// Global app setup
-useHead({
-  titleTemplate: '%s - Tehnička Škola Ada',
-  htmlAttrs: {
-    lang: 'sr'
-  }
-})
+// Nuxt 3 minimal app
 </script>
 
 <style>
-/* Global styles will be imported via nuxt.config.ts */
+body {
+  margin: 0;
+  padding: 0;
+}
 </style>
