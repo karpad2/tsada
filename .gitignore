@@ -31,6 +31,7 @@ dev-dist
 *.sw?
 
 *.tsbuildinfo
+stats.html
 
 # Nuxt 3 (experimental - not in use)
 .nuxt/
