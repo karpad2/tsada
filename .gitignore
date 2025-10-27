@@ -31,3 +31,18 @@ dev-dist
 *.sw?
 
 *.tsbuildinfo
+
+# Nuxt 3 (experimental - not in use)
+.nuxt/
+.output/
+nuxt.config.ts
+app.vue
+.nuxtignore
+NUXT3_*.md
+NUXT_RECOMMENDATION.md
+src/pages/
+src/layouts/
+src/middleware/
+src/plugins/appwrite.client.ts
+src/plugins/primevue.ts
+src/composables/useAppwrite.ts

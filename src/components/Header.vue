@@ -182,19 +182,19 @@ export default {
         { name: 'Magyar', code: 'hu', country: "hun" },
         { name: 'English', code: 'en', country: "gbr" }
       ] as LanguageItem[],
-      
+
       doccategories: [] as MenuItem[],
       _erasmus: [] as MenuItem[],
       abouts: [] as MenuItem[],
       _students: [] as MenuItem[],
-      
+
       reload: ref(true),
       menu_opened: false,
       mobile_view: false,
       tablet_view: false,
       logged_in: false,
       lang: "",
-      
+
       erasmus_list: false,
       erasmus_apply_on: false,
     }
@@ -226,7 +226,7 @@ export default {
       const cc = useLoadingStore();
       return cc.isErasmus;
     },
-    
+
     mobile_mode() {
       return this.menu_opened && this.mobile_view || !this.mobile_view;
     },
@@ -234,7 +234,11 @@ export default {
     style_computed_for_mobile() {
       return this.mobile_view && !this.mobile_mode;
     },
-    
+
+    tablet_mode() {
+      return this.tablet_view;
+    },
+
     isLoggedin() {
       const cc = useLoadingStore();
       return cc.userLoggedin;
