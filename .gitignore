@@ -33,7 +33,7 @@ dev-dist
 *.tsbuildinfo
 stats.html
 
-# Nuxt 3 (experimental - not in use)
+# Nuxt 3 (experimental - not used in production)
 .nuxt/
 .output/
 nuxt.config.ts
@@ -41,9 +41,11 @@ app.vue
 .nuxtignore
 NUXT3_*.md
 NUXT_RECOMMENDATION.md
+i18n/
 src/pages/
 src/layouts/
 src/middleware/
 src/plugins/appwrite.client.ts
 src/plugins/primevue.ts
 src/composables/useAppwrite.ts
+src/locales/
