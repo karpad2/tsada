@@ -33,19 +33,10 @@ dev-dist
 *.tsbuildinfo
 stats.html
 
-# Nuxt 3 (experimental - not used in production)
+# Nuxt 3 build output
 .nuxt/
 .output/
-nuxt.config.ts
-app.vue
-.nuxtignore
-NUXT3_*.md
-NUXT_RECOMMENDATION.md
-i18n/
-src/pages/
-src/layouts/
-src/middleware/
-src/plugins/appwrite.client.ts
-src/plugins/primevue.ts
-src/composables/useAppwrite.ts
-src/locales/
+
+# Vite SPA legacy configs (backup)
+vite.config.js.backup
+postcss.config.js.backup

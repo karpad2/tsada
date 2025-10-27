@@ -69,18 +69,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { usePWA } from '@/composables/usePWA'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 export default defineComponent({
   name: 'PWAUpdatePrompt',
   setup() {
     const updating = ref(false)
     const {
-      updateAvailable,
+      needRefresh: updateAvailable,
       offlineReady,
-      updateApp: pwaUpdate,
-      closePrompt
-    } = usePWA()
+      updateServiceWorker: pwaUpdate,
+    } = useRegisterSW()
 
     const updateApp = async () => {
       updating.value = true
@@ -94,7 +93,7 @@ export default defineComponent({
     }
 
     const dismissUpdate = () => {
-      closePrompt()
+      updateAvailable.value = false
     }
 
     return {
