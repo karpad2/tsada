@@ -140,7 +140,7 @@ export default{
                     else {
 
                     }
-                    return moment(a).format("LLL");
+                    return moment(a).format("LL");
                 },
 
     }

@@ -11,16 +11,7 @@
           hide-details
         ></v-text-field>
   
-        <ckeditor v-model="modelContent" />
-        <QuillEditor
-          v-if="false"
-          content-type="html"
-          style="min-height:200px;"
-          toolbar="full"
-          theme="snow"
-          v-model:content="modelContent"
-          @textChange="$emit('save')"
-        />
+        <ckeditor v-model="modelContent" @input="$emit('save')" />
       </div>
     </div>
   </template>
