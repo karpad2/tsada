@@ -379,7 +379,7 @@ export default {
                 moment.locale('en');
             }
 
-            return moment(dateString).format("LLL");
+            return moment(dateString).format("LL");
         },
 
         setupHeaders() {

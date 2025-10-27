@@ -122,8 +122,8 @@ export function generateKeywordsFromContent(title: string, description: string):
     .filter(word => /^[a-zA-ZčćžšđČĆŽŠĐáéíóúýÁÉÍÓÚÝäëïöüÄËÏÖÜ]+$/.test(word))
     .slice(0, 10) // Take first 10 keywords
 
-  // Add default keywords
-  const defaultKeywords = ['tehnicka skola ada', 'stručno obrazovanje', 'Ada', 'Vojvodina']
+  // Add default keywords based on current language context
+  const defaultKeywords = ['tehnicka skola ada', 'stručno obrazovanje', 'Ada', 'Vojvodina', 'adai műszaki iskola', 'technical school ada', 'szakképzés', 'vocational education']
 
   return [...new Set([...keywords, ...defaultKeywords])].join(', ')
 }
@@ -131,10 +131,17 @@ export function generateKeywordsFromContent(title: string, description: string):
 /**
  * Update page title with proper formatting
  */
-export function updatePageTitle(title: string, addSiteName = true): void {
-  const siteName = 'Tehnička Škola Ada'
+export function updatePageTitle(title: string, addSiteName = true, language = 'rs'): void {
+  // Multi-language school names
+  const schoolNames = {
+    'rs': 'Tehnička Škola Ada',
+    'hu': 'Adai Műszaki Iskola',
+    'en': 'Technical School Ada'
+  } as const
+
+  const siteName = schoolNames[language as keyof typeof schoolNames] || schoolNames.rs
   const formattedTitle = addSiteName && !title.includes(siteName)
-    ? `${title} - ${siteName}`
+    ? `${title} ~ ${siteName}`
     : title
 
   document.title = formattedTitle
