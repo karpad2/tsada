@@ -164,6 +164,18 @@ export default {
       ]
     };
   },
+  computed: {
+    currentLanguage() {
+      return useLoadingStore().language;
+    }
+  },
+  watch: {
+    currentLanguage(newLang, oldLang) {
+      if (newLang !== oldLang) {
+        this.synchronize_documents();
+      }
+    }
+  },
   async mounted() {
     const cc = useLoadingStore();
     this.admin = cc.userLoggedin;

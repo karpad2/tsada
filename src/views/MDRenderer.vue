@@ -92,7 +92,7 @@
   </template>
   
   <script lang="ts">
-  import { defineComponent, reactive, computed, onMounted, ref } from 'vue';
+  import { defineComponent, reactive, computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { Client, Databases, Storage, Query, Account } from 'appwrite';
   import { useLoadingStore } from '@/stores/loading';
@@ -352,6 +352,13 @@
         );
       };
   
+      // Watch for language changes
+      watch(currentLanguage, async (newLang, oldLang) => {
+        if (newLang !== oldLang && state.loaded) {
+          await loadContent();
+        }
+      });
+
       // Lifecycle
       onMounted(async () => {
         await initializeAdmin();

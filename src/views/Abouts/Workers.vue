@@ -148,12 +148,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUpdated, onUnmounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, onUpdated, onUnmounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Client, Databases, ID, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { convertifserbian } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
+import { useSEO } from '@/composables/useSEO';
 import gsap from 'gsap';
 import Loading from '@/components/Loading.vue';
 
@@ -177,6 +178,7 @@ export default defineComponent({
     // Composition API variables
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
+    const { setPageTitle } = useSEO();
     const visibleRoles = ref<Role[]>([]);
     const allRoles = ref<Role[]>([]);
     const loadCount = 3;
@@ -187,6 +189,19 @@ export default defineComponent({
 
     // Computed properties
     const isAdmin = computed(() => loadingStore.userLoggedin);
+    const currentLanguage = computed(() => loadingStore.language);
+
+    // Watch for language changes
+    watch(currentLanguage, async (newLang, oldLang) => {
+      if (newLang !== oldLang) {
+        // Reset and reload
+        allRoles.value = [];
+        visibleRoles.value = [];
+        loadIndex.value = 0;
+        loaded.value = false;
+        await loadWorkers();
+      }
+    });
 
     // Methods
     const getContactIcon = (contact: string): string => {
@@ -338,7 +353,7 @@ export default defineComponent({
 
     // Lifecycle hooks
     onMounted(() => {
-      document.title = t('workers');
+      setPageTitle(t('workers'));
 
       // Title animation
       gsap.fromTo(

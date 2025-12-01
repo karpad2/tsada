@@ -1,5 +1,4 @@
 import type { App } from 'vue'
-import { useSEO } from '@/composables/useSEO'
 
 export interface SEOPlugin {
   setSEO: (data: any) => void
@@ -8,18 +7,11 @@ export interface SEOPlugin {
 
 export default {
   install(app: App) {
-    const { setSEO, generatePageSEO } = useSEO()
-
-    // Global SEO methods
+    // The SEO plugin is installed but composables should be used directly in components
+    // This is just a placeholder for future SEO functionality
     app.config.globalProperties.$seo = {
-      setSEO,
-      generatePageSEO
+      setSEO: () => {},
+      generatePageSEO: () => {}
     }
-
-    // Provide SEO methods for composition API
-    app.provide('seo', {
-      setSEO,
-      generatePageSEO
-    })
   }
 }

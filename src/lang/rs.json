@@ -394,6 +394,28 @@
   "english": "Енглески",
   "gallery_editor": "Уређивач галерије",
   "file_uploaded": "Фајл постављен",
-  "create_a_new_album": "Направи нову галерију"
+  "create_a_new_album": "Направи нову галерију",
+
+  "create_new_class_description": "Креирање новог одељења",
+  "unknown_language": "Непознат језик",
+  "fetch_error": "Грешка при учитавању података",
+  "create_error": "Грешка при креирању",
+  "level_up_error": "Грешка при промени разреда",
+  "navigation_error": "Грешка у навигацији",
+  "other_info": "Остале информације",
+  "operations": "Операције",
+  "vicepresident": "Потпредседник",
+  "error": "Грешка",
+  "born": "Рођен",
+  "visible": "Видљиво",
+  "hidden": "Скривено",
+  "read_more": "Прочитај више",
+  "loading_more": "Учитавање још",
+  "no_more_content": "Нема више садржаја",
+  "no_content_available": "Нема доступног садржаја",
+  "no_content_description": "Тренутно нема садржаја за приказ",
+  "no_gallery_items": "Нема ставки у галерији",
+  "add_first_item": "Додај први елемент",
+  "check_back_later": "Проверите касније",
+  "load_more": "Учитај више"
 }
-  

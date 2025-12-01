@@ -1,6 +1,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLoadingStore } from '@/stores/loading'
+import { useI18n } from 'vue-i18n'
+import { messages } from '@/lang'
 
 export interface SEOData {
   title?: string
@@ -21,6 +23,7 @@ export interface SEOData {
 export function useSEO() {
   const route = useRoute()
   const loadingStore = useLoadingStore()
+  const { t } = useI18n()
 
   const defaultSEO = {
     title: 'Tehnička Škola Ada',
@@ -33,6 +36,18 @@ export function useSEO() {
   }
 
   const currentSEO = ref<SEOData>({ ...defaultSEO })
+
+  /**
+   * Set page title with automatic formatting: "title ~ School Name"
+   * @param title - The page title (can be a translation key or plain text)
+   */
+  const setPageTitle = (title: string) => {
+    const schoolName = t('school_name')
+    const formattedTitle = title ? `${title} ~ ${schoolName}` : schoolName
+    document.title = formattedTitle
+    updateMetaTag('property', 'og:title', formattedTitle)
+    updateMetaTag('name', 'twitter:title', formattedTitle)
+  }
 
   /**
    * Set SEO data for current page
@@ -51,11 +66,13 @@ export function useSEO() {
   const updateMetaTags = () => {
     const seo = currentSEO.value
 
-    // Update title
+    // Update title with formatting
     if (seo.title) {
-      document.title = seo.title
-      updateMetaTag('property', 'og:title', seo.title)
-      updateMetaTag('name', 'twitter:title', seo.title)
+      const schoolName = t('school_name')
+      const formattedTitle = seo.title.includes(schoolName) ? seo.title : `${seo.title} ~ ${schoolName}`
+      document.title = formattedTitle
+      updateMetaTag('property', 'og:title', formattedTitle)
+      updateMetaTag('name', 'twitter:title', formattedTitle)
     }
 
     // Update description
@@ -284,7 +301,24 @@ export function useSEO() {
   return {
     currentSEO,
     setSEO,
+    setPageTitle,
     generatePageSEO,
     updateMetaTags
   }
+}
+
+/**
+ * Global helper function to set page title (works in Options API)
+ * @param title - The page title
+ */
+export function setDocumentTitle(title: string) {
+  const loadingStore = useLoadingStore()
+  const currentLang = loadingStore.language || 'hu'
+
+  // Get messages for current language
+  const langKey = currentLang === 'sr' ? 'rs' : currentLang
+  const langMessages = (messages as any)[langKey] || (messages as any).hu
+  const schoolName = langMessages.school_name || 'Adai Műszaki Iskola'
+  const formattedTitle = title ? `${title} ~ ${schoolName}` : schoolName
+  document.title = formattedTitle
 }

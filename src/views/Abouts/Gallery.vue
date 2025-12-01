@@ -199,6 +199,7 @@ import { Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
+import { setDocumentTitle } from "@/composables/useSEO";
 
 interface Course {
   id: string;
@@ -243,8 +244,15 @@ export default defineComponent({
       return this.isInitialLoad ? 6 : 3;
     }
   },
+  watch: {
+    language(newLang, oldLang) {
+      if (newLang !== oldLang) {
+        this.refreshGallery();
+      }
+    }
+  },
   async mounted() {
-    document.title = this.$t("gallery");
+    setDocumentTitle(this.$t("gallery"));
     this.admin = this.userLoggedin;
     
     // Setup scroll listener

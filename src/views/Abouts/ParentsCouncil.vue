@@ -469,6 +469,10 @@ export default {
       return cc.userLoggedin;
     },
 
+    currentLanguage() {
+      return useLoadingStore().language;
+    },
+
     /**
      * Végső, nézet által használt lista:
      * - Speciális szerepek elöl (elnök, alelnök, titkár, pénztáros)
@@ -551,6 +555,14 @@ export default {
         return aName.localeCompare(bName, "hu", { sensitivity: "base" });
       });
     },
+  },
+
+  watch: {
+    currentLanguage(newLang, oldLang) {
+      if (newLang !== oldLang) {
+        this.loadData();
+      }
+    }
   },
 
   async mounted() {

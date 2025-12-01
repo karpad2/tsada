@@ -186,6 +186,7 @@ import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
+import { setDocumentTitle } from "@/composables/useSEO";
 
 interface Schedule {
   day: string;
@@ -291,8 +292,20 @@ export default {
       }
     }
   }),
+  computed: {
+    currentLanguage() {
+      return useLoadingStore().language;
+    }
+  },
+  watch: {
+    currentLanguage(newLang, oldLang) {
+      if (newLang !== oldLang) {
+        this.fetchClasses();
+      }
+    }
+  },
   mounted() {
-    document.title = this.$t("classlist");
+    setDocumentTitle(this.$t("classlist"));
     const cc = useLoadingStore();
     this.admin = cc.userLoggedin;
     this.fetchClasses();

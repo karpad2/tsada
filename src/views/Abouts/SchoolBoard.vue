@@ -389,6 +389,10 @@ export default {
             return cc.userLoggedin;
         },
 
+        currentLanguage() {
+            return useLoadingStore().language;
+        },
+
         sortedMembers(): BoardMember[] {
             if (!this.boardMembers.length) return [];
 
@@ -418,6 +422,14 @@ export default {
                 const bName = this.getDisplayName(b);
                 return aName.localeCompare(bName, 'hu', { sensitivity: 'base' });
             });
+        }
+    },
+
+    watch: {
+        currentLanguage(newLang, oldLang) {
+            if (newLang !== oldLang) {
+                this.loadData();
+            }
         }
     },
 

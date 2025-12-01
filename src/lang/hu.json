@@ -397,6 +397,29 @@
     "hungarian": "Magyar",
     "english": "Angol",
     "gallery_editor": "Galéria szerkesztő",
-    "file_uploaded": "Fájl feltöltve"
+    "file_uploaded": "Fájl feltöltve",
+
+    "create_new_class_description": "Új osztály létrehozása",
+    "unknown_language": "Ismeretlen nyelv",
+    "fetch_error": "Hiba az adatok betöltésekor",
+    "create_error": "Hiba a létrehozás során",
+    "level_up_error": "Hiba az évfolyam váltásnál",
+    "navigation_error": "Navigációs hiba",
+    "other_info": "Egyéb információ",
+    "operations": "Műveletek",
+    "vicepresident": "Alelnök",
+    "error": "Hiba",
+    "born": "Született",
+    "visible": "Látható",
+    "hidden": "Rejtett",
+    "read_more": "Tovább olvasom",
+    "loading_more": "Továbbiak betöltése",
+    "no_more_content": "Nincs több tartalom",
+    "no_content_available": "Nincs elérhető tartalom",
+    "no_content_description": "Jelenleg nincs megjeleníthető tartalom",
+    "no_gallery_items": "Nincsenek galéria elemek",
+    "add_first_item": "Adj hozzá az első elemet",
+    "check_back_later": "Látogass vissza később",
+    "load_more": "Továbbiak betöltése"
 
  }

@@ -239,6 +239,10 @@ export default {
     },
 
     computed: {
+        currentLanguage() {
+            return useLoadingStore().language;
+        },
+
         sortedMembers(): ParliamentMember[] {
             if (!this.parliamentMembers.length) return [];
 
@@ -284,6 +288,14 @@ export default {
                 const bName = this.getDisplayName(b);
                 return aName.localeCompare(bName);
             });
+        }
+    },
+
+    watch: {
+        currentLanguage(newLang, oldLang) {
+            if (newLang !== oldLang) {
+                this.loadData();
+            }
         }
     },
 
