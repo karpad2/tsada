@@ -86,7 +86,6 @@
                                 :model-value="contentValue"
                                 @update:model-value="$emit('update:content', $event)"
                                 @change="$emit('save')"
-                                :config="editorConfig"
                             />
                         </v-card-text>
                     </v-card>
@@ -140,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
@@ -198,50 +197,6 @@ export default defineComponent({
             return div.textContent?.length || 0;
         };
 
-        // CKEditor configuration with minimal toolbar for light/dark mode support
-        const editorConfig = computed(() => ({
-            toolbar: {
-                items: [
-                    'bold', 'italic', 'underline', '|',
-                    'bulletedList', 'numberedList', '|',
-                    'link', 'undo', 'redo'
-                ],
-                shouldNotGroupWhenFull: false
-            },
-            language: 'en',
-            removePlugins: [
-                'CKFinderUploadAdapter',
-                'CKFinder',
-                'EasyImage',
-                'Image',
-                'ImageCaption',
-                'ImageStyle',
-                'ImageToolbar',
-                'ImageUpload',
-                'MediaEmbed'
-            ],
-            link: {
-                decorators: {
-                    openInNewTab: {
-                        mode: 'manual',
-                        label: 'Open in a new tab',
-                        attributes: {
-                            target: '_blank',
-                            rel: 'noopener noreferrer'
-                        }
-                    }
-                }
-            },
-            typing: {
-                transformations: {
-                    remove: [
-                        'enDash',
-                        'emDash'
-                    ]
-                }
-            }
-        }));
-
         return {
             titleErrors,
             shortErrors,
@@ -249,8 +204,7 @@ export default defineComponent({
             getLanguageIcon,
             validateTitle,
             validateShort,
-            getContentLength,
-            editorConfig
+            getContentLength
         };
     },
     props: {

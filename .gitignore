@@ -31,12 +31,3 @@ dev-dist
 *.sw?
 
 *.tsbuildinfo
-stats.html
-
-# Nuxt 3 build output
-.nuxt/
-.output/
-
-# Vite SPA legacy configs (backup)
-vite.config.js.backup
-postcss.config.js.backup

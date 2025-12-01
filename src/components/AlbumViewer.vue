@@ -393,9 +393,7 @@ export default defineComponent({
               : language === 'hu'
               ? title_hu
               : title_rs;
-          // Import and use the SEO utils for consistent title format
-          const { updatePageTitle } = await import('@/utils/seo');
-          updatePageTitle(this.title, true, language);
+          document.title = this.title;
         }
 
         const { documents } = await database.listDocuments(
@@ -415,19 +413,39 @@ export default defineComponent({
 
         const newImages = await Promise.all(
           documents.map(async ({ $id, image_id }) => {
-            // Low-resolution thumbnail for gallery
-            const thumbnail = storage.getFilePreview(
+            // Low-resolution thumbnail for gallery (600px for better mobile performance)
+            const thumbnail = await storage.getFilePreview(
               config.gallery_pictures_storage,
               image_id,
-              600, 0, 'center', 85, 5, 'FFFFFF', 15, 1, 0, 'FFFFFF', 'webp'
-            ).toString();
+              600,
+              0,
+              'center',
+              85,
+              5,
+              'FFFFFF',
+              15,
+              1,
+              0,
+              'FFFFFF',
+              'webp'
+            );
 
-            // Higher-resolution image for viewer
-            const fullsize = storage.getFilePreview(
+            // Higher-resolution image for viewer (1920px for better viewing experience)
+            const fullsize = await storage.getFilePreview(
               config.gallery_pictures_storage,
               image_id,
-              1920, 0, 'center', 95, 5, 'FFFFFF', 15, 1, 0, 'FFFFFF', 'webp'
-            ).toString();
+              1920,
+              0,
+              'center',
+              95,
+              5,
+              'FFFFFF',
+              15,
+              1,
+              0,
+              'FFFFFF',
+              'webp'
+            );
 
             return { img: thumbnail, fullsize, id: $id, img_id: image_id };
           })

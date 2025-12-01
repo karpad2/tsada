@@ -21,14 +21,7 @@
                     
                 </div>
                 <div class="relative mb-4">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                        {{ $t('message') }}
-                    </label>
-                    <ckeditor
-                        v-model="message"
-                        :config="editorConfig"
-                        :placeholder="$t('message')"
-                    />
+                    <QuillEditor  content-type="html" :placeholder="$t('message')" v-model:content="message" toolbar="minimal" theme="snow" />    
                 </div>
                 
                 <div class="relative mt-10 w-full">
@@ -38,93 +31,6 @@
                 
             </div>
 </template>
-
-<style scoped>
-/* CKEditor dark mode support */
-.dark :deep(.ck-editor) {
-    background-color: rgb(71 85 105) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-toolbar) {
-    background-color: rgb(51 65 85) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-content) {
-    background-color: rgb(71 85 105) !important;
-    color: rgb(31 41 55) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-content p) {
-    color: rgb(31 41 55) !important;
-}
-
-/* Hide CKEditor bottom panel */
-:deep(.cke_1_bottom) {
-    display: none !important;
-}
-
-.dark :deep(.ck-button) {
-    color: rgb(203 213 225) !important;
-}
-
-.dark :deep(.ck-button:hover) {
-    background-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-button.ck-on) {
-    background-color: rgb(59 130 246) !important;
-    color: white !important;
-}
-
-.dark :deep(.ck-dropdown__button) {
-    color: rgb(203 213 225) !important;
-}
-
-.dark :deep(.ck-dropdown__panel) {
-    background-color: rgb(71 85 105) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-list__item) {
-    color: rgb(248 250 252) !important;
-}
-
-.dark :deep(.ck-list__item:hover) {
-    background-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-balloon-panel) {
-    background-color: rgb(71 85 105) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-.dark :deep(.ck-input) {
-    background-color: rgb(71 85 105) !important;
-    color: rgb(248 250 252) !important;
-    border-color: rgb(100 116 139) !important;
-}
-
-/* Light mode enhancements */
-:deep(.ck-editor) {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-:deep(.ck-toolbar) {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-}
-
-:deep(.ck-content) {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    min-height: 120px;
-}
-</style>
-
 <script>
 
 
@@ -141,53 +47,11 @@ export default {
     data() {
         return {
             toast: null,
-
+            
                 email: '',
                 name: '',
-                message: '',
-                editorConfig: {
-                    toolbar: {
-                        items: [
-                            'bold', 'italic', 'underline', '|',
-                            'bulletedList', 'numberedList', '|',
-                            'link', 'undo', 'redo'
-                        ],
-                        shouldNotGroupWhenFull: false
-                    },
-                    language: 'en',
-                    removePlugins: [
-                        'CKFinderUploadAdapter',
-                        'CKFinder',
-                        'EasyImage',
-                        'Image',
-                        'ImageCaption',
-                        'ImageStyle',
-                        'ImageToolbar',
-                        'ImageUpload',
-                        'MediaEmbed'
-                    ],
-                    link: {
-                        decorators: {
-                            openInNewTab: {
-                                mode: 'manual',
-                                label: 'Open in a new tab',
-                                attributes: {
-                                    target: '_blank',
-                                    rel: 'noopener noreferrer'
-                                }
-                            }
-                        }
-                    },
-                    typing: {
-                        transformations: {
-                            remove: [
-                                'enDash',
-                                'emDash'
-                            ]
-                        }
-                    }
-                }
-
+                message: ''
+        
         }
     },
     setup() {

@@ -354,13 +354,13 @@ export default defineComponent({
 
     getImageUrl(imageId: string, storage: Storage): string {
       if (!imageId) return '';
-
+      
       try {
         return storage.getFilePreview(
           config.gallery_pictures_storage,
           imageId,
           400, 300, 'center', 85, 0, 'FFFFFF', 10, 1, 0, 'FFFFFF', 'webp'
-        ).toString();
+        );
       } catch (error) {
         console.error('Error getting image URL:', error);
         return '';

@@ -409,6 +409,8 @@ var foreignCharacterCombinations = [
     '&',
     '@',
     '#',
+    '⟪',  // Translation placeholder opening bracket
+    '⟫',  // Translation placeholder closing bracket
     'bb',
     'cc',
     'dd',

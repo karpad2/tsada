@@ -26,19 +26,31 @@
                     @click:clear="clearFiles"
                 />
 
-                <!-- Upload Button -->
-                <v-btn
-                    v-if="files.length > 0 && !uploading"
-                    @click="startUpload"
-                    color="success"
-                    size="large"
-                    block
-                    :disabled="validationErrors.length > 0"
-                    class="mb-4"
-                >
-                    <v-icon left>mdi-upload</v-icon>
-                    {{ $t('upload_files', { count: files.length }) }}
-                </v-btn>
+                <!-- Upload and Translate Buttons -->
+                <div v-if="files.length > 0 && !uploading" class="d-flex gap-2 mb-4">
+                    <v-btn
+                        @click="startUpload"
+                        color="success"
+                        size="large"
+                        :disabled="validationErrors.length > 0"
+                        class="flex-grow-1"
+                    >
+                        <v-icon left>mdi-upload</v-icon>
+                        {{ $t('upload_files', { count: files.length }) }}
+                    </v-btn>
+
+                    <v-btn
+                        v-if="uploadType === 'document' && enableTranslation"
+                        @click="translateDialog = true"
+                        color="primary"
+                        size="large"
+                        :disabled="validationErrors.length > 0"
+                        variant="tonal"
+                    >
+                        <v-icon left>mdi-translate</v-icon>
+                        {{ $t('translate') }}
+                    </v-btn>
+                </div>
 
                 <!-- Upload Progress -->
                 <div v-if="uploading" class="upload-progress mb-4">
@@ -293,6 +305,136 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!-- Translation Dialog -->
+        <v-dialog v-model="translateDialog" max-width="600">
+            <v-card>
+                <v-card-title class="bg-primary text-white d-flex align-center">
+                    <v-icon left>mdi-translate</v-icon>
+                    {{ $t('translate_document') }}
+                </v-card-title>
+
+                <v-card-text class="pt-6">
+                    <v-alert
+                        v-if="!translationComposable.isTranslating.value"
+                        type="info"
+                        variant="tonal"
+                        class="mb-4"
+                    >
+                        <v-icon left>mdi-information</v-icon>
+                        {{ $t('translation_info') }}
+                    </v-alert>
+
+                    <!-- Source Language Selection -->
+                    <v-select
+                        v-model="sourceLanguage"
+                        :items="availableLanguages"
+                        item-title="name"
+                        item-value="code"
+                        :label="$t('source_language')"
+                        variant="outlined"
+                        density="comfortable"
+                        :disabled="translationComposable.isTranslating.value"
+                        class="mb-4"
+                    >
+                        <template #prepend-inner>
+                            <v-icon>mdi-book-open-variant</v-icon>
+                        </template>
+                    </v-select>
+
+                    <!-- Target Languages Multi-Select -->
+                    <v-select
+                        v-model="targetLanguages"
+                        :items="availableLanguages"
+                        item-title="name"
+                        item-value="code"
+                        :label="$t('target_languages')"
+                        variant="outlined"
+                        density="comfortable"
+                        multiple
+                        chips
+                        :disabled="translationComposable.isTranslating.value"
+                        class="mb-4"
+                    >
+                        <template #prepend-inner>
+                            <v-icon>mdi-web</v-icon>
+                        </template>
+                    </v-select>
+
+                    <!-- Translation Progress -->
+                    <div v-if="translationComposable.isTranslating.value">
+                        <v-progress-linear
+                            :model-value="translationComposable.translationProgress.value"
+                            color="primary"
+                            height="25"
+                            rounded
+                            striped
+                        >
+                            <template #default="{ value }">
+                                <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+                            </template>
+                        </v-progress-linear>
+
+                        <v-chip color="info" class="mt-3" size="small">
+                            <v-icon left size="small">mdi-robot</v-icon>
+                            {{ $t('translating_with_ai') }}
+                        </v-chip>
+                    </div>
+
+                    <!-- Translation Results -->
+                    <v-list v-if="translationResults.length > 0 && !translationComposable.isTranslating.value" class="mt-4">
+                        <v-list-subheader>
+                            <v-icon left>mdi-check-circle</v-icon>
+                            {{ $t('translation_complete') }}
+                        </v-list-subheader>
+                        <v-list-item
+                            v-for="result in translationResults"
+                            :key="result.lang"
+                            class="border rounded mb-2"
+                        >
+                            <template #prepend>
+                                <v-avatar color="success" size="40">
+                                    <v-icon>mdi-translate</v-icon>
+                                </v-avatar>
+                            </template>
+
+                            <v-list-item-title>{{ result.fileName }}</v-list-item-title>
+                            <v-list-item-subtitle>{{ getLanguageName(result.lang) }}</v-list-item-subtitle>
+                        </v-list-item>
+                    </v-list>
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn
+                        @click="closeTranslateDialog"
+                        text
+                        :disabled="translationComposable.isTranslating.value"
+                    >
+                        {{ translationResults.length > 0 ? $t('close') : $t('cancel') }}
+                    </v-btn>
+                    <v-btn
+                        v-if="translationResults.length === 0"
+                        @click="startTranslation"
+                        color="primary"
+                        :disabled="targetLanguages.length === 0 || translationComposable.isTranslating.value"
+                        :loading="translationComposable.isTranslating.value"
+                    >
+                        <v-icon left>mdi-play</v-icon>
+                        {{ $t('start_translation') }}
+                    </v-btn>
+                    <v-btn
+                        v-else
+                        @click="uploadTranslatedFiles"
+                        color="success"
+                        :loading="uploading"
+                    >
+                        <v-icon left>mdi-upload</v-icon>
+                        {{ $t('upload_translations') }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -308,6 +450,7 @@ import {
 } from '@/utils/editorUtils';
 import { useI18n } from 'vue-i18n';
 import { trackFileUpload, trackUserInteraction, trackError } from '@/utils/analytics';
+import { useTranslation } from '@/composables/useTranslation';
 
 export default defineComponent({
     name: 'FileUploadSection',
@@ -357,10 +500,15 @@ export default defineComponent({
         maxFiles: {
             type: Number,
             default: 10
+        },
+        enableTranslation: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props, { emit }) {
         const { t } = useI18n();
+        const translationComposable = useTranslation();
 
         // Reactive state
         const files = ref<File[]>([]);
@@ -372,6 +520,17 @@ export default defineComponent({
         const currentlyUploading = ref<File[]>([]);
         const deleteDialog = ref(false);
         const fileToDelete = ref<string>('');
+
+        // Translation state
+        const translateDialog = ref(false);
+        const sourceLanguage = ref('en');
+        const targetLanguages = ref<string[]>(['hu', 'sr']);
+        const translationResults = ref<Array<{ lang: string; fileName: string; file: File }>>([]);
+        const availableLanguages = [
+            { code: 'en', name: 'English' },
+            { code: 'hu', name: 'Magyar' },
+            { code: 'sr', name: 'Srpski' }
+        ];
 
         const config = EditorConfigManager.getConfig();
 
@@ -588,6 +747,86 @@ export default defineComponent({
 
         const formatFileSize = DataParsingManager.formatFileSize;
 
+        // Translation methods
+        const startTranslation = async () => {
+            if (files.value.length === 0 || targetLanguages.value.length === 0) return;
+
+            try {
+                translationResults.value = [];
+
+                for (const file of files.value) {
+                    // Read file content as text
+                    const fileContent = await file.text();
+
+                    // Translate to each target language
+                    for (const targetLang of targetLanguages.value) {
+                        if (targetLang === sourceLanguage.value) continue;
+
+                        const result = await translationComposable.translateWithAI(
+                            fileContent,
+                            sourceLanguage.value,
+                            targetLang
+                        );
+
+                        // Create translated file name
+                        const originalName = file.name;
+                        const lastDotIndex = originalName.lastIndexOf('.');
+                        const nameWithoutExt = lastDotIndex > 0 ? originalName.substring(0, lastDotIndex) : originalName;
+                        const extension = lastDotIndex > 0 ? originalName.substring(lastDotIndex) : '';
+                        const translatedFileName = `${nameWithoutExt}_${targetLang}${extension}`;
+
+                        // Create new File object with translated content
+                        const translatedFile = new File([result], translatedFileName, { type: file.type });
+
+                        translationResults.value.push({
+                            lang: targetLang,
+                            fileName: translatedFileName,
+                            file: translatedFile
+                        });
+                    }
+                }
+
+                showNotification(
+                    t('translation_complete_notification', { count: translationResults.value.length }),
+                    'success'
+                );
+
+                trackUserInteraction('translation_complete', 'translate_dialog', {
+                    source_lang: sourceLanguage.value,
+                    target_langs: targetLanguages.value,
+                    file_count: translationResults.value.length
+                });
+            } catch (error: any) {
+                console.error('Translation error:', error);
+                errorMessage.value = error.message || t('translation_failed');
+                showNotification(error.message || t('translation_failed'), 'error');
+
+                trackError('translation_error', error.message || 'Translation failed', 'FileUploadSection');
+            }
+        };
+
+        const uploadTranslatedFiles = async () => {
+            if (translationResults.value.length === 0) return;
+
+            const filesToUpload = translationResults.value.map(r => r.file);
+            await uploadFiles(filesToUpload);
+
+            // Close dialog and reset on success
+            closeTranslateDialog();
+        };
+
+        const closeTranslateDialog = () => {
+            translateDialog.value = false;
+            translationResults.value = [];
+            sourceLanguage.value = 'en';
+            targetLanguages.value = ['hu', 'sr'];
+        };
+
+        const getLanguageName = (code: string): string => {
+            const lang = availableLanguages.find(l => l.code === code);
+            return lang?.name || code;
+        };
+
         return {
             // State
             files,
@@ -615,7 +854,19 @@ export default defineComponent({
             downloadFile,
             getFileIcon,
             getFileExtension,
-            formatFileSize
+            formatFileSize,
+
+            // Translation
+            translationComposable,
+            translateDialog,
+            sourceLanguage,
+            targetLanguages,
+            availableLanguages,
+            translationResults,
+            startTranslation,
+            uploadTranslatedFiles,
+            closeTranslateDialog,
+            getLanguageName
         };
     }
 });

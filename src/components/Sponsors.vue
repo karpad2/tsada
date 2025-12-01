@@ -155,7 +155,7 @@ export default {
             config.website_images,
             doc[imageField],
             200, 0, "center", 90, 5, 'FFFFFF', 0, 1, 0, 'FFFFFF', "webp"
-          ).toString(),
+          ),
         }));
 
         this.isLoading = false;

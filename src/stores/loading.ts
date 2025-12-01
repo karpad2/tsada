@@ -15,9 +15,6 @@ export const useLoadingStore = defineStore('loading', () => {
     const language=ref("sr");
     const theme=ref("light");
     const uid=ref("");
-    const mobile_view=ref(false);
-    const tablet_mode=ref(false);
-    const mobile_mode=ref(true);
     let notif=ref([]);
     const doubleCount = computed(() => count.value * 2)
     function increment() {
@@ -73,23 +70,10 @@ export const useLoadingStore = defineStore('loading', () => {
       this.hideheaders=v;
     }
 
-    function setMobileView(v:boolean)
-    {
-      this.mobile_view=v;
-    }
-
-    function setTabletMode(v:boolean)
-    {
-      this.tablet_mode=v;
-    }
-
-    function setMobileMode(v:boolean)
-    {
-      this.mobile_mode=v;
-    }
+    
 
 
-    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,mobile_view,tablet_mode,mobile_mode,setMobileView,setTabletMode,setMobileMode }
+    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
   },
 {persist:true})
 

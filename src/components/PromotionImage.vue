@@ -136,19 +136,19 @@ export default defineComponent({
         const results = await Promise.all(requests);
         const [img1Res, img2Res] = results;
 
-        // Optimalizált képparaméterek (cwebp telepítés után működik)
+        // Optimalizált képparaméterek
         this.img1 = storage.getFilePreview(
           config.website_images,
           img1Res.setting_data,
           800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
-        ).toString();
+        );
 
         if (!this.promoimage2off && img2Res) {
           this.img2 = storage.getFilePreview(
             config.website_images,
             img2Res.setting_data,
             800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
-          ).toString();
+          );
         }
 
       } catch (err) {

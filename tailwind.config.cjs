@@ -1,23 +1,15 @@
 import themes from "./src/themes/store.json";
-
 module.exports = {
-  content: [
-    './src/components/**/*.{vue,js,ts}',
-    './src/layouts/**/*.vue',
-    './src/pages/**/*.vue',
-    './src/composables/**/*.{js,ts}',
-    './src/plugins/**/*.{js,ts}',
-    './app.vue'
-  ],
-  darkMode: 'class',
+  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
     extend: {},
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: themes,
+    themes: themes,// Ensuring light and dark are available
     darkTheme: 'cupcake',
     base: true,
-    logs: false, // Disable logs for production
+    logs: true,  // Default dark theme
   },
 }

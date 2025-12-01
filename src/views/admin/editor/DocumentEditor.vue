@@ -39,75 +39,40 @@
         </v-card-title>
       </v-card>
   
-      <!-- File upload section -->
-      <v-card class="mb-4 upload-card" elevation="1">
-        <v-card-title class="subtitle-1 card-header">
-          <v-icon left>mdi-upload</v-icon>
-          {{ $t('file_management') }}
-        </v-card-title>
-        
-        <v-card-text>
-          <div class="upload-area" :class="{ 'has-file': currentDocumentId, 'drag-over': isDragOver }">
-            <v-file-input
-              v-model="fileToUpload"
-              @change="handleFileChange"
-              @dragover="isDragOver = true"
-              @dragleave="isDragOver = false"
-              @drop="isDragOver = false"
-              accept="document/*"
-              :label="$t('fileupload')"
-              :loading="isUploading"
-              :disabled="isUploading"
-              prepend-icon="mdi-paperclip"
-              show-size
-              clearable
-              class="file-input-custom"
-            >
-              <template #selection="{ text }">
-                <v-chip small color="primary" class="ma-1">
-                  <v-icon left small>mdi-file</v-icon>
-                  {{ text }}
-                </v-chip>
-              </template>
-            </v-file-input>
-  
-            <!-- Upload progress -->
-            <div v-if="isUploading" class="upload-progress mt-4">
-              <div class="d-flex justify-space-between align-center mb-2">
-                <span class="caption">{{ $t('uploading') }}...</span>
-                <span class="caption">{{ uploadProgress }}%</span>
-              </div>
-              <v-progress-linear
-                :value="uploadProgress"
-                color="primary"
-                height="8"
-                rounded
-              ></v-progress-linear>
-            </div>
-            
-            <!-- Current file info -->
-            <v-alert
-              v-if="currentDocumentId && !isUploading"
-              type="info"
-              dense
-              text
-              class="mt-3"
-            >
-              <v-icon left small>mdi-file-check</v-icon>
-              {{ $t('file_attached') }}: {{ currentDocumentId }}
-            </v-alert>
-          </div>
-        </v-card-text>
-      </v-card>
+      <!-- File upload section with translation -->
+      <FileUploadSection
+        upload-type="document"
+        :multiple="false"
+        :enable-translation="true"
+        :show-preview="false"
+        :uploaded-file-names="currentDocumentId ? [currentDocumentId] : []"
+        storage-id="documents"
+        @files-uploaded="handleFilesUploaded"
+        @upload-progress="uploadProgress = $event"
+        class="mb-4"
+      />
   
       <!-- Multi-language titles -->
       <v-card class="titles-card" elevation="1">
         <v-card-title class="subtitle-1 card-header">
           <v-icon left>mdi-translate</v-icon>
           {{ $t('multilingual_titles') }}
-          
+
           <v-spacer></v-spacer>
-          
+
+          <!-- AI Translate Button -->
+          <v-btn
+            v-if="hasAnyTitle"
+            @click="showTranslateDialog = true"
+            color="primary"
+            variant="tonal"
+            size="small"
+            class="mr-2"
+          >
+            <v-icon left size="small">mdi-robot</v-icon>
+            {{ $t('auto_translate') }}
+          </v-btn>
+
           <!-- Progress indicator -->
           <v-chip small :color="completedTitles === languages.length ? 'success' : 'warning'">
             {{ completedTitles }}/{{ languages.length }}
@@ -224,6 +189,69 @@
         </v-card>
       </v-dialog>
   
+      <!-- AI Translation Dialog -->
+      <v-dialog v-model="showTranslateDialog" max-width="500">
+        <v-card>
+          <v-card-title class="headline primary--text">
+            <v-icon left color="primary">mdi-robot</v-icon>
+            {{ $t('auto_translate_titles') }}
+          </v-card-title>
+
+          <v-card-text class="pt-4">
+            <div class="text-body-1 mb-4">
+              {{ $t('auto_translate_description') }}
+            </div>
+
+            <!-- Fordítási folyamat -->
+            <div v-if="isTranslating" class="translation-progress">
+              <v-progress-linear
+                :value="translationProgress"
+                color="primary"
+                height="8"
+                rounded
+                striped
+                class="mb-3"
+              ></v-progress-linear>
+              <div class="text-center">
+                <v-icon color="primary" class="rotating">mdi-robot</v-icon>
+                <p class="caption mt-2">{{ $t('translating_titles') }}...</p>
+              </div>
+            </div>
+
+            <!-- Információ -->
+            <v-alert v-else type="info" dense outlined class="mb-0">
+              <div class="d-flex align-start">
+                <v-icon color="info" class="mr-2">mdi-information</v-icon>
+                <div>
+                  <div class="font-weight-bold mb-1">{{ $t('how_it_works') }}</div>
+                  <ul class="caption mb-0 pl-4">
+                    <li>{{ $t('ai_detects_source_language') }}</li>
+                    <li>{{ $t('translates_to_empty_fields') }}</li>
+                    <li>{{ $t('uses_free_ai_services') }}</li>
+                  </ul>
+                </div>
+              </div>
+            </v-alert>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="showTranslateDialog = false" :disabled="isTranslating">
+              {{ $t('cancel') }}
+            </v-btn>
+            <v-btn
+              color="primary"
+              @click="autoTranslateTitles"
+              :loading="isTranslating"
+              :disabled="isTranslating"
+            >
+              <v-icon left>mdi-robot</v-icon>
+              {{ $t('start_translation') }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- Unsaved changes dialog -->
       <v-dialog v-model="showUnsavedDialog" max-width="400" persistent>
         <v-card>
@@ -231,7 +259,7 @@
             <v-icon left color="warning">mdi-alert</v-icon>
             {{ $t('unsaved_changes') }}
           </v-card-title>
-          
+
           <v-card-text>
             {{ $t('unsaved_changes_message') }}
           </v-card-text>
@@ -254,6 +282,7 @@
   import { Client, Databases, ID, Storage, Query, Functions } from "appwrite";
   import { appw, config } from "@/appwrite";
   import { useLoadingStore } from "@/stores/loading";
+  import FileUploadSection from "@/components/shared/FileUploadSection.vue";
   
   interface Language {
     code: string;
@@ -276,7 +305,11 @@
   
   export default {
     name: 'DocumentEditor',
-    
+
+    components: {
+      FileUploadSection
+    },
+
     props: {
       modded: {
         type: String,
@@ -322,7 +355,12 @@
         storage: new Storage(appw),
         
         // Auto-save timer
-        autoSaveTimer: null as NodeJS.Timeout | null
+        autoSaveTimer: null as NodeJS.Timeout | null,
+
+        // Translation state
+        showTranslateDialog: false,
+        isTranslating: false,
+        translationProgress: 0
       };
     },
   
@@ -345,6 +383,10 @@
   
       completedTitles(): number {
         return Object.values(this.titles).filter(title => title.trim()).length;
+      },
+
+      hasAnyTitle(): boolean {
+        return Object.values(this.titles).some(title => title.trim().length > 0);
       },
   
       documentId(): string {
@@ -582,6 +624,139 @@
         }
       },
   
+      handleFilesUploaded(uploadedFiles: any[]): void {
+        if (uploadedFiles && uploadedFiles.length > 0) {
+          // Get the first uploaded file ID
+          this.currentDocumentId = uploadedFiles[0].$id;
+          this.hasChanges = true;
+
+          this.$notify({
+            type: 'success',
+            text: this.$t('file_uploaded')
+          });
+
+          // Auto-save after successful upload
+          this.saveDocument();
+        }
+      },
+
+      /**
+       * Intelligens nyelvdetektálás - megtalálja a legjobb forrásnyelvet
+       * Azt a mezőt választja, amelyik a leghosszabb és legérdekesebb tartalmat tartalmazza
+       */
+      detectSourceLanguage(): { code: string; text: string } | null {
+        const entries = Object.entries(this.titles)
+          .filter(([_, text]) => text.trim().length > 0)
+          .map(([code, text]) => ({
+            code,
+            text: text.trim(),
+            length: text.trim().length,
+            // Súlyozás: hosszabb szöveg = jobb forrás
+            score: text.trim().length
+          }))
+          .sort((a, b) => b.score - a.score);
+
+        if (entries.length === 0) {
+          return null;
+        }
+
+        const best = entries[0];
+        console.log('🔍 AI detected source language:', best.code, 'with text:', best.text);
+        return { code: best.code, text: best.text };
+      },
+
+      /**
+       * Címek automatikus fordítása AI-val
+       * Automatikusan detektálja a forrásnyelvet és lefordítja a hiányzó mezőkre
+       */
+      async autoTranslateTitles(): Promise<void> {
+        // Detektálja a forrás nyelvet
+        const source = this.detectSourceLanguage();
+
+        if (!source) {
+          this.$notify({
+            type: 'warning',
+            text: this.$t('no_title_to_translate')
+          });
+          return;
+        }
+
+        this.isTranslating = true;
+        this.translationProgress = 0;
+        this.showTranslateDialog = false;
+
+        try {
+          // Importáljuk a fordító composable-t
+          const { translateWithAI } = await import('@/composables/useTranslation').then(m => m.useTranslation());
+
+          // Meghatározzuk, mely nyelvekre kell fordítani
+          const targetLanguages = this.languages
+            .filter(lang => lang.code !== source.code && !this.titles[lang.code].trim())
+            .map(lang => lang.code);
+
+          if (targetLanguages.length === 0) {
+            this.$notify({
+              type: 'info',
+              text: this.$t('all_titles_already_filled')
+            });
+            return;
+          }
+
+          console.log('🤖 Starting AI translation from', source.code, 'to', targetLanguages);
+
+          const totalSteps = targetLanguages.length;
+          let completed = 0;
+
+          // Fordítás minden célnyelvre
+          for (const targetLang of targetLanguages) {
+            try {
+              console.log(`🔄 Translating to ${targetLang}...`);
+
+              const translated = await translateWithAI(
+                source.text,
+                source.code,
+                targetLang
+              );
+
+              // Frissítjük a címet
+              this.titles[targetLang] = translated;
+              completed++;
+              this.translationProgress = (completed / totalSteps) * 100;
+
+              console.log(`✅ Translated to ${targetLang}:`, translated);
+
+              // Kis késleltetés a rate limiting elkerülésére
+              await new Promise(resolve => setTimeout(resolve, 500));
+
+            } catch (error) {
+              console.error(`❌ Translation failed for ${targetLang}:`, error);
+              this.$notify({
+                type: 'warning',
+                text: this.$t('translation_failed_for_language', { lang: targetLang })
+              });
+            }
+          }
+
+          this.$notify({
+            type: 'success',
+            text: this.$t('titles_translated_successfully')
+          });
+
+          // Mentés az új címekkel
+          await this.saveDocument();
+
+        } catch (error) {
+          console.error('Translation error:', error);
+          this.$notify({
+            type: 'error',
+            text: this.$t('translation_error')
+          });
+        } finally {
+          this.isTranslating = false;
+          this.translationProgress = 0;
+        }
+      },
+
       handleFileChange(): void {
         if (this.fileToUpload) {
           this.uploadFile();
@@ -762,6 +937,25 @@
     100% {
       box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
     }
+  }
+
+  /* AI Translation Animation */
+  .rotating {
+    animation: rotate 2s linear infinite;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .translation-progress {
+    text-align: center;
+    padding: 20px 0;
   }
   
   /* Loading overlay */

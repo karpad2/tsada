@@ -316,8 +316,18 @@ export default {
                         a.img = storage.getFilePreview(
                             config.gallery_pictures_storage,
                             element.image_id,
-                            300, 0, 'center', 90, 5, 'FFFFFF', 15, 1, 0, 'FFFFFF', 'webp'
-                        ).toString();
+                            300,
+                            0,
+                            'center',
+                            90,
+                            5,
+                            'FFFFFF',
+                            15,
+                            1,
+                            0,
+                            'FFFFFF',
+                            'webp'
+                        );
                         console.log('Generated image URL:', a.img);
                         this.images.push(a);
                     });

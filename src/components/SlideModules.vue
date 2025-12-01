@@ -64,7 +64,7 @@
           <!-- Admin filter buttons -->
           <div class="flex gap-2 mb-4">
             <button
-              @click="setFilter('all')"
+              @click="filterType = 'all'"
               :class="[
                 'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
                 filterType === 'all'
@@ -76,7 +76,7 @@
             </button>
 
             <button
-              @click="setFilter('visible')"
+              @click="filterType = 'visible'"
               :class="[
                 'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
                 filterType === 'visible'
@@ -88,7 +88,7 @@
             </button>
 
             <button
-              @click="setFilter('hidden')"
+              @click="filterType = 'hidden'"
               :class="[
                 'px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
                 filterType === 'hidden'
@@ -311,7 +311,6 @@ export default defineComponent({
       return this.courses.filter(course => !course.visible).length;
     },
     filteredCourses() {
-      console.log('Computing filteredCourses with filterType:', this.filterType);
       let filtered = [...this.allCourses];
 
       // Apply search filter
@@ -325,14 +324,11 @@ export default defineComponent({
 
       // Apply visibility filter
       if (this.filterType === 'visible') {
-        console.log('Filtering for visible only');
         filtered = filtered.filter(course => course.visible);
       } else if (this.filterType === 'hidden') {
-        console.log('Filtering for hidden only');
         filtered = filtered.filter(course => !course.visible);
       }
 
-      console.log('Filtered result:', filtered.length, 'items');
       return filtered;
     }
   },
@@ -367,12 +363,6 @@ export default defineComponent({
     async currentLanguage() {
       // Reload content when language changes
       await this.reloadAllContent();
-    },
-
-    // Watch for filter type changes
-    filterType() {
-      console.log('Filter type changed to:', this.filterType);
-      this.applyFilters();
     }
   },
   methods: {
@@ -432,7 +422,17 @@ export default defineComponent({
               ? storage.getFilePreview(
                   config.website_images,
                   doc.default_image,
-                  700, 0, 'center', 90, 5, 'FFFFFF', 15, 1, 0, 'FFFFFF', 'webp'
+                  700,
+                  0,
+                  'center',
+                  90,
+                  5,
+                  'FFFFFF',
+                  15,
+                  1,
+                  0,
+                  'FFFFFF',
+                  'webp'
                 ).toString()
               : this.getPlaceholderImage(),
           };
@@ -507,17 +507,9 @@ export default defineComponent({
       this.applyFilters();
     },
 
-    setFilter(type: string) {
-      console.log('Setting filter to:', type);
-      this.filterType = type;
-      this.applyFilters();
-    },
-
     applyFilters() {
-      console.log('Applying filters - filterType:', this.filterType, 'searchQuery:', this.searchQuery);
-      console.log('All courses:', this.allCourses.length, 'Filtered courses:', this.filteredCourses.length);
       // Update displayed courses based on current filters
-      this.courses = [...this.filteredCourses]; // Force reactivity with spread operator
+      this.courses = this.filteredCourses;
     },
 
     async reloadAllContent() {

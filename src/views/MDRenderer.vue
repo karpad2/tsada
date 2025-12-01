@@ -16,8 +16,8 @@
             </h1>
             <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
           </div>
-          <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-gray-700 dark:text-white">
-            <strong>{{ $t("date") }}</strong>: {{ formatDate(state.date) }} |
+          <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-gray-600 dark:text-white">
+            <strong>{{ $t("date") }}</strong>: {{ formatDate(state.date) }} | 
             <strong>{{ $t("last_modified") }}</strong>: {{ formatDate(state.lastModified) }}
           </p>
         </div>
@@ -48,55 +48,43 @@
           <VBtn v-if="false" @click="downloadPDF">PDF</VBtn>
         </div>
   
-        <!-- New Modular Content System -->
-        <div v-if="!state.useLegacyContent" ref="pdfContent" class="w-full print_content content-section">
-          <ContentRenderer
-            :contentId="contentId"
-            :contentType="contentType"
-            :language="currentLanguage"
+        <!-- Main Content -->
+        <div ref="pdfContent" class="w-full p-5 dark:text-white print_content content-section" v-html="localizedContent" />
+  
+        <!-- Additional Content Sections -->
+        <div 
+          v-for="contentSection in state.chtmls" 
+          :key="contentSection.$id" 
+          class="w-full p-5 dark:text-white print_content content-section" 
+          v-html="contentSection.text"
+        />
+  
+        <!-- YouTube Videos -->
+        <div v-for="ytVideo in state.ytVideos" :key="ytVideo" class="p-5 video-container">
+          <iframe 
+            class="mx-auto" 
+            width="560" 
+            height="315" 
+            :src="getYouTubeEmbedUrl(ytVideo)" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen
           />
         </div>
-
-        <!-- Legacy Content System -->
-        <template v-else>
-          <!-- Main Content -->
-          <div ref="pdfContent" class="w-full p-5 dark:text-white print_content content-section" v-html="localizedContent" />
-
-          <!-- Additional Content Sections -->
-          <div
-            v-for="contentSection in state.chtmls"
-            :key="contentSection.$id"
-            class="w-full p-5 dark:text-white print_content content-section"
-            v-html="contentSection.text"
-          />
-
-          <!-- YouTube Videos -->
-          <div v-for="ytVideo in state.ytVideos" :key="ytVideo" class="p-5 video-container">
-            <iframe
-              class="mx-auto"
-              width="560"
-              height="315"
-              :src="getYouTubeEmbedUrl(ytVideo)"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            />
+  
+        <!-- Gallery -->
+        <div v-if="state.galleryFlag" class="gallery-section">
+          <AlbumViewer :caption="false" :id="state.galleryId" />
+        </div>
+  
+        <!-- Documents -->
+        <div v-if="state.hasDocuments" class="documents-section">
+          <div class="m-auto w-full">
+            <DocLister :_id="contentId" />
           </div>
-
-          <!-- Gallery -->
-          <div v-if="state.galleryFlag" class="gallery-section">
-            <AlbumViewer :caption="false" :id="state.galleryId" />
-          </div>
-
-          <!-- Documents -->
-          <div v-if="state.hasDocuments" class="documents-section">
-            <div class="m-auto w-full">
-              <DocLister :_id="contentId" />
-            </div>
-          </div>
-        </template>
+        </div>
       </div>
   
       <Loading v-else />
@@ -104,13 +92,12 @@
   </template>
   
   <script lang="ts">
-  import { defineComponent, reactive, computed, onMounted, ref, getCurrentInstance, watch } from 'vue';
+  import { defineComponent, reactive, computed, onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { Client, Databases, Storage, Query, Account } from 'appwrite';
   import { useLoadingStore } from '@/stores/loading';
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
-  import { updatePageTitle } from '@/utils/seo';
   import gsap from 'gsap';
   import moment from 'moment/min/moment-with-locales';
   import { jsPDF } from 'jspdf';
@@ -118,7 +105,6 @@
   import AlbumViewer from '@/components/AlbumViewer.vue';
   import Loading from '@/components/Loading.vue';
   import DocLister from '@/components/DocLister.vue';
-  import ContentRenderer from '@/components/content/ContentRenderer.vue';
   
   interface ContentState {
     loaded: boolean;
@@ -140,7 +126,6 @@
     galleryId: string;
     hasDocuments: boolean;
     showDate: boolean;
-    useLegacyContent: boolean; // Flag to determine which rendering system to use
   }
   
   export default defineComponent({
@@ -148,15 +133,13 @@
     components: {
       AlbumViewer,
       Loading,
-      DocLister,
-      ContentRenderer
+      DocLister
     },
     setup() {
       const route = useRoute();
       const router = useRouter();
       const loadingStore = useLoadingStore();
       const pdfContent = ref(null);
-      const instance = getCurrentInstance();
   
       const state = reactive<ContentState>({
         loaded: false,
@@ -177,22 +160,12 @@
         galleryFlag: false,
         galleryId: '',
         hasDocuments: false,
-        showDate: false,
-        useLegacyContent: true // Default to legacy content until we check the document
+        showDate: false
       });
   
       // Computed Properties
       const contentId = computed(() => route.params.id as string);
-
-      const contentType = computed(() => {
-        // Determine content type from route or other context
-        const path = route.path;
-        if (path.includes('/documents/')) return 'document';
-        if (path.includes('/news/')) return 'news';
-        if (path.includes('/about/')) return 'about';
-        return 'page'; // default
-      });
-
+      
       const currentLanguage = computed(() => loadingStore.language);
       
       const localizedTitle = computed(() => {
@@ -273,9 +246,6 @@
           state.showDate = mainContent.show_date;
           state.videoId = mainContent.video || '';
           state.date = mainContent.$createdAt;
-
-          // Check if this document uses the new modular content system
-          state.useLegacyContent = mainContent.use_legacy_content !== false;
   
           // Set localized content
           state.titleRs = mainContent.title_rs || '';
@@ -285,8 +255,8 @@
           state.contentHu = mainContent.text_hu || '';
           state.contentEn = mainContent.text_en || '';
   
-          // Set document title with page name ~ school name format using SEO utils
-          updatePageTitle(localizedTitle.value, true, currentLanguage.value);
+          // Set document title
+          document.title = localizedTitle.value;
   
           // Handle gallery
           if (state.galleryFlag && mainContent.gallery) {
@@ -382,13 +352,6 @@
         );
       };
   
-      // Watch for language changes and update title
-      watch(currentLanguage, (newLanguage) => {
-        if (state.loaded && localizedTitle.value) {
-          updatePageTitle(localizedTitle.value, true, newLanguage);
-        }
-      });
-
       // Lifecycle
       onMounted(async () => {
         await initializeAdmin();
@@ -400,8 +363,6 @@
         state,
         pdfContent,
         contentId,
-        contentType,
-        currentLanguage,
         localizedTitle,
         localizedContent,
         videoLink,

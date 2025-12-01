@@ -36,7 +36,7 @@
           <Certop class="h-28 w-28" />
 
           <img
-            v-if="showErasmusFlag"
+            
             src="@a/Erasmus_Logo.svg"
             alt="erasmus+"
             class="w-36 h-12 text-white p-2"
