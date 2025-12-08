@@ -73,7 +73,7 @@ export const useLoadingStore = defineStore('loading', () => {
 
     function setCurrentPageEuFunding(v:boolean)
     {
-      this.currentPageEuFunding=v;
+      currentPageEuFunding.value=v;
     }
 
     

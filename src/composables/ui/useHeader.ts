@@ -73,6 +73,7 @@ export function useHeader() {
     if (!globallyEnabled) return false
 
     // Check current page setting from loadingStore (set by MDRenderer)
+    // Access the ref value directly to ensure reactivity
     return loadingStore.currentPageEuFunding
   })
 
