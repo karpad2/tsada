@@ -16,7 +16,15 @@
       @update:visible="updateField('visible', $event)"
       @update:notNews="updateField('notNews', $event)"
       @update:showDate="updateField('show_date', $event)"
-    />
+    >
+      <template #custom-switches>
+        <v-switch
+          v-model="formData.eu_funding_enabled"
+          :label="$t('eu_funding_enabled')"
+          @change="save"
+        />
+      </template>
+    </GeneralControlsSection>
 
     <!-- File Upload Section -->
     <FileUploadSection
@@ -140,15 +148,6 @@
           <AlbumViewer :caption="false" :id="formData.gallery_id" />
         </div>
       </div>
-    </section>
-
-    <!-- EU Funding Logo Section -->
-    <section class="eu-funding-section mb-6">
-      <v-switch
-        v-model="formData.eu_funding_enabled"
-        :label="$t('eu_funding_enabled')"
-        @change="save"
-      />
     </section>
 
     <!-- AI Translation Dialog -->
