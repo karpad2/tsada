@@ -247,10 +247,12 @@ router.beforeEach((to, from, next) => {
   if(fullPath.indexOf("erasmus") !== -1)
   {
     loadingStore.setErasmus(true);
+    
   }
   else
   {
     loadingStore.setErasmus(false);
+    loadingStore.setCurrentPageEuFunding(false);
   }
   let k=false;
   if(fullPath.indexOf("admin") !== -1)

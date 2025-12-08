@@ -70,11 +70,19 @@ export function useHeader() {
   const showEuFunding = computed(() => {
     // Check if globally enabled in database settings
     const globallyEnabled = state.navigationData?.erasmusSettings.eu_funding_enabled || false
-    if (!globallyEnabled) return false
+    console.log('🟢 useHeader: globallyEnabled:', globallyEnabled);
+    console.log('🟢 useHeader: currentPageEuFunding:', loadingStore.currentPageEuFunding);
+
+    if (!globallyEnabled) {
+      console.log('🔴 useHeader: Global setting is FALSE, hiding logo');
+      return false;
+    }
 
     // Check current page setting from loadingStore (set by MDRenderer)
     // Access the ref value directly to ensure reactivity
-    return loadingStore.currentPageEuFunding
+    const result = loadingStore.currentPageEuFunding;
+    console.log('🟢 useHeader: Final result:', result);
+    return result;
   })
 
   // Navigation methods

@@ -251,6 +251,8 @@
           state.euFundingEnabled = mainContent.eu_funding_enabled || false;
 
           // Update global store for header
+          console.log('🔵 MDRenderer: eu_funding_enabled from DB:', mainContent.eu_funding_enabled);
+          console.log('🔵 MDRenderer: Setting store to:', state.euFundingEnabled);
           loadingStore.setCurrentPageEuFunding(state.euFundingEnabled);
 
           // Set localized content

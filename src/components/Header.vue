@@ -24,6 +24,13 @@
           <span class="ml-1 max-sm:hidden text-xl dark:text-white">{{ $t('school_name') }}</span>
           <Certop class="h-28 w-28" />
           <img src="@a/Erasmus_Logo.svg" alt="erasmus+" class="w-36 h-12 text-white p-2" />
+          <img
+            v-if="showEuFunding"
+            src="@a/eu_co_funded.png"
+            alt="Co-funded by the European Union"
+            class="w-32  text-white p-1"
+          />
+        
         </router-link>
       </div>
 
@@ -265,6 +272,7 @@ const showHeader = ref(true);
 const menuOpened = ref(false);
 const mobileView = ref(false);
 const tabletView = ref(false);
+const showEuFunding = computed(() => loadingStore.currentPageEuFunding);
 
 // Computed
 const isLoggedIn = computed(() => loadingStore.userLoggedin);
