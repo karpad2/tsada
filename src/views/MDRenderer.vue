@@ -126,6 +126,7 @@
     galleryId: string;
     hasDocuments: boolean;
     showDate: boolean;
+    euFundingEnabled: boolean;
   }
   
   export default defineComponent({
@@ -160,7 +161,8 @@
         galleryFlag: false,
         galleryId: '',
         hasDocuments: false,
-        showDate: false
+        showDate: false,
+        euFundingEnabled: false
       });
   
       // Computed Properties
@@ -246,7 +248,11 @@
           state.showDate = mainContent.show_date;
           state.videoId = mainContent.video || '';
           state.date = mainContent.$createdAt;
-  
+          state.euFundingEnabled = mainContent.eu_funding_enabled || false;
+
+          // Update global store for header
+          loadingStore.setCurrentPageEuFunding(state.euFundingEnabled);
+
           // Set localized content
           state.titleRs = mainContent.title_rs || '';
           state.titleHu = mainContent.title_hu || '';

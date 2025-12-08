@@ -66,19 +66,14 @@ export function useHeader() {
     state.navigationData?.erasmusSettings.apply_enabled || false
   )
 
-  // EU Co-funded logo visibility (controlled by database setting and page route)
+  // EU Co-funded logo visibility (controlled by current page's text_components setting)
   const showEuFunding = computed(() => {
-    // Check if globally enabled in database
-    const isEnabled = state.navigationData?.erasmusSettings.eu_funding_enabled || false
-    if (!isEnabled) return false
+    // Check if globally enabled in database settings
+    const globallyEnabled = state.navigationData?.erasmusSettings.eu_funding_enabled || false
+    if (!globallyEnabled) return false
 
-    // Check current page - show on specific pages
-    const path = route.path.toLowerCase()
-    return path.includes('/home') ||
-           path.includes('/erasmus') ||
-           path.includes('/about') ||
-           path.includes('/renderer/about') ||
-           path === '/'
+    // Check current page setting from loadingStore (set by MDRenderer)
+    return loadingStore.currentPageEuFunding
   })
 
   // Navigation methods

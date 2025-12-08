@@ -16,6 +16,7 @@ export const useLoadingStore = defineStore('loading', () => {
     const theme=ref("light");
     const uid=ref("");
     let notif=ref([]);
+    const currentPageEuFunding=ref(false);
     const doubleCount = computed(() => count.value * 2)
     function increment() {
       count.value++
@@ -70,10 +71,15 @@ export const useLoadingStore = defineStore('loading', () => {
       this.hideheaders=v;
     }
 
+    function setCurrentPageEuFunding(v:boolean)
+    {
+      this.currentPageEuFunding=v;
+    }
+
     
 
 
-    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting }
+    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding }
   },
 {persist:true})
 
