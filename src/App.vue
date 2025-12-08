@@ -1,9 +1,9 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import Index from '@/views/Index.vue';
 import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
 import { useLoadingStore } from '@/stores/loading';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 export default {
   name: 'App',
@@ -15,8 +15,15 @@ export default {
   },
   setup() {
     const loadingStore = useLoadingStore();
+    const route = useRoute();
+
     const routeKey = computed(() => {
       return `${loadingStore.language}`;
+    });
+
+    // Reset EU funding logo when route changes
+    watch(() => route.path, () => {
+      loadingStore.setCurrentPageEuFunding(false);
     });
 
     return {
