@@ -36,10 +36,17 @@
           <Certop class="h-28 w-28" />
 
           <img
-            
+
             src="@a/Erasmus_Logo.svg"
             alt="erasmus+"
             class="w-36 h-12 text-white p-2"
+          />
+
+          <img
+            v-if="showEuFunding"
+            src="@a/eu_co_funded.png"
+            alt="Co-funded by the European Union"
+            class="w-32 h-12 text-white p-1"
           />
         </router-link>
       </div>
@@ -276,6 +283,7 @@ export default defineComponent({
       isMobileMode,
       showErasmusFlag,
       showErasmusApply,
+      showEuFunding,
 
       // Methods
       toggleMobileMenu,
@@ -300,6 +308,7 @@ export default defineComponent({
       isMobileMode,
       showErasmusFlag,
       showErasmusApply,
+      showEuFunding,
 
       // Methods
       toggleMobileMenu,

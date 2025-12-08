@@ -66,6 +66,21 @@ export function useHeader() {
     state.navigationData?.erasmusSettings.apply_enabled || false
   )
 
+  // EU Co-funded logo visibility (controlled by database setting and page route)
+  const showEuFunding = computed(() => {
+    // Check if globally enabled in database
+    const isEnabled = state.navigationData?.erasmusSettings.eu_funding_enabled || false
+    if (!isEnabled) return false
+
+    // Check current page - show on specific pages
+    const path = route.path.toLowerCase()
+    return path.includes('/home') ||
+           path.includes('/erasmus') ||
+           path.includes('/about') ||
+           path.includes('/renderer/about') ||
+           path === '/'
+  })
+
   // Navigation methods
   const initializeHeader = async (forceRefresh = false) => {
     state.loading = true
@@ -225,6 +240,7 @@ export function useHeader() {
     currentBreadcrumb,
     showErasmusFlag,
     showErasmusApply,
+    showEuFunding,
 
     // Methods
     initializeHeader,

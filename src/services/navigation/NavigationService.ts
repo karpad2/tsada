@@ -24,6 +24,7 @@ export interface NavigationData {
   erasmusSettings: {
     list_enabled: boolean
     apply_enabled: boolean
+    eu_funding_enabled: boolean
   }
 }
 
@@ -78,7 +79,8 @@ export class NavigationService extends BaseApiService<any> {
         studentItems: studentItems.success ? studentItems.data! : [],
         erasmusSettings: erasmusSettings.success ? erasmusSettings.data! : {
           list_enabled: false,
-          apply_enabled: false
+          apply_enabled: false,
+          eu_funding_enabled: false
         }
       }
 
@@ -217,20 +219,22 @@ export class NavigationService extends BaseApiService<any> {
   /**
    * Get Erasmus module settings
    */
-  async getErasmusSettings(): Promise<ApiResponse<{ list_enabled: boolean; apply_enabled: boolean }>> {
+  async getErasmusSettings(): Promise<ApiResponse<{ list_enabled: boolean; apply_enabled: boolean; eu_funding_enabled: boolean }>> {
     try {
       const databases = appwriteService.getDatabases()
 
-      const [listSetting, applySetting] = await Promise.all([
+      const [listSetting, applySetting, euFundingSetting] = await Promise.all([
         databases.getDocument(this.config.website_db, this.config.general_settings, 'erasmus_list').catch(() => null),
-        databases.getDocument(this.config.website_db, this.config.general_settings, 'erasmus_apply_on').catch(() => null)
+        databases.getDocument(this.config.website_db, this.config.general_settings, 'erasmus_apply_on').catch(() => null),
+        databases.getDocument(this.config.website_db, this.config.general_settings, 'eu_funding_enabled').catch(() => null)
       ])
 
       return {
         success: true,
         data: {
           list_enabled: listSetting?.setting_status || false,
-          apply_enabled: applySetting?.setting_status || false
+          apply_enabled: applySetting?.setting_status || false,
+          eu_funding_enabled: euFundingSetting?.setting_status || false
         }
       }
     } catch (error: any) {
