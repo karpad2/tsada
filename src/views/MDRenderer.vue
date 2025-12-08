@@ -365,6 +365,11 @@
         }
       });
 
+      // Watch for EU funding enabled changes
+      watch(() => state.euFundingEnabled, (newValue) => {
+        loadingStore.setCurrentPageEuFunding(newValue);
+      });
+
       // Lifecycle
       onMounted(async () => {
         await initializeAdmin();
