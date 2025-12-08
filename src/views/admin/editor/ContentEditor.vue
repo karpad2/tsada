@@ -117,16 +117,16 @@
 
     <!-- Album Section -->
     <section class="album-section mb-6">
-      <v-switch 
-        v-model="formData.album_flag" 
-        :label="$t('album_flag')" 
-        @change="save" 
+      <v-switch
+        v-model="formData.album_flag"
+        :label="$t('album_flag')"
+        @change="save"
       />
       <div v-if="formData.album_flag" class="mt-4">
         <v-btn class="mb-4" @click="handleCreateGallery">
           {{ $t('create_a_new_album') }}
         </v-btn>
-        
+
         <v-select
           v-model="formData.gallery_id"
           :items="galleries"
@@ -140,6 +140,15 @@
           <AlbumViewer :caption="false" :id="formData.gallery_id" />
         </div>
       </div>
+    </section>
+
+    <!-- EU Funding Logo Section -->
+    <section class="eu-funding-section mb-6">
+      <v-switch
+        v-model="formData.eu_funding_enabled"
+        :label="$t('eu_funding_enabled')"
+        @change="save"
+      />
     </section>
 
     <!-- AI Translation Dialog -->
@@ -242,6 +251,7 @@ interface FormData {
   album_flag: boolean
   gallery_id: string
   notNews: boolean
+  eu_funding_enabled: boolean
 }
 
 export default defineComponent({
@@ -290,7 +300,8 @@ export default defineComponent({
       documents_flag: false,
       album_flag: false,
       gallery_id: "",
-      notNews: false
+      notNews: false,
+      eu_funding_enabled: false
     })
 
     // Loading helpers
@@ -355,7 +366,8 @@ export default defineComponent({
           show_date: document.show_date || false,
           documents_flag: document.has_documents || false,
           album_flag: document.has_gallery || false,
-          gallery_id: document.gallery?.$id || ""
+          gallery_id: document.gallery?.$id || "",
+          eu_funding_enabled: document.eu_funding_enabled || false
         })
         
         // Set image
@@ -393,7 +405,8 @@ export default defineComponent({
             gallery: formData.gallery_id || null,
             default_image: default_image.value,
             notNews: formData.notNews,
-            show_date: formData.show_date
+            show_date: formData.show_date,
+            eu_funding_enabled: formData.eu_funding_enabled
           }
         )
         console.log('Document saved successfully')

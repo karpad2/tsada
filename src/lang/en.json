@@ -146,6 +146,7 @@
     "author":"Author",
     "documents_flag":"Enable documents",
     "album_flag":"Enable gallery",
+    "eu_funding_enabled":"Display EU co-funded logo",
     "edit_gallery":"Edit gallery",
     "erasmus_applies_result":"Erasmus+ locations and student points list",
     "score":"Score",

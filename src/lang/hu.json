@@ -156,6 +156,7 @@
     "author":"Szerző",
     "documents_flag":"Dokumentumok engedélyezése",
     "album_flag":"Galéria engedélyezése",
+    "eu_funding_enabled":"EU társfinanszírozás logó megjelenítése",
     "create_a_new_album":"Új galéria készítése",
     "edit_gallery":"Galéria szerkesztése",
     "applies_are_closed":"Jelentkezés lezárult, vagy már jelentkeztél",
