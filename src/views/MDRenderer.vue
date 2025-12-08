@@ -371,13 +371,30 @@
       watch(() => state.euFundingEnabled, (newValue) => {
         loadingStore.setCurrentPageEuFunding(newValue);
       });
-
+      /*
       // Lifecycle
       onMounted(async () => {
         await initializeAdmin();
         await loadContent();
         animateTitle();
       });
+      */
+     onMounted(async () => {
+  await initializeAdmin();
+  await loadContent();
+  animateTitle();
+});
+
+// 🔥 Route param figyelés — EZ A MEGOLDÁS
+watch(
+  () => [route.params.mode, route.params.id],
+  async () => {
+    state.loaded = false;
+    await loadContent();
+    animateTitle();
+  }
+);
+
   
       return {
         state,
