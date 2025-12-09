@@ -1,5 +1,6 @@
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useLoadingStore } from '@/stores/loading'
 import { appwriteService } from '@/appwrite'
 import { navigationService } from '@/services/navigation/NavigationService'
@@ -25,16 +26,19 @@ export interface HeaderState {
 }
 
 export function useHeader() {
+  // i18n
+  const { locale } = useI18n()
+
   // Reactive state
   const state = reactive<HeaderState>({
     navigationData: null,
     loading: false,
     error: null,
     mobileMenuOpen: false,
-    currentLanguage: 'rs',
+    currentLanguage: 'sr',
     currentFlag: 'rs',
     languages: [
-      { code: 'rs', name: 'Српски', country: 'rs' },
+      { code: 'sr', name: 'Српски', country: 'rs' },
       { code: 'hu', name: 'Magyar', country: 'hu' },
       { code: 'en', name: 'English', country: 'gb' }
     ]
@@ -44,6 +48,10 @@ export function useHeader() {
   const loadingStore = useLoadingStore()
   const route = useRoute()
   const router = useRouter()
+
+  // Initialize locale AND i18nService from store immediately
+  locale.value = loadingStore.language
+  i18nService.setCurrentLanguage(loadingStore.language)
 
   // Computed properties
   const isAuthenticated = computed(() => loadingStore.userLoggedin)
@@ -66,23 +74,10 @@ export function useHeader() {
     state.navigationData?.erasmusSettings.apply_enabled || false
   )
 
-  // EU Co-funded logo visibility (controlled by current page's text_components setting)
+  // EU Co-funded logo visibility (always show if globally enabled)
   const showEuFunding = computed(() => {
     // Check if globally enabled in database settings
-    const globallyEnabled = state.navigationData?.erasmusSettings.eu_funding_enabled || false
-    console.log('🟢 useHeader: globallyEnabled:', globallyEnabled);
-    console.log('🟢 useHeader: currentPageEuFunding:', loadingStore.currentPageEuFunding);
-
-    if (!globallyEnabled) {
-      console.log('🔴 useHeader: Global setting is FALSE, hiding logo');
-      return false;
-    }
-
-    // Check current page setting from loadingStore (set by MDRenderer)
-    // Access the ref value directly to ensure reactivity
-    const result = loadingStore.currentPageEuFunding;
-    console.log('🟢 useHeader: Final result:', result);
-    return result;
+    return state.navigationData?.erasmusSettings.eu_funding_enabled || false
   })
 
   // Navigation methods
@@ -96,8 +91,10 @@ export function useHeader() {
       // Initialize authentication check
       await appwriteService.checkAuth()
 
-      // Set current language
+      // Set current language and i18n locale AND i18nService
       state.currentLanguage = loadingStore.language
+      locale.value = loadingStore.language
+      i18nService.setCurrentLanguage(loadingStore.language)
       setCurrentLanguageFlag(state.currentLanguage)
 
       // Load navigation data
@@ -138,11 +135,14 @@ export function useHeader() {
     state.currentFlag = language?.country || 'rs'
   }
 
-  const changeLanguage = (languageCode: string) => {
+  const changeLanguage = async (languageCode: string) => {
     const oldLanguage = state.currentLanguage
 
     if (oldLanguage !== languageCode) {
       trackLanguageChange(oldLanguage, languageCode)
+
+      // Update locale immediately
+      locale.value = languageCode
 
       // Update stores
       loadingStore.setLanguage(languageCode)
@@ -155,7 +155,21 @@ export function useHeader() {
       // Clear navigation cache to reload localized content
       navigationService.clearCache()
 
-      // Reload page for i18n changes
+      // Clear PWA cache for API calls
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys()
+          const apiCaches = cacheNames.filter(
+            name => name.includes('api-cache') || name.includes('dynamic-cache')
+          )
+          await Promise.all(apiCaches.map(cacheName => caches.delete(cacheName)))
+        } catch (error) {
+          console.error('Error clearing cache:', error)
+        }
+      }
+
+      // Wait a bit to ensure everything is saved, then reload
+      await new Promise(resolve => setTimeout(resolve, 100))
       window.location.reload()
     }
   }
@@ -227,9 +241,22 @@ export function useHeader() {
     }
   )
 
+  // Resize handler for mobile/tablet detection
+  const onResize = () => {
+    loadingStore.mobile_view = window.innerWidth <= 1276
+    loadingStore.tablet_mode = window.innerWidth >= 1276 && window.innerWidth <= 1550
+    loadingStore.mobile_mode = (state.mobileMenuOpen && loadingStore.mobile_view) || !loadingStore.mobile_view
+  }
+
   // Lifecycle
   onMounted(() => {
     initializeHeader()
+    onResize()
+    window.addEventListener('resize', onResize)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', onResize)
   })
 
   return {

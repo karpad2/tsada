@@ -45,7 +45,7 @@
   import { useLoadingStore } from "@/stores/loading";
   import { useSEO } from "@/composables/useSEO";
   import { useRoute } from "vue-router";
-  import Header from "@/components/Header.vue";
+  import Header from "@/components/HeaderModular.vue";
   import Footer from "@/components/Footer.vue";
   import Loading from "@/components/Loading.vue";
   import NoInternet from "@/components/NoInternet.vue";

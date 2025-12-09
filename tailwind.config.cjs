@@ -1,15 +1,15 @@
-import themes from "./src/themes/store.json";
 module.exports = {
-  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  darkMode: 'class', // or 'media' or 'class'
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // Custom color palette to replace DaisyUI base colors
+        gray: {
+          750: '#2d3748', // Custom shade between 700 and 800
+        }
+      }
+    },
   },
-  plugins: [require("daisyui")],
-  daisyui: {
-    themes: themes,// Ensuring light and dark are available
-    darkTheme: 'cupcake',
-    base: true,
-    logs: true,  // Default dark theme
-  },
+  plugins: [],
 }

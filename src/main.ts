@@ -3,6 +3,8 @@ import { createApp as createVueApp } from 'vue'
 
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { useLoadingStore } from '@/stores/loading'
+import { i18nService } from '@/services/i18n/I18nService'
 
 import App from './App.vue'
 import { createRouter } from './router'
@@ -85,8 +87,17 @@ export function createApp() {
   //console.log(messages);
 
   app.use(CKEditor);
+
+  // Get persisted language from pinia store
+  const loadingStore = useLoadingStore()
+  const savedLanguage = loadingStore.language || 'sr'
+
   const i18n = createI18n({
-      locale: 'en', fallbackLocale: 'en',  messages, globalInjection: true  });
+      locale: savedLanguage, fallbackLocale: 'en',  messages, globalInjection: true  });
+
+  // Set i18nService language to match
+  i18nService.setCurrentLanguage(savedLanguage)
+
   /*
   client
       .setEndpoint('https://appwrite.kasoft.co.uk/v1')

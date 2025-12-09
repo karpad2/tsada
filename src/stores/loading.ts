@@ -17,6 +17,9 @@ export const useLoadingStore = defineStore('loading', () => {
     const uid=ref("");
     let notif=ref([]);
     const currentPageEuFunding=ref(false);
+    const mobile_view=ref(false);
+    const tablet_mode=ref(false);
+    const mobile_mode=ref(true);
     const doubleCount = computed(() => count.value * 2)
     function increment() {
       count.value++
@@ -79,7 +82,7 @@ export const useLoadingStore = defineStore('loading', () => {
     
 
 
-    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding }
+    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding,mobile_view,tablet_mode,mobile_mode }
   },
 {persist:true})
 

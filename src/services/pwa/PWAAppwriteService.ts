@@ -2,6 +2,10 @@ import { Client, Databases, Storage, Account, Query, ID } from 'appwrite'
 import { config } from '@/appwrite'
 import { PWAApiService, type PWAApiOptions } from './PWAApiService'
 
+// Appwrite endpoint configuration
+const APPWRITE_ENDPOINT = 'https://appwrite.tsada.edu.rs/v1'
+const APPWRITE_PROJECT_ID = '659ea7f886cf55d4528a'
+
 /**
  * PWA-optimized Appwrite service wrapper
  * Provides intelligent caching and offline support for Appwrite operations
@@ -23,8 +27,8 @@ export class PWAAppwriteService {
 
   private constructor() {
     this.client = new Client()
-      .setEndpoint(config.url)
-      .setProject(config.project_id)
+      .setEndpoint(APPWRITE_ENDPOINT)
+      .setProject(APPWRITE_PROJECT_ID)
 
     this.databases = new Databases(this.client)
     this.storage = new Storage(this.client)

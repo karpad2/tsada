@@ -12,9 +12,9 @@ export function useLanguage() {
   const loadingStore = useLoadingStore();
 
   const languages: LanguageItem[] = [
-    { name: 'Српски', code: 'sr', country: 'srb' },
-    { name: 'Magyar', code: 'hu', country: 'hun' },
-    { name: 'English', code: 'en', country: 'gbr' },
+    { name: 'Српски', code: 'sr', country: 'rs' },
+    { name: 'Magyar', code: 'hu', country: 'hu' },
+    { name: 'English', code: 'en', country: 'gb' },
   ];
 
   const currentLanguage = computed(() => {

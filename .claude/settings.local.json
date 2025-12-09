@@ -3,7 +3,11 @@
     "allow": [
       "Bash(git commit:*)",
       "Bash(git add:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 180 npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

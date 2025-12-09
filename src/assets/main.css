@@ -118,3 +118,15 @@ body {
     @apply dark:bg-sky-600;
     @apply dark:text-white;
    }
+
+   /* Dropdown menu dark mode fix */
+   .dropdown-content.menu li a,
+   .dropdown-content.menu li router-link
+   {
+    @apply dark:text-white;
+   }
+   .dropdown-content.menu li:hover a,
+   .dropdown-content.menu li:hover router-link
+   {
+    @apply dark:text-black;
+   }

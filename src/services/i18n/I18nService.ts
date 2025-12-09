@@ -35,7 +35,7 @@ export class I18nService {
       flag: 'hu'
     },
     {
-      code: 'rs',
+      code: 'sr',
       name: 'Serbian',
       nativeName: 'Српски',
       flag: 'rs'
@@ -120,17 +120,32 @@ export class I18nService {
    */
   private findContentKey(content: MultiLangContent, languageCode: string): string | undefined {
     // Common field prefixes
-    const prefixes = ['title_', 'name_', 'description_', 'content_', 'short_', 'text_']
+    const prefixes = ['title_', 'name_', 'description_', 'content_', 'short_', 'text_', 'category_name_']
+
+    // Map 'sr' to 'rs' for database compatibility (database uses 'rs' but app uses 'sr')
+    const dbLanguageCode = languageCode === 'sr' ? 'rs' : languageCode
 
     for (const prefix of prefixes) {
-      const key = `${prefix}${languageCode}`
+      // Try with mapped language code first (sr -> rs)
+      const key = `${prefix}${dbLanguageCode}`
       if (content.hasOwnProperty(key)) {
         return key
       }
+
+      // Also try original language code for backward compatibility
+      if (languageCode !== dbLanguageCode) {
+        const altKey = `${prefix}${languageCode}`
+        if (content.hasOwnProperty(altKey)) {
+          return altKey
+        }
+      }
     }
 
-    // Direct language code key
-    if (content.hasOwnProperty(languageCode)) {
+    // Direct language code key (try both versions)
+    if (content.hasOwnProperty(dbLanguageCode)) {
+      return dbLanguageCode
+    }
+    if (languageCode !== dbLanguageCode && content.hasOwnProperty(languageCode)) {
       return languageCode
     }
 
@@ -156,7 +171,7 @@ export class I18nService {
    */
   validateMultiLangContent(
     content: MultiLangContent,
-    requiredLanguages: string[] = ['rs'],
+    requiredLanguages: string[] = ['sr'],
     fieldPrefix = 'title'
   ): { isValid: boolean, missingLanguages: string[] } {
     const missingLanguages: string[] = []
@@ -199,7 +214,7 @@ export class I18nService {
     try {
       const locales: Record<string, string> = {
         'hu': 'hu-HU',
-        'rs': 'sr-RS',
+        'sr': 'sr-RS',
         'en': 'en-GB'
       }
 
@@ -222,7 +237,7 @@ export class I18nService {
     try {
       const locales: Record<string, string> = {
         'hu': 'hu-HU',
-        'rs': 'sr-RS',
+        'sr': 'sr-RS',
         'en': 'en-GB'
       }
 
@@ -319,3 +334,6 @@ export class I18nService {
     return completeness
   }
 }
+
+// Export singleton instance
+export const i18nService = I18nService.getInstance()
