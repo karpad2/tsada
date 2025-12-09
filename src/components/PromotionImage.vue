@@ -92,6 +92,8 @@ export default defineComponent({
       isDestroyed: false,
       retryCount: 0,
       maxRetries: 2,
+      img1Timer: null as NodeJS.Timeout | null,
+      img2Timer: null as NodeJS.Timeout | null,
     };
   },
   async created() {
@@ -99,6 +101,16 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.isDestroyed = true;
+
+    // Timer-ek törlése
+    if (this.img1Timer) {
+      clearTimeout(this.img1Timer);
+      this.img1Timer = null;
+    }
+    if (this.img2Timer) {
+      clearTimeout(this.img2Timer);
+      this.img2Timer = null;
+    }
   },
   methods: {
     async getPromo() {
@@ -143,12 +155,28 @@ export default defineComponent({
           800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
         );
 
+        // Timeout beállítás az első képhez - 10 másodperc után mutatja a hibát
+        this.img1Timer = setTimeout(() => {
+          if (!this.img1Loaded && !this.img1Error) {
+            this.img1Error = true;
+            this.img1Loaded = true;
+          }
+        }, 10000);
+
         if (!this.promoimage2off && img2Res) {
           this.img2 = storage.getFilePreview(
             config.website_images,
             img2Res.setting_data,
             800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
           );
+
+          // Timeout beállítás a második képhez - 10 másodperc után mutatja a hibát
+          this.img2Timer = setTimeout(() => {
+            if (!this.img2Loaded && !this.img2Error) {
+              this.img2Error = true;
+              this.img2Loaded = true;
+            }
+          }, 10000);
         }
 
       } catch (err) {
@@ -162,9 +190,16 @@ export default defineComponent({
 
     onImg1Load() {
       if (this.isDestroyed) return;
+
+      // Timer törlése sikeres betöltés esetén
+      if (this.img1Timer) {
+        clearTimeout(this.img1Timer);
+        this.img1Timer = null;
+      }
+
       this.img1Loaded = true;
       this.img1Error = false;
-      
+
       // Kis késleltetés a smooth átmenet érdekében
       setTimeout(() => {
         this.animateImage("#promo-img1", false);
@@ -173,9 +208,16 @@ export default defineComponent({
 
     onImg2Load() {
       if (this.isDestroyed) return;
+
+      // Timer törlése sikeres betöltés esetén
+      if (this.img2Timer) {
+        clearTimeout(this.img2Timer);
+        this.img2Timer = null;
+      }
+
       this.img2Loaded = true;
       this.img2Error = false;
-      
+
       // Kis késleltetés a smooth átmenet érdekében
       setTimeout(() => {
         this.animateImage("#promo-img2", true);
@@ -185,23 +227,13 @@ export default defineComponent({
     onImgError(event: Event) {
       const target = event.target as HTMLImageElement;
       console.error("Image load error:", event);
-      
+
+      // NE állítsd be azonnal a hibát, hanem hagyd, hogy a timer kezelje
+      // A timer majd 10 másodperc után mutatja a hibát, ha nem töltött be
       if (target.id === "promo-img1") {
-        // Timer törlése
-        if (this.img1Timer) {
-          clearTimeout(this.img1Timer);
-          this.img1Timer = null;
-        }
-        this.img1Error = true;
-        this.img1Loaded = true; // A placeholder eltűntetéséhez
+        console.log("Image 1 error - waiting for timer...");
       } else if (target.id === "promo-img2") {
-        // Timer törlése
-        if (this.img2Timer) {
-          clearTimeout(this.img2Timer);
-          this.img2Timer = null;
-        }
-        this.img2Error = true;
-        this.img2Loaded = true; // A placeholder eltűntetéséhez
+        console.log("Image 2 error - waiting for timer...");
       }
     },
 

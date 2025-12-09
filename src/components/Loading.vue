@@ -1,39 +1,225 @@
 <template>
-    <div class="loading1 text-black dark:text-white ">
-        
-        <div>
-            <span  class=" w-28 h-28 loading loading-ring dark:text-white"></span>
-            <h2 class="dark:text-white text-2xl">{{ $t("getting_ready") }}</h2>
+    <div class="loading-container">
+        <div class="skeleton-wrapper">
+            <!-- Header skeleton -->
+            <div class="skeleton-header">
+                <div class="skeleton-logo"></div>
+                <div class="skeleton-nav">
+                    <div class="skeleton-nav-item"></div>
+                    <div class="skeleton-nav-item"></div>
+                    <div class="skeleton-nav-item"></div>
+                    <div class="skeleton-nav-item"></div>
+                </div>
+            </div>
+
+            <!-- Content skeleton -->
+            <div class="skeleton-content">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text short"></div>
+                <div class="skeleton-grid">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+
+            <!-- Loading text -->
+            <div class="loading-text">
+                <h2 class="dark:text-white text-gray-700 text-xl">{{ $t("getting_ready") }}</h2>
+            </div>
         </div>
     </div>
 </template>
 
-<style>
-.loading1 {
+<script setup lang="ts">
+// i18n is globally available via $t in template
+</script>
+
+<style scoped>
+.loading-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    transform: scale(0.5);
+    min-height: 100vh;
+    background: #f9fafb;
+    padding: 20px;
 }
 
-.loading1-image {
-    animation: pulse 2s linear infinite;
+@media (prefers-color-scheme: dark) {
+    .loading-container {
+        background: #1a1a1a;
+    }
+}
+
+.skeleton-wrapper {
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Header skeleton */
+.skeleton-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+.skeleton-logo {
+    width: 120px;
+    height: 60px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .skeleton-logo {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200% 100%;
+    }
+}
+
+.skeleton-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.skeleton-nav-item {
+    width: 80px;
+    height: 20px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .skeleton-nav-item {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200% 100%;
+    }
+}
+
+/* Content skeleton */
+.skeleton-content {
+    padding: 20px;
+}
+
+.skeleton-title {
+    width: 60%;
+    height: 40px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .skeleton-title {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200% 100%;
+    }
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.skeleton-text.short {
+    width: 70%;
+}
+
+@media (prefers-color-scheme: dark) {
+    .skeleton-text {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200% 100%;
+    }
+}
+
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.skeleton-card {
+    height: 200px;
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .skeleton-card {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200% 100%;
+    }
+}
+
+.loading-text {
+    text-align: center;
+    margin-top: 40px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 @keyframes pulse {
-    0% {
-        transform: scale(0.5);
+    0%, 100% {
         opacity: 1;
     }
     50% {
-        transform: scale(0.7);
-        opacity: 0.7;
-        filter: blur(2px); 
+        opacity: 0.5;
     }
-    100% {
-        transform: scale(0.5);
-        opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .skeleton-nav {
+        display: none;
+    }
+
+    .skeleton-title {
+        width: 80%;
+        height: 30px;
+    }
+
+    .skeleton-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-logo,
+    .skeleton-nav-item,
+    .skeleton-title,
+    .skeleton-text,
+    .skeleton-card {
+        animation: none;
+    }
+
+    .loading-text {
+        animation: none;
     }
 }
 </style>

@@ -1,7 +1,6 @@
 <template>
   <header
-    v-if="!state.loading"
-    :class="{ mobile_force: isMobileView }"
+    :class="{ mobile_force: styleComputedForMobile }"
     style="z-index: 200"
     class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300 dark:bg-gray-900 backdrop-blur-lg body-font sticky top-0"
     id="home"
@@ -36,14 +35,13 @@
           <Certop class="h-28 w-28" />
 
           <img
-
             src="@a/Erasmus_Logo.svg"
             alt="erasmus+"
             class="w-36 h-12 text-white p-2"
           />
 
           <img
-            v-if="showEuFunding || true"
+            v-if="showEuFunding"
             src="@a/eu_co_funded.png"
             alt="Co-funded by the European Union"
             class="w-32 h-12 text-white p-1"
@@ -53,180 +51,175 @@
 
       <!-- Navigation Menu -->
       <nav
-        v-if="isMobileMode"
+        v-if="showMobileMenu"
         :class="[
-          { 'flex-col': isMobileView },
+          { 'flex-col w-full px-4 max-h-[70vh] overflow-y-auto': isMobileView },
           { 'mx-auto': isMobileView || isTabletMode },
           { 'flex-row': !isMobileView }
         ]"
         class="md:ml-auto flex items-center text-base justify-center"
       >
-        <!-- Home Link -->
-        <router-link
-          to="/home"
-          class="btn btn-ghost cursor-pointer dark:text-white"
-        >
-          {{ $t('home') }}
-        </router-link>
+        <!-- Mobile Accordion Menu -->
+        <AccordionMenu
+          v-if="isMobileView"
+          :items="mobileMenuItems"
+          @item-clicked="closeMobileMenu"
+          class="w-full"
+        />
 
-        <!-- About Us Dropdown -->
-        <NavigationDropdown
-          :title="$t('aboutus')"
-          :items="getAboutItems()"
-          route-prefix="/renderer/about/"
-          tracking-category="about"
-        >
-          <template #custom-items>
-            <li><router-link to="/renderer/about/history">{{ $t("history_of_school") }}</router-link></li>
-            <li><router-link to="/about/schoolboard">{{ $t("school_board") }}</router-link></li>
-            <li><router-link to="/about/parentscouncil">{{ $t("parents_council") }}</router-link></li>
-            <li><router-link to="/about/pepsi">{{ $t("services") }}</router-link></li>
-            <li><router-link to="/about/workers">{{ $t("workers") }}</router-link></li>
-            <li><router-link to="/about/classlist">{{ $t("classlist") }}</router-link></li>
-          </template>
-        </NavigationDropdown>
+        <!-- Desktop Menu -->
+        <template v-else>
+          <!-- Home Link -->
+          <router-link
+            to="/home"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
+                   hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
+                   shadow-md shadow-transparent hover:shadow-sky-500/10
+                   text-gray-800 dark:text-white
+                   relative overflow-hidden"
+          >
+            {{ $t('home') }}
+          </router-link>
 
-        <!-- Education Dropdown -->
-        <div class="dropdown dropdown-hover">
-          <div
-            tabindex="0"
-            role="button"
-            class="btn btn-ghost cursor-pointer dark:text-white"
-          >
-            {{ $t('education') }} <i class="pi pi-angle-down"></i>
-          </div>
-          <ul
-            tabindex="0"
-            class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-box block w-52"
-          >
+          <!-- About Us Dropdown -->
+          <GlassDropdown :label="$t('aboutus')">
+            <GlassDropdownItem to="/renderer/about/history" :label="$t('history_of_school')" />
+            <GlassDropdownItem to="/about/schoolboard" :label="$t('school_board')" />
+            <GlassDropdownItem to="/about/parentscouncil" :label="$t('parents_council')" />
+            <GlassDropdownItem to="/about/pepsi" :label="$t('services')" />
+            <GlassDropdownItem
+              v-for="about in getAboutItems()"
+              :key="about.id"
+              :to="'/renderer/about/' + about.id"
+              :label="about.title"
+            />
+            <GlassDropdownItem to="/about/workers" :label="$t('workers')" />
+            <GlassDropdownItem to="/about/classlist" :label="$t('classlist')" />
+          </GlassDropdown>
+
+          <!-- Education Dropdown -->
+          <GlassDropdown :label="$t('education')">
             <!-- Courses submenu -->
-            <li>
-              <details
-                :class="{ 'dropdown-right': !isMobileView }"
-                class="dropdown dropdown-hover"
-              >
-                <summary>{{ $t("courses") }}</summary>
-                <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                  <!-- Machine courses -->
-                  <li>
-                    <details
-                      :class="{ 'dropdown-right': !isMobileView }"
-                      class="dropdown dropdown-hover"
-                    >
-                      <summary>{{ $t("machine") }}</summary>
-                      <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                        <li><router-link to="/renderer/education/mechanical_technician">{{ $t("mechanical_technician") }}</router-link></li>
-                        <li><router-link to="/renderer/education/cnc_miller">{{ $t("cnc_miller") }}</router-link></li>
-                      </ul>
-                    </details>
-                  </li>
+            <GlassNestedDropdown :label="$t('courses')">
+              <!-- Machine courses -->
+              <GlassNestedDropdown :label="$t('machine')" :z-index="400">
+                <GlassDropdownItem to="/renderer/education/mechanical_technician" :label="$t('mechanical_technician')" />
+                <GlassDropdownItem to="/renderer/education/cnc_miller" :label="$t('cnc_miller')" />
+              </GlassNestedDropdown>
 
-                  <!-- Electrotechnics courses -->
-                  <li>
-                    <details
-                      :class="{ 'dropdown-right': !isMobileView }"
-                      class="dropdown dropdown-hover"
-                    >
-                      <summary>{{ $t("electrotechnic") }}</summary>
-                      <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                        <li><router-link to="/renderer/education/mechatronic_technician">{{ $t("mechatronic_technician") }}</router-link></li>
-                        <li><router-link to="/renderer/education/computer_electrotechnician">{{ $t("computer_electrotechnician") }}</router-link></li>
-                      </ul>
-                    </details>
-                  </li>
+              <!-- Electrotechnics courses -->
+              <GlassNestedDropdown :label="$t('electrotechnic')" :z-index="400">
+                <GlassDropdownItem to="/renderer/education/mechatronic_technician" :label="$t('mechatronic_technician')" />
+                <GlassDropdownItem to="/renderer/education/computer_electrotechnician" :label="$t('computer_electrotechnician')" />
+              </GlassNestedDropdown>
 
-                  <!-- Civil engineering courses -->
-                  <li>
-                    <details
-                      :class="{ 'dropdown-right': !isMobileView }"
-                      class="dropdown dropdown-hover"
-                    >
-                      <summary>{{ $t("civil_engineering") }}</summary>
-                      <ul class="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                        <li><router-link to="/renderer/education/primary_construction_works_operator">{{ $t("primary_construction_works_operator") }}</router-link></li>
-                      </ul>
-                    </details>
-                  </li>
-                </ul>
-              </details>
-            </li>
+              <!-- Civil engineering courses -->
+              <GlassNestedDropdown :label="$t('civil_engineering')" :z-index="400">
+                <GlassDropdownItem to="/renderer/education/primary_construction_works_operator" :label="$t('primary_construction_works_operator')" />
+              </GlassNestedDropdown>
+            </GlassNestedDropdown>
 
             <!-- Other education links -->
-            <li><router-link to="/about/timetable">{{ $t("timetable") }}</router-link></li>
-            <li><router-link to="/about/workerstimetable">{{ $t("teachers_receiving_hour") }}</router-link></li>
-            <li><router-link to="/about/parentvisiting">{{ $t("parentsvisiting") }}</router-link></li>
-            <li><router-link to="/renderer/education/examslist">{{ $t("examslist") }}</router-link></li>
-            <li><router-link to="/renderer/education/textbooks">{{ $t("textbooks") }}</router-link></li>
-          </ul>
-        </div>
+            <GlassDropdownItem to="/about/timetable" :label="$t('timetable')" />
+            <GlassDropdownItem to="/about/workerstimetable" :label="$t('teachers_receiving_hour')" />
+            <GlassDropdownItem to="/about/parentvisiting" :label="$t('parentsvisiting')" />
+            <GlassDropdownItem to="/renderer/education/examslist" :label="$t('examslist')" />
+            <GlassDropdownItem to="/renderer/education/textbooks" :label="$t('textbooks')" />
+          </GlassDropdown>
 
-        <!-- Gallery Link -->
-        <router-link
-          to="/gallery"
-          class="btn btn-ghost cursor-pointer dark:text-white"
-        >
-          {{ $t('gallery') }}
-        </router-link>
+          <!-- Gallery Link -->
+          <router-link
+            to="/gallery"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
+                   hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
+                   shadow-md shadow-transparent hover:shadow-sky-500/10
+                   text-gray-800 dark:text-white
+                   relative overflow-hidden"
+          >
+            {{ $t('gallery') }}
+          </router-link>
 
-        <!-- For Students Dropdown -->
-        <NavigationDropdown
-          :title="$t('for_students')"
-          :items="getStudentItems()"
-          route-prefix="/renderer/students/"
-          tracking-category="students"
-        >
-          <template #custom-items>
-            <li><router-link to="/about/studentcouncil">{{ $t("student_parliament") }}</router-link></li>
-            <li><router-link to="/studentdocuments">{{ $t("studentdocuments") }}</router-link></li>
-            <li><a href="https://moodle.tsada.edu.rs">{{ $t("eclassroom") }}</a></li>
-          </template>
-        </NavigationDropdown>
+          <!-- For Students Dropdown -->
+          <GlassDropdown :label="$t('for_students')">
+            <GlassDropdownItem to="/about/studentcouncil" :label="$t('student_parliament')" />
+            <GlassDropdownItem
+              v-for="student in getStudentItems()"
+              :key="student.id"
+              :to="'/renderer/students/' + student.id"
+              :label="student.name"
+            />
+            <GlassDropdownItem to="/studentdocuments" :label="$t('studentdocuments')" />
+            <GlassDropdownItem href="https://moodle.tsada.edu.rs" :label="$t('eclassroom')" />
+          </GlassDropdown>
 
-        <!-- Documents Dropdown -->
-        <NavigationDropdown
-          :title="$t('documents')"
-          :items="getDocumentCategories()"
-          route-prefix="/renderer/documents/"
-          tracking-category="documents"
-        >
-          <template #custom-items>
-            <li><router-link to="/documents">{{ $t("school_documents") }}</router-link></li>
-            <li><router-link to="/docs/public_procurements">{{ $t("public_procurements") }}</router-link></li>
-            <li><router-link to="/docs/leases">{{ $t("lease") }}</router-link></li>
-          </template>
-        </NavigationDropdown>
+          <!-- Documents Dropdown -->
+          <GlassDropdown :label="$t('documents')">
+            <GlassDropdownItem to="/documents" :label="$t('school_documents')" />
+            <GlassDropdownItem to="/docs/public_procurements" :label="$t('public_procurements')" />
+            <GlassDropdownItem to="/docs/leases" :label="$t('lease')" />
+            <GlassDropdownItem to="/renderer/education/67b4d43f0017f6a974b8" :label="$t('duplicates_of_diplomas')" />
+          </GlassDropdown>
 
-        <!-- Erasmus Dropdown (conditionally shown) -->
-        <NavigationDropdown
-          v-if="showErasmusFlag && getErasmusItems().length > 0"
-          title="Erasmus+"
-          :items="getErasmusItems()"
-          route-prefix="/renderer/erasmus/"
-          tracking-category="erasmus"
-        >
-          <template #custom-items>
-            <li v-if="showErasmusApply">
-              <router-link to="/erasmus/apply">{{ $t("erasmus_apply") }}</router-link>
-            </li>
-          </template>
-        </NavigationDropdown>
+          <!-- Adult Education -->
+          <router-link
+            to="/renderer/education/adult_education"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
+                   hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
+                   shadow-md shadow-transparent hover:shadow-sky-500/10
+                   text-gray-800 dark:text-white
+                   relative overflow-hidden"
+          >
+            {{ $t('adult_education') }}
+          </router-link>
 
-        <!-- User Menu and Language Selector -->
-        <div class="flex items-center gap-2 ml-4">
-          <LanguageSelector
-            :languages="state.languages"
-            :current-language="state.currentLanguage"
-            :current-flag="state.currentFlag"
-            @language-change="changeLanguage"
-          />
+          <!-- Erasmus Dropdown -->
+          <GlassDropdown :label="$t('Erasmus')">
+            <GlassDropdownItem
+              v-for="erasmus in getErasmusItems()"
+              :key="erasmus.id"
+              :to="'/renderer/erasmus/' + erasmus.id"
+              :label="erasmus.name"
+            />
+            <GlassDropdownItem v-if="showErasmusApply" to="/erasmus/apply" :label="$t('erasmus_apply')" />
+            <GlassDropdownItem v-if="state.navigationData?.erasmusSettings.list_enabled" to="/erasmus/results" :label="$t('erasmus_applies_result')" />
+            <GlassDropdownItem v-if="isAuthenticated" to="/admin/erasmus/applies" :label="$t('erasmus_applies')" />
+          </GlassDropdown>
 
-          <UserMenu
-            :is-authenticated="isAuthenticated"
-            :show-profile="false"
-            :show-settings="false"
-            @logout="logout"
-          />
-        </div>
+          <!-- Language Selector Desktop -->
+          <GlassDropdown>
+            <template #trigger>
+              <country-flag :country="state.currentFlag" size="small" />
+            </template>
+            <GlassDropdownItem
+              v-for="lang in state.languages"
+              :key="lang.code"
+              :action="() => changeLanguage(lang.code)"
+            >
+              <country-flag :country="lang.country" size="small" />
+              {{ lang.name }}
+            </GlassDropdownItem>
+          </GlassDropdown>
+
+          <!-- Account Menu (Logged In) -->
+          <GlassDropdown v-if="isAuthenticated" :label="$t('account')">
+            <GlassDropdownItem to="/admin/messages" :label="$t('messages')" />
+            <GlassDropdownItem to="/admin/slide-editor" :label="$t('presentation_editor')" />
+            <GlassDropdownItem :action="logout" :label="$t('logout')" />
+          </GlassDropdown>
+
+          <!-- Login (Not Logged In) -->
+          <router-link
+            v-else
+            to="/login"
+            class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
+                   hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
+                   shadow-md shadow-transparent hover:shadow-sky-500/10
+                   text-gray-800 dark:text-white
+                   relative overflow-hidden"
+          >
+            {{ $t('login') }}
+          </router-link>
+        </template>
       </nav>
     </div>
 
@@ -253,75 +246,176 @@
   </header>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useHeader } from '@/composables/ui/useHeader'
-import NavigationDropdown from '@/components/navigation/NavigationDropdown.vue'
-import LanguageSelector from '@/components/navigation/LanguageSelector.vue'
 import MobileMenuButton from '@/components/navigation/MobileMenuButton.vue'
-import UserMenu from '@/components/navigation/UserMenu.vue'
-import Certop from '@/components/shared/Certop.vue'
+import AccordionMenu from '@/components/navigation/AccordionMenu.vue'
+import GlassDropdown from '@/components/navigation/GlassDropdown.vue'
+import GlassDropdownItem from '@/components/navigation/GlassDropdownItem.vue'
+import GlassNestedDropdown from '@/components/navigation/GlassNestedDropdown.vue'
+import Certop from '@/components/Certop.vue'
+ import { useLoadingStore } from '@/stores/loading';
 
-export default defineComponent({
-  name: 'HeaderModular',
-  components: {
-    NavigationDropdown,
-    LanguageSelector,
-    MobileMenuButton,
-    UserMenu,
-    Certop
-  },
-  setup() {
-    const {
-      // State
-      state,
+const { t } = useI18n()
 
-      // Computed
-      isAuthenticated,
-      isMobileView,
-      isTabletMode,
-      isMobileMode,
-      showErasmusFlag,
-      showErasmusApply,
-      showEuFunding,
+const {
+  // State
+  state,
 
-      // Methods
-      toggleMobileMenu,
-      changeLanguage,
-      logout,
+  // Computed
+  isAuthenticated,
+  isMobileView,
+  isTabletMode,
+  showErasmusApply,
+  //showEuFunding,
 
-      // Menu getters
-      getDocumentCategories,
-      getAboutItems,
-      getErasmusItems,
-      getStudentItems
-    } = useHeader()
+  // Methods
+  toggleMobileMenu,
+  closeMobileMenu,
+  changeLanguage,
+  logout,
 
-    return {
-      // State
-      state,
+  // Menu getters
+  getAboutItems,
+  getErasmusItems,
+  getStudentItems
+} = useHeader()
 
-      // Computed
-      isAuthenticated,
-      isMobileView,
-      isTabletMode,
-      isMobileMode,
-      showErasmusFlag,
-      showErasmusApply,
-      showEuFunding,
+const loading=  useLoadingStore();
+// Additional computed
+const showMobileMenu = computed(() => (state.mobileMenuOpen && isMobileView.value) || !isMobileView.value)
+const styleComputedForMobile = computed(() => isMobileView.value && !showMobileMenu.value)
+const showEuFunding = computed(() => loading.currentPageEuFunding)
 
-      // Methods
-      toggleMobileMenu,
-      changeLanguage,
-      logout,
 
-      // Menu getters
-      getDocumentCategories,
-      getAboutItems,
-      getErasmusItems,
-      getStudentItems
+// Mobile menu items structure
+const mobileMenuItems = computed(() => {
+  const items = [
+    {
+      label: t('home'),
+      to: '/home'
+    },
+    {
+      label: t('aboutus'),
+      children: [
+        { label: t('history_of_school'), to: '/renderer/about/history' },
+        { label: t('school_board'), to: '/about/schoolboard' },
+        { label: t('parents_council'), to: '/about/parentscouncil' },
+        { label: t('services'), to: '/about/pepsi' },
+        ...getAboutItems().map(item => ({
+          label: item.title,
+          to: `/renderer/about/${item.id}`
+        })),
+        { label: t('workers'), to: '/about/workers' },
+        { label: t('classlist'), to: '/about/classlist' }
+      ]
+    },
+    {
+      label: t('education'),
+      children: [
+        {
+          label: t('courses'),
+          children: [
+            {
+              label: t('machine'),
+              children: [
+                { label: t('mechanical_technician'), to: '/renderer/education/mechanical_technician' },
+                { label: t('cnc_miller'), to: '/renderer/education/cnc_miller' }
+              ]
+            },
+            {
+              label: t('electrotechnic'),
+              children: [
+                { label: t('mechatronic_technician'), to: '/renderer/education/mechatronic_technician' },
+                { label: t('computer_electrotechnician'), to: '/renderer/education/computer_electrotechnician' }
+              ]
+            },
+            {
+              label: t('civil_engineering'),
+              children: [
+                { label: t('primary_construction_works_operator'), to: '/renderer/education/primary_construction_works_operator' }
+              ]
+            }
+          ]
+        },
+        { label: t('timetable'), to: '/about/timetable' },
+        { label: t('teachers_receiving_hour'), to: '/about/workerstimetable' },
+        { label: t('parentsvisiting'), to: '/about/parentvisiting' },
+        { label: t('examslist'), to: '/renderer/education/examslist' },
+        { label: t('textbooks'), to: '/renderer/education/textbooks' }
+      ]
+    },
+    {
+      label: t('gallery'),
+      to: '/gallery'
+    },
+    {
+      label: t('for_students'),
+      children: [
+        { label: t('student_parliament'), to: '/about/studentcouncil' },
+        ...getStudentItems().map(item => ({
+          label: item.name || item.title,
+          to: `/renderer/students/${item.id}`
+        })),
+        { label: t('studentdocuments'), to: '/studentdocuments' },
+        { label: t('eclassroom'), href: 'https://moodle.tsada.edu.rs' }
+      ]
+    },
+    {
+      label: t('documents'),
+      children: [
+        { label: t('school_documents'), to: '/documents' },
+        { label: t('public_procurements'), to: '/docs/public_procurements' },
+        { label: t('lease'), to: '/docs/leases' },
+        { label: t('duplicates_of_diplomas'), to: '/renderer/education/67b4d43f0017f6a974b8' }
+      ]
+    },
+    {
+      label: t('adult_education'),
+      to: '/renderer/education/adult_education'
+    },
+    {
+      label: t('Erasmus'),
+      children: [
+        ...getErasmusItems().map(item => ({
+          label: item.name || item.title,
+          to: `/renderer/erasmus/${item.id}`
+        })),
+        ...(showErasmusApply.value ? [{ label: t('erasmus_apply'), to: '/erasmus/apply' }] : []),
+        ...(state.navigationData?.erasmusSettings.list_enabled ? [{ label: t('erasmus_applies_result'), to: '/erasmus/results' }] : []),
+        ...(isAuthenticated.value ? [{ label: t('erasmus_applies'), to: '/admin/erasmus/applies' }] : [])
+      ]
+    },
+    {
+      label: t('language'),
+      children: state.languages.map(lang => ({
+        label: lang.name,
+        flag: lang.country,
+        action: () => changeLanguage(lang.code)
+      }))
     }
+  ]
+
+  // Add account menu if authenticated
+  if (isAuthenticated.value) {
+    items.push({
+      label: t('account'),
+      children: [
+        { label: t('messages'), to: '/admin/messages' },
+        { label: t('presentation_editor'), to: '/admin/slide-editor' },
+        { label: t('logout'), action: logout }
+      ]
+    })
+  } else {
+    items.push({
+      label: t('login'),
+      to: '/login'
+    })
   }
+
+  return items
 })
 </script>
 

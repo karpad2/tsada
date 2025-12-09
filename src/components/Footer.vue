@@ -14,7 +14,10 @@
           <div>App version: {{ _version }}</div>
         </div>
   
-        <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
+        <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start items-center gap-4">
+          <!-- EU Funding Logo -->
+          <Certop v-if="showEuFunding" class="h-16 w-16" />
+
           <a href="https://www.facebook.com/p/Msc-Kultura-100063626860924" aria-label="Facebook" class="ml-2 text-gray-400 hover:text-sky-400">
             <i class="pi pi-facebook"></i>
           </a>
@@ -29,11 +32,10 @@
           </a>
   
           <!-- Dark/Light Mode Toggle -->
-          <label  class="swap theme-controller swap-rotate ml-2 text-gray-400 hover:text-sky-400">
-            <input type="checkbox" value="synthwave" @change="toggleDarkMode" :checked="isDarkMode" />
-            <i class="swap-off pi pi-sun"></i>
-            <i class="swap-on pi pi-moon"></i>
-          </label>
+          <button @click="toggleDarkMode" class="ml-2 text-gray-400 hover:text-sky-400 cursor-pointer transition-colors">
+            <i v-if="isDarkMode" class="pi pi-moon"></i>
+            <i v-else class="pi pi-sun"></i>
+          </button>
   
     <!-- Optional random theme trigger -->
           <div v-if="false"  class="ml-2 text-gray-400 hover:text-sky-400 dropdown dropdown-top dropdown-hover">
@@ -92,16 +94,18 @@
   
   <script>
   import Cookie from "@/components/Cookie.vue";
+  import Certop from "@/components/Certop.vue";
   import moment from "moment";
   import vv from "../../package.json";
   import { useTheme } from "vuetify";
   import themes from "@/themes/store.json";
   import { useLoadingStore } from "@/stores/loading";
-  
+
   export default {
     name: "Footer",
     components: {
       Cookie,
+      Certop,
     },
     data() {
       return {
@@ -118,6 +122,10 @@
       },
       _version() {
         return vv.version;
+      },
+      showEuFunding() {
+        const loadingStore = useLoadingStore();
+        return loadingStore.currentPageEuFunding;
       },
     },
     mounted() {
