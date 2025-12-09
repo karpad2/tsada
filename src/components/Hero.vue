@@ -36,7 +36,7 @@
 
 <script>
 import VideoBackground from 'vue-responsive-video-background-player';
-import { Client, Databases, Storage } from 'appwrite';
+import { Client, Databases, Storage, Query } from 'appwrite';
 import { appw, config, randomIntFromInterval } from '@/appwrite';
 import gsap from 'gsap';
 
@@ -67,7 +67,11 @@ export default {
       try {
         const database = new Databases(appw);
         const storage = new Storage(appw);
-        const { documents } = await database.listDocuments(config.website_db, config.hero_videos);
+        const { documents } = await database.listDocuments(
+          config.website_db,
+          config.hero_videos,
+          [Query.select(['link', '$id'])]
+        );
         if (documents.length > 0) {
           const k = randomIntFromInterval(0, documents.length - 1);
           this.integrated_video = documents[k].link;
