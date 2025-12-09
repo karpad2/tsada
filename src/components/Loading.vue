@@ -36,6 +36,38 @@
 // i18n is globally available via $t in template
 </script>
 
+<style>
+/* Dark mode styles - unscoped to work with html.dark */
+html.dark .loading-container {
+    background: #1a1a1a !important;
+}
+
+html.dark .skeleton-logo {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+html.dark .skeleton-nav-item {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+html.dark .skeleton-title {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+html.dark .skeleton-text {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+html.dark .skeleton-card {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background-size: 200% 100% !important;
+}
+</style>
+
 <style scoped>
 .loading-container {
     display: flex;
@@ -44,12 +76,6 @@
     min-height: 100vh;
     background: #f9fafb;
     padding: 20px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .loading-container {
-        background: #1a1a1a;
-    }
 }
 
 .skeleton-wrapper {
@@ -75,13 +101,6 @@
     border-radius: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .skeleton-logo {
-        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        background-size: 200% 100%;
-    }
-}
-
 .skeleton-nav {
     display: flex;
     gap: 20px;
@@ -94,13 +113,6 @@
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 4px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .skeleton-nav-item {
-        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        background-size: 200% 100%;
-    }
 }
 
 /* Content skeleton */
@@ -118,13 +130,6 @@
     margin-bottom: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .skeleton-title {
-        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        background-size: 200% 100%;
-    }
-}
-
 .skeleton-text {
     width: 100%;
     height: 20px;
@@ -137,13 +142,6 @@
 
 .skeleton-text.short {
     width: 70%;
-}
-
-@media (prefers-color-scheme: dark) {
-    .skeleton-text {
-        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        background-size: 200% 100%;
-    }
 }
 
 .skeleton-grid {
@@ -159,13 +157,6 @@
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 12px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .skeleton-card {
-        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-        background-size: 200% 100%;
-    }
 }
 
 .loading-text {

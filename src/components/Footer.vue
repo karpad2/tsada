@@ -15,8 +15,8 @@
         </div>
   
         <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start items-center gap-4">
-          <!-- EU Funding Logo -->
-          <Certop v-if="showEuFunding" class="h-16 w-16" />
+          
+         
 
           <a href="https://www.facebook.com/p/Msc-Kultura-100063626860924" aria-label="Facebook" class="ml-2 text-gray-400 hover:text-sky-400">
             <i class="pi pi-facebook"></i>
