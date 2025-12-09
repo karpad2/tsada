@@ -12,10 +12,11 @@
           <!-- Slide Content with Image and Text -->
           <div class="flex flex-wrap items-center justify-center w-full max-w-5xl">
             <div v-if="slides[currentSlide].image" class="w-full md:w-1/2 p-4">
-              <img 
-                :src="slides[currentSlide].image" 
-                alt="Slide Image" 
+              <img
+                :src="slides[currentSlide].image"
+                alt="Slide Image"
                 class="object-cover w-full h-96 rounded-lg shadow-lg"
+                loading="lazy"
               />
             </div>
             <div :class="[slides[currentSlide].image ? 'w-full md:w-1/2' : 'w-full']" class="p-4">
@@ -29,7 +30,7 @@
 
     <!-- News Ticker -->
     <div class="absolute bottom-0 w-full bg-gray-800 text-white flex items-center py-6 px-8">
-      <img src="@/assets/tsada_logo.png" alt="School Logo" class="h-16 w-auto mr-6" />
+      <img src="@/assets/tsada_logo.png" alt="School Logo" class="h-16 w-auto mr-6" loading="lazy" width="64" height="64" />
       <div class="flex overflow-hidden whitespace-nowrap animate-marquee space-x-12">
         <div v-for="(news, index) in newsItems" :key="index" class="flex-shrink-0 text-3xl">
           {{ news }}

@@ -27,6 +27,9 @@
             src="@a/tsada_logo.png"
             alt="logo"
             class="size-20 text-white p-1 bg-sky-400/15 rounded-full"
+            loading="lazy"
+            width="80"
+            height="80"
           />
           <span class="ml-1 max-sm:hidden text-xl dark:text-white">
             {{ $t('school_name') }}
@@ -38,6 +41,9 @@
             src="@a/Erasmus_Logo.svg"
             alt="erasmus+"
             class="w-36 h-12 text-white p-2"
+            loading="lazy"
+            width="144"
+            height="48"
           />
 
           <img
@@ -45,6 +51,9 @@
             src="@a/eu_co_funded.png"
             alt="Co-funded by the European Union"
             class="w-32 h-12 text-white p-1"
+            loading="lazy"
+            width="128"
+            height="48"
           />
         </router-link>
       </div>
