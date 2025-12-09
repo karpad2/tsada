@@ -110,7 +110,6 @@
     import {convertifserbian} from "@/lang";
     import moment from "moment";
     import gsap from "gsap";
-import { AgXToneMapping, CubeCamera } from "three";
 import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
     
     export default {

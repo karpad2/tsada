@@ -140,6 +140,42 @@ export default defineConfig({
             return 'vendor-three';
           }
 
+          // Rich text editors (large, rarely used together)
+          if (id.includes('node_modules/ckeditor') ||
+              id.includes('node_modules/@ckeditor') ||
+              id.includes('node_modules/@mayasabha')) {
+            return 'vendor-ckeditor';
+          }
+          if (id.includes('node_modules/@vueup/vue-quill') ||
+              id.includes('node_modules/quill')) {
+            return 'vendor-quill';
+          }
+
+          // UI Framework
+          if (id.includes('node_modules/vuestic')) {
+            return 'vendor-vuestic';
+          }
+
+          // Video components
+          if (id.includes('node_modules/vue-responsive-video')) {
+            return 'vendor-video';
+          }
+
+          // PDF & Canvas utilities (large, rarely needed on initial load)
+          if (id.includes('node_modules/html2canvas') ||
+              id.includes('node_modules/jspdf')) {
+            return 'vendor-pdf';
+          }
+
+          // Other utilities
+          if (id.includes('node_modules/@fireworks-js')) {
+            return 'vendor-fireworks';
+          }
+          if (id.includes('node_modules/@ipaat') ||
+              id.includes('node_modules/@kyvg')) {
+            return 'vendor-ui-extras';
+          }
+
           // All other node_modules
           if (id.includes('node_modules/')) {
             return 'vendor-misc';
