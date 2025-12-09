@@ -77,12 +77,73 @@ export default defineConfig({
   },
   build: {
     target: 'esnext', // Support modern features including top-level await
+    chunkSizeWarningLimit: 600, // Temporary increase while optimizing
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': ['vue', 'vue-router', 'pinia'],
-          'ui': ['vuetify'],
-          'appwrite': ['appwrite']
+        manualChunks(id) {
+          // Core Vue ecosystem
+          if (id.includes('node_modules/vue/') ||
+              id.includes('node_modules/@vue/') ||
+              id.includes('node_modules/vue-router') ||
+              id.includes('node_modules/pinia')) {
+            return 'vendor-vue';
+          }
+
+          // UI Libraries
+          if (id.includes('node_modules/vuetify')) {
+            return 'vendor-vuetify';
+          }
+          if (id.includes('node_modules/primevue') ||
+              id.includes('node_modules/@primevue')) {
+            return 'vendor-primevue';
+          }
+
+          // Backend/API
+          if (id.includes('node_modules/appwrite')) {
+            return 'vendor-appwrite';
+          }
+
+          // Animations & Effects
+          if (id.includes('node_modules/gsap')) {
+            return 'vendor-gsap';
+          }
+          if (id.includes('node_modules/@tsparticles') ||
+              id.includes('node_modules/tsparticles')) {
+            return 'vendor-particles';
+          }
+
+          // i18n
+          if (id.includes('node_modules/vue-i18n') ||
+              id.includes('node_modules/@intlify')) {
+            return 'vendor-i18n';
+          }
+
+          // Utilities
+          if (id.includes('node_modules/moment')) {
+            return 'vendor-moment';
+          }
+          if (id.includes('node_modules/axios')) {
+            return 'vendor-axios';
+          }
+
+          // Viewers & Media
+          if (id.includes('node_modules/v-viewer') ||
+              id.includes('node_modules/viewerjs')) {
+            return 'vendor-viewer';
+          }
+          if (id.includes('node_modules/swiper')) {
+            return 'vendor-swiper';
+          }
+
+          // Other large dependencies
+          if (id.includes('node_modules/three')) {
+            return 'vendor-three';
+          }
+
+          // All other node_modules
+          if (id.includes('node_modules/')) {
+            return 'vendor-misc';
+          }
         }
       }
     }
