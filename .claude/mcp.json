@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "appwrite-api": {
+      "command": "uvx",
+      "args": ["mcp-server-appwrite"],
+      "env": {
+        "APPWRITE_ENDPOINT": "https://appwrite.tsada.edu.rs/v1",
+        "APPWRITE_PROJECT_ID": "659ea7f886cf55d4528a",
+        "APPWRITE_API_KEY": "YOUR_API_KEY_HERE"
+      },
+      "description": "Appwrite API MCP server - direct access to Appwrite databases, users, functions, teams"
+    },
+    "appwrite-docs": {
+      "command": "npx",
+      "args": ["-y", "@smithery/mcp-server-appwrite-docs"],
+      "description": "Appwrite documentation MCP server - provides access to Appwrite docs, SDK examples, and API references"
+    }
+  }
+}

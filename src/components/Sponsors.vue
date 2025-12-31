@@ -141,11 +141,11 @@ export default {
         const collectionId = this.isSponsorsMode ? config.sponsors_db : config.usefullinks;
         const imageField = this.isSponsorsMode ? 'sponsor_img' : 'logo';
         const linkField = this.isSponsorsMode ? 'sponsor_url' : 'link';
-        const titleField = this.isSponsorsMode ? 'sponsor_name' : 'name';
+        
 
         const selectFields = this.isSponsorsMode
-          ? ['sponsor_name', 'sponsor_url', 'sponsor_img', '$id']
-          : ['name', 'link', 'logo', '$id'];
+          ? [ 'sponsor_url', 'sponsor_img', '$id']
+          : [ 'link', 'logo', '$id'];
 
         const { documents } = await database.listDocuments(config.website_db, collectionId, [
           Query.select(selectFields),
@@ -154,7 +154,7 @@ export default {
 
         this.links = documents.map((doc) => ({
           id: doc.$id,
-          title: doc[titleField] || '',
+          //title: doc[titleField] || '',
           link: doc[linkField],
           img: storage.getFilePreview(
             config.website_images,

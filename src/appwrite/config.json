@@ -40,7 +40,9 @@
     "parliament_members":"68c17ee1000cf42b8b76",
     "parent_council_members":"68c48971000e22c04756",
     "school_board":"68c55bb4000d6f5f630e",
-    "services":"68c692da001074b6c9fb"
+    "services":"68c692da001074b6c9fb",
+    "push_subscriptions":"PLACEHOLDER_PUSH_SUBS",
+    "push_notifications_log":"PLACEHOLDER_PUSH_LOG"
 
 
 }

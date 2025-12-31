@@ -140,12 +140,9 @@ export default defineConfig({
             return 'vendor-three';
           }
 
-          // Rich text editors (large, rarely used together)
-          if (id.includes('node_modules/ckeditor') ||
-              id.includes('node_modules/@ckeditor') ||
-              id.includes('node_modules/@mayasabha')) {
-            return 'vendor-ckeditor';
-          }
+          // Rich text editors
+          // NOTE: CKEditor has circular dependency issues when chunked separately
+          // Keep it in the main bundle or vendor-misc
           if (id.includes('node_modules/@vueup/vue-quill') ||
               id.includes('node_modules/quill')) {
             return 'vendor-quill';

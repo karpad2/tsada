@@ -183,12 +183,22 @@ export function createRouter() {
     {
       path:'/admin/erasmus/editapply/:id',
       name:'ErasmusApplyEdit',
-      component: () => import('../views/admin/erasmus/ErasmusApplyEdit.vue')      
+      component: () => import('../views/admin/erasmus/ErasmusApplyEdit.vue')
+    },
+    {
+      path:'/admin/notifications/send',
+      name:'send_notification',
+      component: () => import('../views/admin/notifications/SendNotification.vue')
+    },
+    {
+      path:'/admin/messaging',
+      name:'messaging_center',
+      component: () => import('../views/admin/notifications/MessagingCenter.vue')
     },
     {
       path:'/contact',
       name:'contact',
-      component: () => import('../views/Contact.vue')      
+      component: () => import('../views/Contact.vue')
     },
     {
       path:'/gallery',
@@ -335,6 +345,8 @@ router.afterEach((to, from) => {
       'gallery_editor': 'Uređivanje galerije ~ TSADA',
       'class_editor': 'Uređivanje klasa ~ TSADA',
       'slide_editor': 'Uređivanje slajdova ~ TSADA',
+      'send_notification': 'Push értesítések ~ TSADA',
+      'messaging_center': 'Appwrite Messaging ~ TSADA',
       'missingpage': 'Stranica nije pronađena ~ TSADA'
     };
 

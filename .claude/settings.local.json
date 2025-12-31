@@ -7,7 +7,11 @@
       "Bash(npm run build:*)",
       "Bash(timeout 180 npm run build:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(du -sh:*)",
+      "Bash(ls:*)",
+      "Bash(sort:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

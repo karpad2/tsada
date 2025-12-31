@@ -47,7 +47,7 @@
           />
 
           <img
-            v-if="showEuFunding"
+            v-if="showEuFunding || true"
             src="@a/eu_co_funded.png"
             alt="Co-funded by the European Union"
             class="w-32 h-12 text-white p-1"
