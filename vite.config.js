@@ -13,11 +13,16 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
+      // Inline mode to have more control over registration
+      injectRegister: 'auto',
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
-        skipWaiting: false,
-        clientsClaim: false,
+        // IMPORTANT: These settings prevent infinite reload loop
+        skipWaiting: false, // Don't auto-activate new SW - wait for user confirmation
+        clientsClaim: false, // Don't claim clients immediately - prevents force reload
+        // Navigation preload for faster page loads
+        navigationPreload: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,
