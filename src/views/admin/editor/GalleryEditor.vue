@@ -374,13 +374,13 @@ export default {
                 console.error('Error saving gallery:', error);
                 this.$notify({
                     type: 'error',
-                    text: 'Error saving gallery'
+                    text: this.$t('error_saving_gallery')
                 });
             }
         },
 
         async delete_content() {
-            if (!confirm('Are you sure you want to delete this gallery?')) {
+            if (!confirm(this.$t('confirm_delete_gallery'))) {
                 return;
             }
 
@@ -394,7 +394,7 @@ export default {
                 console.error('Error deleting gallery:', error);
                 this.$notify({
                     type: 'error',
-                    text: 'Error deleting gallery'
+                    text: this.$t('error_deleting_gallery')
                 });
             }
         },
@@ -451,7 +451,7 @@ export default {
                 this.uploading = false;
                 this.$notify({
                     type: 'error',
-                    text: 'Error uploading files'
+                    text: this.$t('error_uploading_files')
                 });
             }
         },
@@ -463,7 +463,7 @@ export default {
         },
 
         async delete_picture(aa: string, bb: string) {
-            if (!confirm('Are you sure you want to delete this image?')) {
+            if (!confirm(this.$t('confirm_delete_image'))) {
                 return;
             }
 
