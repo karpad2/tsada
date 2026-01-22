@@ -1,6 +1,6 @@
 {
   "name": "tsada",
-  "version": "1.2.0beta",
+  "version": "1.1.8beta",
   "private": true,
   "type": "module",
   "scripts": {
@@ -25,7 +25,7 @@
     "@primevue/themes": "^4.2.1",
     "@tsparticles/vue3": "^3.0.1",
     "@vueup/vue-quill": "^1.2.0",
-    "appwrite": "^20",
+    "appwrite": "^21.5.0",
     "axios": "^1.7.7",
     "express": "^4.21.1",
     "gsap": "^3.12.5",
@@ -50,6 +50,7 @@
     "vue-responsive-video-background-player": "^2.3.1",
     "vue-router": "^4.4.5",
     "vue3-lazyload": "^0.3.8",
+    "vuedraggable": "^4.1.0",
     "vuestic-ui": "^1.10.3"
   },
   "devDependencies": {
@@ -71,7 +72,8 @@
     "vite-plugin-vuetify": "^2.0.4",
     "vitest": "^3.2.4",
     "vue-cli-plugin-i18n": "~2.3.2",
-    "vuetify": "^3.7.4"
+    "vuetify": "^3.7.4",
+    "xlsx": "^0.18.5"
   },
   "description": "This template should help get you started developing with Vue 3 in Vite.",
   "main": "postcss.config.js",

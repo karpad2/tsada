@@ -60,6 +60,7 @@
 import { defineComponent } from 'vue';
 import { Client, Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
+import { loadRelations, commonRelations } from '@/appwrite/relationHelper';
 import { convertifserbian } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
 import Loading from '@/components/Loading.vue';
@@ -206,7 +207,12 @@ export default defineComponent({
           [Query.orderAsc('year'), Query.orderAsc('designation')]
         );
 
-        this.classes = documents.map((doc) => {
+        // Betöltjük a workers relációt (osztályfőnök adatai)
+        const docsWithRelations = await loadRelations(documents, [
+          { field: 'workers', collectionId: config.workers }
+        ]);
+
+        this.classes = docsWithRelations.map((doc) => {
           const worker = doc.workers;
           const chiefName =
             local === 'rs' || local === 'sr'

@@ -376,8 +376,8 @@ export default defineComponent({
     },
 
     courseopen(id: string) {
-      const path = id.toLowerCase().replaceAll(" ", "");
-      this.$router.push("/album/" + path);
+      // Az ID-t nem módosítjuk, mert az Appwrite ID-k case-sensitive-ek
+      this.$router.push("/album/" + id);
     },
 
     async new_stuff() {

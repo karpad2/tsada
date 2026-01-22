@@ -1,5 +1,6 @@
 {
     "website_db":"658d3bb1c4785b1fad28",
+    "erp_db":"696ff344002025b7ffe0",
     "mess_coll":"658d3c1031808d03b1e5",
     "website_images":"658d805ba6d15a0d3256",
     "main_page_gallery":"658d8f529368ca8ce991",
@@ -41,8 +42,26 @@
     "parent_council_members":"68c48971000e22c04756",
     "school_board":"68c55bb4000d6f5f630e",
     "services":"68c692da001074b6c9fb",
+    "forms":"68c9537b000253c3d145",
+    "form_submissions":"68c9546d003c5b58d161",
+    "content_backups":"68d6aac800130cdeafc4",
+    "document_videos":"673dff16002a5bc2b32c",
     "push_subscriptions":"PLACEHOLDER_PUSH_SUBS",
-    "push_notifications_log":"PLACEHOLDER_PUSH_LOG"
+    "push_notifications_log":"PLACEHOLDER_PUSH_LOG",
 
-
+    "erp_students":"students",
+    "erp_assessments_for_subjects":"assessments_for_subjects",
+    "erp_subject_types":"subject_types",
+    "erp_subjects":"subjects",
+    "erp_parents_of_students":"parents_of_students",
+    "erp_places":"places",
+    "erp_study_programs":"study_programs",
+    "erp_study_program_subjects":"study_program_subjects",
+    "erp_generations":"generations",
+    "erp_foreign_languages":"foreign_languages",
+    "erp_religion_options":"religion_options",
+    "erp_school_years":"school_years",
+    "erp_student_enrollments":"student_enrollments",
+    "erp_student_grades":"student_grades",
+    "erp_print_templates":"print_templates"
 }

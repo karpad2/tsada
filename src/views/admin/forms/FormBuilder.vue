@@ -239,6 +239,7 @@ import { useRoute, useRouter } from 'vue-router';
 import draggable from 'vuedraggable';
 import { FormsService, type Form, type FormField } from '@/services/forms/FormsService';
 import { nanoid } from 'nanoid';
+import FormFieldPreview from '@/components/forms/fields/FormFieldPreview.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -329,8 +330,7 @@ function getFieldTypeName(type: string): string {
 }
 
 function getFieldComponent(type: string) {
-  // Return preview component based on type
-  return 'div'; // Placeholder - you'd create actual preview components
+  return FormFieldPreview;
 }
 
 async function saveForm() {

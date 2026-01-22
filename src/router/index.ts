@@ -195,6 +195,54 @@ export function createRouter() {
       name:'messaging_center',
       component: () => import('../views/admin/notifications/MessagingCenter.vue')
     },
+    // Forms Admin Routes
+    {
+      path:'/admin/forms',
+      name:'forms_admin',
+      component: () => import('../views/admin/forms/FormsAdmin.vue')
+    },
+    {
+      path:'/admin/forms/edit/:id',
+      name:'form_builder',
+      component: () => import('../views/admin/forms/FormBuilder.vue')
+    },
+    {
+      path:'/admin/forms/responses/:id',
+      name:'form_responses',
+      component: () => import('../views/admin/forms/FormResponses.vue')
+    },
+    // Public Form View
+    {
+      path:'/forms/:id',
+      name:'form_view',
+      component: () => import('../views/forms/FormView.vue')
+    },
+    // ERP Admin Routes
+    {
+      path:'/admin/erp/subjects',
+      name:'erp_subjects_admin',
+      component: () => import('../views/admin/erp/SubjectsAdmin.vue')
+    },
+    {
+      path:'/admin/erp/study-programs',
+      name:'erp_study_programs_admin',
+      component: () => import('../views/admin/erp/StudyProgramsAdmin.vue')
+    },
+    {
+      path:'/admin/erp/class',
+      name:'erp_class_teacher',
+      component: () => import('../views/admin/erp/ClassTeacherDashboard.vue')
+    },
+    {
+      path:'/admin/erp/print',
+      name:'erp_print_manager',
+      component: () => import('../views/admin/erp/PrintManager.vue')
+    },
+    {
+      path:'/admin/erp/template-editor',
+      name:'erp_template_editor',
+      component: () => import('../views/admin/erp/TemplateEditor.vue')
+    },
     {
       path:'/contact',
       name:'contact',
@@ -347,6 +395,15 @@ router.afterEach((to, from) => {
       'slide_editor': 'Uređivanje slajdova ~ TSADA',
       'send_notification': 'Push értesítések ~ TSADA',
       'messaging_center': 'Appwrite Messaging ~ TSADA',
+      'forms_admin': 'Űrlapok kezelése ~ TSADA',
+      'form_builder': 'Űrlap szerkesztő ~ TSADA',
+      'form_responses': 'Űrlap válaszok ~ TSADA',
+      'form_view': 'Űrlap kitöltése ~ TSADA',
+      'erp_subjects_admin': 'Tantárgyak kezelése ~ TSADA',
+      'erp_study_programs_admin': 'Szakok kezelése ~ TSADA',
+      'erp_class_teacher': 'Osztályfőnöki felület ~ TSADA',
+      'erp_print_manager': 'Nyomtatás kezelő ~ TSADA',
+      'erp_template_editor': 'Sablon szerkesztő ~ TSADA',
       'missingpage': 'Stranica nije pronađena ~ TSADA'
     };
 

@@ -22,19 +22,59 @@ export class FileManager {
     private storage: Storage;
     private config: AppwriteConfig;
 
+    // Storage ID mapping - maps short names to actual bucket IDs
+    private readonly storageMap: Record<string, keyof AppwriteConfig> = {
+        'documents': 'documents_storage',
+        'documents_storage': 'documents_storage',
+        'images': 'website_images',
+        'website_images': 'website_images',
+        'gallery': 'gallery_pictures_storage',
+        'gallery_pictures_storage': 'gallery_pictures_storage',
+        'erasmus': 'fs_erasmus',
+        'fs_erasmus': 'fs_erasmus'
+    };
+
     constructor() {
         this.storage = appwriteService.getStorage();
         this.config = appwriteService.config;
     }
 
+    /**
+     * Resolves a storage ID to the actual bucket ID from config
+     * @param storageId - Short name (e.g., 'documents') or actual bucket ID
+     * @returns The actual Appwrite bucket ID
+     */
+    private resolveBucketId(storageId?: string): string {
+        // Handle undefined, null, or empty string
+        if (!storageId || storageId.trim() === '') {
+            return this.config.website_images;
+        }
+
+        // Check if it's a short name that needs mapping
+        const configKey = this.storageMap[storageId];
+        if (configKey && this.config[configKey]) {
+            return this.config[configKey] as string;
+        }
+
+        // If it looks like an actual bucket ID (20+ char alphanumeric string), use it directly
+        if (storageId.length >= 20 && /^[a-zA-Z0-9]+$/.test(storageId)) {
+            return storageId;
+        }
+
+        // Fallback to website_images if unknown
+        console.warn(`Unknown storage ID '${storageId}', using default bucket`);
+        return this.config.website_images;
+    }
+
     async uploadFile(options: FileUploadOptions): Promise<FileUploadResult> {
-        const { file, bucketId = this.config.website_images, onProgress, onSuccess, onError } = options;
+        const { file, bucketId, onProgress, onSuccess, onError } = options;
+        const resolvedBucketId = this.resolveBucketId(bucketId);
 
         try {
             this.validateFile(file);
 
             const fileId = ID.unique();
-            const result = await this.storage.createFile(bucketId, fileId, file);
+            const result = await this.storage.createFile(resolvedBucketId, fileId, file);
 
             const uploadResult: FileUploadResult = {
                 $id: result.$id,
@@ -77,9 +117,10 @@ export class FileManager {
 
     async uploadMultipleFiles(
         files: File[],
-        bucketId: string = this.config.website_images,
+        storageId?: string,
         onProgress?: (progress: number) => void
     ): Promise<FileUploadResult[]> {
+        const resolvedBucketId = this.resolveBucketId(storageId);
         const results: FileUploadResult[] = [];
         const totalFiles = files.length;
 
@@ -87,7 +128,7 @@ export class FileManager {
             try {
                 const result = await this.uploadFile({
                     file: files[i],
-                    bucketId,
+                    bucketId: resolvedBucketId,
                     onProgress: (fileProgress) => {
                         const overallProgress = Math.round(((i + fileProgress/100) / totalFiles) * 100);
                         if (onProgress) {
@@ -105,9 +146,10 @@ export class FileManager {
         return results;
     }
 
-    async deleteFile(fileId: string, bucketId: string = this.config.website_images): Promise<void> {
+    async deleteFile(fileId: string, storageId?: string): Promise<void> {
+        const resolvedBucketId = this.resolveBucketId(storageId);
         try {
-            await this.storage.deleteFile(bucketId, fileId);
+            await this.storage.deleteFile(resolvedBucketId, fileId);
 
             notify({
                 type: 'success',
@@ -128,28 +170,27 @@ export class FileManager {
 
     getFilePreview(
         fileId: string,
-        bucketId: string = this.config.website_images,
+        storageId?: string,
         width: number = 400,
-        height: number = 400,
-        gravity: string = 'center',
-        quality: number = 100
+        height: number = 400
     ): string {
+        const resolvedBucketId = this.resolveBucketId(storageId);
         return this.storage.getFilePreview(
-            bucketId,
+            resolvedBucketId,
             fileId,
             width,
-            height,
-            gravity,
-            quality
-        ).href;
+            height
+        );
     }
 
-    getFileView(fileId: string, bucketId: string = this.config.website_images): string {
-        return this.storage.getFileView(bucketId, fileId).href;
+    getFileView(fileId: string, storageId?: string): string {
+        const resolvedBucketId = this.resolveBucketId(storageId);
+        return this.storage.getFileView(resolvedBucketId, fileId);
     }
 
-    getFileDownload(fileId: string, bucketId: string = this.config.website_images): string {
-        return this.storage.getFileDownload(bucketId, fileId).href;
+    getFileDownload(fileId: string, storageId?: string): string {
+        const resolvedBucketId = this.resolveBucketId(storageId);
+        return this.storage.getFileDownload(resolvedBucketId, fileId);
     }
 
     private validateFile(file: File): void {

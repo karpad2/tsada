@@ -184,6 +184,7 @@
 <script lang="ts">
 import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
+import { loadRelations, commonRelations } from "@/appwrite/relationHelper";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
 import { setDocumentTitle } from "@/composables/useSEO";
@@ -339,7 +340,10 @@ export default {
           [Query.orderAsc("year"), Query.orderAsc("designation")]
         );
 
-        this.classes = response.documents.map(doc => {
+        // Betöltjük a workers és courses relációkat
+        const docsWithRelations = await loadRelations(response.documents, commonRelations.classes);
+
+        this.classes = docsWithRelations.map(doc => {
           // Fogadóórák feldolgozása
           let receiving_schedules: Schedule[] = [];
           try {
@@ -401,7 +405,9 @@ export default {
       const db = new Databases(appw);
       try {
         const response = await db.listDocuments(config.website_db, config.classlist);
-        const classesToUpdate: Class[] = [];
+        // A levelUpClasses-ben nem szükséges a relációkat betölteni,
+        // mert csak az évfolyamot frissítjük és töröljük a 4. éveseket
+        const classesToUpdate: string[] = [];
         const classesToDelete: string[] = [];
 
         for (const doc of response.documents) {
@@ -409,21 +415,16 @@ export default {
           if (currentYear >= 4) {
             classesToDelete.push(doc.$id);
           } else {
-            classesToUpdate.push({
-              id: doc.$id,
-              year: currentYear + 1,
-              designation: doc.designation,
-              role: doc.courses?.title_hu || doc.courses?.title_rs || doc.courses?.title_en || "",
-              chief: doc.workers?.worker_name_hu || convertifserbian(doc.workers?.worker_name_rs) || "",
-              language: doc.language,
-              receiving_hour: doc.receiving_hour || "",
-              receiving_schedules: [],
-            });
+            classesToUpdate.push(doc.$id);
           }
         }
 
-        for (const classItem of classesToUpdate) {
-          await db.updateDocument(config.website_db, config.classlist, classItem.id, { year: classItem.year });
+        // Frissítjük az évfolyamokat
+        for (const docId of classesToUpdate) {
+          const doc = response.documents.find(d => d.$id === docId);
+          if (doc) {
+            await db.updateDocument(config.website_db, config.classlist, docId, { year: doc.year + 1 });
+          }
         }
 
         for (const classId of classesToDelete) {

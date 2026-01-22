@@ -348,18 +348,30 @@ export default defineComponent({
     images(): string[] {
       return this.courses.map(course => course.img);
     },
-    
+
     currentImage() {
       return this.courses[this.currentImageIndex] || null;
     }
   },
-  
+
+  watch: {
+    // Ha az id prop később érkezik meg (pl. async route), akkor is betöltjük
+    id: {
+      immediate: false,
+      handler(newId) {
+        if (newId && this.courses.length === 0) {
+          this.loadCourses();
+        }
+      }
+    }
+  },
+
   mounted() {
     this.isAdmin = useLoadingStore().userLoggedin;
     this.loadCourses();
     window.addEventListener('scroll', this.handleScroll, { passive: true });
     window.addEventListener('keydown', this.handleKeydown);
-    
+
     // Touch event optimization
     document.addEventListener('touchstart', () => {}, { passive: true });
   },
@@ -371,7 +383,7 @@ export default defineComponent({
   
   methods: {
     async loadCourses() {
-      if (this.isLoading || this.noMoreImages) return;
+      if (this.isLoading || this.noMoreImages || !this.id) return;
       this.isLoading = true;
 
       try {
@@ -396,6 +408,7 @@ export default defineComponent({
           document.title = this.title;
         }
 
+        // A 'gallery' mező egy reláció - a Query.equal a kapcsolt dokumentum $id-jára működik
         const { documents } = await database.listDocuments(
           config.website_db,
           config.album_images,

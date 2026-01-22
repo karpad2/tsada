@@ -209,9 +209,20 @@
             </GlassDropdownItem>
           </GlassDropdown>
 
+          <!-- ERP Menu (Logged In) -->
+          <GlassDropdown v-if="isAuthenticated" :label="$t('erp_system')">
+            <GlassDropdownItem to="/admin/erp/class" :label="$t('erp_class_teacher')" />
+            <GlassDropdownItem to="/admin/erp/subjects" :label="$t('erp_subjects')" />
+            <GlassDropdownItem to="/admin/erp/study-programs" :label="$t('erp_study_programs')" />
+            <GlassDropdownItem to="/admin/erp/print" :label="$t('erp_print_manager')" />
+            <GlassDropdownItem to="/admin/erp/template-editor" :label="$t('erp_template_editor')" />
+          </GlassDropdown>
+
           <!-- Account Menu (Logged In) -->
-          <GlassDropdown v-if="isAuthenticated" :label="$t('account')">
+          <GlassDropdown v-if="isAuthenticated" :label="$t('admin_panel')">
             <GlassDropdownItem to="/admin/messages" :label="$t('messages')" />
+            <GlassDropdownItem to="/admin/messaging" :label="$t('messaging_center')" />
+            <GlassDropdownItem to="/admin/forms" :label="$t('forms_management')" />
             <GlassDropdownItem to="/admin/slide-editor" :label="$t('presentation_editor')" />
             <GlassDropdownItem :action="logout" :label="$t('logout')" />
           </GlassDropdown>
@@ -407,12 +418,24 @@ const mobileMenuItems = computed(() => {
     }
   ]
 
-  // Add account menu if authenticated
+  // Add ERP and account menus if authenticated
   if (isAuthenticated.value) {
     items.push({
-      label: t('account'),
+      label: t('erp_system'),
+      children: [
+        { label: t('erp_class_teacher'), to: '/admin/erp/class' },
+        { label: t('erp_subjects'), to: '/admin/erp/subjects' },
+        { label: t('erp_study_programs'), to: '/admin/erp/study-programs' },
+        { label: t('erp_print_manager'), to: '/admin/erp/print' },
+        { label: t('erp_template_editor'), to: '/admin/erp/template-editor' }
+      ]
+    })
+    items.push({
+      label: t('admin_panel'),
       children: [
         { label: t('messages'), to: '/admin/messages' },
+        { label: t('messaging_center'), to: '/admin/messaging' },
+        { label: t('forms_management'), to: '/admin/forms' },
         { label: t('presentation_editor'), to: '/admin/slide-editor' },
         { label: t('logout'), action: logout }
       ]

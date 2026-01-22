@@ -11,7 +11,20 @@
       "Bash(du -sh:*)",
       "Bash(ls:*)",
       "Bash(sort:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(uv --version:*)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(uvx mcp-server-appwrite:*)",
+      "Bash(python -m uv:*)",
+      "Bash(node scripts/fetch-db-schema.js:*)",
+      "Bash(node scripts/list-all-collections.js:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e \"\nconst fs = require\\(''fs''\\);\nconst mcpConfig = JSON.parse\\(fs.readFileSync\\(''.claude/mcp.json'', ''utf-8''\\)\\);\nconst apiKey = mcpConfig.mcpServers[''appwrite-api''].env.APPWRITE_API_KEY;\n\nconst ENDPOINT = ''https://appwrite.tsada.edu.rs/v1'';\nconst PROJECT_ID = ''659ea7f886cf55d4528a'';\n\nasync function listDatabases\\(\\) {\n    const response = await fetch\\(ENDPOINT + ''/databases'', {\n        headers: {\n            ''X-Appwrite-Project'': PROJECT_ID,\n            ''X-Appwrite-Key'': apiKey,\n            ''Content-Type'': ''application/json''\n        }\n    }\\);\n    const data = await response.json\\(\\);\n    console.log\\(''Databases found:'', data.total\\);\n    data.databases.forEach\\(db => {\n        console.log\\(''- '' + db.name + '' \\('' + db.$id + ''\\)''\\);\n    }\\);\n}\nlistDatabases\\(\\);\n\")"
     ],
     "deny": [],
     "ask": []
