@@ -2,6 +2,8 @@ import { createRouter as createVueRouter, createWebHistory, createMemoryHistory 
 import { useLoadingStore } from "@/stores/loading";
 import { trackPageView, trackNavigation, setUserProperties } from '@/utils/analytics';
 import { seoGuard } from './seoGuard';
+import { RoleService, ROUTE_PERMISSION_MAP } from '@/services/RoleService';
+import type { UserRole } from '@/services/RoleService';
 import HomeView from '../views/HomeView.vue'
 
 export function createRouter() {
@@ -109,60 +111,71 @@ export function createRouter() {
     {
       path:'/admin/edit/:mode/:id',
       name:'content_editor',
-      component: () => import('../views/admin/editor/ContentEditor.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/ContentEditor.vue')
     },
     {
       path:'/admin/worker/:id',
       name:'worker_editor',
-      component: () => import('../views/admin/editor/WorkerEditor.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/WorkerEditor.vue')
     },
     {
       path:'/admin/document/:id',
       name:'document_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/editor/DocumentEditor.vue'),
-      props:{modded:"documents_db"}       
+      props:{modded:"documents_db"}
     },
     {
       path:'/admin/text-document-editor/:id',
       name:'text_document_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/editor/DocumentEditor.vue'),
-      props:{modded:"text_documents"}      
+      props:{modded:"text_documents"}
     },
     {
       path:'/admin/studentdocument/:id',
       name:'student_document_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/editor/DocumentEditor.vue'),
-      props:{modded:"st_documents"}       
+      props:{modded:"st_documents"}
     },
     {
       path:'/admin/gallery-edit/:id',
       name:'gallery_editor',
-      component: () => import('../views/admin/editor/GalleryEditor.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'photographer'] },
+      component: () => import('../views/admin/editor/GalleryEditor.vue')
     },
     {
       path:'/admin/class-edit/:id',
       name:'class_editor',
-      component: () => import('../views/admin/editor/ClassEditor.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/ClassEditor.vue')
     },
     {
       path:'/admin/slide-editor',
       name:'slide_editor',
-      component: () => import('../views/admin/editor/SlideEditor.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/SlideEditor.vue')
     },
     {
       path:'/admin/messages',
       name:'messages',
-      component: () => import('../views/admin/messages/Messages.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/messages/Messages.vue')
     },
     {
       path:'/admin/message/:id',
       name:'message',
-      component: () => import('../views/admin/messages/Message.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/messages/Message.vue')
     },
     {
       path:'/admin/erasmus/docviewer/:id',
       name:'ErDocViewer',
-      component: () => import('../views/admin/erasmus/ErDocViewer.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/erasmus/ErDocViewer.vue')
     },
     {
       path:'/sterasmus/docviewer/:id',
@@ -173,27 +186,114 @@ export function createRouter() {
     {
       path:'/admin/mrow',
       name:'mrrp',
-      component: () => import('../components/mrrp.vue')      
+      meta: { requiresAuth: true, roles: ['admin'] },
+      component: () => import('../components/mrrp.vue')
     },
     {
       path:'/admin/erasmus/applies',
       name:'ErAdApplies',
-      component: () => import('../views/admin/erasmus/ErasmusApplies.vue')      
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/erasmus/ErasmusApplies.vue')
     },
     {
       path:'/admin/erasmus/editapply/:id',
       name:'ErasmusApplyEdit',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/erasmus/ErasmusApplyEdit.vue')
     },
     {
       path:'/admin/notifications/send',
       name:'send_notification',
+      meta: { requiresAuth: true, roles: ['admin'] },
       component: () => import('../views/admin/notifications/SendNotification.vue')
     },
     {
       path:'/admin/messaging',
       name:'messaging_center',
+      meta: { requiresAuth: true, roles: ['admin'] },
       component: () => import('../views/admin/notifications/MessagingCenter.vue')
+    },
+    // Forms Admin Routes
+    {
+      path:'/admin/forms',
+      name:'forms_admin',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/forms/FormsAdmin.vue')
+    },
+    {
+      path:'/admin/forms/edit/:id',
+      name:'form_builder',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/forms/FormBuilder.vue')
+    },
+    {
+      path:'/admin/forms/responses/:id',
+      name:'form_responses',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/forms/FormResponses.vue')
+    },
+    // Public Form View
+    {
+      path:'/forms/:id',
+      name:'form_view',
+      component: () => import('../views/forms/FormView.vue')
+    },
+    // ERP Admin Routes
+    {
+      path:'/admin/erp/subjects',
+      name:'erp_subjects_admin',
+      meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
+      component: () => import('../views/admin/erp/SubjectsAdmin.vue')
+    },
+    {
+      path:'/admin/erp/study-programs',
+      name:'erp_study_programs_admin',
+      meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
+      component: () => import('../views/admin/erp/StudyProgramsAdmin.vue')
+    },
+    {
+      path:'/admin/erp/class',
+      name:'erp_class_teacher',
+      meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
+      component: () => import('../views/admin/erp/ClassTeacherDashboard.vue')
+    },
+    {
+      path:'/admin/erp/print',
+      name:'erp_print_manager',
+      meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
+      component: () => import('../views/admin/erp/PrintManager.vue')
+    },
+    {
+      path:'/admin/erp/template-editor',
+      name:'erp_template_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
+      component: () => import('../views/admin/erp/TemplateEditor.vue')
+    },
+    // Sponsors Editor
+    {
+      path:'/admin/sponsors',
+      name:'sponsors_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/SponsorsEditor.vue')
+    },
+    // Role Manager (Admin only)
+    {
+      path:'/admin/roles',
+      name:'role_manager',
+      meta: { requiresAuth: true, roles: ['admin'] },
+      component: () => import('../views/admin/RoleManager.vue')
+    },
+    // Menu Editor (Admin only)
+    {
+      path:'/admin/menu-editor',
+      name:'menu_editor',
+      meta: { requiresAuth: true, roles: ['admin'] },
+      component: () => import('../views/admin/MenuEditor.vue')
+    },
+    {
+      path:'/dc',
+      name:'dc_chat',
+      component: () => import('../views/DcChat.vue')
     },
     {
       path:'/contact',
@@ -264,42 +364,46 @@ router.beforeEach((to, from, next) => {
     loadingStore.setErasmus(false);
     loadingStore.setCurrentPageEuFunding(false);
   }
-  let k=false;
-  if(fullPath.indexOf("admin") !== -1)
+  if(fullPath.indexOf("/moodle") !== -1)
     {
-      k=true;
+      window.location.replace("https://moodle.tsada.edu.rs");
+    }
+
+  if(fullPath.indexOf("/about/birthday") !== -1)
+    {
+      loadingStore.setfireworkSetting(true);
     }
     else
     {
-      k=false;
+      loadingStore.setfireworkSetting(false);
     }
-    if(fullPath.indexOf("/moodle") !== -1)
+    if(fullPath.indexOf("/tvview") !== -1)
       {
-        window.location.replace("https://moodle.tsada.edu.rs");
-      }
-
-    if(fullPath.indexOf("/about/birthday") !== -1)
-      {
-        loadingStore.setfireworkSetting(true);
+        loadingStore.sethideheaders(true);
       }
       else
       {
-        loadingStore.setfireworkSetting(false);
+        loadingStore.sethideheaders(false);
       }
-      if(fullPath.indexOf("/tvview") !== -1)
-        {
-          loadingStore.sethideheaders(true);
-        }
-        else
-        {
-          loadingStore.sethideheaders(false);
-        }
-  
 
-  if(!loadingStore.userLoggedin&&k)
-    {
-    router.push("/home");   
+  // Role-based access control
+  const requiresAuth = to.meta?.requiresAuth || fullPath.indexOf("admin") !== -1;
+
+  if (requiresAuth && !loadingStore.userLoggedin) {
+    router.push("/home");
+    return;
+  }
+
+  // Check role-based permissions
+  if (to.meta?.roles && loadingStore.userLoggedin) {
+    const allowedRoles = to.meta.roles as string[];
+    const userRole = loadingStore.userRole;
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      router.push("/home");
+      return;
     }
+  }
 
 
 
@@ -347,6 +451,17 @@ router.afterEach((to, from) => {
       'slide_editor': 'Uređivanje slajdova ~ TSADA',
       'send_notification': 'Push értesítések ~ TSADA',
       'messaging_center': 'Appwrite Messaging ~ TSADA',
+      'forms_admin': 'Űrlapok kezelése ~ TSADA',
+      'form_builder': 'Űrlap szerkesztő ~ TSADA',
+      'form_responses': 'Űrlap válaszok ~ TSADA',
+      'form_view': 'Űrlap kitöltése ~ TSADA',
+      'erp_subjects_admin': 'Tantárgyak kezelése ~ TSADA',
+      'erp_study_programs_admin': 'Szakok kezelése ~ TSADA',
+      'erp_class_teacher': 'Osztályfőnöki felület ~ TSADA',
+      'erp_print_manager': 'Nyomtatás kezelő ~ TSADA',
+      'erp_template_editor': 'Sablon szerkesztő ~ TSADA',
+      'sponsors_editor': 'Szponzorok szerkesztő ~ TSADA',
+      'menu_editor': 'Menü szerkesztő ~ TSADA',
       'missingpage': 'Stranica nije pronađena ~ TSADA'
     };
 

@@ -30,12 +30,12 @@
   defineProps(['video_id', 'video_link', 'title', 'date', 'last_modified', 'admin', 'show_date'])
   defineEmits()
   import { useLoadingStore } from '@/stores/loading';
-  import moment from 'moment/min/moment-with-locales';
+  import dayjs from '@/utils/dayjs';
   
   const rt_time = (a) => {
     const local = useLoadingStore().language;
-    moment.locale(local);
-    return moment(a).format('LL');
+    dayjs.locale(local);
+    return dayjs(a).format('LL');
   };
   </script>
   

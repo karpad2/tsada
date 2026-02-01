@@ -9,7 +9,7 @@
             <i class="pi pi-user text-3xl text-white"></i>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t("login") }}</h1>
-          <p class="text-gray-700 dark:text-gray-300">{{ $t("welcome_back") || "Jelentkezz be a fiókodba" }}</p>
+          <p class="text-gray-700 dark:text-gray-300">{{ $t("welcome_back") }}</p>
         </div>
 
         <!-- Login Card -->
@@ -60,7 +60,7 @@
               <div class="flex items-center justify-between">
                 <v-checkbox
                   v-model="rememberMe"
-                  :label="$t('remember_me') || 'Emlékezz rám'"
+                  :label="$t('remember_me')"
                   hide-details
                   density="compact"
                   color="primary"
@@ -70,7 +70,7 @@
                   @click.prevent="showForgotPassword = true"
                   class="text-sm text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 font-medium transition-colors"
                 >
-                  {{ $t('forgot_password') || 'Elfelejtett jelszó?' }}
+                  {{ $t('forgot_password') }}
                 </a>
               </div>
 
@@ -84,7 +84,7 @@
                 class="!mt-6 text-base font-semibold rounded-xl !h-12 shadow-lg hover:shadow-xl dark:shadow-sky-500/30 dark:hover:shadow-sky-500/50 transition-all"
               >
                 <i class="pi pi-sign-in mr-2"></i>
-                {{ isLoading ? $t("logging_in") || "Bejelentkezés..." : $t("login") }}
+                {{ isLoading ? $t("logging_in") : $t("login") }}
               </v-btn>
             </form>
 
@@ -93,11 +93,11 @@
               <v-card class="rounded-xl">
                 <v-card-title class="text-xl font-bold pt-6 px-6">
                   <i class="pi pi-key mr-2 text-sky-600 dark:text-sky-400"></i>
-                  {{ $t('forgot_password') || 'Elfelejtett jelszó' }}
+                  {{ $t('forgot_password') }}
                 </v-card-title>
                 <v-card-text class="px-6 py-4">
                   <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    Add meg az email címed és küldünk egy jelszó visszaállítási linket.
+                    {{ $t('forgot_password_description') }}
                   </p>
                   <v-text-field
                     v-model="resetEmail"
@@ -117,14 +117,14 @@
                     @click="showForgotPassword = false"
                     variant="text"
                   >
-                    {{ $t('cancel') || 'Mégse' }}
+                    {{ $t('cancel') }}
                   </v-btn>
                   <v-btn
                     @click="sendPasswordReset"
                     color="primary"
                     :loading="isResetting"
                   >
-                    {{ $t('send') || 'Küldés' }}
+                    {{ $t('send') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -149,10 +149,10 @@
             <div class="flex items-center justify-between">
               <div class="flex-1">
                 <h1 class="text-3xl font-bold text-white mb-2">
-                  {{ $t("Account page") || "Fiók" }}
+                  {{ $t("account_page") }}
                 </h1>
                 <p class="text-blue-100 text-lg">
-                  {{ $t("welcome") || "Üdvözlünk" }}, <span class="font-semibold">{{ username }}</span>!
+                  {{ $t("welcome") }}, <span class="font-semibold">{{ username }}</span>!
                 </p>
               </div>
               <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40 shadow-xl">
@@ -181,7 +181,7 @@
                 <i class="pi pi-chart-line text-purple-700 dark:text-purple-300 text-xl"></i>
               </div>
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                {{ $t("account_info") || "Fiók információk" }}
+                {{ $t("account_info") }}
               </h3>
             </div>
 
@@ -193,7 +193,7 @@
                     <i class="pi pi-calendar text-white text-lg"></i>
                   </div>
                   <div>
-                    <p class="text-xs text-green-800 dark:text-green-300 uppercase tracking-wide font-bold">Regisztráció</p>
+                    <p class="text-xs text-green-800 dark:text-green-300 uppercase tracking-wide font-bold">{{ $t('registration') }}</p>
                     <p class="font-bold text-gray-900 dark:text-white">{{ accountCreatedAt || 'N/A' }}</p>
                   </div>
                 </div>
@@ -206,8 +206,8 @@
                     <i class="pi pi-clock text-white text-lg"></i>
                   </div>
                   <div>
-                    <p class="text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide font-bold">Utolsó belépés</p>
-                    <p class="font-bold text-gray-900 dark:text-white">{{ lastLogin || 'Éppen most' }}</p>
+                    <p class="text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide font-bold">{{ $t('last_login') }}</p>
+                    <p class="font-bold text-gray-900 dark:text-white">{{ lastLogin || $t('just_now') }}</p>
                   </div>
                 </div>
               </div>
@@ -221,7 +221,7 @@
                 <i class="pi pi-cog text-slate-700 dark:text-slate-300 text-xl"></i>
               </div>
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                {{ $t("settings") || "Beállítások" }}
+                {{ $t("settings") }}
               </h3>
             </div>
 
@@ -235,10 +235,10 @@
                     </div>
                     <div>
                       <p class="font-bold text-gray-900 dark:text-white">
-                        {{ $t('disable_animation_background') || 'Háttéranimáció' }}
+                        {{ $t('background_animation') }}
                       </p>
                       <p class="text-sm text-purple-900 dark:text-purple-300 mt-0.5">
-                        Animált háttér be/kikapcsolása
+                        {{ $t('toggle_background_animation') }}
                       </p>
                     </div>
                   </div>
@@ -261,10 +261,10 @@
                     </div>
                     <div>
                       <p class="font-bold text-gray-900 dark:text-white">
-                        Jelszó módosítás
+                        {{ $t('change_password') }}
                       </p>
                       <p class="text-sm text-amber-900 dark:text-amber-300 mt-0.5">
-                        Változtasd meg a jelszavad
+                        {{ $t('change_password_description') }}
                       </p>
                     </div>
                   </div>
@@ -274,7 +274,7 @@
                     variant="outlined"
                     size="small"
                   >
-                    Módosítás
+                    {{ $t('modify') }}
                   </v-btn>
                 </div>
               </div>
@@ -293,7 +293,7 @@
               class="rounded-xl !h-12 font-semibold shadow-lg hover:shadow-xl dark:shadow-red-500/20 dark:hover:shadow-red-500/40 transition-all"
             >
               <i class="pi pi-sign-out mr-2"></i>
-              {{ $t("logout") || "Kijelentkezés" }}
+              {{ $t("logout") }}
             </v-btn>
           </div>
 
@@ -302,14 +302,14 @@
             <v-card class="rounded-xl">
               <v-card-title class="text-xl font-bold pt-6 px-6">
                 <i class="pi pi-lock mr-2 text-amber-600 dark:text-amber-400"></i>
-                Jelszó módosítás
+                {{ $t('change_password') }}
               </v-card-title>
               <v-card-text class="px-6 py-4">
                 <div class="space-y-4">
                   <v-text-field
                     v-model="oldPassword"
                     :type="showOldPassword ? 'text' : 'password'"
-                    label="Jelenlegi jelszó"
+                    :label="$t('current_password')"
                     variant="outlined"
                     prepend-inner-icon="mdi-lock"
                     :append-inner-icon="showOldPassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -320,7 +320,7 @@
                   <v-text-field
                     v-model="newPassword"
                     :type="showNewPassword ? 'text' : 'password'"
-                    label="Új jelszó"
+                    :label="$t('new_password')"
                     variant="outlined"
                     prepend-inner-icon="mdi-lock-plus"
                     :append-inner-icon="showNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -331,7 +331,7 @@
                   <v-text-field
                     v-model="confirmPassword"
                     :type="showConfirmPassword ? 'text' : 'password'"
-                    label="Új jelszó megerősítése"
+                    :label="$t('confirm_new_password')"
                     variant="outlined"
                     prepend-inner-icon="mdi-lock-check"
                     :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -350,14 +350,14 @@
                   @click="closePasswordDialog"
                   variant="text"
                 >
-                  Mégse
+                  {{ $t('cancel') }}
                 </v-btn>
                 <v-btn
                   @click="changePassword"
                   color="primary"
                   :loading="isChangingPassword"
                 >
-                  Jelszó módosítása
+                  {{ $t('change_password') }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -378,6 +378,7 @@ import { ref, computed, onMounted } from "vue";
 import { Account } from "appwrite";
 import { appw, user } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+import { RoleService } from "@/services/RoleService";
 import router from "@/router";
 
 export default {
@@ -418,6 +419,24 @@ export default {
 
     const isLoggedin = computed(() => loadingStore.userLoggedin);
 
+    const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer'];
+
+    const loadUserRoleFromLabels = (labels: string[]) => {
+      const role = labels?.find((l: string) => VALID_ROLES.includes(l)) || '';
+      loadingStore.setUserRole(role);
+    };
+
+    const loadUserAssignedClasses = async (userId: string) => {
+      try {
+        const roleService = RoleService.getInstance();
+        const classes = await roleService.getUserAssignedClasses(userId);
+        loadingStore.setAssignedClasses(classes);
+      } catch (err) {
+        console.error('Failed to load assigned classes:', err);
+        loadingStore.setAssignedClasses([]);
+      }
+    };
+
     const checkLogin = async () => {
       try {
         const account = new Account(appw);
@@ -425,6 +444,12 @@ export default {
         loadingStore.setUserLoggedin(true);
         username.value = session.name || session.email;
         loadingStore.setuid(session.$id);
+
+        // Load user role from labels
+        loadUserRoleFromLabels(session.labels || []);
+        if (loadingStore.userRole === 'teacher') {
+          await loadUserAssignedClasses(session.$id);
+        }
 
         // Format account creation date
         if (session.registration) {
@@ -456,6 +481,15 @@ export default {
         loadingStore.setUserLoggedin(true);
         loadingStore.setuid(response.userId);
         username.value = response.email;
+
+        // Load user role from labels
+        const account = new Account(appw);
+        const userData = await account.get();
+        loadUserRoleFromLabels(userData.labels || []);
+        if (loadingStore.userRole === 'teacher') {
+          await loadUserAssignedClasses(response.userId);
+        }
+
         getUserSettings();
 
         // Success - clear form
@@ -491,6 +525,9 @@ export default {
         await account.deleteSession("current");
         loadingStore.setUserLoggedin(false);
         loadingStore.setuid("");
+        loadingStore.setUserRole('');
+        loadingStore.setAssignedClasses([]);
+        RoleService.getInstance().clearCache();
         router.push("/home");
       } catch (err) {
         console.error("Logout failed", err);

@@ -37,29 +37,102 @@ body {
     @apply text-black;
   }
 }
-.print_content table{
-  @apply table;
-  @apply table-zebra;
-}
-.print_content a{
-  /*@apply text-lg;*/
-  @apply text-sky-400;
-  @apply font-medium;
+/* Rich text content styling - for CKEditor generated content */
+.print_content {
+  @apply leading-relaxed;
 }
 
-.print_content strong{
-  /*@apply text-lg;*/
-
-  @apply text-sky-600;
-  @apply font-medium;
-  @apply dark:text-sky-400;
+.print_content h1 {
+  @apply text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white;
 }
 
-.print_content a:hover{
-  /*@apply text-lg;*/
-  @apply text-sky-600;
-  @apply font-medium;
-  @apply underline;
+.print_content h2 {
+  @apply text-2xl font-bold mt-6 mb-3 text-gray-800 dark:text-gray-100;
+}
+
+.print_content h3 {
+  @apply text-xl font-semibold mt-5 mb-2 text-gray-800 dark:text-gray-200;
+}
+
+.print_content h4 {
+  @apply text-lg font-semibold mt-4 mb-2 text-gray-700 dark:text-gray-300;
+}
+
+.print_content p {
+  @apply mb-4 text-base leading-7 text-gray-700 dark:text-gray-300;
+}
+
+.print_content ul {
+  @apply list-disc list-inside mb-4 pl-4 space-y-1;
+}
+
+.print_content ol {
+  @apply list-decimal list-inside mb-4 pl-4 space-y-1;
+}
+
+.print_content li {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.print_content blockquote {
+  @apply border-l-4 border-sky-500 pl-4 py-2 my-4 italic bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400;
+}
+
+.print_content pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4 text-sm;
+}
+
+.print_content code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600 dark:text-pink-400;
+}
+
+.print_content pre code {
+  @apply bg-transparent p-0;
+}
+
+.print_content hr {
+  @apply my-8 border-gray-200 dark:border-gray-700;
+}
+
+.print_content img {
+  @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.print_content figure {
+  @apply my-6;
+}
+
+.print_content figcaption {
+  @apply text-sm text-center text-gray-500 dark:text-gray-400 mt-2 italic;
+}
+
+.print_content table {
+  @apply table table-zebra w-full mb-4;
+}
+
+.print_content th {
+  @apply bg-gray-100 dark:bg-gray-800 font-semibold text-left p-3;
+}
+
+.print_content td {
+  @apply p-3 border-b border-gray-200 dark:border-gray-700;
+}
+
+.print_content a {
+  @apply text-sky-500 hover:text-sky-600 font-medium underline-offset-2 hover:underline;
+}
+
+.print_content strong {
+  @apply text-sky-600 dark:text-sky-400 font-semibold;
+}
+
+.print_content em {
+  @apply italic;
+}
+
+/* First paragraph larger text */
+.print_content > p:first-of-type {
+  @apply text-lg leading-8;
 }
 .btn-ghost:hover{
   @apply dark:bg-sky-600/50;

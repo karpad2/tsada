@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted, defineComponent } from "vue";
+import { ref, onMounted, defineComponent, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useLoadingStore } from "@/stores/loading";
@@ -70,7 +70,7 @@ export default defineComponent({
         const title = ref("");
         const documents = ref<DocumentItem[]>([]);
         const headers = ref<any[]>([]);
-        const admin = ref(loadingStore.userLoggedin);
+        const admin = ref(loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor'));
         const loaded = ref(false);
 
         const loadDocuments = async () => {
@@ -122,6 +122,17 @@ export default defineComponent({
 
             loadDocuments();
         });
+
+        // Újratöltés ha a route paraméter változik (pl. /docs/leases -> /docs/public_procurements)
+        watch(
+            () => route.params.id,
+            (newId, oldId) => {
+                if (newId !== oldId) {
+                    loaded.value = false;
+                    loadDocuments();
+                }
+            }
+        );
 
         return {
             title,

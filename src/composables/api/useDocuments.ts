@@ -1,7 +1,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { documentService } from '@/services/api/DocumentService'
 import { i18nService } from '@/services/i18n/I18nService'
 import { trackUserInteraction, trackError } from '@/utils/analytics'
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog'
 import type {
   DocumentItem,
   DocumentCategory,
@@ -27,6 +29,9 @@ export interface DocumentsState {
 }
 
 export function useDocuments(options: UseDocumentsOptions = {}) {
+  const { t } = useI18n()
+  const { openDialog } = useConfirmDialog()
+
   // Reactive state
   const state = reactive<DocumentsState>({
     documents: [],
@@ -191,8 +196,15 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
   }
 
   const deleteDocument = async (id: string, confirmDelete = true): Promise<boolean> => {
-    if (confirmDelete && !confirm('Are you sure you want to delete this document?')) {
-      return false
+    if (confirmDelete) {
+      const confirmed = await openDialog({
+        title: t('delete'),
+        message: t('confirm_delete'),
+        confirmText: t('delete'),
+        color: 'error',
+        icon: 'mdi-delete'
+      })
+      if (!confirmed) return false
     }
 
     state.loading = true
@@ -303,8 +315,15 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
   }
 
   const deleteCategory = async (id: string, deleteDocuments = false, confirmDelete = true): Promise<boolean> => {
-    if (confirmDelete && !confirm('Are you sure you want to delete this category?')) {
-      return false
+    if (confirmDelete) {
+      const confirmed = await openDialog({
+        title: t('delete_category'),
+        message: t('confirm_delete'),
+        confirmText: t('delete'),
+        color: 'error',
+        icon: 'mdi-delete'
+      })
+      if (!confirmed) return false
     }
 
     state.loading = true
@@ -399,7 +418,7 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
       document_title_hu: document.document_title_hu,
       document_title_rs: document.document_title_rs,
       document_title_en: document.document_title_en
-    }) || 'Untitled Document'
+    }) || t('untitled_document')
   }
 
   const getLocalizedCategoryName = (category: DocumentCategory): string => {
@@ -407,7 +426,7 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
       category_name_hu: category.category_name_hu,
       category_name_rs: category.category_name_rs,
       category_name_en: category.category_name_en
-    }) || 'Unnamed Category'
+    }) || t('unnamed_category')
   }
 
   const refreshData = async () => {

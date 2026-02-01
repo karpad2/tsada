@@ -150,6 +150,32 @@
       </div>
     </section>
 
+    <!-- Content Blocks Section -->
+    <section class="content-blocks-section mb-6">
+      <v-expansion-panels variant="accordion">
+        <v-expansion-panel>
+          <v-expansion-panel-title>
+            <v-icon left class="mr-2">mdi-view-dashboard-variant</v-icon>
+            {{ $t('content_blocks') }}
+            <v-chip size="x-small" color="info" class="ml-2">
+              {{ $t('advanced') }}
+            </v-chip>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <p class="text-body-2 text-grey mb-4">
+              {{ $t('content_blocks_description') }}
+            </p>
+            <ContentBlocksEditor :doc-id="id" @update="onTextComponentsUpdate" />
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </section>
+
+    <!-- Content History Section -->
+    <section class="content-history-section mb-6">
+      <ContentHistoryPanel :content-id="id" @restored="loadContent" />
+    </section>
+
     <!-- AI Translation Dialog -->
     <v-dialog v-model="showTranslateDialog" max-width="600">
       <v-card>
@@ -217,6 +243,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { notify } from '@kyvg/vue3-notification'
 import { useRoute, useRouter } from 'vue-router'
 import { Client, Databases, ID, Storage, Query } from "appwrite"
 import { appw, config } from "@/appwrite"
@@ -230,8 +257,11 @@ import { LoadingManager } from '@/utils/editorUtils'
 import GeneralControlsSection from '@/components/shared/GeneralControlsSection.vue'
 import LanguageFieldGroup from '@/components/shared/LanguageFieldGroup.vue'
 import FileUploadSection from '@/components/shared/FileUploadSection.vue'
+import ContentBlocksEditor from '@/components/shared/ContentBlocksEditor.vue'
+import ContentHistoryPanel from '@/components/shared/ContentHistoryPanel.vue'
 import { useTranslation } from '@/composables/useTranslation'
 import { useI18n } from 'vue-i18n'
+import { ContentBackupService } from '@/services/ContentBackupService'
 
 interface FormData {
   title_en: string
@@ -260,7 +290,9 @@ export default defineComponent({
     DocLister,
     GeneralControlsSection,
     LanguageFieldGroup,
-    FileUploadSection
+    FileUploadSection,
+    ContentBlocksEditor,
+    ContentHistoryPanel
   },
   setup() {
     const route = useRoute()
@@ -341,6 +373,10 @@ export default defineComponent({
     // Database instances
     const database = new Databases(appw)
     const storage = new Storage(appw)
+    const backupService = ContentBackupService.getInstance()
+
+    // Store for original data (for backup comparison)
+    const originalData = ref<Record<string, any>>({})
 
     // Methods
     const loadContent = async (): Promise<void> => {
@@ -365,7 +401,7 @@ export default defineComponent({
           show_date: document.show_date || false,
           documents_flag: document.has_documents || false,
           album_flag: document.has_gallery || false,
-          gallery_id: document.gallery?.$id || "",
+          gallery_id: typeof document.gallery === 'string' ? document.gallery : (document.gallery?.$id || ""),
           eu_funding_enabled: document.eu_funding_enabled || false
         })
         
@@ -374,7 +410,10 @@ export default defineComponent({
           default_image.value = document.default_image
           img.value = storage.getFileView(config.website_images, document.default_image).toString()
         }
-        
+
+        // Store original data for backup comparison
+        originalData.value = { ...document }
+
       } catch (error) {
         console.error('Failed to load content:', error)
       }
@@ -383,36 +422,55 @@ export default defineComponent({
     const save = async (): Promise<void> => {
       try {
         console.log('Saving document with default_image:', default_image.value)
+
+        const newData = {
+          title_rs: formData.title_rs,
+          title_hu: formData.title_hu,
+          title_en: formData.title_en,
+          text_en: formData.content_en,
+          text_hu: formData.content_hu,
+          text_rs: formData.content_rs,
+          isHungarian: formData.hun_flag,
+          isSerbian: formData.srb_flag,
+          isEnglish: formData.en_flag,
+          visible: formData.visible,
+          yt_video: formData.yt_video,
+          has_documents: formData.documents_flag,
+          has_gallery: formData.album_flag,
+          gallery: formData.gallery_id || null,
+          default_image: default_image.value,
+          notNews: formData.notNews,
+          show_date: formData.show_date,
+          eu_funding_enabled: formData.eu_funding_enabled
+        }
+
+        // Create backup before saving (if we have original data)
+        if (Object.keys(originalData.value).length > 0) {
+          await backupService.createBackup(
+            id.value,
+            'about_us',
+            config.about_us_db,
+            originalData.value,
+            newData,
+            'update'
+          )
+        }
+
         await database.updateDocument(
           config.website_db,
           config.about_us_db,
           id.value,
-          {
-            title_rs: formData.title_rs,
-            title_hu: formData.title_hu,
-            title_en: formData.title_en,
-            text_en: formData.content_en,
-            text_hu: formData.content_hu,
-            text_rs: formData.content_rs,
-            isHungarian: formData.hun_flag,
-            isSerbian: formData.srb_flag,
-            isEnglish: formData.en_flag,
-            visible: formData.visible,
-            yt_video: formData.yt_video,
-            has_documents: formData.documents_flag,
-            has_gallery: formData.album_flag,
-            gallery: formData.gallery_id || null,
-            default_image: default_image.value,
-            notNews: formData.notNews,
-            show_date: formData.show_date,
-            eu_funding_enabled: formData.eu_funding_enabled
-          }
+          newData
         )
-        console.log('Document saved successfully')
+
+        // Update original data after successful save
+        originalData.value = { ...originalData.value, ...newData }
+
+        console.log('Document saved successfully with backup')
 
         // Show success notification (assuming $notify is available)
         // this.$notify(this.$t('saved'))
-        
+
       } catch (error) {
         console.error('Failed to save:', error)
       }
@@ -504,6 +562,11 @@ export default defineComponent({
       _update.value = false
       await save()
       _update.value = true
+    }
+
+    const onTextComponentsUpdate = (): void => {
+      console.log('Text components updated')
+      // Optionally refresh or notify about changes
     }
 
     const createNewGallery = async (): Promise<string> => {
@@ -600,8 +663,7 @@ export default defineComponent({
       const source = detectSourceContent()
 
       if (!source) {
-        // Show notification using native notification if available
-        alert(t('no_content_to_translate'))
+        notify({ type: 'warning', text: t('no_content_to_translate') })
         return
       }
 
@@ -620,7 +682,7 @@ export default defineComponent({
         ].filter(lang => lang.code !== source.code && lang.isEmpty)
 
         if (targetLanguages.length === 0) {
-          alert(t('all_content_already_filled'))
+          notify({ type: 'info', text: t('all_content_already_filled') })
           return
         }
 
@@ -666,18 +728,18 @@ export default defineComponent({
 
           } catch (error) {
             console.error(`❌ Translation failed for ${target.code}:`, error)
-            alert(t('translation_failed_for_language', { lang: target.code }))
+            notify({ type: 'error', text: t('translation_failed_for_language', { lang: target.code }) })
           }
         }
 
-        alert(t('content_translated_successfully'))
+        notify({ type: 'success', text: t('content_translated_successfully') })
 
         // Mentés az új tartalommal
         await save()
 
       } catch (error) {
         console.error('Translation error:', error)
-        alert(t('translation_error'))
+        notify({ type: 'error', text: t('translation_error') })
       } finally {
         isTranslating.value = false
         translationProgress.value = 0
@@ -729,6 +791,7 @@ export default defineComponent({
       handleDocumentsToggle,
       handleCreateGallery,
       handleGalleryChange,
+      onTextComponentsUpdate,
 
       // Translation
       showTranslateDialog,

@@ -51,13 +51,22 @@
         <!-- Main Content -->
         <div ref="pdfContent" class="w-full p-5 dark:text-white print_content content-section" v-html="localizedContent" />
   
-        <!-- Additional Content Sections -->
-        <div 
-          v-for="contentSection in state.chtmls" 
-          :key="contentSection.$id" 
-          class="w-full p-5 dark:text-white print_content content-section" 
-          v-html="contentSection.text"
-        />
+        <!-- Additional Content Blocks -->
+        <template v-for="contentBlock in state.chtmls" :key="contentBlock.$id">
+          <!-- If block has a type, use ContentBlockRenderer -->
+          <ContentBlockRenderer
+            v-if="contentBlock.type && contentBlock.visible !== false"
+            :block="contentBlock"
+            :language="currentLanguage"
+            class="w-full p-5"
+          />
+          <!-- Legacy text-only blocks (no type or type='text') -->
+          <div
+            v-else-if="contentBlock.visible !== false"
+            class="w-full p-5 dark:text-white print_content content-section"
+            v-html="getLocalizedComponentContent(contentBlock)"
+          />
+        </template>
   
         <!-- YouTube Videos -->
         <div v-for="ytVideo in state.ytVideos" :key="ytVideo" class="p-5 video-container">
@@ -99,12 +108,13 @@
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
   import gsap from 'gsap';
-  import moment from 'moment/min/moment-with-locales';
+  import dayjs from '@/utils/dayjs';
   import { jsPDF } from 'jspdf';
   import html2canvas from 'html2canvas';
   import AlbumViewer from '@/components/AlbumViewer.vue';
   import Loading from '@/components/Loading.vue';
   import DocLister from '@/components/DocLister.vue';
+  import ContentBlockRenderer from '@/components/shared/ContentBlockRenderer.vue';
   
   interface ContentState {
     loaded: boolean;
@@ -134,7 +144,8 @@
     components: {
       AlbumViewer,
       Loading,
-      DocLister
+      DocLister,
+      ContentBlockRenderer
     },
     setup() {
       const route = useRoute();
@@ -210,7 +221,8 @@
   
       // Methods
       const initializeAdmin = async () => {
-        state.admin = loadingStore.userLoggedin;
+        const role = loadingStore.userRole;
+        state.admin = loadingStore.userLoggedin && (role === 'admin' || role === 'editor');
         if (state.admin) {
           const account = new Account(appw);
           console.log(account.client);
@@ -266,10 +278,13 @@
           // Set document title
           document.title = localizedTitle.value;
   
-          // Handle gallery
+          // Handle gallery - kezeli mind a string ID-t (új Appwrite), mind az objektumot (régi)
           if (state.galleryFlag && mainContent.gallery) {
             try {
-              state.galleryId = mainContent.gallery.$id;
+              // Ha string, akkor ez az ID, ha objektum, akkor a $id mezőt használjuk
+              state.galleryId = typeof mainContent.gallery === 'string'
+                ? mainContent.gallery
+                : mainContent.gallery.$id;
             } catch (error) {
               console.error('Gallery ID error:', error);
             }
@@ -283,21 +298,42 @@
   
       const formatDate = (dateString: string): string => {
         const language = currentLanguage.value;
-        
+
         switch (language) {
           case 'rs':
           case 'sr':
-            moment.locale('sr');
+            dayjs.locale('sr');
             break;
           case 'hu':
-            moment.locale('hu');
+            dayjs.locale('hu');
             break;
           case 'en':
-            moment.locale('en');
+            dayjs.locale('en');
             break;
         }
-        
-        return moment(dateString).format('LL');
+
+        return dayjs(dateString).format('LL');
+      };
+
+      const getLocalizedComponentContent = (component: any): string => {
+        const lang = currentLanguage.value;
+
+        // First try the language-specific content fields
+        switch (lang) {
+          case 'sr':
+          case 'rs':
+            if (component.content_rs) return component.content_rs;
+            break;
+          case 'hu':
+            if (component.content_hu) return component.content_hu;
+            break;
+          case 'en':
+            if (component.content_en) return component.content_en;
+            break;
+        }
+
+        // Fallback to the 'text' field if language-specific content is empty
+        return component.text || '';
       };
   
       const getYouTubeEmbedUrl = (url: string): string => {
@@ -400,12 +436,14 @@ watch(
         state,
         pdfContent,
         contentId,
+        currentLanguage,
         localizedTitle,
         localizedContent,
         videoLink,
         shouldShowDate,
         formatDate,
         getYouTubeEmbedUrl,
+        getLocalizedComponentContent,
         editContent,
         downloadPDF
       };

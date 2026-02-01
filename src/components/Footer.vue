@@ -95,7 +95,7 @@
   <script>
   import Cookie from "@/components/Cookie.vue";
   import Certop from "@/components/Certop.vue";
-  import moment from "moment";
+  import dayjs from '@/utils/dayjs';
   import vv from "../../package.json";
   import { useTheme } from "vuetify";
   import themes from "@/themes/store.json";
@@ -118,7 +118,7 @@
     },
     computed: {
       year() {
-        return moment().format("YYYY");
+        return dayjs().format("YYYY");
       },
       _version() {
         return vv.version;

@@ -253,7 +253,8 @@ export default defineComponent({
   },
   async mounted() {
     setDocumentTitle(this.$t("gallery"));
-    this.admin = this.userLoggedin;
+    const role = this.loadingStore.userRole;
+    this.admin = this.userLoggedin && (role === 'admin' || role === 'editor' || role === 'photographer');
     
     // Setup scroll listener
     this.handleScrollDebounced = this.debounce(this.handleScroll, 200);
@@ -376,8 +377,8 @@ export default defineComponent({
     },
 
     courseopen(id: string) {
-      const path = id.toLowerCase().replaceAll(" ", "");
-      this.$router.push("/album/" + path);
+      // Az ID-t nem módosítjuk, mert az Appwrite ID-k case-sensitive-ek
+      this.$router.push("/album/" + id);
     },
 
     async new_stuff() {

@@ -566,7 +566,7 @@
     computed: {
       isAdmin(): boolean {
         const loadingStore = useLoadingStore();
-        return loadingStore.userLoggedin;
+        return loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
       },
       selectedWorker(): Worker | null {
         return this.availableWorkers.find(w => w.id === this.newService.worker) || null;
@@ -608,9 +608,7 @@
       },
   
       showNotification(message: string, type: 'success' | 'error' | 'info' = 'info') {
-        if (type === 'error') alert('❌ ' + message);
-        else if (type === 'success') alert('✅ ' + message);
-        else alert('ℹ️ ' + message);
+        this.$notify({ type, text: message });
       },
   
       getDayName(dayKey: string): string {

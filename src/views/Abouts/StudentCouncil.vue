@@ -383,8 +383,9 @@ export default {
         },
 
         getClassName(member: ParliamentMember): string {
-            if (member.classList && (member.classList.$id || member.classList.id)) {
-                const classId = member.classList.$id || member.classList.id;
+            // Kezeli mind az objektum (régi Appwrite), mind a string ID (új Appwrite) formátumot
+            const classId = this.getClassIdFromMember(member);
+            if (classId) {
                 const classData = this.classes.find(c => c.id === classId);
                 return classData ? classData.name : 'Ismeretlen osztály';
             }
@@ -392,10 +393,10 @@ export default {
         },
 
         getClassInfo(member: ParliamentMember): { year: number, designation: number } {
-            if (member.classList && (member.classList.$id || member.classList.id)) {
-                const classId = member.classList.$id || member.classList.id;
+            // Kezeli mind az objektum (régi Appwrite), mind a string ID (új Appwrite) formátumot
+            const classId = this.getClassIdFromMember(member);
+            if (classId) {
                 const classData = this.classes.find(c => c.id === classId);
-
                 if (classData) {
                     return {
                         year: classData.year || 999, // 999 = ismeretlen évfolyam, hátulra kerül
@@ -406,6 +407,26 @@ export default {
 
             // Ha nincs osztály információ, hátulra tesszük
             return { year: 999, designation: 999 };
+        },
+
+        /**
+         * Kiolvassa az osztály ID-t a tagból - kezeli mind a string ID-t (új Appwrite),
+         * mind a beágyazott objektumot (régi Appwrite)
+         */
+        getClassIdFromMember(member: ParliamentMember): string | null {
+            if (!member.classList) return null;
+
+            // Ha string, akkor ez már az ID (új Appwrite verzió)
+            if (typeof member.classList === 'string') {
+                return member.classList;
+            }
+
+            // Ha objektum, akkor a $id vagy id mezőt keressük (régi Appwrite verzió)
+            if (typeof member.classList === 'object') {
+                return member.classList.$id || member.classList.id || null;
+            }
+
+            return null;
         },
 
         getDisplayName(member: ParliamentMember): string {

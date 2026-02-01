@@ -250,6 +250,7 @@ import { Client, Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 
 interface Schedule {
     day: string;
@@ -268,6 +269,10 @@ interface ParliamentMember {
 }
 
 export default {
+    setup() {
+        const { openDialog } = useConfirmDialog();
+        return { openDialog };
+    },
     data() {
         return {
             // Eredeti osztály adatok
@@ -313,12 +318,12 @@ export default {
             ],
 
             nameRules: [
-                (v: string) => !!v || 'Magyar név megadása kötelező',
-                (v: string) => (v && v.length <= 100) || 'Név maximum 100 karakter lehet',
+                (v: string) => !!v || this.$t('name_required'),
+                (v: string) => (v && v.length <= 100) || this.$t('name_max_100'),
             ],
 
             nameRulesOptional: [
-                (v: string) => !v || v.length <= 100 || 'Név maximum 100 karakter lehet',
+                (v: string) => !v || v.length <= 100 || this.$t('name_max_100'),
             ],
 
             dayOptions: [
@@ -369,7 +374,7 @@ export default {
                 await this.getParliamentMembers();
             } catch (error) {
                 console.error('Inicializálási hiba:', error);
-                this.$notify('Hiba történt az adatok betöltésekor');
+                this.$notify(this.$t('error_loading_data'));
             } finally {
                 this.loading = false;
             }
@@ -484,18 +489,20 @@ export default {
                 
                 // Osztály adatok betöltése
                 k = await database.getDocument(config.website_db, config.classlist, this.$route.params.id);
-                
+
                 this.year = k.year || 1;
                 this.delegation = k.designation;
-                
+
+                // A workers és courses relációk most csak ID-kat tartalmaznak (Appwrite verzió változás)
                 try {
-                    this.masterchief = k.workers?.$id || "";
+                    // Ha objektum, akkor $id-t használunk, ha string (ID), akkor közvetlenül
+                    this.masterchief = typeof k.workers === 'object' ? k.workers?.$id || "" : k.workers || "";
                 } catch (ex) {
                     console.log('Masterchief hiba:', ex);
                 }
-                
+
                 try {
-                    this.course = k.courses?.$id || "";
+                    this.course = typeof k.courses === 'object' ? k.courses?.$id || "" : k.courses || "";
                 } catch (ex) {
                     console.log('Course hiba:', ex);
                 }
@@ -550,12 +557,19 @@ export default {
                 this.$notify(this.$t('saved'));
             } catch (error) {
                 console.error('Mentési hiba:', error);
-                this.$notify('Hiba történt a mentés során');
+                this.$notify(this.$t('error_saving'));
             }
         },
         
         async delete_content() {
-            if (!confirm(this.$t('confirm_delete'))) return;
+            const confirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!confirmed) return;
             
             try {
                 const database = new Databases(appw);
@@ -564,7 +578,7 @@ export default {
                 this.$router.push("/about/classlist");
             } catch (error) {
                 console.error('Törlési hiba:', error);
-                this.$notify('Hiba történt a törlés során');
+                this.$notify(this.$t('error_deleting'));
             }
         },
 
@@ -621,7 +635,7 @@ export default {
 
         async addParliamentMember() {
             if (!this.parliament_member_name_hu?.trim()) {
-                this.$notify('Kérem, adja meg a tag magyar nevét');
+                this.$notify(this.$t('please_enter_member_name'));
                 return;
             }
 
@@ -648,7 +662,7 @@ export default {
                         documentData
                     );
                     this.editing_member_id = null;
-                    this.$notify('Tag sikeresen frissítve');
+                    this.$notify(this.$t('member_updated_successfully'));
                 } else {
                     // Új hozzáadás
                     await database.createDocument(
@@ -657,7 +671,7 @@ export default {
                         ID.unique(),
                         documentData
                     );
-                    this.$notify('Tag sikeresen hozzáadva');
+                    this.$notify(this.$t('member_added_successfully'));
                 }
                 
                 this.clearParliamentForm();
@@ -665,7 +679,7 @@ export default {
                 
             } catch (ex) {
                 console.error('Parliament member mentési hiba:', ex);
-                this.$notify('Hiba történt a tag mentésekor');
+                this.$notify(this.$t('error_saving_member'));
             }
         },
 
@@ -682,17 +696,24 @@ export default {
         },
 
         async deleteParliamentMember(memberId: string) {
-            if (!confirm('Biztosan törli ezt a parlament tagot?')) return;
+            const memberConfirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete_member'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!memberConfirmed) return;
             
             const database = new Databases(appw);
             
             try {
                 await database.deleteDocument(config.website_db, config.parliament_members, memberId);
                 await this.getParliamentMembers();
-                this.$notify('Tag sikeresen törölve');
+                this.$notify(this.$t('member_deleted_successfully'));
             } catch (ex) {
                 console.error('Parliament member törlési hiba:', ex);
-                this.$notify('Hiba történt a tag törlésekor');
+                this.$notify(this.$t('error_deleting_member'));
             }
         },
 

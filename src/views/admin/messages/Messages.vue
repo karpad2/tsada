@@ -36,7 +36,7 @@
     import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
-    import moment from 'moment/min/moment-with-locales';
+    import dayjs from '@/utils/dayjs';
     
     
     
@@ -52,7 +52,7 @@
         mounted()
         {
             const loadingStore = useLoadingStore();
-            this.admin=loadingStore.userLoggedin;
+            this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
             //loadingStore.setLoading(true);
             
             this.headers= [
@@ -112,9 +112,9 @@
                 this.loaded=true;
                 },
                 rt_time(a)
-                {   moment.locale('hu');
-                    return moment(a).format("LLL");
-                } 
+                {   dayjs.locale('hu');
+                    return dayjs(a).format("LLL");
+                }
             
            
         },

@@ -235,7 +235,7 @@
   import { convertifserbian } from "@/lang";
   import { useLoadingStore } from "@/stores/loading";
   import gsap from "gsap";
-  import moment from 'moment/min/moment-with-locales';
+  import dayjs from '@/utils/dayjs';
   import Loading from "@/components/Loading.vue";
   
   interface DocumentItem {
@@ -294,7 +294,7 @@
   
     async mounted() {
         const loadingStore = useLoadingStore();
-        this.admin = loadingStore.userLoggedin;
+        this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
         document.title = this.$t("studentdocuments");
   
         // Initialize headers
@@ -332,14 +332,14 @@
             let local = loadingStore.language;
             
             if (local === "rs" || local === "sr") {
-                moment.locale('sr');
+                dayjs.locale('sr');
             } else if (local === "hu") {
-                moment.locale('hu');
+                dayjs.locale('hu');
             } else if (local === "en") {
-                moment.locale('en');
+                dayjs.locale('en');
             }
             
-            return moment(dateString).format("LLL");
+            return dayjs(dateString).format("LLL");
         },
   
         async new_stuff(categoryId: string): Promise<void> {

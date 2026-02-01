@@ -1,13 +1,11 @@
 <template>
-    <AlbumViewer :caption="true" :id="l" />
+    <AlbumViewer :caption="true" :id="albumId" :key="albumId" />
 </template>
 <script setup>
 import AlbumViewer from "@/components/AlbumViewer.vue";
 import { useRoute } from 'vue-router';
-const route = useRoute()
-                                      
-let l=route.params.id;
+import { computed } from 'vue';
 
-
-//console.log(l);
+const route = useRoute();
+const albumId = computed(() => route.params.id);
 </script>

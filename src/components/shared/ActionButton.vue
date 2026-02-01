@@ -36,6 +36,8 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 
 export default defineComponent({
     name: 'ActionButton',
@@ -105,7 +107,7 @@ export default defineComponent({
         },
         confirmMessage: {
             type: String,
-            default: 'Are you sure you want to perform this action?'
+            default: ''
         },
         tooltip: {
             type: String,
@@ -113,6 +115,9 @@ export default defineComponent({
         }
     },
     setup(props, { emit }) {
+        const { t } = useI18n();
+        const { openDialog } = useConfirmDialog();
+
         const isIconOnly = computed(() => {
             return !!props.icon && !props.text && !props.prependIcon && !props.appendIcon;
         });
@@ -138,13 +143,19 @@ export default defineComponent({
             return classes.join(' ');
         });
 
-        const handleClick = (event: Event) => {
+        const handleClick = async (event: Event) => {
             if (props.disabled || props.loading) {
                 return;
             }
 
             if (props.confirmAction) {
-                if (confirm(props.confirmMessage)) {
+                const confirmed = await openDialog({
+                    message: props.confirmMessage || t('confirm_delete'),
+                    confirmText: t('accept'),
+                    color: 'error',
+                    icon: 'mdi-alert'
+                });
+                if (confirmed) {
                     emit('click', event);
                 }
             } else {

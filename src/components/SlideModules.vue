@@ -15,7 +15,7 @@
               <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
-              {{ courses.length }} {{ $t('items') }}
+              {{ allCourses.length }} {{ $t('items') }}
             </div>
 
             <div v-if="admin" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">
@@ -40,7 +40,6 @@
           <div class="relative mb-4 w-full lg:w-96">
             <input
               v-model="searchQuery"
-              @input="handleSearch"
               type="text"
               :placeholder="$t('search_content')"
               class="w-full px-4 py-2 pl-10 pr-4 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
@@ -173,7 +172,7 @@
 
         <!-- Content cards with improved design -->
         <article
-          v-for="course in courses"
+          v-for="course in displayedCourses"
           :key="course.id"
           class="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 fade-slide border border-gray-100 dark:border-gray-700"
           @click="courseOpen(course.id)"
@@ -238,12 +237,12 @@
       </div>
 
       <!-- No more content indicator -->
-      <div v-if="!hasMore && courses.length > 0" class="w-full text-center py-8">
+      <div v-if="!hasMore && displayedCourses.length > 0" class="w-full text-center py-8">
         <p class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('no_more_content') }}</p>
       </div>
 
       <!-- Empty state -->
-      <div v-if="!isLoading && !isInitialLoading && courses.length === 0" class="text-center py-16">
+      <div v-if="!isLoading && !isInitialLoading && displayedCourses.length === 0" class="text-center py-16">
         <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
           <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -275,14 +274,6 @@ export default defineComponent({
   data() {
     return {
       admin: false,
-      courses: [] as Array<{
-        id: string;
-        visible: boolean;
-        title: string;
-        subtitle: string;
-        text: string;
-        img: string;
-      }>,
       page: 0,
       limit: 24, // Significantly increased to load more items
       isLoading: false,
@@ -294,7 +285,6 @@ export default defineComponent({
       filterType: 'all', // 'all', 'visible', 'hidden'
       viewMode: 'grid', // 'grid', 'list'
       allCourses: [] as Array<any>, // Store all courses for filtering
-      searchTimeout: null as any, // For debouncing search
     };
   },
   computed: {
@@ -305,12 +295,12 @@ export default defineComponent({
       return this.loadingStore.language;
     },
     visibleCount() {
-      return this.courses.filter(course => course.visible).length;
+      return this.allCourses.filter(course => course.visible).length;
     },
     hiddenCount() {
-      return this.courses.filter(course => !course.visible).length;
+      return this.allCourses.filter(course => !course.visible).length;
     },
-    filteredCourses() {
+    displayedCourses() {
       let filtered = [...this.allCourses];
 
       // Apply search filter
@@ -333,7 +323,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.admin = this.loadingStore.userLoggedin;
+    this.admin = this.loadingStore.userLoggedin && (this.loadingStore.userRole === 'admin' || this.loadingStore.userRole === 'editor');
     await this.loadCourses();
 
     window.addEventListener('scroll', this.handleScroll, { passive: true });
@@ -393,7 +383,7 @@ export default defineComponent({
             '$createdAt',
           ]),
           ...(this.mode === 'news' ? [Query.or([Query.isNull('notNews'), Query.equal('notNews', false)])] : []),
-          ...(!this.loadingStore.userLoggedin ? [Query.equal(getStatus(), true), Query.equal('visible', true)] : []),
+          ...(!this.admin ? [Query.equal(getStatus(), true), Query.equal('visible', true)] : []),
         ];
 
         const { documents } = await db.listDocuments(config.website_db, config.about_us_db, filters);
@@ -438,8 +428,7 @@ export default defineComponent({
           };
         });
 
-        this.courses.push(...newCourses);
-        this.allCourses.push(...newCourses); // Store all courses for filtering
+        this.allCourses.push(...newCourses);
         this.page++;
         this.retryCount = 0; // Reset retry count on success
       } catch (error) {
@@ -493,29 +482,13 @@ export default defineComponent({
       return 'https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&h=400&q=80';
     },
 
-    // Search and filter methods
-    handleSearch() {
-      // Debounce search for better performance
-      clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => {
-        this.applyFilters();
-      }, 300);
-    },
-
     clearSearch() {
       this.searchQuery = '';
-      this.applyFilters();
-    },
-
-    applyFilters() {
-      // Update displayed courses based on current filters
-      this.courses = this.filteredCourses;
     },
 
     async reloadAllContent() {
       // Reset pagination and reload all content for new language
       this.page = 0;
-      this.courses = [];
       this.allCourses = [];
       this.hasMore = true;
       this.isInitialLoading = true;

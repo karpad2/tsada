@@ -2,6 +2,7 @@
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import Index from '@/views/Index.vue';
 import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useLoadingStore } from '@/stores/loading';
 import { computed, watch } from 'vue';
 
@@ -11,7 +12,8 @@ export default {
     RouterLink,
     RouterView,
     Index,
-    PWAUpdatePrompt
+    PWAUpdatePrompt,
+    ConfirmDialog
   },
   setup() {
     const loadingStore = useLoadingStore();
@@ -38,6 +40,7 @@ export default {
     <notifications position="top right"/>
     <RouterView :key="routeKey" />
     <PWAUpdatePrompt />
+    <ConfirmDialog />
   </Index>
 </template>
 

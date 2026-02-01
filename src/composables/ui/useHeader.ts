@@ -4,9 +4,12 @@ import { useI18n } from 'vue-i18n'
 import { useLoadingStore } from '@/stores/loading'
 import { appwriteService } from '@/appwrite'
 import { navigationService } from '@/services/navigation/NavigationService'
+import { menuConfigService } from '@/services/navigation/MenuConfigService'
 import { i18nService } from '@/services/i18n/I18nService'
 import { trackUserInteraction, trackLanguageChange, trackError } from '@/utils/analytics'
+import { RoleService } from '@/services/RoleService'
 import type { NavigationData, MenuItem } from '@/services/navigation/NavigationService'
+import type { MenuConfig, MenuGroupDefinition, ResolvedMenuGroup } from '@/types/MenuTypes'
 
 export interface Language {
   code: string
@@ -27,7 +30,11 @@ export interface HeaderState {
 
 export function useHeader() {
   // i18n
-  const { locale } = useI18n()
+  const { t, locale } = useI18n()
+
+  // Menu config
+  const menuConfig = ref<MenuConfig | null>(null)
+  const effectiveRegistry = ref<MenuGroupDefinition[]>([])
 
   // Reactive state
   const state = reactive<HeaderState>({
@@ -55,9 +62,17 @@ export function useHeader() {
 
   // Computed properties
   const isAuthenticated = computed(() => loadingStore.userLoggedin)
+  const userRole = computed(() => loadingStore.userRole)
   const isMobileView = computed(() => loadingStore.mobile_view)
   const isTabletMode = computed(() => loadingStore.tablet_mode)
   const isMobileMode = computed(() => loadingStore.mobile_mode)
+
+  // Role-based access helper
+  const hasRole = (...roles: string[]) => {
+    const currentRole = loadingStore.userRole
+    if (!currentRole) return false
+    return roles.includes(currentRole)
+  }
   const currentBreadcrumb = computed(() => {
     if (state.navigationData) {
       return navigationService.getBreadcrumb(route.path, state.navigationData)
@@ -80,6 +95,21 @@ export function useHeader() {
     return state.navigationData?.erasmusSettings.eu_funding_enabled || false
   })
 
+  // Resolved dynamic menu groups
+  const resolvedMenuGroups = computed<ResolvedMenuGroup[]>(() => {
+    if (!effectiveRegistry.value.length) return []
+
+    return menuConfigService.resolveMenu(
+      effectiveRegistry.value,
+      state.navigationData,
+      isAuthenticated.value,
+      loadingStore.userRole,
+      t,
+      state.currentLanguage,
+      { logout }
+    )
+  })
+
   // Navigation methods
   const initializeHeader = async (forceRefresh = false) => {
     state.loading = true
@@ -97,14 +127,21 @@ export function useHeader() {
       i18nService.setCurrentLanguage(loadingStore.language)
       setCurrentLanguageFlag(state.currentLanguage)
 
-      // Load navigation data
-      const response = await navigationService.getNavigationData(forceRefresh)
+      // Load navigation data and menu config in parallel
+      const [response, savedMenuConfig] = await Promise.all([
+        navigationService.getNavigationData(forceRefresh),
+        menuConfigService.loadMenuConfig()
+      ])
 
       if (response.success && response.data) {
         state.navigationData = response.data
       } else {
         throw new Error(response.error || 'Failed to load navigation data')
       }
+
+      // Apply menu config
+      menuConfig.value = savedMenuConfig
+      effectiveRegistry.value = menuConfigService.getEffectiveRegistry(savedMenuConfig)
     } catch (error: any) {
       console.error('Error initializing header:', error)
       state.error = error.message
@@ -152,8 +189,9 @@ export function useHeader() {
       state.currentLanguage = languageCode
       setCurrentLanguageFlag(languageCode)
 
-      // Clear navigation cache to reload localized content
+      // Clear navigation and menu config cache to reload localized content
       navigationService.clearCache()
+      menuConfigService.clearCache()
 
       // Clear PWA cache for API calls
       if ('caches' in window) {
@@ -183,6 +221,11 @@ export function useHeader() {
 
       // Update loading store
       loadingStore.setUserLoggedin(false)
+      loadingStore.setUserRole('')
+      loadingStore.setAssignedClasses([])
+
+      // Clear role cache
+      RoleService.getInstance().clearCache()
 
       // Redirect to home or reload
       await router.push('/home')
@@ -265,6 +308,8 @@ export function useHeader() {
 
     // Computed
     isAuthenticated,
+    userRole,
+    hasRole,
     isMobileView,
     isTabletMode,
     isMobileMode,
@@ -272,6 +317,7 @@ export function useHeader() {
     showErasmusFlag,
     showErasmusApply,
     showEuFunding,
+    resolvedMenuGroups,
 
     // Methods
     initializeHeader,

@@ -13,11 +13,23 @@ export function usePWA() {
   } = useRegisterSW({
     onRegistered(r) {
       console.log('SW Registered: ' + r)
+      // Clear update flag after successful registration
+      sessionStorage.removeItem('pwa-updating')
     },
     onRegisterError(error) {
       console.log('SW registration error', error)
+      sessionStorage.removeItem('pwa-updating')
     },
     onNeedRefresh() {
+      // Prevent infinite loop: don't show update prompt if already updating
+      const isUpdating = sessionStorage.getItem('pwa-updating')
+      if (isUpdating === 'true') {
+        console.log('SW: Update in progress, skipping prompt')
+        // Auto-update silently
+        updateServiceWorker(true)
+        return
+      }
+
       needRefresh.value = true
       updateAvailable.value = true
       console.log('SW: Update available')
@@ -25,6 +37,7 @@ export function usePWA() {
     onOfflineReady() {
       offlineReady.value = true
       console.log('SW: App ready to work offline')
+      sessionStorage.removeItem('pwa-updating')
     }
   })
 
@@ -35,16 +48,20 @@ export function usePWA() {
 
   const updateApp = async () => {
     try {
-      await updateServiceWorker(true)
       needRefresh.value = false
       updateAvailable.value = false
 
-      // Kis késés után újratöltés
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+      // Set flag to prevent infinite reload loop
+      sessionStorage.setItem('pwa-updating', 'true')
+
+      // Update service worker - this will activate the new SW
+      await updateServiceWorker(true)
+
+      // The new SW will take over and reload happens automatically
+      // No manual reload needed - skipWaiting handles this
     } catch (error) {
       console.error('Error updating service worker:', error)
+      sessionStorage.removeItem('pwa-updating')
     }
   }
 

@@ -1,0 +1,206 @@
+import type { MenuGroupDefinition } from '@/types/MenuTypes'
+
+/**
+ * Default menu structure that matches the current hardcoded HeaderModular.vue layout.
+ * This serves as the fallback when no saved config exists in Appwrite.
+ */
+export const DEFAULT_MENU_REGISTRY: MenuGroupDefinition[] = [
+  // 1. Home
+  {
+    id: 'home',
+    type: 'direct-link',
+    labelKey: 'home',
+    to: '/home',
+    items: []
+  },
+
+  // 2. About Us
+  {
+    id: 'about',
+    type: 'dropdown',
+    labelKey: 'aboutus',
+    items: [
+      { id: 'about_history', labelKey: 'history_of_school', to: '/renderer/about/history' },
+      { id: 'about_schoolboard', labelKey: 'school_board', to: '/about/schoolboard' },
+      { id: 'about_parentscouncil', labelKey: 'parents_council', to: '/about/parentscouncil' },
+      { id: 'about_services', labelKey: 'services', to: '/about/pepsi' },
+      { id: 'about_dynamic', dynamicSource: 'about', dynamicRoutePrefix: '/renderer/about/' },
+      { id: 'about_workers', labelKey: 'workers', to: '/about/workers' },
+      { id: 'about_classlist', labelKey: 'classlist', to: '/about/classlist' }
+    ]
+  },
+
+  // 3. Education (with nested submenus)
+  {
+    id: 'education',
+    type: 'dropdown',
+    labelKey: 'education',
+    items: [
+      {
+        id: 'edu_courses',
+        labelKey: 'courses',
+        children: [
+          {
+            id: 'edu_machine',
+            labelKey: 'machine',
+            children: [
+              { id: 'edu_mechanical_technician', labelKey: 'mechanical_technician', to: '/renderer/education/mechanical_technician' },
+              { id: 'edu_cnc_miller', labelKey: 'cnc_miller', to: '/renderer/education/cnc_miller' }
+            ]
+          },
+          {
+            id: 'edu_electrotechnic',
+            labelKey: 'electrotechnic',
+            children: [
+              { id: 'edu_mechatronic_technician', labelKey: 'mechatronic_technician', to: '/renderer/education/mechatronic_technician' },
+              { id: 'edu_computer_electrotechnician', labelKey: 'computer_electrotechnician', to: '/renderer/education/computer_electrotechnician' }
+            ]
+          },
+          {
+            id: 'edu_civil_engineering',
+            labelKey: 'civil_engineering',
+            children: [
+              { id: 'edu_primary_construction', labelKey: 'primary_construction_works_operator', to: '/renderer/education/primary_construction_works_operator' }
+            ]
+          }
+        ]
+      },
+      { id: 'edu_timetable', labelKey: 'timetable', to: '/about/timetable' },
+      { id: 'edu_teachers_hour', labelKey: 'teachers_receiving_hour', to: '/about/workerstimetable' },
+      { id: 'edu_parentvisiting', labelKey: 'parentsvisiting', to: '/about/parentvisiting' },
+      { id: 'edu_examslist', labelKey: 'examslist', to: '/renderer/education/examslist' },
+      { id: 'edu_textbooks', labelKey: 'textbooks', to: '/renderer/education/textbooks' }
+    ]
+  },
+
+  // 4. Gallery
+  {
+    id: 'gallery',
+    type: 'direct-link',
+    labelKey: 'gallery',
+    to: '/gallery',
+    items: []
+  },
+
+  // 5. For Students
+  {
+    id: 'for_students',
+    type: 'dropdown',
+    labelKey: 'for_students',
+    items: [
+      { id: 'student_parliament', labelKey: 'student_parliament', to: '/about/studentcouncil' },
+      { id: 'student_dynamic', dynamicSource: 'students', dynamicRoutePrefix: '/renderer/students/' },
+      { id: 'student_documents', labelKey: 'studentdocuments', to: '/studentdocuments' },
+      { id: 'student_eclassroom', labelKey: 'eclassroom', href: 'https://moodle.tsada.edu.rs' }
+    ]
+  },
+
+  // 6. Documents
+  {
+    id: 'documents',
+    type: 'dropdown',
+    labelKey: 'documents',
+    items: [
+      { id: 'doc_school', labelKey: 'school_documents', to: '/documents' },
+      { id: 'doc_procurements', labelKey: 'public_procurements', to: '/docs/public_procurements' },
+      { id: 'doc_leases', labelKey: 'lease', to: '/docs/leases' },
+      { id: 'doc_diplomas', labelKey: 'duplicates_of_diplomas', to: '/renderer/education/67b4d43f0017f6a974b8' }
+    ]
+  },
+
+  // 7. Adult Education
+  {
+    id: 'adult_education',
+    type: 'direct-link',
+    labelKey: 'adult_education',
+    to: '/renderer/education/adult_education',
+    items: []
+  },
+
+  // 8. Erasmus
+  {
+    id: 'erasmus',
+    type: 'dropdown',
+    labelKey: 'Erasmus',
+    items: [
+      { id: 'erasmus_dynamic', dynamicSource: 'erasmus', dynamicRoutePrefix: '/renderer/erasmus/' },
+      { id: 'erasmus_apply', labelKey: 'erasmus_apply', to: '/erasmus/apply', condition: { setting: 'erasmus-apply' } },
+      { id: 'erasmus_results', labelKey: 'erasmus_applies_result', to: '/erasmus/results', condition: { setting: 'erasmus-list' } },
+      { id: 'erasmus_admin', labelKey: 'erasmus_applies', to: '/admin/erasmus/applies', condition: { auth: 'required', roles: ['admin', 'editor'] } }
+    ]
+  },
+
+  // 9. Language Selector
+  {
+    id: 'language',
+    type: 'language-selector',
+    items: []
+  },
+
+  // 10. ERP System (admin + teacher)
+  {
+    id: 'erp',
+    type: 'dropdown',
+    labelKey: 'erp_system',
+    condition: { auth: 'required', roles: ['admin', 'teacher'] },
+    items: [
+      { id: 'erp_class', labelKey: 'erp_class_teacher', to: '/admin/erp/class' },
+      { id: 'erp_subjects', labelKey: 'erp_subjects', to: '/admin/erp/subjects' },
+      { id: 'erp_study_programs', labelKey: 'erp_study_programs', to: '/admin/erp/study-programs' },
+      { id: 'erp_print', labelKey: 'erp_print_manager', to: '/admin/erp/print' },
+      { id: 'erp_template', labelKey: 'erp_template_editor', to: '/admin/erp/template-editor' }
+    ]
+  },
+
+  // 11. Admin Panel (admin + editor)
+  {
+    id: 'admin',
+    type: 'dropdown',
+    labelKey: 'admin_panel',
+    condition: { auth: 'required', roles: ['admin', 'editor'] },
+    items: [
+      { id: 'admin_messages', labelKey: 'messages', to: '/admin/messages' },
+      { id: 'admin_messaging', labelKey: 'messaging_center', to: '/admin/messaging', condition: { roles: ['admin'] } },
+      { id: 'admin_forms', labelKey: 'forms_management', to: '/admin/forms' },
+      { id: 'admin_slides', labelKey: 'presentation_editor', to: '/admin/slide-editor' },
+      { id: 'admin_sponsors', labelKey: 'sponsors_editor', to: '/admin/sponsors' },
+      { id: 'admin_notifications', labelKey: 'push_notifications', to: '/admin/notifications/send', condition: { roles: ['admin'] } },
+      { id: 'admin_roles', labelKey: 'role_manager', to: '/admin/roles', condition: { roles: ['admin'] } },
+      { id: 'admin_menu', labelKey: 'menu_editor', to: '/admin/menu-editor', condition: { roles: ['admin'] } },
+      { id: 'admin_logout', labelKey: 'logout', isAction: 'logout' }
+    ]
+  },
+
+  // 12. Photographer Panel
+  {
+    id: 'photographer',
+    type: 'dropdown',
+    labelKey: 'admin_panel',
+    condition: { auth: 'required', roles: ['photographer'] },
+    items: [
+      { id: 'photo_gallery', labelKey: 'gallery', to: '/gallery' },
+      { id: 'photo_logout', labelKey: 'logout', isAction: 'logout' }
+    ]
+  },
+
+  // 13. Teacher Logout (logged in but not admin/editor/photographer)
+  {
+    id: 'teacher_logout',
+    type: 'direct-link',
+    labelKey: 'logout',
+    condition: { auth: 'required', excludeRoles: ['admin', 'editor', 'photographer'] },
+    items: [
+      { id: 'teacher_logout_action', labelKey: 'logout', isAction: 'logout' }
+    ]
+  },
+
+  // 14. Login (not logged in)
+  {
+    id: 'login',
+    type: 'direct-link',
+    labelKey: 'login',
+    to: '/login',
+    condition: { auth: 'forbidden' },
+    items: []
+  }
+]

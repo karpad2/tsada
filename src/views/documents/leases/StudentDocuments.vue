@@ -42,7 +42,7 @@
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
     import gsap from "gsap";
-    import moment from 'moment/min/moment-with-locales';
+    import dayjs from '@/utils/dayjs';
     
     export default {
         name: 'Workers',
@@ -56,7 +56,7 @@
         mounted()
         {
             const loadingStore = useLoadingStore();
-            this.admin=loadingStore.userLoggedin;
+            this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
             document.title=this.$t("studentdocuments");
     
             gsap.fromTo(
@@ -128,20 +128,20 @@
                     let local=loadingStore.language;
                     if(local=="rs"||local=="sr")
                     {
-                        moment.locale('sr');
+                        dayjs.locale('sr');
                     }
                     else if(local=="hu")
                     {
-                        moment.locale('hu');
+                        dayjs.locale('hu');
                     }
                     else if(local=="en")
                     {
-                        moment.locale('en');
+                        dayjs.locale('en');
                     }
                     else {
 
                     }
-                    return moment(a).format("LLL");
+                    return dayjs(a).format("LLL");
                 },
             async new_stuff(aaa)
             {

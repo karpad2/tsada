@@ -9,6 +9,7 @@
                         <span class="text-h5">{{ $t('gallery_editor') }}</span>
                         <v-spacer />
                         <v-chip
+                            v-if="!isPhotographer"
                             :color="visible ? 'success' : 'warning'"
                             :prepend-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
                             variant="elevated"
@@ -21,6 +22,7 @@
                         <!-- Quick Actions -->
                         <div class="d-flex flex-wrap gap-3 align-center">
                             <v-switch
+                                v-if="!isPhotographer"
                                 v-model="visible"
                                 :label="$t('make_visible')"
                                 color="success"
@@ -29,9 +31,10 @@
                                 @change="save"
                             />
 
-                            <v-divider vertical class="mx-2" />
+                            <v-divider v-if="!isPhotographer" vertical class="mx-2" />
 
                             <v-btn
+                                v-if="!isPhotographer"
                                 @click="save"
                                 color="success"
                                 size="large"
@@ -42,6 +45,7 @@
                             </v-btn>
 
                             <v-btn
+                                v-if="!isPhotographer"
                                 @click="delete_content"
                                 color="error"
                                 size="large"
@@ -109,7 +113,7 @@
             </v-col>
 
             <!-- Language Fields Section -->
-            <v-col cols="12" lg="6">
+            <v-col v-if="!isPhotographer" cols="12" lg="6">
                 <v-card elevation="2" rounded class="language-card">
                     <v-card-title class="bg-secondary text-white">
                         <v-icon left>mdi-translate</v-icon>
@@ -187,23 +191,152 @@
             </v-col>
         </v-row>
 
-        <!-- Images Preview Section -->
-        <v-row v-if="images.length > 0">
+        <!-- Pending Images Section (Admin/Editor only) -->
+        <v-row v-if="!isPhotographer && pendingImages.length > 0">
             <v-col>
                 <v-card elevation="2" rounded>
-                    <v-card-title class="bg-info text-white">
-                        <v-icon left>mdi-eye</v-icon>
-                        {{ $t('preview') }}
+                    <v-card-title class="bg-warning text-white d-flex align-center">
+                        <v-icon left>mdi-clock-outline</v-icon>
+                        {{ $t('pending_approval') }}
                         <v-spacer />
-                        <v-chip color="white" variant="elevated" text-color="info">
-                            {{ images.length }} {{ $t('images') }}
+                        <v-chip color="white" variant="elevated" text-color="warning" class="mr-3">
+                            {{ pendingImages.length }} {{ $t('images') }}
+                        </v-chip>
+                        <v-btn
+                            @click="approve_all"
+                            color="success"
+                            size="small"
+                            prepend-icon="mdi-check-all"
+                            variant="elevated"
+                        >
+                            {{ $t('approve_all') }}
+                        </v-btn>
+                    </v-card-title>
+
+                    <v-card-text class="pa-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div
+                                v-for="image in pendingImages"
+                                :key="image.img_id"
+                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-orange-300"
+                            >
+                                <figure class="relative">
+                                    <img
+                                        :src="image.img"
+                                        alt="Pending image"
+                                        class="w-full h-48 object-cover"
+                                    />
+                                    <div class="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ $t("pending") }}
+                                    </div>
+                                </figure>
+
+                                <div class="p-4">
+                                    <div class="flex gap-2 justify-end">
+                                        <v-btn
+                                            @click="approve_image(image.doc_id)"
+                                            size="small"
+                                            color="success"
+                                            variant="tonal"
+                                            prepend-icon="mdi-check"
+                                        >
+                                            {{ $t("approve") }}
+                                        </v-btn>
+                                        <v-btn
+                                            @click="reject_image(image.img_id, image.doc_id)"
+                                            size="small"
+                                            color="error"
+                                            variant="tonal"
+                                            prepend-icon="mdi-close"
+                                        >
+                                            {{ $t("reject") }}
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Delete Requested Images Section (Admin/Editor only) -->
+        <v-row v-if="!isPhotographer && deleteRequestedImages.length > 0">
+            <v-col>
+                <v-card elevation="2" rounded>
+                    <v-card-title class="bg-error text-white d-flex align-center">
+                        <v-icon left>mdi-delete-clock</v-icon>
+                        {{ $t('delete_requested') }}
+                        <v-spacer />
+                        <v-chip color="white" variant="elevated" text-color="error">
+                            {{ deleteRequestedImages.length }} {{ $t('images') }}
                         </v-chip>
                     </v-card-title>
 
                     <v-card-text class="pa-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             <div
-                                v-for="image in images"
+                                v-for="image in deleteRequestedImages"
+                                :key="image.img_id"
+                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-red-300"
+                            >
+                                <figure class="relative">
+                                    <img
+                                        :src="image.img"
+                                        alt="Delete requested image"
+                                        class="w-full h-48 object-cover opacity-70"
+                                    />
+                                    <div class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ $t("delete_requested") }}
+                                    </div>
+                                </figure>
+
+                                <div class="p-4">
+                                    <div class="flex gap-2 justify-end">
+                                        <v-btn
+                                            @click="approve_image(image.doc_id)"
+                                            size="small"
+                                            color="success"
+                                            variant="tonal"
+                                            prepend-icon="mdi-undo"
+                                        >
+                                            {{ $t("restore") }}
+                                        </v-btn>
+                                        <v-btn
+                                            @click="delete_picture(image.img_id, image.doc_id)"
+                                            size="small"
+                                            color="error"
+                                            variant="tonal"
+                                            prepend-icon="mdi-delete"
+                                        >
+                                            {{ $t("delete") }}
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Approved Images Section -->
+        <v-row v-if="approvedImages.length > 0">
+            <v-col>
+                <v-card elevation="2" rounded>
+                    <v-card-title class="bg-info text-white">
+                        <v-icon left>mdi-eye</v-icon>
+                        {{ $t('approved_images') }}
+                        <v-spacer />
+                        <v-chip color="white" variant="elevated" text-color="info">
+                            {{ approvedImages.length }} {{ $t('images') }}
+                        </v-chip>
+                    </v-card-title>
+
+                    <v-card-text class="pa-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div
+                                v-for="image in approvedImages"
                                 :key="image.img_id"
                                 class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg"
                             >
@@ -219,12 +352,18 @@
                                     >
                                         {{ $t("default_picture") }}
                                     </div>
+                                    <div
+                                        v-if="!isPhotographer"
+                                        class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium"
+                                    >
+                                        {{ $t("approved") }}
+                                    </div>
                                 </figure>
 
                                 <div class="p-4">
                                     <div class="flex gap-2 justify-end">
                                         <v-btn
-                                            v-if="default_image !== image.img_id"
+                                            v-if="!isPhotographer && default_image !== image.img_id"
                                             @click="set_as_default(image.img_id)"
                                             size="small"
                                             color="primary"
@@ -232,6 +371,72 @@
                                         >
                                             {{ $t("set_as_default") }}
                                         </v-btn>
+                                        <!-- Admin/Editor can delete directly -->
+                                        <v-btn
+                                            v-if="!isPhotographer"
+                                            @click="delete_picture(image.img_id, image.doc_id)"
+                                            size="small"
+                                            color="error"
+                                            variant="tonal"
+                                        >
+                                            {{ $t("delete") }}
+                                        </v-btn>
+                                        <!-- Photographer can only request deletion for approved images -->
+                                        <v-btn
+                                            v-if="isPhotographer"
+                                            @click="request_delete(image.doc_id)"
+                                            size="small"
+                                            color="warning"
+                                            variant="tonal"
+                                            prepend-icon="mdi-delete-alert"
+                                        >
+                                            {{ $t("request_delete") }}
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Photographer's Pending Images (Photographer sees their pending uploads) -->
+        <v-row v-if="isPhotographer && pendingImages.length > 0">
+            <v-col>
+                <v-card elevation="2" rounded>
+                    <v-card-title class="bg-warning text-white">
+                        <v-icon left>mdi-clock-outline</v-icon>
+                        {{ $t('pending_approval') }}
+                        <v-spacer />
+                        <v-chip color="white" variant="elevated" text-color="warning">
+                            {{ pendingImages.length }} {{ $t('images') }}
+                        </v-chip>
+                    </v-card-title>
+
+                    <v-card-text class="pa-6">
+                        <v-alert type="info" variant="tonal" class="mb-4">
+                            {{ $t('pending_images_info') }}
+                        </v-alert>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div
+                                v-for="image in pendingImages"
+                                :key="image.img_id"
+                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-orange-300 opacity-80"
+                            >
+                                <figure class="relative">
+                                    <img
+                                        :src="image.img"
+                                        alt="Pending image"
+                                        class="w-full h-48 object-cover"
+                                    />
+                                    <div class="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ $t("pending") }}
+                                    </div>
+                                </figure>
+
+                                <div class="p-4">
+                                    <div class="flex gap-2 justify-end">
                                         <v-btn
                                             @click="delete_picture(image.img_id, image.doc_id)"
                                             size="small"
@@ -255,8 +460,29 @@
 import { Client, Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+import { RoleService } from "@/services/RoleService";
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 
 export default {
+    setup() {
+        const { openDialog } = useConfirmDialog();
+        return { openDialog };
+    },
+    computed: {
+        isPhotographer(): boolean {
+            const loadingStore = useLoadingStore();
+            return loadingStore.userRole === 'photographer';
+        },
+        pendingImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+            return this.images.filter(img => img.status === 'pending');
+        },
+        approvedImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+            return this.images.filter(img => img.status === 'approved');
+        },
+        deleteRequestedImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+            return this.images.filter(img => img.status === 'delete_requested');
+        }
+    },
     data() {
         return {
             title_en: "",
@@ -269,7 +495,7 @@ export default {
             visible: false,
             default_image: "",
             file_link: null,
-            images: [] as any[],
+            images: [] as Array<{ img: string; img_id: string; doc_id: string; status: string }>,
             uploading: false
         }
     },
@@ -310,9 +536,10 @@ export default {
 
                     l.documents.forEach(element => {
                         console.log('Processing image:', element.image_id);
-                        let a = { img: "", img_id: "", doc_id: "" };
+                        let a = { img: "", img_id: "", doc_id: "", status: "approved" };
                         a.img_id = element.image_id;
                         a.doc_id = element.$id;
+                        a.status = element.status || "approved";
                         a.img = storage.getFilePreview(
                             config.gallery_pictures_storage,
                             element.image_id,
@@ -354,35 +581,49 @@ export default {
             const database = new Databases(appw);
 
             try {
+                const updateData: any = {
+                    "title_rs": this.title_rs,
+                    "title_hu": this.title_hu,
+                    "title_en": this.title_en,
+                    "short_en": this.short_en,
+                    "short_hu": this.short_hu,
+                    "short_rs": this.short_rs,
+                    "default_image": this.default_image
+                };
+
+                // Photographer cannot change visibility
+                if (!this.isPhotographer) {
+                    updateData.visible = this.visible;
+                }
+
                 const result = await database.updateDocument(
                     config.website_db,
                     config.gallery,
                     this.$route.params.id as string,
-                    {
-                        "title_rs": this.title_rs,
-                        "title_hu": this.title_hu,
-                        "title_en": this.title_en,
-                        "short_en": this.short_en,
-                        "short_hu": this.short_hu,
-                        "short_rs": this.short_rs,
-                        "visible": this.visible,
-                        "default_image": this.default_image
-                    }
+                    updateData
                 );
                 this.$notify(this.$t('saved'));
             } catch (error) {
                 console.error('Error saving gallery:', error);
                 this.$notify({
                     type: 'error',
-                    text: 'Error saving gallery'
+                    text: this.$t('error_saving_gallery')
                 });
             }
         },
 
         async delete_content() {
-            if (!confirm('Are you sure you want to delete this gallery?')) {
-                return;
-            }
+            // Photographer cannot delete galleries
+            if (this.isPhotographer) return;
+
+            const galleryConfirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete_gallery'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!galleryConfirmed) return;
 
             const database = new Databases(appw);
 
@@ -394,7 +635,7 @@ export default {
                 console.error('Error deleting gallery:', error);
                 this.$notify({
                     type: 'error',
-                    text: 'Error deleting gallery'
+                    text: this.$t('error_deleting_gallery')
                 });
             }
         },
@@ -432,7 +673,8 @@ export default {
                         ID.unique(),
                         {
                             "image_id": result.$id,
-                            "gallery": this.gallery_id
+                            "gallery": this.gallery_id,
+                            "status": this.isPhotographer ? "pending" : "approved"
                         }
                     );
 
@@ -451,8 +693,66 @@ export default {
                 this.uploading = false;
                 this.$notify({
                     type: 'error',
-                    text: 'Error uploading files'
+                    text: this.$t('error_uploading_files')
                 });
+            }
+        },
+
+        async approve_image(docId: string) {
+            const database = new Databases(appw);
+            try {
+                await database.updateDocument(config.website_db, config.album_images, docId, {
+                    "status": "approved"
+                });
+                this.$notify({ type: 'success', text: this.$t('image_approved') });
+                await this.getMD();
+            } catch (error) {
+                console.error('Error approving image:', error);
+                this.$notify({ type: 'error', text: this.$t('error_approving_image') });
+            }
+        },
+
+        async approve_all() {
+            const database = new Databases(appw);
+            try {
+                await Promise.all(
+                    this.pendingImages.map(img =>
+                        database.updateDocument(config.website_db, config.album_images, img.doc_id, {
+                            "status": "approved"
+                        })
+                    )
+                );
+                this.$notify({ type: 'success', text: this.$t('all_images_approved') });
+                await this.getMD();
+            } catch (error) {
+                console.error('Error approving all images:', error);
+                this.$notify({ type: 'error', text: this.$t('error_approving_image') });
+            }
+        },
+
+        async reject_image(imgId: string, docId: string) {
+            const rejectConfirmed = await this.openDialog({
+                title: this.$t('reject'),
+                message: this.$t('confirm_reject_image'),
+                confirmText: this.$t('reject'),
+                color: 'error',
+                icon: 'mdi-close-circle'
+            });
+            if (!rejectConfirmed) return;
+            await this.delete_picture(imgId, docId);
+        },
+
+        async request_delete(docId: string) {
+            const database = new Databases(appw);
+            try {
+                await database.updateDocument(config.website_db, config.album_images, docId, {
+                    "status": "delete_requested"
+                });
+                this.$notify({ type: 'info', text: this.$t('delete_requested_notify') });
+                await this.getMD();
+            } catch (error) {
+                console.error('Error requesting deletion:', error);
+                this.$notify({ type: 'error', text: this.$t('error_requesting_delete') });
             }
         },
 
@@ -463,9 +763,14 @@ export default {
         },
 
         async delete_picture(aa: string, bb: string) {
-            if (!confirm('Are you sure you want to delete this image?')) {
-                return;
-            }
+            const imgConfirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete_image'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!imgConfirmed) return;
 
             const storage = new Storage(appw);
             const database = new Databases(appw);

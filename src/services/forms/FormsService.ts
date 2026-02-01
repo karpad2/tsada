@@ -14,6 +14,7 @@ export interface FormField {
   placeholder?: string;
   required: boolean;
   options?: string[]; // For select, radio, checkbox
+  imageId?: string; // Appwrite file ID for question image
   validation?: {
     min?: number;
     max?: number;
@@ -35,11 +36,6 @@ export interface Form {
     confirmationMessage: string;
     collectEmail: boolean;
     active: boolean;
-  };
-  theme?: {
-    primaryColor?: string;
-    backgroundColor?: string;
-    headerImage?: string;
   };
   createdBy?: string;
   createdAt?: string;
@@ -86,7 +82,6 @@ export class FormsService {
           description: form.description || '',
           fields: JSON.stringify(form.fields),
           settings: JSON.stringify(form.settings),
-          theme: JSON.stringify(form.theme || {}),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           responsesCount: 0,
@@ -113,7 +108,6 @@ export class FormsService {
       if (updates.description !== undefined) updateData.description = updates.description;
       if (updates.fields) updateData.fields = JSON.stringify(updates.fields);
       if (updates.settings) updateData.settings = JSON.stringify(updates.settings);
-      if (updates.theme) updateData.theme = JSON.stringify(updates.theme);
 
       const document = await this.databases.updateDocument(
         config.website_db,
@@ -202,7 +196,7 @@ export class FormsService {
 
       const document = await this.databases.createDocument(
         config.website_db,
-        config.form_responses || 'form_responses',
+        config.form_submissions || 'form_submissions',
         'unique()',
         {
           formId,
@@ -243,7 +237,7 @@ export class FormsService {
     try {
       const result = await this.databases.listDocuments(
         config.website_db,
-        config.form_responses || 'form_responses',
+        config.form_submissions || 'form_submissions',
         [Query.equal('formId', formId), Query.orderDesc('submittedAt'), Query.limit(limit), Query.offset(offset)]
       );
 
@@ -264,7 +258,7 @@ export class FormsService {
     try {
       const document = await this.databases.getDocument(
         config.website_db,
-        config.form_responses || 'form_responses',
+        config.form_submissions || 'form_submissions',
         responseId
       );
 
@@ -282,7 +276,7 @@ export class FormsService {
     try {
       await this.databases.deleteDocument(
         config.website_db,
-        config.form_responses || 'form_responses',
+        config.form_submissions || 'form_submissions',
         responseId
       );
     } catch (error) {
@@ -400,11 +394,17 @@ export class FormsService {
       $id: doc.$id,
       title: doc.title,
       description: doc.description,
-      fields: JSON.parse(doc.fields),
-      settings: JSON.parse(doc.settings),
-      theme: doc.theme ? JSON.parse(doc.theme) : {},
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
+      fields: doc.fields ? JSON.parse(doc.fields) : [],
+      settings: doc.settings ? JSON.parse(doc.settings) : {
+        allowMultipleResponses: true,
+        requireLogin: false,
+        showProgressBar: true,
+        confirmationMessage: 'Köszönjük a válaszod!',
+        collectEmail: false,
+        active: true,
+      },
+      createdAt: doc.createdAt || doc.$createdAt,
+      updatedAt: doc.updatedAt || doc.$updatedAt,
       responsesCount: doc.responsesCount || 0,
     };
   }
@@ -416,8 +416,8 @@ export class FormsService {
     return {
       $id: doc.$id,
       formId: doc.formId,
-      responses: JSON.parse(doc.responses),
-      submittedAt: doc.submittedAt,
+      responses: doc.responses ? JSON.parse(doc.responses) : {},
+      submittedAt: doc.submittedAt || doc.$createdAt,
       submittedBy: doc.submittedBy,
     };
   }

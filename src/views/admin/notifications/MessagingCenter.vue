@@ -3,8 +3,8 @@
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-4xl font-black text-white mb-2">📱 Appwrite Messaging Center</h1>
-        <p class="text-gray-300">Natív Appwrite Messaging használatával - Push, Email, SMS</p>
+        <h1 class="text-4xl font-black text-white mb-2">{{ $t('messaging_center') }}</h1>
+        <p class="text-gray-300">{{ $t('messaging_center_description') }}</p>
       </div>
 
       <!-- Stats Grid -->
@@ -14,10 +14,10 @@
             <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
-            <h3 class="text-white font-semibold">Üzenetek</h3>
+            <h3 class="text-white font-semibold">{{ $t('messages') }}</h3>
           </div>
           <p class="text-3xl font-bold text-white">{{ stats.totalMessages }}</p>
-          <p class="text-sm text-gray-400 mt-1">Összes elküldött</p>
+          <p class="text-sm text-gray-400 mt-1">{{ $t('total_sent') }}</p>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
@@ -25,10 +25,10 @@
             <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 class="text-white font-semibold">Topics</h3>
+            <h3 class="text-white font-semibold">{{ $t('mc_topics') }}</h3>
           </div>
           <p class="text-3xl font-bold text-white">{{ topics.length }}</p>
-          <p class="text-sm text-gray-400 mt-1">Aktív csoportok</p>
+          <p class="text-sm text-gray-400 mt-1">{{ $t('mc_active_groups') }}</p>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
@@ -36,10 +36,10 @@
             <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="text-white font-semibold">Sikeres</h3>
+            <h3 class="text-white font-semibold">{{ $t('mc_successful') }}</h3>
           </div>
           <p class="text-3xl font-bold text-white">{{ stats.successful }}</p>
-          <p class="text-sm text-gray-400 mt-1">Kézbesítve</p>
+          <p class="text-sm text-gray-400 mt-1">{{ $t('mc_delivered') }}</p>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
@@ -47,10 +47,10 @@
             <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="text-white font-semibold">Ütemezett</h3>
+            <h3 class="text-white font-semibold">{{ $t('mc_scheduled') }}</h3>
           </div>
           <p class="text-3xl font-bold text-white">{{ stats.scheduled }}</p>
-          <p class="text-sm text-gray-400 mt-1">Várakozik</p>
+          <p class="text-sm text-gray-400 mt-1">{{ $t('mc_waiting') }}</p>
         </div>
       </div>
 
@@ -63,7 +63,7 @@
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
-              Új Értesítés Küldése
+              {{ $t('send_new_notification') }}
             </h2>
 
             <form @submit.prevent="sendNotification">
@@ -88,25 +88,25 @@
               <!-- Title & Body -->
               <div class="space-y-4 mb-6">
                 <div>
-                  <label class="block text-white font-semibold mb-2">Cím</label>
+                  <label class="block text-white font-semibold mb-2">{{ $t('notification_title') }}</label>
                   <input
                     v-model="notification.title"
                     type="text"
                     maxlength="50"
                     class="input-field"
-                    placeholder="Értesítés címe..."
+                    :placeholder="$t('notification_title_placeholder')"
                   />
                   <p class="text-sm text-gray-400 mt-1">{{ notification.title.length }}/50</p>
                 </div>
 
                 <div>
-                  <label class="block text-white font-semibold mb-2">Szöveg</label>
+                  <label class="block text-white font-semibold mb-2">{{ $t('notification_body') }}</label>
                   <textarea
                     v-model="notification.body"
                     maxlength="200"
                     rows="4"
                     class="input-field resize-none"
-                    placeholder="Értesítés szövege..."
+                    :placeholder="$t('notification_body_placeholder')"
                   ></textarea>
                   <p class="text-sm text-gray-400 mt-1">{{ notification.body.length }}/200</p>
                 </div>
@@ -114,18 +114,18 @@
 
               <!-- Target Selection -->
               <div class="mb-6">
-                <label class="block text-white font-semibold mb-2">Címzettek</label>
+                <label class="block text-white font-semibold mb-2">{{ $t('mc_recipients') }}</label>
                 <select v-model="notification.targetType" class="input-field">
-                  <option value="all">Mindenki (all-users topic)</option>
-                  <option value="topic">Meghatározott topic</option>
-                  <option value="users">Konkrét felhasználók</option>
+                  <option value="all">{{ $t('mc_everyone') }}</option>
+                  <option value="topic">{{ $t('mc_specific_topic') }}</option>
+                  <option value="users">{{ $t('mc_specific_users') }}</option>
                 </select>
 
                 <div v-if="notification.targetType === 'topic'" class="mt-3">
                   <select v-model="notification.selectedTopic" class="input-field">
-                    <option value="">Válassz topic-ot...</option>
+                    <option value="">{{ $t('mc_select_topic') }}</option>
                     <option v-for="topic in topics" :key="topic.$id" :value="topic.$id">
-                      {{ topic.name }} ({{ topic.total || 0 }} feliratkozó)
+                      {{ topic.name }} ({{ topic.total || 0 }} {{ $t('subscribers') }})
                     </option>
                   </select>
                 </div>
@@ -135,9 +135,9 @@
                     v-model="notification.userIds"
                     type="text"
                     class="input-field"
-                    placeholder="User ID-k vesszővel elválasztva..."
+                    :placeholder="$t('mc_user_ids_placeholder')"
                   />
-                  <p class="text-sm text-gray-400 mt-1">Példa: user1, user2, user3</p>
+                  <p class="text-sm text-gray-400 mt-1">{{ $t('mc_user_ids_hint') }}</p>
                 </div>
               </div>
 
@@ -157,18 +157,18 @@
                   >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
-                  Haladó beállítások
+                  {{ $t('mc_advanced_settings') }}
                 </button>
 
                 <div v-if="showAdvanced" class="mt-4 space-y-4 p-4 bg-white/5 rounded-xl">
                   <!-- Icon & Sound -->
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-white text-sm mb-2">Ikon URL</label>
+                      <label class="block text-white text-sm mb-2">{{ $t('icon_url_optional') }}</label>
                       <input v-model="notification.icon" type="url" class="input-field" placeholder="https://..." />
                     </div>
                     <div>
-                      <label class="block text-white text-sm mb-2">Hang</label>
+                      <label class="block text-white text-sm mb-2">{{ $t('mc_sound') }}</label>
                       <input v-model="notification.sound" type="text" class="input-field" placeholder="default" />
                     </div>
                   </div>
@@ -176,28 +176,28 @@
                   <!-- Priority & Badge -->
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-white text-sm mb-2">Prioritás (Android)</label>
+                      <label class="block text-white text-sm mb-2">{{ $t('mc_priority') }}</label>
                       <select v-model="notification.priority" class="input-field">
-                        <option value="default">Alap</option>
-                        <option value="high">Magas</option>
-                        <option value="max">Maximum</option>
-                        <option value="low">Alacsony</option>
+                        <option value="default">{{ $t('mc_priority_default') }}</option>
+                        <option value="high">{{ $t('mc_priority_high') }}</option>
+                        <option value="max">{{ $t('mc_priority_max') }}</option>
+                        <option value="low">{{ $t('mc_priority_low') }}</option>
                       </select>
                     </div>
                     <div>
-                      <label class="block text-white text-sm mb-2">Badge szám</label>
+                      <label class="block text-white text-sm mb-2">{{ $t('mc_badge_number') }}</label>
                       <input v-model.number="notification.badge" type="number" class="input-field" placeholder="0" />
                     </div>
                   </div>
 
                   <!-- iOS Interruption Level -->
                   <div>
-                    <label class="block text-white text-sm mb-2">iOS Interruption Level</label>
+                    <label class="block text-white text-sm mb-2">{{ $t('mc_ios_interruption') }}</label>
                     <select v-model="notification.interruptionLevel" class="input-field">
-                      <option value="active">Aktív (alapértelmezett)</option>
-                      <option value="time-sensitive">Időérzékeny</option>
-                      <option value="critical">Kritikus (Do Not Disturb bypass)</option>
-                      <option value="passive">Passzív</option>
+                      <option value="active">{{ $t('mc_interruption_active') }}</option>
+                      <option value="time-sensitive">{{ $t('mc_interruption_time_sensitive') }}</option>
+                      <option value="critical">{{ $t('mc_interruption_critical') }}</option>
+                      <option value="passive">{{ $t('mc_interruption_passive') }}</option>
                     </select>
                   </div>
 
@@ -205,7 +205,7 @@
                   <div>
                     <label class="flex items-center gap-2 text-white mb-2">
                       <input v-model="notification.scheduled" type="checkbox" class="checkbox" />
-                      Ütemezett küldés
+                      {{ $t('mc_scheduled_send') }}
                     </label>
                     <input
                       v-if="notification.scheduled"
@@ -225,18 +225,18 @@
                   class="flex-1 btn-primary"
                 >
                   <span v-if="!isSending">
-                    {{ notification.scheduled ? '⏰ Ütemezés' : '📤 Küldés Most' }}
+                    {{ notification.scheduled ? $t('mc_schedule_btn') : $t('mc_send_now_btn') }}
                   </span>
                   <span v-else class="flex items-center justify-center gap-2">
                     <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Küldés...
+                    {{ $t('sending') }}
                   </span>
                 </button>
                 <button type="button" @click="resetForm" class="px-6 py-4 btn-secondary">
-                  Törlés
+                  {{ $t('delete') }}
                 </button>
               </div>
             </form>
@@ -247,9 +247,9 @@
         <div class="space-y-6">
           <!-- Topics -->
           <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">Topics</h3>
+            <h3 class="text-xl font-bold text-white mb-4">{{ $t('mc_topics') }}</h3>
             <div v-if="topics.length === 0" class="text-center py-8 text-gray-400">
-              <p>Még nincsenek topics</p>
+              <p>{{ $t('mc_no_topics') }}</p>
             </div>
             <div v-else class="space-y-2">
               <div
@@ -260,7 +260,7 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <h4 class="text-white font-semibold">{{ topic.name }}</h4>
-                    <p class="text-sm text-gray-400">{{ topic.total || 0 }} feliratkozó</p>
+                    <p class="text-sm text-gray-400">{{ topic.total || 0 }} {{ $t('subscribers') }}</p>
                   </div>
                 </div>
               </div>
@@ -269,9 +269,9 @@
 
           <!-- Recent Messages -->
           <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">Legutóbbi</h3>
+            <h3 class="text-xl font-bold text-white mb-4">{{ $t('mc_recent') }}</h3>
             <div v-if="recentMessages.length === 0" class="text-center py-8 text-gray-400">
-              <p>Még nincsenek üzenetek</p>
+              <p>{{ $t('mc_no_messages') }}</p>
             </div>
             <div v-else class="space-y-3">
               <div
@@ -279,7 +279,7 @@
                 :key="msg.$id"
                 class="p-3 bg-white/5 rounded-lg"
               >
-                <h4 class="text-white font-semibold text-sm truncate">{{ msg.data?.title || 'Untitled' }}</h4>
+                <h4 class="text-white font-semibold text-sm truncate">{{ msg.data?.title || $t('untitled_document') }}</h4>
                 <p class="text-xs text-gray-400">{{ formatDate(msg.$createdAt) }}</p>
                 <span
                   :class="[
@@ -302,16 +302,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { notify } from '@kyvg/vue3-notification';
 import { AppwriteMessagingService } from '@/services/notifications/AppwriteMessagingService';
-import moment from 'moment';
+import dayjs from '@/utils/dayjs';
 
+const { t } = useI18n();
 const messagingService = AppwriteMessagingService.getInstance();
 
-const notificationTypes = [
-  { value: 'push', label: '📱 Push' },
-  { value: 'email', label: '📧 Email' },
-  { value: 'sms', label: '💬 SMS' },
-];
+const notificationTypes = computed(() => [
+  { value: 'push', label: 'Push' },
+  { value: 'email', label: 'Email' },
+  { value: 'sms', label: 'SMS' },
+]);
 
 const selectedType = ref('push');
 const showAdvanced = ref(false);
@@ -414,13 +417,13 @@ async function sendNotification() {
       result = await messagingService.sendToUsers(userIds, payload, options);
     }
 
-    alert('✅ Értesítés sikeresen elküldve!');
+    notify({ type: 'success', text: t('notification_sent_success') });
     resetForm();
     await loadRecentMessages();
     await loadStats();
   } catch (error: any) {
     console.error('Failed to send notification:', error);
-    alert('❌ Hiba történt: ' + (error.message || 'Ismeretlen hiba'));
+    notify({ type: 'error', text: t('notification_sent_error') + ': ' + (error.message || '') });
   } finally {
     isSending.value = false;
   }
@@ -444,7 +447,7 @@ function resetForm() {
 }
 
 function formatDate(dateString: string) {
-  return moment(dateString).fromNow();
+  return dayjs(dateString).fromNow();
 }
 </script>
 

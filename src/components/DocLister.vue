@@ -24,7 +24,7 @@
 <script>
 import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
 import {appw,config} from "@/appwrite";
-import moment from 'moment/min/moment-with-locales';
+import dayjs from '@/utils/dayjs';
 import {useLoadingStore} from "@/stores/loading";
 import { convertifserbian } from "@/lang";
 
@@ -58,7 +58,7 @@ export default{
     mounted()
     {
         this.setupHeaders();
-        this.admin = this.loadingStore.userLoggedin;
+        this.admin = this.loadingStore.userLoggedin && (this.loadingStore.userRole === 'admin' || this.loadingStore.userRole === 'editor');
         this.synchronize_documents();
     },
     methods:{
@@ -127,20 +127,20 @@ export default{
                 {   let local=this.loadingStore.language;
                     if(local=="rs"||local=="sr")
                     {
-                        moment.locale('sr');
+                        dayjs.locale('sr');
                     }
                     else if(local=="hu")
                     {
-                        moment.locale('hu');
+                        dayjs.locale('hu');
                     }
                     else if(local=="en")
                     {
-                        moment.locale('en');
+                        dayjs.locale('en');
                     }
                     else {
 
                     }
-                    return moment(a).format("LLL");
+                    return dayjs(a).format("LLL");
                 },
 
     }

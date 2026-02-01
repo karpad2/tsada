@@ -11,6 +11,7 @@ import {
     type SaveOptions,
     type DeleteOptions
 } from '@/utils/editorUtils';
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 
 export interface UseEditorOptions {
     collectionId: string;
@@ -25,6 +26,7 @@ export function useEditor(options: UseEditorOptions) {
     const route = useRoute();
     const router = useRouter();
     const { t } = useI18n();
+    const { openDialog } = useConfirmDialog();
 
     // State
     const formData = reactive<Record<string, any>>({});
@@ -78,7 +80,7 @@ export function useEditor(options: UseEditorOptions) {
                 collectionId: options.collectionId,
                 documentId: documentId.value,
                 data: { ...formData },
-                successMessage: showSuccess ? 'Changes saved successfully' : undefined
+                successMessage: showSuccess ? t('saved') : undefined
             };
 
             const result = await documentManager.save(saveOptions);
@@ -103,9 +105,14 @@ export function useEditor(options: UseEditorOptions) {
     const deleteContent = async () => {
         if (!documentId.value) return;
 
-        if (!confirm(t('confirm_delete'))) {
-            return;
-        }
+        const confirmed = await openDialog({
+            title: t('delete'),
+            message: t('confirm_delete'),
+            confirmText: t('delete'),
+            color: 'error',
+            icon: 'mdi-delete'
+        });
+        if (!confirmed) return;
 
         loadingManager.setLoading('delete', true);
 
@@ -114,7 +121,7 @@ export function useEditor(options: UseEditorOptions) {
                 databaseId: options.databaseId || 'default',
                 collectionId: options.collectionId,
                 documentId: documentId.value,
-                successMessage: 'Content deleted successfully'
+                successMessage: t('deleted')
             };
 
             await documentManager.delete(deleteOptions);

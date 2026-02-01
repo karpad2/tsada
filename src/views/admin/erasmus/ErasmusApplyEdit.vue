@@ -41,8 +41,6 @@
 import { Client, Databases, ID, Storage, Query } from "appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { appw, config } from "@/appwrite";
-import moment from "moment";
-
 export default {
     data() {
         return {
