@@ -108,7 +108,7 @@
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
   import gsap from 'gsap';
-  import moment from 'moment/min/moment-with-locales';
+  import dayjs from '@/utils/dayjs';
   import { jsPDF } from 'jspdf';
   import html2canvas from 'html2canvas';
   import AlbumViewer from '@/components/AlbumViewer.vue';
@@ -221,7 +221,8 @@
   
       // Methods
       const initializeAdmin = async () => {
-        state.admin = loadingStore.userLoggedin;
+        const role = loadingStore.userRole;
+        state.admin = loadingStore.userLoggedin && (role === 'admin' || role === 'editor');
         if (state.admin) {
           const account = new Account(appw);
           console.log(account.client);
@@ -301,17 +302,17 @@
         switch (language) {
           case 'rs':
           case 'sr':
-            moment.locale('sr');
+            dayjs.locale('sr');
             break;
           case 'hu':
-            moment.locale('hu');
+            dayjs.locale('hu');
             break;
           case 'en':
-            moment.locale('en');
+            dayjs.locale('en');
             break;
         }
 
-        return moment(dateString).format('LL');
+        return dayjs(dateString).format('LL');
       };
 
       const getLocalizedComponentContent = (component: any): string => {

@@ -172,6 +172,10 @@
               <v-icon left>mdi-download</v-icon>
               {{ $t('export_list') }}
             </v-btn>
+            <v-btn block color="success" variant="outlined" class="mb-2" @click="openExcelImportDialog">
+              <v-icon left>mdi-file-excel</v-icon>
+              {{ $t('import_from_excel') }}
+            </v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -508,6 +512,187 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Excel Import Dialog -->
+    <v-dialog v-model="showExcelImportDialog" max-width="900" scrollable persistent>
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2" color="success">mdi-file-excel</v-icon>
+          {{ $t('import_from_excel') }}
+          <v-spacer></v-spacer>
+          <v-btn icon size="small" variant="text" @click="closeExcelImportDialog">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text>
+          <!-- Step 1: File Upload -->
+          <v-stepper v-model="excelImportStep" :items="excelImportSteps" hide-actions>
+            <template #item.1>
+              <v-card flat>
+                <v-card-text>
+                  <v-file-input
+                    v-model="excelFile"
+                    :label="$t('select_excel_file')"
+                    accept=".xls,.xlsx,.csv"
+                    prepend-icon="mdi-file-excel"
+                    show-size
+                    @update:model-value="onExcelFileSelected"
+                  ></v-file-input>
+
+                  <v-alert v-if="excelFileError" type="error" variant="tonal" class="mt-3">
+                    {{ excelFileError }}
+                  </v-alert>
+
+                  <div v-if="excelSheets.length > 0" class="mt-4">
+                    <h4 class="mb-2">{{ $t('select_sheet') }}</h4>
+                    <v-radio-group v-model="selectedSheetName">
+                      <v-radio
+                        v-for="sheet in excelSheets"
+                        :key="sheet.name"
+                        :label="`${sheet.name} (${sheet.rowCount} ${$t('rows')})`"
+                        :value="sheet.name"
+                      ></v-radio>
+                    </v-radio-group>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </template>
+
+            <template #item.2>
+              <v-card flat>
+                <v-card-text>
+                  <v-alert type="info" variant="tonal" density="compact" class="mb-4">
+                    {{ $t('column_mapping_info') }}
+                  </v-alert>
+
+                  <v-table density="compact">
+                    <thead>
+                      <tr>
+                        <th>{{ $t('excel_column') }}</th>
+                        <th>{{ $t('target_field') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(mapping, index) in columnMappings" :key="index">
+                        <td>{{ mapping.excelColumn }}</td>
+                        <td>
+                          <v-select
+                            v-model="columnMappings[index].targetField"
+                            :items="availableTargetFields"
+                            item-title="label"
+                            item-value="value"
+                            density="compact"
+                            hide-details
+                            clearable
+                            variant="underlined"
+                          ></v-select>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </v-card-text>
+              </v-card>
+            </template>
+
+            <template #item.3>
+              <v-card flat>
+                <v-card-text>
+                  <v-alert type="info" variant="tonal" density="compact" class="mb-4">
+                    {{ $t('preview_import_data') }}
+                  </v-alert>
+
+                  <div v-if="importPreviewData.length > 0">
+                    <v-chip class="mb-3 mr-2" color="primary">
+                      {{ importPreviewData.length }} {{ $t('students_to_import') }}
+                    </v-chip>
+
+                    <v-data-table
+                      :headers="importPreviewHeaders"
+                      :items="importPreviewData.slice(0, 10)"
+                      density="compact"
+                      class="elevation-1"
+                    >
+                      <template #bottom>
+                        <div v-if="importPreviewData.length > 10" class="text-center py-2 text-grey">
+                          ... {{ $t('and_more', { count: importPreviewData.length - 10 }) }}
+                        </div>
+                      </template>
+                    </v-data-table>
+                  </div>
+
+                  <v-alert v-if="importResult?.errors?.length" type="warning" variant="tonal" class="mt-4">
+                    {{ $t('import_errors', { count: importResult.errors.length }) }}
+                    <ul class="mt-2">
+                      <li v-for="err in importResult.errors.slice(0, 5)" :key="err.row">
+                        {{ $t('row') }} {{ err.row }}: {{ err.error }}
+                      </li>
+                    </ul>
+                  </v-alert>
+                </v-card-text>
+              </v-card>
+            </template>
+
+            <template #item.4>
+              <v-card flat>
+                <v-card-text class="text-center py-8">
+                  <div v-if="isImporting">
+                    <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+                    <p class="mt-4">{{ $t('importing_students') }}...</p>
+                  </div>
+                  <div v-else-if="importCompleted">
+                    <v-icon size="64" color="success">mdi-check-circle</v-icon>
+                    <h3 class="mt-4 text-success">{{ $t('import_completed') }}</h3>
+                    <p class="mt-2">
+                      {{ $t('imported_count', { count: importedCount }) }}
+                    </p>
+                    <p v-if="importSkippedCount > 0" class="text-grey">
+                      {{ $t('skipped_count', { count: importSkippedCount }) }}
+                    </p>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </template>
+          </v-stepper>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn
+            v-if="excelImportStep > 1 && !importCompleted"
+            variant="text"
+            @click="excelImportStep--"
+          >
+            {{ $t('back') }}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn variant="text" @click="closeExcelImportDialog">
+            {{ importCompleted ? $t('close') : $t('cancel') }}
+          </v-btn>
+          <v-btn
+            v-if="excelImportStep === 1 && selectedSheetName"
+            color="primary"
+            @click="proceedToColumnMapping"
+          >
+            {{ $t('next') }}
+          </v-btn>
+          <v-btn
+            v-if="excelImportStep === 2"
+            color="primary"
+            @click="proceedToPreview"
+          >
+            {{ $t('preview') }}
+          </v-btn>
+          <v-btn
+            v-if="excelImportStep === 3 && importPreviewData.length > 0"
+            color="success"
+            :loading="isImporting"
+            @click="executeImport"
+          >
+            {{ $t('import') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -517,6 +702,8 @@ import { Databases, Query, ID } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { loadRelations, commonRelations, erpRelations } from '@/appwrite/relationHelper';
 import { ErpService, type Subject, type StudyProgram, type Generation, type Place, type ForeignLanguage, type ReligionOption, type SchoolYear } from '@/services/ErpService';
+import { ExcelImportService, type ExcelSheetInfo, type ExcelColumnMapping, type ImportResult, type ExcelStudentData } from '@/services/ExcelImportService';
+import { useLoadingStore } from '@/stores/loading';
 import { useI18n } from 'vue-i18n';
 
 interface Student {
@@ -562,6 +749,8 @@ export default defineComponent({
     const { t } = useI18n();
     const databases = new Databases(appw);
     const erpService = ErpService.getInstance();
+    const excelImportService = ExcelImportService.getInstance();
+    const loadingStore = useLoadingStore();
 
     // Data
     const classes = ref<ClassItem[]>([]);
@@ -592,6 +781,37 @@ export default defineComponent({
     const showGradesDialog = ref(false);
     const showBulkGradeDialog = ref(false);
     const showDeleteStudentDialog = ref(false);
+    const showExcelImportDialog = ref(false);
+
+    // Excel Import State
+    const excelImportStep = ref(1);
+    const excelImportSteps = computed(() => [
+      { title: t('file_selection'), value: 1 },
+      { title: t('column_mapping'), value: 2 },
+      { title: t('preview'), value: 3 },
+      { title: t('import'), value: 4 }
+    ]);
+    const excelFile = ref<File[] | null>(null);
+    const excelFileError = ref<string | null>(null);
+    const excelSheets = ref<ExcelSheetInfo[]>([]);
+    const selectedSheetName = ref<string | null>(null);
+    const columnMappings = ref<ExcelColumnMapping[]>([]);
+    const availableTargetFields = ref(excelImportService.getAvailableTargetFields());
+    const importResult = ref<ImportResult | null>(null);
+    const importPreviewData = ref<ExcelStudentData[]>([]);
+    const isImporting = ref(false);
+    const importCompleted = ref(false);
+    const importedCount = ref(0);
+    const importSkippedCount = ref(0);
+
+    const importPreviewHeaders = computed(() => [
+      { title: t('lastname_hungarian'), key: 'lastname_hu' },
+      { title: t('firstname_hungarian'), key: 'firstname_hu' },
+      { title: t('lastname_serbian'), key: 'lastname_rs' },
+      { title: t('firstname_serbian'), key: 'firstname_rs' },
+      { title: 'JMBG', key: 'JMBG' },
+      { title: t('birth_date'), key: 'birth_display' }
+    ]);
 
     // Form states
     const studentFormRef = ref();
@@ -674,7 +894,16 @@ export default defineComponent({
         // Betöltjük a workers és courses relációkat a helper segítségével
         const docsWithRelations = await loadRelations(result.documents, commonRelations.classes);
 
-        classes.value = docsWithRelations.map((doc: any) => {
+        let filteredDocs = docsWithRelations;
+
+        // Teacher role: csak a hozzárendelt osztályokat mutassa
+        if (loadingStore.userRole === 'teacher' && loadingStore.assignedClasses.length > 0) {
+          filteredDocs = docsWithRelations.filter((doc: any) =>
+            loadingStore.assignedClasses.includes(doc.$id)
+          );
+        }
+
+        classes.value = filteredDocs.map((doc: any) => {
           const langLabel = doc.language === 'class_hun' ? 'Magyar' : 'Szerb';
           const courseName = doc.courses?.title_hu || doc.courses?.title_rs || '';
           const workerName = doc.workers?.worker_name_hu || doc.workers?.worker_name_rs || '';
@@ -1008,6 +1237,150 @@ export default defineComponent({
       URL.revokeObjectURL(url);
     };
 
+    // Excel Import Functions
+    const openExcelImportDialog = () => {
+      // Reset state
+      excelImportStep.value = 1;
+      excelFile.value = null;
+      excelFileError.value = null;
+      excelSheets.value = [];
+      selectedSheetName.value = null;
+      columnMappings.value = [];
+      importResult.value = null;
+      importPreviewData.value = [];
+      isImporting.value = false;
+      importCompleted.value = false;
+      importedCount.value = 0;
+      importSkippedCount.value = 0;
+      showExcelImportDialog.value = true;
+    };
+
+    const closeExcelImportDialog = () => {
+      showExcelImportDialog.value = false;
+      if (importCompleted.value) {
+        loadStudents();
+      }
+    };
+
+    const onExcelFileSelected = async (files: File[] | null) => {
+      excelFileError.value = null;
+      excelSheets.value = [];
+      selectedSheetName.value = null;
+
+      if (!files || files.length === 0) return;
+
+      const file = files[0];
+      try {
+        excelSheets.value = await excelImportService.readExcelFile(file);
+        if (excelSheets.value.length > 0) {
+          selectedSheetName.value = excelSheets.value[0].name;
+        }
+      } catch (error) {
+        excelFileError.value = String(error);
+      }
+    };
+
+    const proceedToColumnMapping = () => {
+      if (!selectedSheetName.value) return;
+
+      const selectedSheet = excelSheets.value.find(s => s.name === selectedSheetName.value);
+      if (!selectedSheet) return;
+
+      // Auto-detect column mappings
+      const autoMappings = excelImportService.findColumnMappings(selectedSheet.columns);
+
+      // Add remaining columns without mapping
+      const mappedColumns = new Set(autoMappings.map(m => m.excelColumn));
+      selectedSheet.columns.forEach(col => {
+        if (!mappedColumns.has(col)) {
+          autoMappings.push({
+            excelColumn: col,
+            targetField: ''
+          });
+        }
+      });
+
+      columnMappings.value = autoMappings;
+      excelImportStep.value = 2;
+    };
+
+    const proceedToPreview = async () => {
+      if (!excelFile.value || !selectedSheetName.value) return;
+
+      try {
+        // Filter only mappings with target fields
+        const activeMappings = columnMappings.value.filter(m => m.targetField);
+
+        importResult.value = await excelImportService.importSheet(
+          excelFile.value[0],
+          selectedSheetName.value,
+          activeMappings,
+          true
+        );
+
+        // Add display field for birth date
+        importPreviewData.value = importResult.value.data.map(item => ({
+          ...item,
+          birth_display: item.birth_year
+            ? `${item.birth_year}.${(item.birth_month || 1).toString().padStart(2, '0')}.${(item.birth_day || 1).toString().padStart(2, '0')}.`
+            : '-'
+        }));
+
+        excelImportStep.value = 3;
+      } catch (error) {
+        excelFileError.value = String(error);
+      }
+    };
+
+    const executeImport = async () => {
+      if (!importPreviewData.value.length || !selectedClass.value) return;
+
+      isImporting.value = true;
+      importedCount.value = 0;
+      importSkippedCount.value = 0;
+
+      try {
+        for (const studentData of importPreviewData.value) {
+          try {
+            // Prepare data for database
+            const data: any = {
+              firstname_hu: studentData.firstname_hu || '',
+              firstname_rs: studentData.firstname_rs || undefined,
+              lastname_hu: studentData.lastname_hu || undefined,
+              lastname_rs: studentData.lastname_rs || undefined,
+              JMBG: studentData.JMBG || undefined,
+              birth_year: studentData.birth_year || undefined,
+              birth_month: studentData.birth_month || undefined,
+              birth_day: studentData.birth_day || undefined,
+              // Set study program from current class if available
+              study_program: selectedClass.value?.courses?.$id || undefined
+            };
+
+            // Remove undefined values
+            Object.keys(data).forEach(key => data[key] === undefined && delete data[key]);
+
+            await databases.createDocument(
+              config.erp_db,
+              config.erp_students,
+              ID.unique(),
+              data
+            );
+            importedCount.value++;
+          } catch (error) {
+            console.error('Failed to import student:', studentData, error);
+            importSkippedCount.value++;
+          }
+        }
+
+        importCompleted.value = true;
+        excelImportStep.value = 4;
+      } catch (error) {
+        excelFileError.value = String(error);
+      } finally {
+        isImporting.value = false;
+      }
+    };
+
     // Watchers
     watch(selectedClassId, () => {
       loadStudents();
@@ -1054,6 +1427,24 @@ export default defineComponent({
       showGradesDialog,
       showBulkGradeDialog,
       showDeleteStudentDialog,
+      showExcelImportDialog,
+
+      // Excel Import
+      excelImportStep,
+      excelImportSteps,
+      excelFile,
+      excelFileError,
+      excelSheets,
+      selectedSheetName,
+      columnMappings,
+      availableTargetFields,
+      importResult,
+      importPreviewData,
+      importPreviewHeaders,
+      isImporting,
+      importCompleted,
+      importedCount,
+      importSkippedCount,
 
       // Form
       studentFormRef,
@@ -1082,7 +1473,15 @@ export default defineComponent({
       openBulkGradeEntry,
       saveBulkGrades,
       getGradeColor,
-      exportStudentList
+      exportStudentList,
+
+      // Excel Import Methods
+      openExcelImportDialog,
+      closeExcelImportDialog,
+      onExcelFileSelected,
+      proceedToColumnMapping,
+      proceedToPreview,
+      executeImport
     };
   }
 });

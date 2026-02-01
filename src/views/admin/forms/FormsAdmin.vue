@@ -1,182 +1,164 @@
 <template>
-  <div class="forms-admin min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
-    <div class="max-w-6xl mx-auto">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-4xl font-black text-white mb-2">📝 Űrlapok</h1>
-          <p class="text-gray-300">Google Forms-szerű űrlapok kezelése</p>
+  <v-container fluid>
+    <!-- Header -->
+    <v-row class="mb-4">
+      <v-col>
+        <div class="d-flex align-center justify-space-between">
+          <div>
+            <h1 class="text-h4 font-weight-bold dark:text-white  ">{{ $t('forms_management') }}</h1>
+            <p class="text-body-2 text-medium-emphasis mt-1">{{ $t('forms_subtitle') }}</p>
+          </div>
+          <div class="d-flex ga-2">
+            <v-btn color="primary" prepend-icon="mdi-plus" @click="createNewForm">
+              {{ $t('new_form') }}
+            </v-btn>
+            <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="goBack">
+              {{ $t('back') }}
+            </v-btn>
+          </div>
         </div>
-        <div class="flex gap-3">
-          <button @click="createNewForm" class="btn-primary">
-            ➕ Új űrlap
-          </button>
-          <button @click="goBack" class="btn-secondary">
-            ← Vissza
-          </button>
-        </div>
-      </div>
+      </v-col>
+    </v-row>
 
-      <!-- Loading State -->
-      <div v-if="isLoading" class="glass-card p-12 rounded-2xl text-center">
-        <div class="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p class="text-gray-300">Betöltés...</p>
-      </div>
+    <!-- Loading State -->
+    <v-row v-if="isLoading">
+      <v-col class="text-center py-12">
+        <v-progress-circular indeterminate color="primary" size="48" />
+        <p class="text-body-1 text-medium-emphasis mt-4">{{ $t('loading') }}...</p>
+      </v-col>
+    </v-row>
 
-      <!-- Empty State -->
-      <div v-else-if="forms.length === 0" class="glass-card p-12 rounded-2xl text-center">
-        <div class="text-6xl mb-4">📋</div>
-        <h3 class="text-2xl font-bold text-white mb-2">Még nincsenek űrlapok</h3>
-        <p class="text-gray-400 mb-6">Hozd létre az első űrlapodat a fenti gombbal!</p>
-        <button @click="createNewForm" class="btn-primary">
-          ➕ Első űrlap létrehozása
-        </button>
-      </div>
+    <!-- Empty State -->
+    <v-row v-else-if="forms.length === 0">
+      <v-col>
+        <v-card class="text-center pa-12">
+          <v-icon size="64" color="grey">mdi-clipboard-text-outline</v-icon>
+          <h3 class="text-h5 font-weight-bold mt-4">{{ $t('no_forms') }}</h3>
+          <p class="text-body-2 text-medium-emphasis mt-2">{{ $t('create_first_form') }}!</p>
+          <v-btn color="primary" class="mt-4" prepend-icon="mdi-plus" @click="createNewForm">
+            {{ $t('create_first_form_btn') }}
+          </v-btn>
+        </v-card>
+      </v-col>
+    </v-row>
 
-      <!-- Forms Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="form in forms"
-          :key="form.$id"
-          class="glass-card rounded-2xl overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all cursor-pointer group"
+    <!-- Forms Grid -->
+    <v-row v-else>
+      <v-col
+        v-for="form in forms"
+        :key="form.$id"
+        cols="12"
+        md="6"
+        lg="4"
+      >
+        <v-card
+          class="h-100 cursor-pointer"
+          hover
           @click="editForm(form.$id!)"
         >
-          <!-- Card Header -->
-          <div class="p-6 pb-4">
-            <div class="flex items-start justify-between mb-3">
-              <h3 class="text-xl font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-1">
-                {{ form.title || 'Névtelen űrlap' }}
-              </h3>
-              <span
-                :class="[
-                  'px-3 py-1 rounded-full text-xs font-semibold',
-                  form.settings.active
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-gray-500/20 text-gray-400'
-                ]"
-              >
-                {{ form.settings.active ? 'Aktív' : 'Inaktív' }}
+          <v-card-title class="d-flex align-center justify-space-between">
+            <span class="text-truncate">{{ form.title || $t('untitled_form') }}</span>
+            <v-chip
+              :color="form.settings.active ? 'success' : 'grey'"
+              size="small"
+              variant="tonal"
+            >
+              {{ form.settings.active ? $t('active') : $t('inactive') }}
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <p class="text-body-2 text-medium-emphasis" style="min-height: 40px;">
+              {{ form.description || $t('no_description') }}
+            </p>
+            <div class="d-flex ga-4 mt-3">
+              <span class="text-caption text-medium-emphasis">
+                <v-icon size="14" class="mr-1">mdi-format-list-bulleted</v-icon>
+                {{ form.fields?.length || 0 }} {{ $t('fields') }}
+              </span>
+              <span class="text-caption text-medium-emphasis">
+                <v-icon size="14" class="mr-1">mdi-message-reply-text</v-icon>
+                {{ form.responsesCount || 0 }} {{ $t('responses') }}
               </span>
             </div>
-            <p class="text-gray-400 text-sm line-clamp-2 min-h-[40px]">
-              {{ form.description || 'Nincs leírás' }}
-            </p>
-          </div>
+          </v-card-text>
 
-          <!-- Card Stats -->
-          <div class="px-6 py-4 bg-white/5 border-t border-white/10">
-            <div class="flex items-center justify-between text-sm">
-              <div class="flex items-center gap-4">
-                <span class="flex items-center gap-1 text-gray-400">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  {{ form.fields?.length || 0 }} mező
-                </span>
-                <span class="flex items-center gap-1 text-gray-400">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                  </svg>
-                  {{ form.responsesCount || 0 }} válasz
-                </span>
-              </div>
-            </div>
-          </div>
+          <v-divider />
 
-          <!-- Card Actions -->
-          <div class="px-6 py-3 bg-white/5 border-t border-white/10 flex items-center justify-end gap-2">
-            <button
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              icon="mdi-chart-bar"
+              size="small"
+              variant="text"
               @click.stop="viewResponses(form.$id!)"
-              class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
-              title="Válaszok megtekintése"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </button>
-            <button
+              :title="$t('view_responses')"
+            />
+            <v-btn
+              icon="mdi-link"
+              size="small"
+              variant="text"
               @click.stop="copyFormLink(form.$id!)"
-              class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
-              title="Link másolása"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-              </svg>
-            </button>
-            <button
+              :title="$t('link_copied')"
+            />
+            <v-btn
+              icon="mdi-content-copy"
+              size="small"
+              variant="text"
               @click.stop="duplicateForm(form)"
-              class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
-              title="Duplikálás"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </button>
-            <button
+              :title="$t('duplicate_form')"
+            />
+            <v-btn
+              icon="mdi-delete"
+              size="small"
+              variant="text"
+              color="error"
               @click.stop="confirmDelete(form)"
-              class="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-gray-400 hover:text-red-400"
-              title="Törlés"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+              :title="$t('delete_form')"
+            />
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
 
-      <!-- Pagination -->
-      <div v-if="total > pageSize" class="flex items-center justify-center gap-4 mt-8">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="btn-secondary disabled:opacity-50"
-        >
-          ← Előző
-        </button>
-        <span class="text-gray-400">
-          {{ currentPage }} / {{ Math.ceil(total / pageSize) }}
-        </span>
-        <button
-          @click="nextPage"
-          :disabled="currentPage >= Math.ceil(total / pageSize)"
-          class="btn-secondary disabled:opacity-50"
-        >
-          Következő →
-        </button>
-      </div>
-    </div>
+    <!-- Pagination -->
+    <v-row v-if="total > pageSize" class="mt-4">
+      <v-col class="d-flex justify-center">
+        <v-pagination
+          v-model="currentPage"
+          :length="Math.ceil(total / pageSize)"
+          @update:model-value="loadForms"
+        />
+      </v-col>
+    </v-row>
 
-    <!-- Delete Confirmation Modal -->
-    <div
-      v-if="showDeleteModal"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-      @click.self="showDeleteModal = false"
-    >
-      <div class="glass-card p-6 rounded-2xl max-w-md w-full">
-        <h3 class="text-xl font-bold text-white mb-4">🗑️ Űrlap törlése</h3>
-        <p class="text-gray-300 mb-6">
-          Biztosan törölni szeretnéd a(z) <strong class="text-white">"{{ formToDelete?.title }}"</strong> űrlapot?
-          Ez a művelet nem vonható vissza, és az összes válasz is törlődik!
-        </p>
-        <div class="flex gap-3 justify-end">
-          <button @click="showDeleteModal = false" class="btn-secondary">
-            Mégsem
-          </button>
-          <button @click="deleteForm" :disabled="isDeleting" class="btn-danger">
-            {{ isDeleting ? 'Törlés...' : '🗑️ Törlés' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- Delete Dialog -->
+    <v-dialog v-model="showDeleteModal" max-width="420">
+      <v-card>
+        <v-card-title>{{ $t('delete_form') }}</v-card-title>
+        <v-card-text>
+          {{ $t('delete_form_confirm') }}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="showDeleteModal = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="isDeleting" @click="deleteForm">
+            {{ $t('delete') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { FormsService, type Form } from '@/services/forms/FormsService';
 import { notify } from '@kyvg/vue3-notification';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const formsService = FormsService.getInstance();
@@ -204,10 +186,7 @@ async function loadForms() {
     total.value = result.total;
   } catch (error) {
     console.error('Failed to load forms:', error);
-    notify({
-      type: 'error',
-      text: 'Nem sikerült betölteni az űrlapokat!'
-    });
+    notify({ type: 'error', text: t('forms_load_error') });
   } finally {
     isLoading.value = false;
   }
@@ -228,40 +207,26 @@ function viewResponses(formId: string) {
 function copyFormLink(formId: string) {
   const url = `${window.location.origin}/forms/${formId}`;
   navigator.clipboard.writeText(url).then(() => {
-    notify({
-      type: 'success',
-      text: '✅ Link másolva a vágólapra!'
-    });
+    notify({ type: 'success', text: t('link_copied') });
   }).catch(() => {
-    notify({
-      type: 'error',
-      text: 'Nem sikerült másolni a linket'
-    });
+    notify({ type: 'error', text: t('link_copy_error') });
   });
 }
 
 async function duplicateForm(form: Form) {
   try {
     const newForm: Form = {
-      title: `${form.title} (másolat)`,
+      title: `${form.title} (${t('copy_suffix')})`,
       description: form.description,
       fields: [...form.fields],
       settings: { ...form.settings },
-      theme: form.theme ? { ...form.theme } : undefined,
     };
-
     await formsService.createForm(newForm);
-    notify({
-      type: 'success',
-      text: '✅ Űrlap sikeresen duplikálva!'
-    });
+    notify({ type: 'success', text: t('form_duplicated') });
     await loadForms();
   } catch (error) {
     console.error('Failed to duplicate form:', error);
-    notify({
-      type: 'error',
-      text: 'Nem sikerült duplikálni az űrlapot!'
-    });
+    notify({ type: 'error', text: t('form_duplicate_error') });
   }
 }
 
@@ -272,39 +237,18 @@ function confirmDelete(form: Form) {
 
 async function deleteForm() {
   if (!formToDelete.value?.$id) return;
-
   isDeleting.value = true;
   try {
     await formsService.deleteForm(formToDelete.value.$id);
-    notify({
-      type: 'success',
-      text: '✅ Űrlap sikeresen törölve!'
-    });
+    notify({ type: 'success', text: t('form_deleted') });
     showDeleteModal.value = false;
     formToDelete.value = null;
     await loadForms();
   } catch (error) {
     console.error('Failed to delete form:', error);
-    notify({
-      type: 'error',
-      text: 'Nem sikerült törölni az űrlapot!'
-    });
+    notify({ type: 'error', text: t('form_delete_error') });
   } finally {
     isDeleting.value = false;
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    loadForms();
-  }
-}
-
-function nextPage() {
-  if (currentPage.value < Math.ceil(total.value / pageSize)) {
-    currentPage.value++;
-    loadForms();
   }
 }
 
@@ -314,35 +258,10 @@ function goBack() {
 </script>
 
 <style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.cursor-pointer {
+  cursor: pointer;
 }
-
-.btn-primary {
-  @apply px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all disabled:opacity-50;
-}
-
-.btn-secondary {
-  @apply px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all;
-}
-
-.btn-danger {
-  @apply px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all disabled:opacity-50;
-}
-
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.h-100 {
+  height: 100%;
 }
 </style>

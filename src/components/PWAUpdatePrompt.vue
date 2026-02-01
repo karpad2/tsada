@@ -9,10 +9,10 @@
       </div>
       <div class="flex-1">
         <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-          {{ $t('new_version_available') || 'Új verzió elérhető' }}
+          {{ $t('new_version_available') }}
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-          {{ $t('update_app_message') || 'Frissítsd az alkalmazást a legújabb funkciókhoz.' }}
+          {{ $t('update_app_message') }}
         </p>
         <div class="flex space-x-2 mt-3">
           <button
@@ -21,13 +21,13 @@
             class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors disabled:opacity-50"
           >
             <i v-if="updating" class="pi pi-spin pi-spinner mr-1"></i>
-            {{ updating ? (updateButtonText || 'Frissítés...') : (updateButtonText || 'Frissítés') }}
+            {{ updating ? $t('updating') : $t('update_button') }}
           </button>
           <button
             @click="dismissUpdate"
             class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs px-3 py-1 rounded transition-colors"
           >
-            {{ $t('later') || 'Később' }}
+            {{ $t('later') }}
           </button>
         </div>
       </div>
@@ -51,10 +51,10 @@
       </div>
       <div class="flex-1">
         <h3 class="text-sm font-medium text-green-900 dark:text-green-100">
-          {{ $t('offline_ready') || 'Offline használatra kész' }}
+          {{ $t('offline_ready') }}
         </h3>
         <p class="text-sm text-green-700 dark:text-green-200 mt-1">
-          {{ $t('offline_ready_message') || 'Az alkalmazás mostantól offline is használható.' }}
+          {{ $t('offline_ready_message') }}
         </p>
       </div>
       <button

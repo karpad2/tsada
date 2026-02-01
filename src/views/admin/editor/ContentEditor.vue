@@ -243,6 +243,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { notify } from '@kyvg/vue3-notification'
 import { useRoute, useRouter } from 'vue-router'
 import { Client, Databases, ID, Storage, Query } from "appwrite"
 import { appw, config } from "@/appwrite"
@@ -662,8 +663,7 @@ export default defineComponent({
       const source = detectSourceContent()
 
       if (!source) {
-        // Show notification using native notification if available
-        alert(t('no_content_to_translate'))
+        notify({ type: 'warning', text: t('no_content_to_translate') })
         return
       }
 
@@ -682,7 +682,7 @@ export default defineComponent({
         ].filter(lang => lang.code !== source.code && lang.isEmpty)
 
         if (targetLanguages.length === 0) {
-          alert(t('all_content_already_filled'))
+          notify({ type: 'info', text: t('all_content_already_filled') })
           return
         }
 
@@ -728,18 +728,18 @@ export default defineComponent({
 
           } catch (error) {
             console.error(`❌ Translation failed for ${target.code}:`, error)
-            alert(t('translation_failed_for_language', { lang: target.code }))
+            notify({ type: 'error', text: t('translation_failed_for_language', { lang: target.code }) })
           }
         }
 
-        alert(t('content_translated_successfully'))
+        notify({ type: 'success', text: t('content_translated_successfully') })
 
         // Mentés az új tartalommal
         await save()
 
       } catch (error) {
         console.error('Translation error:', error)
-        alert(t('translation_error'))
+        notify({ type: 'error', text: t('translation_error') })
       } finally {
         isTranslating.value = false
         translationProgress.value = 0

@@ -250,6 +250,7 @@ import { Client, Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 
 interface Schedule {
     day: string;
@@ -268,6 +269,10 @@ interface ParliamentMember {
 }
 
 export default {
+    setup() {
+        const { openDialog } = useConfirmDialog();
+        return { openDialog };
+    },
     data() {
         return {
             // Eredeti osztály adatok
@@ -557,7 +562,14 @@ export default {
         },
         
         async delete_content() {
-            if (!confirm(this.$t('confirm_delete'))) return;
+            const confirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!confirmed) return;
             
             try {
                 const database = new Databases(appw);
@@ -684,7 +696,14 @@ export default {
         },
 
         async deleteParliamentMember(memberId: string) {
-            if (!confirm(this.$t('confirm_delete_member'))) return;
+            const memberConfirmed = await this.openDialog({
+                title: this.$t('delete'),
+                message: this.$t('confirm_delete_member'),
+                confirmText: this.$t('delete'),
+                color: 'error',
+                icon: 'mdi-delete'
+            });
+            if (!memberConfirmed) return;
             
             const database = new Databases(appw);
             

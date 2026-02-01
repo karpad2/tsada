@@ -9,20 +9,35 @@
             Nyomtatási beállítások
           </v-card-title>
           <v-card-text>
-            <!-- Document Type Selection -->
+            <!-- 1. lépés: Fő dokumentum típus -->
             <v-select
-              v-model="documentType"
-              :items="documentTypes"
+              v-model="mainDocumentType"
+              :items="mainDocumentTypes"
               item-title="label"
               item-value="value"
               label="Dokumentum típus"
               class="mb-4"
-              @update:model-value="onDocumentTypeChange"
+              @update:model-value="onMainDocumentTypeChange"
             ></v-select>
 
-            <!-- Year Selection (for grade_book_year) -->
+            <!-- 2. lépés: Főkönyv részei (multi-select, csak ha Főkönyv) -->
             <v-select
-              v-if="documentType === 'grade_book_year'"
+              v-if="mainDocumentType === 'grade_book'"
+              v-model="selectedGradeBookParts"
+              :items="gradeBookParts"
+              item-title="label"
+              item-value="value"
+              label="Nyomtatandó szekciók"
+              multiple
+              chips
+              closable-chips
+              class="mb-4"
+              @update:model-value="onGradeBookPartsChange"
+            ></v-select>
+
+            <!-- 3. lépés: Évfolyam választó (csak ha évfolyam jegyek) -->
+            <v-select
+              v-if="selectedGradeBookParts.includes('grade_book_year')"
               v-model="selectedPrintYear"
               :items="yearOptions"
               item-title="label"
@@ -32,25 +47,38 @@
               @update:model-value="loadTemplateForSelection"
             ></v-select>
 
+            <!-- Nyelvi variáns -->
+            <v-select
+              v-model="selectedFormLanguage"
+              :items="formLanguageOptions"
+              item-title="label"
+              item-value="value"
+              label="Űrlap típus (nyelv)"
+              class="mb-4"
+              @update:model-value="loadTemplateForSelection"
+            ></v-select>
+
             <!-- Template info -->
             <v-alert
-              v-if="currentTemplate"
+              v-if="loadedTemplates.length > 0"
               type="info"
               density="compact"
               variant="tonal"
               class="mb-4"
             >
-              <div class="text-caption">Aktív sablon:</div>
-              <div class="font-weight-medium">{{ currentTemplate.name }}</div>
+              <div class="text-caption">Betöltött sablonok ({{ loadedTemplates.length }}):</div>
+              <div v-for="t in loadedTemplates" :key="t.documentType" class="font-weight-medium">
+                {{ t.name }}
+              </div>
             </v-alert>
             <v-alert
-              v-else
+              v-else-if="selectedDocumentTypes.length > 0"
               type="warning"
               density="compact"
               variant="tonal"
               class="mb-4"
             >
-              Nincs sablon ehhez a konfigurációhoz. Alapértelmezett értékek használata.
+              Nincs sablon a kiválasztott konfigurációhoz. Alapértelmezett értékek használata.
             </v-alert>
 
             <!-- Paper Size -->
@@ -95,6 +123,18 @@
               class="mb-4"
             ></v-select>
 
+            <!-- Szak választó -->
+            <v-select
+              v-model="selectedStudyProgramId"
+              :items="studyPrograms"
+              item-title="study_program_name_hu"
+              item-value="$id"
+              label="Szak (szakonként eltérő papír)"
+              clearable
+              class="mb-4"
+              @update:model-value="loadTemplateForSelection"
+            ></v-select>
+
             <v-select
               v-model="selectedSchoolYearId"
               :items="schoolYears"
@@ -131,7 +171,7 @@
                   type="number"
                   suffix="mm"
                   density="compact"
-                  step="0.5"
+                  step="0.1"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
@@ -141,7 +181,7 @@
                   type="number"
                   suffix="mm"
                   density="compact"
-                  step="0.5"
+                  step="0.1"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -159,7 +199,7 @@
                           type="number"
                           density="compact"
                           suffix="mm"
-                          step="0.5"
+                          step="0.1"
                           hide-details
                         ></v-text-field>
                       </v-col>
@@ -170,7 +210,7 @@
                           type="number"
                           density="compact"
                           suffix="mm"
-                          step="0.5"
+                          step="0.1"
                           hide-details
                         ></v-text-field>
                       </v-col>
@@ -210,7 +250,7 @@
                         type="number"
                         suffix="mm"
                         density="compact"
-                        step="0.5"
+                        step="0.1"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="6">
@@ -220,7 +260,7 @@
                         type="number"
                         suffix="mm"
                         density="compact"
-                        step="0.5"
+                        step="0.1"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="6">
@@ -230,7 +270,7 @@
                         type="number"
                         suffix="mm"
                         density="compact"
-                        step="0.5"
+                        step="0.1"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="6">
@@ -240,7 +280,7 @@
                         type="number"
                         suffix="mm"
                         density="compact"
-                        step="0.5"
+                        step="0.1"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -329,79 +369,45 @@
                 :class="{ 'show-grid': previewMode === 'grid' }"
                 :style="pageStyle"
               >
-                <!-- Student Name -->
+                <!-- Generikus mező renderelés minden betöltött sablonból -->
                 <div
-                  v-if="fieldPositions.studentName"
+                  v-for="(field, key) in fieldPositions"
+                  :key="key"
                   class="print-field"
-                  :style="getFieldStyle(fieldPositions.studentName)"
+                  :style="getFieldStyle(field)"
                 >
-                  {{ previewData.studentName }}
+                  <template v-if="getPreviewFieldValue(key) && getPreviewFieldValue(key) !== key">
+                    {{ getPreviewFieldValue(key) }}
+                  </template>
+                  <template v-else-if="field.strikethrough">
+                    <div class="strikethrough-line" :style="{ width: (field.strikethroughWidth || 30) + 'mm' }"></div>
+                  </template>
+                  <template v-else>
+                    {{ getPreviewFieldValue(key) }}
+                  </template>
                 </div>
 
-                <!-- Birth Date -->
-                <div
-                  v-if="fieldPositions.birthDate"
-                  class="print-field"
-                  :style="getFieldStyle(fieldPositions.birthDate)"
-                >
-                  {{ previewData.birthDate }}
-                </div>
+                <!-- Grades Table (ha grade_book_year típus aktív) -->
+                <template v-if="selectedDocumentTypes.includes('grade_book_year')">
+                  <div
+                    v-for="(grade, index) in previewData.grades"
+                    :key="'grade-' + index"
+                    class="print-field"
+                    :style="getGradeStyle(index)"
+                  >
+                    {{ grade.grade }}
+                  </div>
 
-                <!-- Birth Place -->
-                <div
-                  v-if="fieldPositions.birthPlace"
-                  class="print-field"
-                  :style="getFieldStyle(fieldPositions.birthPlace)"
-                >
-                  {{ previewData.birthPlace }}
-                </div>
-
-                <!-- JMBG -->
-                <div
-                  v-if="fieldPositions.jmbg"
-                  class="print-field"
-                  :style="getFieldStyle(fieldPositions.jmbg)"
-                >
-                  {{ previewData.jmbg }}
-                </div>
-
-                <!-- Study Program -->
-                <div
-                  v-if="fieldPositions.studyProgram"
-                  class="print-field"
-                  :style="getFieldStyle(fieldPositions.studyProgram)"
-                >
-                  {{ previewData.studyProgram }}
-                </div>
-
-                <!-- School Year -->
-                <div
-                  v-if="fieldPositions.schoolYear"
-                  class="print-field"
-                  :style="getFieldStyle(fieldPositions.schoolYear)"
-                >
-                  {{ previewData.schoolYear }}
-                </div>
-
-                <!-- Grades Table -->
-                <div
-                  v-for="(grade, index) in previewData.grades"
-                  :key="index"
-                  class="print-field"
-                  :style="getGradeStyle(index)"
-                >
-                  {{ grade.grade }}
-                </div>
-
-                <!-- Subject Names (optional, for reference) -->
-                <div
-                  v-for="(grade, index) in previewData.grades"
-                  :key="'subj-' + index"
-                  class="print-field print-field-subject"
-                  :style="getSubjectStyle(index)"
-                >
-                  {{ grade.subjectName }}
-                </div>
+                  <!-- Subject Names (optional, for reference) -->
+                  <div
+                    v-for="(grade, index) in previewData.grades"
+                    :key="'subj-' + index"
+                    class="print-field print-field-subject"
+                    :style="getSubjectStyle(index)"
+                  >
+                    {{ grade.subjectName }}
+                  </div>
+                </template>
               </div>
             </div>
           </v-card-text>
@@ -433,11 +439,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { notify } from '@kyvg/vue3-notification';
 import { Databases, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { loadRelations, commonRelations, erpRelations } from '@/appwrite/relationHelper';
-import { ErpService, type Subject, type StudyProgram, type SchoolYear } from '@/services/ErpService';
-import PrintTemplateService, { type PrintTemplate, type FieldPosition as TemplateFieldPosition } from '@/services/PrintTemplateService';
+import { ErpService, type StudyProgram, type SchoolYear } from '@/services/ErpService';
+import PrintTemplateService, { type PrintTemplate } from '@/services/PrintTemplateService';
 
 interface FieldPosition {
   label: string;
@@ -445,6 +452,8 @@ interface FieldPosition {
   y: number;
   fontSize: number;
   letterSpacing?: number;
+  strikethrough?: boolean;
+  strikethroughWidth?: number;
 }
 
 interface Student {
@@ -474,12 +483,19 @@ export default defineComponent({
     const databases = new Databases(appw);
     const erpService = ErpService.getInstance();
 
-    // Document type options
-    const documentTypes = [
-      { value: 'grade_book_base', label: 'Főkönyv alap (beiratkozás)' },
-      { value: 'grade_book_year', label: 'Főkönyv évfolyam (év végi)' },
+    // Hierarchikus menü: Fő dokumentum típusok
+    const mainDocumentTypes = [
+      { value: 'grade_book', label: 'Főkönyv (Matična knjiga)' },
       { value: 'certificate', label: 'Bizonyítvány' },
       { value: 'enrollment', label: 'Beiratkozási lap' }
+    ];
+
+    // Főkönyv részei (almenü)
+    const gradeBookParts = [
+      { value: 'grade_book_base', label: 'Alap adatok (beiratkozás)' },
+      { value: 'grade_book_year', label: 'Évfolyam jegyek' },
+      { value: 'grade_book_matura', label: 'Érettségi vizsga' },
+      { value: 'grade_book_certificates', label: 'Oklevelek / bizonyítványok' }
     ];
 
     const yearOptions = [
@@ -489,10 +505,28 @@ export default defineComponent({
       { value: 4, label: '4. évfolyam' }
     ];
 
+    // Nyelvi variánsok
+    const formLanguageOptions = [
+      { value: 'bilingual', label: 'Kétnyelvű (szerb + magyar)' },
+      { value: 'serbian', label: 'Egynyelvű (szerb)' }
+    ];
+
     // Current template from database
     const currentTemplate = ref<PrintTemplate | null>(null);
-    const documentType = ref<string>('grade_book_base');
+    const loadedTemplates = ref<PrintTemplate[]>([]);
+    const mainDocumentType = ref<string>('grade_book');
+    const selectedGradeBookParts = ref<string[]>(['grade_book_base']);
+    const selectedFormLanguage = ref<'bilingual' | 'serbian'>('bilingual');
+    const documentType = ref<string>('grade_book_base'); // backward compat
     const selectedPrintYear = ref<number>(1);
+
+    // Computed: tényleges kiválasztott típusok a hierarchiából
+    const selectedDocumentTypes = computed(() => {
+      if (mainDocumentType.value === 'grade_book') {
+        return selectedGradeBookParts.value;
+      }
+      return [mainDocumentType.value];
+    });
 
     // Paper sizes
     const paperSizes = [
@@ -511,89 +545,196 @@ export default defineComponent({
     const students = ref<Student[]>([]);
     const schoolYears = ref<SchoolYear[]>([]);
     const studentGrades = ref<any[]>([]);
+    const studyPrograms = ref<StudyProgram[]>([]);
 
     // Selection
     const selectedClassId = ref<string | null>(null);
     const selectedSchoolYearId = ref<string | null>(null);
     const selectedStudentId = ref<string | null>(null);
+    const selectedStudyProgramId = ref<string | null>(null);
 
-    // Sablon betöltése az adatbázisból
+    // Sablon betöltése az adatbázisból - több típus egyidejű támogatása
     const loadTemplateForSelection = async () => {
       try {
-        // A kiválasztott diák szak ID-ja
+        // Szak meghatározása: 1) explicit választás, 2) diákból, 3) osztályból
         const student = students.value.find(s => s.$id === selectedStudentId.value);
-        const studyProgramId = student?.study_program?.$id || null;
+        const studyProgramId = selectedStudyProgramId.value
+          || student?.study_program?.$id
+          || null;
 
-        // Évfolyam meghatározása
-        const year = documentType.value === 'grade_book_base' ? 0 : selectedPrintYear.value;
+        const templates: PrintTemplate[] = [];
+        const mergedPositions: Record<string, FieldPosition> = {};
 
-        // Sablon lekérése
-        const template = await PrintTemplateService.getTemplate(
-          studyProgramId,
-          year,
-          documentType.value
-        );
+        for (const docType of selectedDocumentTypes.value) {
+          const year = docType === 'grade_book_base' ? 0
+            : (docType === 'grade_book_matura' || docType === 'grade_book_certificates') ? 4
+            : selectedPrintYear.value;
 
-        if (template) {
-          currentTemplate.value = template;
-          applyTemplateSettings(template);
-        } else {
-          // Alapértelmezett sablon használata
-          currentTemplate.value = null;
-          const defaultTemplate = PrintTemplateService.getDefaultTemplate(
+          let template = await PrintTemplateService.getTemplate(
+            studyProgramId,
             year,
-            documentType.value as any
+            docType,
+            selectedFormLanguage.value
           );
-          applyTemplateSettings(defaultTemplate);
+
+          if (!template) {
+            template = PrintTemplateService.getDefaultTemplate(year, docType as any);
+          }
+
+          templates.push(template);
+
+          // Mezők összegyűjtése minden sablonból
+          for (const field of template.fields) {
+            mergedPositions[field.fieldId] = {
+              label: field.label,
+              x: field.x,
+              y: field.y,
+              fontSize: field.fontSize,
+              letterSpacing: field.letterSpacing,
+              strikethrough: field.strikethrough,
+              strikethroughWidth: field.strikethroughWidth
+            };
+          }
+        }
+
+        loadedTemplates.value = templates;
+        currentTemplate.value = templates.length > 0 ? templates[0] : null;
+        documentType.value = selectedDocumentTypes.value[0] || 'grade_book_base';
+
+        // Papírméret az első sablontól
+        if (templates.length > 0) {
+          pageSize.value.width = templates[0].paperSize.width;
+          pageSize.value.height = templates[0].paperSize.height;
+          globalOffsetX.value = templates[0].globalOffset.x;
+          globalOffsetY.value = templates[0].globalOffset.y;
+        }
+
+        fieldPositions.value = mergedPositions;
+
+        // Jegytáblázat pozíció (grade_book_year-ből ha van)
+        const yearTemplate = templates.find(t => t.documentType === 'grade_book_year');
+        if (yearTemplate?.gradesTable) {
+          gradesTablePosition.value = {
+            startX: yearTemplate.gradesTable.startX,
+            startY: yearTemplate.gradesTable.startY,
+            rowHeight: yearTemplate.gradesTable.rowHeight,
+            gradeColumnX: yearTemplate.gradesTable.gradeColumnOffsetX,
+            subjectColumnX: yearTemplate.gradesTable.startX,
+            fontSize: yearTemplate.gradesTable.fontSize
+          };
         }
       } catch (error) {
-        console.error('Failed to load template:', error);
+        console.error('Failed to load templates:', error);
         currentTemplate.value = null;
+        loadedTemplates.value = [];
       }
     };
 
-    // Sablon beállítások alkalmazása
-    const applyTemplateSettings = (template: PrintTemplate) => {
-      // Papírméret
-      pageSize.value.width = template.paperSize.width;
-      pageSize.value.height = template.paperSize.height;
-
-      // Globális eltolás
-      globalOffsetX.value = template.globalOffset.x;
-      globalOffsetY.value = template.globalOffset.y;
-
-      // Mező pozíciók konvertálása
-      const newPositions: Record<string, FieldPosition> = {};
-      for (const field of template.fields) {
-        newPositions[field.fieldId] = {
-          label: field.label,
-          x: field.x,
-          y: field.y,
-          fontSize: field.fontSize,
-          letterSpacing: field.letterSpacing
-        };
-      }
-      fieldPositions.value = newPositions;
-
-      // Jegytáblázat pozíció
-      if (template.gradesTable) {
-        gradesTablePosition.value = {
-          startX: template.gradesTable.startX,
-          startY: template.gradesTable.startY,
-          rowHeight: template.gradesTable.rowHeight,
-          gradeColumnX: template.gradesTable.gradeColumnOffsetX,
-          subjectColumnX: template.gradesTable.startX,
-          fontSize: template.gradesTable.fontSize
-        };
-      }
-    };
-
-    // Dokumentum típus változásakor
-    const onDocumentTypeChange = () => {
-      if (documentType.value === 'grade_book_base') {
-        selectedPrintYear.value = 0;
+    // Fő dokumentum típus változásakor
+    const onMainDocumentTypeChange = () => {
+      if (mainDocumentType.value === 'grade_book') {
+        // Alapértelmezett: alap adatok
+        if (selectedGradeBookParts.value.length === 0) {
+          selectedGradeBookParts.value = ['grade_book_base'];
+        }
+        documentType.value = selectedGradeBookParts.value[0] || 'grade_book_base';
+      } else {
+        documentType.value = mainDocumentType.value;
       }
       loadTemplateForSelection();
+    };
+
+    // Főkönyv részei változásakor
+    const onGradeBookPartsChange = () => {
+      if (selectedGradeBookParts.value.length > 0) {
+        documentType.value = selectedGradeBookParts.value[0];
+      }
+      loadTemplateForSelection();
+    };
+
+    // Előnézet mező érték lekérdezése
+    const getPreviewFieldValue = (key: string): string => {
+      const student = students.value.find(s => s.$id === selectedStudentId.value);
+      const schoolYear = schoolYears.value.find(y => y.$id === selectedSchoolYearId.value);
+
+      // Valódi adatok, ha van kiválasztott diák
+      if (student) {
+        const realData: Record<string, string> = {
+          studentName: `${student.lastname_hu || ''} ${student.firstname_hu || ''}`,
+          studentNameRs: `${student.lastname_rs || ''} ${student.firstname_rs || ''}`,
+          birthDate: student.birth_year
+            ? `${student.birth_year}.${String(student.birth_month || 1).padStart(2, '0')}.${String(student.birth_day || 1).padStart(2, '0')}.`
+            : '',
+          birthPlace: student.birth_place?.place_hu || '',
+          birthPlaceRs: student.birth_place?.place_rs || '',
+          jmbg: student.JMBG || '',
+          studyProgram: student.study_program?.study_program_name_hu || '',
+          studyProgramRs: student.study_program?.study_program_name_rs || '',
+          schoolYear: schoolYear?.name || ''
+        };
+        if (realData[key]) return realData[key];
+      }
+
+      // Minta adatok
+      const sampleData: Record<string, string> = {
+        studentName: 'Kovács János',
+        studentNameRs: 'Јанош Ковач',
+        birthDate: '2008.05.15.',
+        birthPlace: 'Szabadka',
+        birthPlaceRs: 'Суботица',
+        jmbg: '1505008123456',
+        studyProgram: 'Gimnázium',
+        studyProgramRs: 'Гимназија',
+        schoolYear: '2024/2025',
+        className: 'I-1',
+        classTeacher: 'Nagy Péter',
+        enrollmentNumber: '123/2024',
+        registryNumber: '45',
+        fatherName: 'Kovács István',
+        motherName: 'Kiss Mária',
+        parentName: 'Kovács István',
+        parentAddress: 'Szabadka, Kossuth u. 12.',
+        parentPhone: '+381 24 123 456',
+        enrollmentDate: '2024.09.01.',
+        educationType: 'Rendes',
+        educationDuration: '4 év',
+        generation: '2024/2028',
+        foreignLanguage: 'Angol',
+        religionOption: 'Hittan',
+        finalGrade: '4.52',
+        behaviorText: 'примерно / példás',
+        generalSuccess: 'врло добар / jó',
+        absencesTotal: '45',
+        absencesJustified: '40',
+        absencesUnjustified: '5',
+        date: '2025.06.15.',
+        directorSignature: 'Dr. Szabó Endre',
+        maturaSchoolYear: '2027/2028',
+        maturaYear: '2028',
+        maturaClassYear: 'IV',
+        maturaSubject1Name: 'Magyar nyelv',
+        maturaSubject1Grade: '5',
+        maturaSubject2Name: 'Matematika',
+        maturaSubject2Grade: '4',
+        maturaSubject3Name: 'Szakmai tárgy',
+        maturaSubject3Grade: '5',
+        maturaPracticalDesc: 'Gyakorlati vizsga',
+        maturaPracticalGrade: '5',
+        maturaFinalGrade: 'Jeles (5)',
+        maturaResult: 'jeles eredménnyel',
+        maturaDate: '2028.06.20.',
+        diplomaNumber: '03-123/2028',
+        diplomaDate: '2028.06.25.',
+        certificateNumber: '05-456/2028',
+        certificateDate: '2028.06.25.',
+        serialNumber: 'А-123456',
+        classTeacherSign: 'Nagy Péter',
+        examCommitteeChair: 'Dr. Horvát Anna',
+        receivedDate: '2028.07.01.',
+        receivedSignature: 'Kovács István',
+        notes: 'Megjegyzés'
+      };
+      return sampleData[key] || key;
     };
 
     // Preview
@@ -641,22 +782,9 @@ export default defineComponent({
       fontSize: 10
     });
 
-    // Computed preview data
+    // Computed preview data (jegyek a táblázathoz)
     const previewData = computed(() => {
-      const student = students.value.find(s => s.$id === selectedStudentId.value);
-      const schoolYear = schoolYears.value.find(y => y.$id === selectedSchoolYearId.value);
-
       return {
-        studentName: student
-          ? `${student.lastname_hu || ''} ${student.firstname_hu || ''}`
-          : 'Minta Diák',
-        birthDate: student?.birth_year
-          ? `${student.birth_year}.${String(student.birth_month || 1).padStart(2, '0')}.${String(student.birth_day || 1).padStart(2, '0')}.`
-          : '2008.01.15.',
-        birthPlace: student?.birth_place?.place_hu || 'Szabadka',
-        jmbg: student?.JMBG || '1501008123456',
-        studyProgram: student?.study_program?.study_program_name_hu || 'Gimnázium',
-        schoolYear: schoolYear?.name || '2024/2025',
         grades: studentGrades.value.length > 0
           ? studentGrades.value.map(g => ({
               subjectName: g.subject?.name_hu || 'Tantárgy',
@@ -688,7 +816,7 @@ export default defineComponent({
       left: `${gradesTablePosition.value.gradeColumnX}mm`,
       top: `${gradesTablePosition.value.startY + index * gradesTablePosition.value.rowHeight}mm`,
       fontSize: `${gradesTablePosition.value.fontSize}pt`,
-      textAlign: 'center',
+      textAlign: 'center' as const,
       width: '15mm'
     });
 
@@ -733,6 +861,15 @@ export default defineComponent({
         });
       } catch (error) {
         console.error('Failed to load classes:', error);
+      }
+    };
+
+    const loadStudyPrograms = async () => {
+      try {
+        const result = await erpService.getStudyPrograms(100);
+        studyPrograms.value = result.programs;
+      } catch (error) {
+        console.error('Failed to load study programs:', error);
       }
     };
 
@@ -806,7 +943,7 @@ export default defineComponent({
         pageSize: pageSize.value
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-      alert('Beállítások elmentve!');
+      notify({ type: 'success', text: 'Beállítások elmentve!' });
     };
 
     const loadSettings = () => {
@@ -855,12 +992,22 @@ export default defineComponent({
     };
 
     // Watchers
-    watch(selectedClassId, loadStudents);
+    watch(selectedClassId, (newClassId) => {
+      loadStudents();
+      // Auto-set study program from class (courses field)
+      if (newClassId) {
+        const selectedClass = classes.value.find(c => c.$id === newClassId);
+        if (selectedClass?.courses?.$id) {
+          selectedStudyProgramId.value = selectedClass.courses.$id;
+          loadTemplateForSelection();
+        }
+      }
+    });
     watch([selectedStudentId, selectedSchoolYearId], loadStudentGrades);
 
     onMounted(async () => {
       loadSettings();
-      await Promise.all([loadClasses(), loadSchoolYears()]);
+      await Promise.all([loadClasses(), loadSchoolYears(), loadStudyPrograms()]);
     });
 
     // Watchers - sablon újratöltése diák változásakor
@@ -872,16 +1019,24 @@ export default defineComponent({
 
     return {
       // Data
-      documentTypes,
+      mainDocumentTypes,
+      gradeBookParts,
       yearOptions,
+      formLanguageOptions,
       paperSizes,
       classes,
       students,
       schoolYears,
       studentGrades,
+      studyPrograms,
 
       // Template
       currentTemplate,
+      loadedTemplates,
+      mainDocumentType,
+      selectedGradeBookParts,
+      selectedFormLanguage,
+      selectedDocumentTypes,
       documentType,
       selectedPrintYear,
 
@@ -890,6 +1045,7 @@ export default defineComponent({
       selectedClassId,
       selectedSchoolYearId,
       selectedStudentId,
+      selectedStudyProgramId,
 
       // Preview
       previewMode,
@@ -910,8 +1066,10 @@ export default defineComponent({
 
       // Methods
       applyPaperSize,
-      onDocumentTypeChange,
+      onMainDocumentTypeChange,
+      onGradeBookPartsChange,
       loadTemplateForSelection,
+      getPreviewFieldValue,
 
       // Methods
       studentDisplayName,
@@ -952,6 +1110,13 @@ export default defineComponent({
 .print-field {
   position: absolute;
   white-space: nowrap;
+}
+
+.strikethrough-line {
+  height: 0;
+  border-top: 1px solid black;
+  position: relative;
+  top: 0.5em;
 }
 
 .print-field-subject {

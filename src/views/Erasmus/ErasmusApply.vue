@@ -108,7 +108,6 @@
     import { Swiper, SwiperSlide } from 'swiper/vue';
     import { EffectFade, Navigation, Pagination } from 'swiper/modules';
     import {convertifserbian} from "@/lang";
-    import moment from "moment";
     import gsap from "gsap";
 import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
     
@@ -153,7 +152,7 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
            // this.getMD();
             const cc=useLoadingStore();
             this.erasmus_applied=cc.erasmus_apply;
-            this.admin=cc.userLoggedin;
+            this.admin = cc.userLoggedin && (cc.userRole === 'admin' || cc.userRole === 'editor');
             let v2="659d5e6949ae7294f9f1";
             const storage = new Storage(appw);
             document.title=this.$t("erasmus_apply");

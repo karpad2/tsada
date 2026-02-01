@@ -63,5 +63,11 @@
     "erp_school_years":"school_years",
     "erp_student_enrollments":"student_enrollments",
     "erp_student_grades":"student_grades",
-    "erp_print_templates":"print_templates"
+    "erp_print_templates":"print_templates",
+    "user_roles":"user_roles",
+    "dc_messages":"dc_messages",
+    "dc_bans":"dc_bans",
+    "dc_reactions":"dc_reactions",
+    "dc_roles":"dc_roles",
+    "dc_users":"dc_users"
 }

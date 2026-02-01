@@ -303,7 +303,7 @@ export default {
     },
 
     async mounted() {
-        this.admin = this.loadingStore.userLoggedin;
+        this.admin = this.loadingStore.userLoggedin && (this.loadingStore.userRole === 'admin' || this.loadingStore.userRole === 'editor');
         document.title = this.$t("documents");
         this.setupHeaders();
 

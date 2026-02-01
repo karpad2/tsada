@@ -32,7 +32,7 @@
               <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </span>
-          {{ isDeleting ? 'Törlés...' : $t('delete_broken_images') }}
+          {{ isDeleting ? $t('deleting') : $t('delete_broken_images') }}
         </VBtn>
       </div>
 
@@ -367,7 +367,9 @@ export default defineComponent({
   },
 
   mounted() {
-    this.isAdmin = useLoadingStore().userLoggedin;
+    const loadingStore = useLoadingStore();
+    const role = loadingStore.userRole;
+    this.isAdmin = loadingStore.userLoggedin && (role === 'admin' || role === 'editor' || role === 'photographer');
     this.loadCourses();
     window.addEventListener('scroll', this.handleScroll, { passive: true });
     window.addEventListener('keydown', this.handleKeydown);
@@ -409,14 +411,19 @@ export default defineComponent({
         }
 
         // A 'gallery' mező egy reláció - a Query.equal a kapcsolt dokumentum $id-jára működik
+        // Only show approved images publicly (non-admin users)
+        const queries = [
+          Query.equal('gallery', this.id),
+          Query.offset(this.page * this.limit),
+          Query.limit(this.limit),
+        ];
+        if (!this.isAdmin) {
+          queries.push(Query.equal('status', 'approved'));
+        }
         const { documents } = await database.listDocuments(
           config.website_db,
           config.album_images,
-          [
-            Query.equal('gallery', this.id),
-            Query.offset(this.page * this.limit),
-            Query.limit(this.limit),
-          ]
+          queries
         );
 
         if (!documents.length) {

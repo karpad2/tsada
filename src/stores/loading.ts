@@ -8,6 +8,8 @@ export const useLoadingStore = defineStore('loading', () => {
     const isErasmus = ref(false);
     const ErasmusAppliedID=ref("");
     const userLoggedin=ref(false);
+    const userRole=ref("");
+    const assignedClasses=ref<string[]>([]);
     const animationSetting=ref(false);
     const fireworkSetting=ref(false);
     const erasmus_apply=ref(false);
@@ -49,6 +51,16 @@ export const useLoadingStore = defineStore('loading', () => {
       this.uid=v;
     }
 
+    function setUserRole(v:string)
+    {
+      userRole.value=v;
+    }
+
+    function setAssignedClasses(v:string[])
+    {
+      assignedClasses.value=v;
+    }
+
     function setfireworkSetting(v:boolean)
     {
       this.fireworkSetting=v;
@@ -82,7 +94,7 @@ export const useLoadingStore = defineStore('loading', () => {
     
 
 
-    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding,mobile_view,tablet_mode,mobile_mode }
+    return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,userRole,assignedClasses,setUserRole,setAssignedClasses,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding,mobile_view,tablet_mode,mobile_mode }
   },
 {persist:true})
 

@@ -186,6 +186,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
+import { notify } from '@kyvg/vue3-notification';
 import { FormsService, type Form } from '@/services/forms/FormsService';
 
 export default defineComponent({
@@ -253,14 +254,14 @@ export default defineComponent({
           const val = responses.value[field.id];
           const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
           if (isEmpty) {
-            alert(`Kérjük töltsd ki: ${field.label}`);
+            notify({ type: 'warning', text: `Kérjük töltsd ki: ${field.label}` });
             return;
           }
         }
       }
 
       if (form.value.settings.collectEmail && !email.value) {
-        alert('Kérjük add meg az email címed!');
+        notify({ type: 'warning', text: 'Kérjük add meg az email címed!' });
         return;
       }
 
@@ -275,7 +276,7 @@ export default defineComponent({
         await formsService.submitResponse(form.value.$id, data);
         isSubmitted.value = true;
       } catch (err: any) {
-        alert(err.message || 'Hiba történt a beküldés során');
+        notify({ type: 'error', text: err.message || 'Hiba történt a beküldés során' });
       } finally {
         isSubmitting.value = false;
       }

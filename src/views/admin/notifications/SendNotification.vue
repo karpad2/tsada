@@ -3,8 +3,8 @@
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-4xl font-black text-white mb-2">Push Értesítés Küldése</h1>
-        <p class="text-gray-300">Küldj értesítéseket az összes feliratkozott felhasználónak</p>
+        <h1 class="text-4xl font-black text-white mb-2">{{ $t('send_push_notification') }}</h1>
+        <p class="text-gray-300">{{ $t('send_push_description') }}</p>
       </div>
 
       <!-- Stats Cards -->
@@ -17,7 +17,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">Feliratkozók</p>
+              <p class="text-gray-400 text-sm">{{ $t('subscribers') }}</p>
               <p class="text-white text-2xl font-bold">{{ stats.totalSubscribers }}</p>
             </div>
           </div>
@@ -31,7 +31,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">Elküldött ma</p>
+              <p class="text-gray-400 text-sm">{{ $t('sent_today') }}</p>
               <p class="text-white text-2xl font-bold">{{ stats.sentToday }}</p>
             </div>
           </div>
@@ -45,7 +45,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">Összes küldés</p>
+              <p class="text-gray-400 text-sm">{{ $t('total_sent') }}</p>
               <p class="text-white text-2xl font-bold">{{ stats.totalSent }}</p>
             </div>
           </div>
@@ -57,35 +57,35 @@
         <form @submit.prevent="sendNotification">
           <!-- Title -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">Értesítés címe *</label>
+            <label class="block text-white font-semibold mb-2">{{ $t('notification_title') }} *</label>
             <input
               v-model="notification.title"
               type="text"
               required
               maxlength="50"
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-              placeholder="Pl. Fontos bejelentés"
+              :placeholder="$t('notification_title_placeholder')"
             />
-            <p class="text-sm text-gray-400 mt-1">{{ notification.title.length }}/50 karakter</p>
+            <p class="text-sm text-gray-400 mt-1">{{ notification.title.length }}/50</p>
           </div>
 
           <!-- Body -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">Értesítés szövege *</label>
+            <label class="block text-white font-semibold mb-2">{{ $t('notification_body') }} *</label>
             <textarea
               v-model="notification.body"
               required
               maxlength="200"
               rows="4"
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
-              placeholder="Ide írhatod az értesítés részletes szövegét..."
+              :placeholder="$t('notification_body_placeholder')"
             ></textarea>
-            <p class="text-sm text-gray-400 mt-1">{{ notification.body.length }}/200 karakter</p>
+            <p class="text-sm text-gray-400 mt-1">{{ notification.body.length }}/200</p>
           </div>
 
           <!-- Icon URL (Optional) -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">Ikon URL (opcionális)</label>
+            <label class="block text-white font-semibold mb-2">{{ $t('icon_url_optional') }}</label>
             <input
               v-model="notification.icon"
               type="url"
@@ -96,7 +96,7 @@
 
           <!-- Action URL -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">Művelet URL (kattintás esetén)</label>
+            <label class="block text-white font-semibold mb-2">{{ $t('action_url') }}</label>
             <input
               v-model="notification.actionUrl"
               type="url"
@@ -107,17 +107,17 @@
 
           <!-- Tag (for grouping) -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">Kategória (tag)</label>
+            <label class="block text-white font-semibold mb-2">{{ $t('notification_category') }}</label>
             <select
               v-model="notification.tag"
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
             >
-              <option value="">Nincs kategória</option>
-              <option value="announcement">Bejelentés</option>
-              <option value="event">Esemény</option>
-              <option value="urgent">Sürgős</option>
-              <option value="news">Hír</option>
-              <option value="reminder">Emlékeztető</option>
+              <option value="">{{ $t('no_category') }}</option>
+              <option value="announcement">{{ $t('announcement') }}</option>
+              <option value="event">{{ $t('event') }}</option>
+              <option value="urgent">{{ $t('urgent') }}</option>
+              <option value="news">{{ $t('news') }}</option>
+              <option value="reminder">{{ $t('reminder') }}</option>
             </select>
           </div>
 
@@ -129,7 +129,7 @@
                 type="checkbox"
                 class="w-5 h-5 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
               />
-              <span class="text-white">Megköveteli a felhasználói interakciót (nem tűnik el automatikusan)</span>
+              <span class="text-white">{{ $t('require_interaction') }}</span>
             </label>
           </div>
 
@@ -140,7 +140,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              Előnézet
+              {{ $t('preview') }}
             </h3>
             <div class="notification-preview bg-white rounded-xl p-4 shadow-lg max-w-md">
               <div class="flex gap-3">
@@ -151,8 +151,8 @@
                   @error="(e) => (e.target as HTMLImageElement).src = '/favicon.png'"
                 />
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-bold text-gray-900 truncate">{{ notification.title || 'Értesítés címe' }}</h4>
-                  <p class="text-sm text-gray-600 line-clamp-2">{{ notification.body || 'Értesítés szövege...' }}</p>
+                  <h4 class="font-bold text-gray-900 truncate">{{ notification.title || $t('notification_title') }}</h4>
+                  <p class="text-sm text-gray-600 line-clamp-2">{{ notification.body || $t('notification_body') + '...' }}</p>
                   <p class="text-xs text-gray-400 mt-1">{{ currentTime }}</p>
                 </div>
               </div>
@@ -170,14 +170,14 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                Értesítés Küldése ({{ stats.totalSubscribers }} felhasználó)
+                {{ $t('send_notification') }} ({{ stats.totalSubscribers }})
               </span>
               <span v-else class="flex items-center justify-center gap-2">
                 <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Küldés folyamatban...
+                {{ $t('sending') }}
               </span>
             </button>
 
@@ -186,7 +186,7 @@
               @click="resetForm"
               class="px-6 py-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all duration-300"
             >
-              Törlés
+              {{ $t('delete') }}
             </button>
           </div>
         </form>
@@ -194,13 +194,13 @@
 
       <!-- Recent Notifications -->
       <div class="glass-card p-8 rounded-3xl">
-        <h2 class="text-2xl font-bold text-white mb-6">Legutóbbi értesítések</h2>
+        <h2 class="text-2xl font-bold text-white mb-6">{{ $t('recent_notifications') }}</h2>
 
         <div v-if="recentNotifications.length === 0" class="text-center py-12">
           <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
-          <p class="text-gray-400">Még nem küldtél értesítéseket</p>
+          <p class="text-gray-400">{{ $t('no_notifications_sent') }}</p>
         </div>
 
         <div v-else class="space-y-4">
@@ -219,7 +219,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    {{ notif.recipients_count }} felhasználó
+                    {{ notif.recipients_count }} {{ $t('persons') }}
                   </span>
                 </div>
               </div>
@@ -239,9 +239,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { notify } from '@kyvg/vue3-notification';
 import { Databases, Query } from 'appwrite';
 import { config, appw } from '@/appwrite';
-import moment from 'moment';
+import dayjs from '@/utils/dayjs';
+
+const { t } = useI18n();
 
 interface NotificationForm {
   title: string;
@@ -269,7 +273,7 @@ const stats = ref({
 
 const recentNotifications = ref<any[]>([]);
 const isSending = ref(false);
-const currentTime = computed(() => moment().format('HH:mm'));
+const currentTime = computed(() => dayjs().format('HH:mm'));
 
 const isFormValid = computed(() => {
   return notification.value.title.trim().length > 0 && notification.value.body.trim().length > 0;
@@ -299,7 +303,7 @@ async function loadStats() {
     stats.value.totalSent = notifications.total;
 
     // Get today's sent count
-    const today = moment().startOf('day').toISOString();
+    const today = dayjs().startOf('day').toISOString();
     const todayNotifications = await database.listDocuments(
       config.website_db,
       config.push_notifications_log || 'push_notifications_log',
@@ -355,13 +359,13 @@ async function sendNotification() {
     // This would typically be a serverless function or backend service that uses
     // the Web Push protocol to send notifications to all subscribed devices
 
-    alert('Értesítés sikeresen elküldve!');
+    notify({ type: 'success', text: t('notification_sent_success') });
     resetForm();
     await loadStats();
     await loadRecentNotifications();
   } catch (error) {
     console.error('Failed to send notification:', error);
-    alert('Hiba történt az értesítés küldése közben!');
+    notify({ type: 'error', text: t('notification_sent_error') });
   } finally {
     isSending.value = false;
   }
@@ -379,7 +383,7 @@ function resetForm() {
 }
 
 function formatDate(dateString: string) {
-  return moment(dateString).fromNow();
+  return dayjs(dateString).fromNow();
 }
 </script>
 

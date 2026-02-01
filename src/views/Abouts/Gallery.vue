@@ -253,7 +253,8 @@ export default defineComponent({
   },
   async mounted() {
     setDocumentTitle(this.$t("gallery"));
-    this.admin = this.userLoggedin;
+    const role = this.loadingStore.userRole;
+    this.admin = this.userLoggedin && (role === 'admin' || role === 'editor' || role === 'photographer');
     
     // Setup scroll listener
     this.handleScrollDebounced = this.debounce(this.handleScroll, 200);

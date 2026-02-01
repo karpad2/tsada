@@ -70,7 +70,7 @@ export default defineComponent({
         const title = ref("");
         const documents = ref<DocumentItem[]>([]);
         const headers = ref<any[]>([]);
-        const admin = ref(loadingStore.userLoggedin);
+        const admin = ref(loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor'));
         const loaded = ref(false);
 
         const loadDocuments = async () => {

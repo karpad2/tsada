@@ -175,7 +175,7 @@ export default defineComponent({
   mounted() {
     document.title = this.$t('parentsvisiting');
     const loadingStore = useLoadingStore();
-    this.admin = loadingStore.userLoggedin;
+    this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
     this.loadCourses();
   },
   methods: {

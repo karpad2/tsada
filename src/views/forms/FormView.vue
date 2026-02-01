@@ -1,288 +1,286 @@
 <template>
-  <div class="form-view min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-8 px-4">
+  <v-container class="py-8" style="max-width: 720px;">
     <!-- Loading State -->
-    <div v-if="isLoading" class="max-w-2xl mx-auto">
-      <div class="glass-card p-12 rounded-3xl text-center">
-        <div class="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p class="text-gray-300">Űrlap betöltése...</p>
-      </div>
-    </div>
+    <v-card v-if="isLoading" class="text-center pa-12">
+      <v-progress-circular indeterminate color="primary" size="48" />
+      <p class="text-body-1 text-medium-emphasis mt-4">Űrlap betöltése...</p>
+    </v-card>
 
     <!-- Error State -->
-    <div v-else-if="error" class="max-w-2xl mx-auto">
-      <div class="glass-card p-12 rounded-3xl text-center">
-        <div class="text-6xl mb-4">😕</div>
-        <h2 class="text-2xl font-bold text-white mb-2">{{ error }}</h2>
-        <p class="text-gray-400 mb-6">Az űrlap nem található vagy nem elérhető.</p>
-        <button @click="goHome" class="btn-secondary">
-          ← Vissza a főoldalra
-        </button>
-      </div>
-    </div>
+    <v-card v-else-if="error" class="text-center pa-12">
+      <v-icon size="64" color="error">mdi-alert-circle-outline</v-icon>
+      <h2 class="text-h5 font-weight-bold mt-4">{{ error }}</h2>
+      <p class="text-body-2 text-medium-emphasis mt-2">Az űrlap nem található vagy nem elérhető.</p>
+      <v-btn variant="outlined" class="mt-6" prepend-icon="mdi-arrow-left" @click="goHome">
+        Vissza a főoldalra
+      </v-btn>
+    </v-card>
 
     <!-- Form Not Active -->
-    <div v-else-if="form && !form.settings.active" class="max-w-2xl mx-auto">
-      <div class="glass-card p-12 rounded-3xl text-center">
-        <div class="text-6xl mb-4">🚫</div>
-        <h2 class="text-2xl font-bold text-white mb-2">Az űrlap jelenleg nem aktív</h2>
-        <p class="text-gray-400 mb-6">Ez az űrlap ideiglenesen le van zárva.</p>
-        <button @click="goHome" class="btn-secondary">
-          ← Vissza a főoldalra
-        </button>
-      </div>
-    </div>
+    <v-card v-else-if="form && !form.settings.active" class="text-center pa-12">
+      <v-icon size="64" color="warning">mdi-lock-outline</v-icon>
+      <h2 class="text-h5 font-weight-bold mt-4">Az űrlap jelenleg nem aktív</h2>
+      <p class="text-body-2 text-medium-emphasis mt-2">Ez az űrlap ideiglenesen le van zárva.</p>
+      <v-btn variant="outlined" class="mt-6" prepend-icon="mdi-arrow-left" @click="goHome">
+        Vissza a főoldalra
+      </v-btn>
+    </v-card>
 
     <!-- Success State -->
-    <div v-else-if="isSubmitted" class="max-w-2xl mx-auto">
-      <div class="glass-card p-12 rounded-3xl text-center">
-        <div class="text-6xl mb-4">✅</div>
-        <h2 class="text-2xl font-bold text-white mb-4">Köszönjük!</h2>
-        <p class="text-gray-300 text-lg mb-6">
-          {{ form?.settings.confirmationMessage || 'Válaszod sikeresen rögzítve!' }}
-        </p>
-        <div class="flex gap-4 justify-center">
-          <button v-if="form?.settings.allowMultipleResponses" @click="resetForm" class="btn-primary">
-            ➕ Új válasz beküldése
-          </button>
-          <button @click="goHome" class="btn-secondary">
-            ← Vissza a főoldalra
-          </button>
-        </div>
+    <v-card v-else-if="isSubmitted" class="text-center pa-12">
+      <v-icon size="64" color="success">mdi-check-circle-outline</v-icon>
+      <h2 class="text-h5 font-weight-bold mt-4">Köszönjük!</h2>
+      <p class="text-body-1 text-medium-emphasis mt-2">
+        {{ form?.settings.confirmationMessage || 'Válaszod sikeresen rögzítve!' }}
+      </p>
+      <div class="d-flex ga-3 justify-center mt-6">
+        <v-btn v-if="form?.settings.allowMultipleResponses" color="primary" prepend-icon="mdi-plus" @click="resetForm">
+          Új válasz beküldése
+        </v-btn>
+        <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="goHome">
+          Vissza a főoldalra
+        </v-btn>
       </div>
-    </div>
+    </v-card>
 
     <!-- Form -->
-    <div v-else-if="form" class="max-w-2xl mx-auto">
+    <template v-else-if="form">
       <!-- Progress Bar -->
-      <div v-if="form.settings.showProgressBar && form.fields.length > 1" class="mb-6">
-        <div class="h-2 bg-white/10 rounded-full overflow-hidden">
-          <div
-            class="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-            :style="{ width: `${progressPercent}%` }"
-          ></div>
-        </div>
-        <p class="text-gray-400 text-sm mt-2 text-center">
-          {{ answeredFieldsCount }} / {{ form.fields.length }} mező kitöltve
-        </p>
-      </div>
+      <v-progress-linear
+        v-if="form.settings.showProgressBar && form.fields.length > 1"
+        :model-value="progressPercent"
+        color="primary"
+        height="8"
+        rounded
+        class="mb-2"
+      />
+      <p v-if="form.settings.showProgressBar && form.fields.length > 1" class="text-caption text-medium-emphasis text-center mb-4">
+        {{ answeredFieldsCount }} / {{ form.fields.length }} mező kitöltve
+      </p>
 
       <!-- Form Header -->
-      <div class="glass-card p-8 rounded-t-3xl border-b-0">
-        <div class="w-full h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6"></div>
-        <h1 class="text-3xl font-bold text-white mb-3">{{ form.title }}</h1>
-        <p v-if="form.description" class="text-gray-300">{{ form.description }}</p>
-        <p v-if="form.settings.collectEmail" class="text-sm text-purple-400 mt-4">
-          * Email cím megadása kötelező
-        </p>
-      </div>
+      <v-card class="mb-4">
+        <div class="bg-primary pa-1 rounded-t" />
+        <v-card-text class="pt-6">
+          <h1 class="text-h4 font-weight-bold mb-2">{{ form.title }}</h1>
+          <p v-if="form.description" class="text-body-1 text-medium-emphasis">{{ form.description }}</p>
+          <p v-if="form.settings.collectEmail" class="text-caption text-primary mt-4">
+            * Email cím megadása kötelező
+          </p>
+        </v-card-text>
+      </v-card>
 
       <!-- Form Fields -->
-      <form @submit.prevent="submitForm">
+      <v-form @submit.prevent="submitForm">
         <!-- Email Field (if collecting) -->
-        <div v-if="form.settings.collectEmail" class="glass-card p-6 border-t-0 border-b-0">
-          <div class="field-container">
-            <label class="field-label">
+        <v-card v-if="form.settings.collectEmail" class="mb-4">
+          <v-card-text>
+            <div class="text-subtitle-1 font-weight-medium mb-2">
               Email cím
-              <span class="text-red-400">*</span>
-            </label>
-            <input
+              <span class="text-error">*</span>
+            </div>
+            <v-text-field
               v-model="emailAddress"
               type="email"
               placeholder="pelda@email.com"
-              class="field-input"
-              required
+              variant="outlined"
+              density="comfortable"
+              :rules="[v => !!v || 'Email cím kötelező']"
             />
-          </div>
-        </div>
+          </v-card-text>
+        </v-card>
 
         <!-- Dynamic Fields -->
-        <div
-          v-for="(field, index) in form.fields"
+        <v-card
+          v-for="field in form.fields"
           :key="field.id"
-          class="glass-card p-6 border-t-0"
-          :class="{ 'border-b-0': index < form.fields.length - 1 }"
+          class="mb-4"
         >
-          <div class="field-container">
-            <label class="field-label">
+          <v-card-text>
+            <div class="text-subtitle-1 font-weight-medium mb-1">
               {{ field.label }}
-              <span v-if="field.required" class="text-red-400">*</span>
-            </label>
-            <p v-if="field.description" class="field-description">{{ field.description }}</p>
+              <span v-if="field.required" class="text-error">*</span>
+            </div>
+            <p v-if="field.description" class="text-caption text-medium-emphasis mb-3">{{ field.description }}</p>
+
+            <!-- Field Image -->
+            <v-img
+              v-if="field.imageId"
+              :src="getFieldImageUrl(field.imageId)"
+              max-height="300"
+              class="rounded mb-3"
+              cover
+            />
 
             <!-- Text Input -->
-            <input
+            <v-text-field
               v-if="field.type === 'text'"
               v-model="responses[field.id]"
-              type="text"
               :placeholder="field.placeholder"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Textarea -->
-            <textarea
+            <v-textarea
               v-else-if="field.type === 'textarea'"
               v-model="responses[field.id]"
               :placeholder="field.placeholder"
+              variant="outlined"
               rows="4"
-              class="field-textarea"
-              :required="field.required"
-            ></textarea>
+              auto-grow
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
+            />
 
             <!-- Email -->
-            <input
+            <v-text-field
               v-else-if="field.type === 'email'"
               v-model="responses[field.id]"
               type="email"
               :placeholder="field.placeholder || 'pelda@email.com'"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Number -->
-            <input
+            <v-text-field
               v-else-if="field.type === 'number'"
               v-model.number="responses[field.id]"
               type="number"
               :placeholder="field.placeholder"
               :min="field.validation?.min"
               :max="field.validation?.max"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => v !== '' && v !== null && v !== undefined || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Phone -->
-            <input
+            <v-text-field
               v-else-if="field.type === 'tel'"
               v-model="responses[field.id]"
               type="tel"
               :placeholder="field.placeholder || '+36 XX XXX XXXX'"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Date -->
-            <input
+            <v-text-field
               v-else-if="field.type === 'date'"
               v-model="responses[field.id]"
               type="date"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Time -->
-            <input
+            <v-text-field
               v-else-if="field.type === 'time'"
               v-model="responses[field.id]"
               type="time"
-              class="field-input"
-              :required="field.required"
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
             />
 
             <!-- Select (Dropdown) -->
-            <select
+            <v-select
               v-else-if="field.type === 'select'"
               v-model="responses[field.id]"
-              class="field-select"
-              :required="field.required"
-            >
-              <option value="" disabled>Válassz egy opciót...</option>
-              <option v-for="option in field.options" :key="option" :value="option">
-                {{ option }}
-              </option>
-            </select>
+              :items="field.options"
+              placeholder="Válassz egy opciót..."
+              variant="outlined"
+              density="comfortable"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
+            />
 
             <!-- Radio Buttons -->
-            <div v-else-if="field.type === 'radio'" class="field-radio-group">
-              <label
+            <v-radio-group
+              v-else-if="field.type === 'radio'"
+              v-model="responses[field.id]"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
+            >
+              <v-radio
                 v-for="option in field.options"
                 :key="option"
-                class="field-radio-option"
-                :class="{ 'selected': responses[field.id] === option }"
-              >
-                <input
-                  type="radio"
-                  :name="field.id"
-                  :value="option"
-                  v-model="responses[field.id]"
-                  :required="field.required"
-                />
-                <span class="radio-circle"></span>
-                <span class="radio-label">{{ option }}</span>
-              </label>
-            </div>
+                :label="option"
+                :value="option"
+              />
+            </v-radio-group>
 
             <!-- Checkboxes -->
-            <div v-else-if="field.type === 'checkbox'" class="field-checkbox-group">
-              <label
+            <div v-else-if="field.type === 'checkbox'">
+              <v-checkbox
                 v-for="option in field.options"
                 :key="option"
-                class="field-checkbox-option"
-                :class="{ 'selected': (responses[field.id] || []).includes(option) }"
-              >
-                <input
-                  type="checkbox"
-                  :value="option"
-                  v-model="responses[field.id]"
-                />
-                <span class="checkbox-box"></span>
-                <span class="checkbox-label">{{ option }}</span>
-              </label>
+                :label="option"
+                :value="option"
+                v-model="responses[field.id]"
+                density="compact"
+                hide-details
+              />
             </div>
 
             <!-- File Upload -->
-            <div v-else-if="field.type === 'file'" class="field-file-upload">
-              <input
-                type="file"
-                :id="field.id"
-                @change="handleFileChange(field.id, $event)"
-                class="hidden"
-              />
-              <label :for="field.id" class="file-upload-area">
-                <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <span class="upload-text">
-                  {{ responses[field.id]?.name || 'Kattints a fájl kiválasztásához' }}
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
+            <v-file-input
+              v-else-if="field.type === 'file'"
+              @update:model-value="handleFileChange(field.id, $event)"
+              variant="outlined"
+              density="comfortable"
+              prepend-icon="mdi-paperclip"
+              :rules="field.required ? [v => !!v || 'Kötelező mező'] : []"
+              hide-details="auto"
+            />
+          </v-card-text>
+        </v-card>
 
-        <!-- Submit Button -->
-        <div class="glass-card p-6 rounded-b-3xl border-t-0">
-          <div class="flex items-center justify-between">
-            <button
-              type="button"
-              @click="clearForm"
-              class="text-gray-400 hover:text-white transition-colors"
-            >
+        <!-- Submit Area -->
+        <v-card>
+          <v-card-text class="d-flex align-center justify-space-between">
+            <v-btn variant="text" @click="clearForm">
               Űrlap törlése
-            </button>
-            <button
+            </v-btn>
+            <v-btn
               type="submit"
-              :disabled="isSubmitting"
-              class="btn-primary"
+              color="primary"
+              size="large"
+              :loading="isSubmitting"
+              prepend-icon="mdi-send"
             >
-              {{ isSubmitting ? '⏳ Küldés...' : '📤 Beküldés' }}
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
+              Beküldés
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-form>
+    </template>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { FormsService, type Form } from '@/services/forms/FormsService';
+import { FileManager } from '@/appwrite/FileManagement';
 import { notify } from '@kyvg/vue3-notification';
 
 const route = useRoute();
 const router = useRouter();
 const formsService = FormsService.getInstance();
+const fileManager = new FileManager();
 
 const form = ref<Form | null>(null);
 const responses = ref<Record<string, any>>({});
@@ -337,10 +335,9 @@ function initializeResponses() {
   });
 }
 
-function handleFileChange(fieldId: string, event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    responses.value[fieldId] = input.files[0];
+function handleFileChange(fieldId: string, files: File[] | null) {
+  if (files && files.length > 0) {
+    responses.value[fieldId] = files[0];
   }
 }
 
@@ -403,125 +400,11 @@ function resetForm() {
   clearForm();
 }
 
+function getFieldImageUrl(imageId: string): string {
+  return fileManager.getFileView(imageId, 'gallery');
+}
+
 function goHome() {
   router.push('/');
 }
 </script>
-
-<style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-primary {
-  @apply px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed;
-}
-
-.btn-secondary {
-  @apply px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all;
-}
-
-.field-container {
-  @apply space-y-2;
-}
-
-.field-label {
-  @apply block text-lg font-semibold text-white;
-}
-
-.field-description {
-  @apply text-sm text-gray-400;
-}
-
-.field-input,
-.field-textarea,
-.field-select {
-  @apply w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all;
-}
-
-.field-textarea {
-  @apply resize-none;
-}
-
-.field-select {
-  @apply appearance-none cursor-pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23888'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 20px;
-  padding-right: 40px;
-}
-
-.field-radio-group,
-.field-checkbox-group {
-  @apply space-y-3 mt-2;
-}
-
-.field-radio-option,
-.field-checkbox-option {
-  @apply flex items-center gap-3 p-3 bg-white/5 rounded-xl cursor-pointer transition-all hover:bg-white/10;
-}
-
-.field-radio-option.selected,
-.field-checkbox-option.selected {
-  @apply bg-purple-500/20 ring-2 ring-purple-500;
-}
-
-.field-radio-option input,
-.field-checkbox-option input {
-  @apply hidden;
-}
-
-.radio-circle {
-  @apply w-5 h-5 rounded-full border-2 border-white/30 flex-shrink-0 relative;
-}
-
-.field-radio-option.selected .radio-circle {
-  @apply border-purple-500;
-}
-
-.field-radio-option.selected .radio-circle::after {
-  content: '';
-  @apply absolute inset-1 bg-purple-500 rounded-full;
-}
-
-.checkbox-box {
-  @apply w-5 h-5 rounded-md border-2 border-white/30 flex-shrink-0 flex items-center justify-center;
-}
-
-.field-checkbox-option.selected .checkbox-box {
-  @apply bg-purple-500 border-purple-500;
-}
-
-.field-checkbox-option.selected .checkbox-box::after {
-  content: '✓';
-  @apply text-white text-xs font-bold;
-}
-
-.radio-label,
-.checkbox-label {
-  @apply text-white;
-}
-
-.field-file-upload {
-  @apply mt-2;
-}
-
-.file-upload-area {
-  @apply flex flex-col items-center justify-center p-8 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-purple-500 hover:bg-white/5 transition-all;
-}
-
-.upload-icon {
-  @apply w-10 h-10 text-gray-400 mb-2;
-}
-
-.upload-text {
-  @apply text-gray-400 text-center;
-}
-
-.hidden {
-  display: none;
-}
-</style>

@@ -308,7 +308,7 @@ export default {
   mounted() {
     setDocumentTitle(this.$t("classlist"));
     const cc = useLoadingStore();
-    this.admin = cc.userLoggedin;
+    this.admin = cc.userLoggedin && (cc.userRole === 'admin' || cc.userRole === 'editor');
     this.fetchClasses();
   },
   methods: {

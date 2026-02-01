@@ -142,7 +142,7 @@ import { Databases, Query, Storage } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
-import moment from "moment/min/moment-with-locales";
+import dayjs from '@/utils/dayjs';
 import gsap from "gsap";
 
 export default {
@@ -178,7 +178,7 @@ export default {
   },
   async mounted() {
     const cc = useLoadingStore();
-    this.admin = cc.userLoggedin;
+    this.admin = cc.userLoggedin && (cc.userRole === 'admin' || cc.userRole === 'editor');
 
     this.headers = [
       { title: this.$t("name"), key: "name", align: "start", sortable: false, width: "300px" },
@@ -211,8 +211,8 @@ export default {
   methods: {
     rt_time(date: string) {
       const local = useLoadingStore().language;
-      moment.locale(local === "rs" ? "sr" : local);
-      return moment(date).format("LL");
+      dayjs.locale(local === "rs" ? "sr" : local);
+      return dayjs(date).format("LL");
     },
 
     async synchronize_documents() {

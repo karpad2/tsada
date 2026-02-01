@@ -273,7 +273,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, reactive } from 'vue';
-import moment from 'moment';
+import dayjs from '@/utils/dayjs';
 import { config } from '@/appwrite';
 import {
   fetchTVContent,
@@ -288,6 +288,8 @@ import {
   EventData
 } from '@/utils/editorUtils';
 import FileUploadSection from '@/components/shared/FileUploadSection.vue';
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'SlideEditor',
@@ -295,6 +297,9 @@ export default defineComponent({
     FileUploadSection
   },
   setup() {
+    const { t } = useI18n();
+    const { openDialog } = useConfirmDialog();
+
     // Reactive data
     const slides = ref<SlideData[]>([]);
     const events = ref<EventData[]>([]);
@@ -317,17 +322,17 @@ export default defineComponent({
     });
 
     // Table headers
-    const slideHeaders = [
-      { text: 'Title', align: 'start', value: 'title' },
-      { text: 'Created At', align: 'start', value: 'createdAt' },
-      { text: 'Actions', align: 'end', value: 'actions', sortable: false }
-    ];
+    const slideHeaders = computed(() => [
+      { text: t('title'), align: 'start', value: 'title' },
+      { text: t('created_at'), align: 'start', value: 'createdAt' },
+      { text: t('operations'), align: 'end', value: 'actions', sortable: false }
+    ]);
 
-    const eventHeaders = [
-      { text: 'Title', align: 'start', value: 'title' },
-      { text: 'Date', align: 'start', value: 'date' },
-      { text: 'Actions', align: 'end', value: 'actions', sortable: false }
-    ];
+    const eventHeaders = computed(() => [
+      { text: t('title'), align: 'start', value: 'title' },
+      { text: t('date'), align: 'start', value: 'date' },
+      { text: t('operations'), align: 'end', value: 'actions', sortable: false }
+    ]);
 
     // Computed properties for image previews
     const slideImageUrl = computed(() => {
@@ -349,11 +354,11 @@ export default defineComponent({
         const content = await fetchTVContent();
         slides.value = content.slides.map(slide => ({
           ...slide,
-          createdAt: moment(slide.createdAt).format('YYYY-MM-DD')
+          createdAt: dayjs(slide.createdAt).format('YYYY-MM-DD')
         }));
         events.value = content.events.map(event => ({
           ...event,
-          date: moment(event.date).format('YYYY-MM-DD')
+          date: dayjs(event.date).format('YYYY-MM-DD')
         }));
       } catch (error) {
         console.error('Error fetching content:', error);
@@ -405,7 +410,14 @@ export default defineComponent({
     };
 
     const removeSlide = async (id: string) => {
-      if (!confirm('Are you sure you want to delete this slide?')) return;
+      const confirmed = await openDialog({
+        title: t('delete'),
+        message: t('confirm_delete'),
+        confirmText: t('delete'),
+        color: 'error',
+        icon: 'mdi-delete'
+      });
+      if (!confirmed) return;
 
       try {
         await deleteTVContent(id);
@@ -472,7 +484,14 @@ export default defineComponent({
     };
 
     const removeEvent = async (id: string) => {
-      if (!confirm('Are you sure you want to delete this event?')) return;
+      const confirmed = await openDialog({
+        title: t('delete'),
+        message: t('confirm_delete'),
+        confirmText: t('delete'),
+        color: 'error',
+        icon: 'mdi-delete'
+      });
+      if (!confirmed) return;
 
       try {
         await deleteTVContent(id);

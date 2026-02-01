@@ -5,11 +5,11 @@
         <v-card>
           <v-card-title class="d-flex align-center">
             <v-icon class="mr-2">mdi-school</v-icon>
-            Szakok kezelése
+            {{ $t('manage_study_programs') }}
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="openCreateDialog">
               <v-icon left>mdi-plus</v-icon>
-              Új szak
+              {{ $t('new_study_program') }}
             </v-btn>
           </v-card-title>
 
@@ -18,7 +18,7 @@
             <v-text-field
               v-model="search"
               prepend-inner-icon="mdi-magnify"
-              label="Keresés..."
+              :label="$t('search_content')"
               single-line
               hide-details
               clearable
@@ -35,13 +35,13 @@
             >
               <template #item.duration_years="{ item }">
                 <v-chip size="small" :color="item.duration_years === 4 ? 'primary' : 'secondary'">
-                  {{ item.duration_years }} év
+                  {{ item.duration_years }} {{ $t('year') }}
                 </v-chip>
               </template>
 
               <template #item.language="{ item }">
                 <v-chip size="small" :color="item.language === 'hu' ? 'success' : 'info'">
-                  {{ item.language === 'hu' ? 'Magyar' : item.language === 'rs' ? 'Szerb' : item.language }}
+                  {{ item.language === 'hu' ? $t('hungarian') : item.language === 'rs' ? $t('serbian') : item.language }}
                 </v-chip>
               </template>
 
@@ -51,7 +51,7 @@
                 </v-btn>
                 <v-btn icon size="small" variant="text" color="primary" @click="manageSubjects(item)">
                   <v-icon>mdi-book-multiple</v-icon>
-                  <v-tooltip activator="parent">Tantárgyak kezelése</v-tooltip>
+                  <v-tooltip activator="parent">{{ $t('manage_subjects') }}</v-tooltip>
                 </v-btn>
                 <v-btn icon size="small" variant="text" color="error" @click="confirmDelete(item)">
                   <v-icon>mdi-delete</v-icon>
@@ -61,7 +61,7 @@
               <template #no-data>
                 <div class="text-center py-4">
                   <v-icon size="64" color="grey">mdi-school</v-icon>
-                  <p class="mt-2">Nincsenek szakok</p>
+                  <p class="mt-2">{{ $t('no_study_programs') }}</p>
                 </div>
               </template>
             </v-data-table>
@@ -75,7 +75,7 @@
       <v-card>
         <v-card-title>
           <v-icon class="mr-2">{{ editingProgram ? 'mdi-pencil' : 'mdi-plus' }}</v-icon>
-          {{ editingProgram ? 'Szak szerkesztése' : 'Új szak' }}
+          {{ editingProgram ? $t('edit_study_program') : $t('new_study_program') }}
         </v-card-title>
         <v-card-text>
           <v-form ref="formRef" v-model="formValid">
@@ -83,32 +83,32 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.study_program_name_hu"
-                  label="Magyar név"
-                  :rules="[v => !!v || 'Kötelező mező']"
+                  :label="$t('study_program_name_hu')"
+                  :rules="[v => !!v || $t('required_field')]"
                   required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.study_program_name_rs"
-                  label="Szerb név"
-                  :rules="[v => !!v || 'Kötelező mező']"
+                  :label="$t('study_program_name_rs')"
+                  :rules="[v => !!v || $t('required_field')]"
                   required
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
                   v-model="form.study_program_internal_name"
-                  label="Belső név (rövid)"
-                  hint="Rövidített név belső használatra"
+                  :label="$t('internal_name')"
+                  :hint="$t('internal_name_hint')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-select
                   v-model="form.duration_years"
                   :items="[3, 4]"
-                  label="Időtartam (év)"
-                  :rules="[v => !!v || 'Kötelező mező']"
+                  :label="$t('duration_years')"
+                  :rules="[v => !!v || $t('required_field')]"
                   required
                 ></v-select>
               </v-col>
@@ -118,7 +118,7 @@
                   :items="languageOptions"
                   item-title="text"
                   item-value="value"
-                  label="Tagozat nyelve"
+                  :label="$t('department_language')"
                 ></v-select>
               </v-col>
             </v-row>
@@ -126,9 +126,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showDialog = false">Mégse</v-btn>
+          <v-btn variant="text" @click="showDialog = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="primary" :loading="isSaving" :disabled="!formValid" @click="saveProgram">
-            {{ editingProgram ? 'Mentés' : 'Létrehozás' }}
+            {{ editingProgram ? $t('save') : $t('create') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -139,15 +139,15 @@
       <v-card>
         <v-card-title class="text-error">
           <v-icon color="error" class="mr-2">mdi-alert</v-icon>
-          Törlés megerősítése
+          {{ $t('confirm_delete') }}
         </v-card-title>
         <v-card-text>
-          Biztosan törölni szeretnéd a(z) <strong>{{ deletingProgram?.study_program_name_hu }}</strong> szakot?
+          {{ $t('confirm_delete_program', { name: deletingProgram?.study_program_name_hu }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showDeleteDialog = false">Mégse</v-btn>
-          <v-btn color="error" :loading="isDeleting" @click="deleteProgram">Törlés</v-btn>
+          <v-btn variant="text" @click="showDeleteDialog = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="error" :loading="isDeleting" @click="deleteProgram">{{ $t('delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -157,12 +157,12 @@
       <v-card>
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2">mdi-book-multiple</v-icon>
-          {{ selectedProgram?.study_program_name_hu }} - Tantárgyak
+          {{ selectedProgram?.study_program_name_hu }} - {{ $t('subjects') }}
         </v-card-title>
         <v-card-text>
           <v-tabs v-model="selectedYear" color="primary">
             <v-tab v-for="year in availableYears" :key="year" :value="year">
-              {{ year }}. évfolyam
+              {{ year }}. {{ $t('year') }}
             </v-tab>
           </v-tabs>
 
@@ -176,7 +176,7 @@
                 :items="availableSubjects"
                 item-title="name_hu"
                 item-value="$id"
-                label="Tantárgy hozzáadása"
+                :label="$t('add_subject')"
                 clearable
                 return-object
               >
@@ -195,7 +195,7 @@
                 @click="addSubjectToProgram"
               >
                 <v-icon left>mdi-plus</v-icon>
-                Hozzáadás
+                {{ $t('add') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -228,12 +228,12 @@
           </v-list>
           <div v-else class="text-center py-8 text-grey">
             <v-icon size="48">mdi-book-off</v-icon>
-            <p class="mt-2">Nincs tantárgy ehhez az évfolyamhoz</p>
+            <p class="mt-2">{{ $t('no_subjects_for_year') }}</p>
           </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showSubjectsDialog = false">Bezárás</v-btn>
+          <v-btn variant="text" @click="showSubjectsDialog = false">{{ $t('close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -242,11 +242,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { ErpService, type StudyProgram, type Subject, type StudyProgramSubject } from '@/services/ErpService';
 
 export default defineComponent({
   name: 'StudyProgramsAdmin',
   setup() {
+    const { t } = useI18n();
     const erpService = ErpService.getInstance();
 
     const programs = ref<StudyProgram[]>([]);
@@ -280,18 +282,18 @@ export default defineComponent({
       language: 'hu'
     });
 
-    const languageOptions = [
-      { text: 'Magyar', value: 'hu' },
-      { text: 'Szerb', value: 'rs' }
-    ];
+    const languageOptions = computed(() => [
+      { text: t('hungarian'), value: 'hu' },
+      { text: t('serbian'), value: 'rs' }
+    ]);
 
-    const headers = [
-      { title: 'Magyar név', key: 'study_program_name_hu' },
-      { title: 'Szerb név', key: 'study_program_name_rs' },
-      { title: 'Időtartam', key: 'duration_years', width: '120px' },
-      { title: 'Tagozat', key: 'language', width: '120px' },
-      { title: 'Műveletek', key: 'actions', sortable: false, width: '150px' }
-    ];
+    const headers = computed(() => [
+      { title: t('study_program_name_hu'), key: 'study_program_name_hu' },
+      { title: t('study_program_name_rs'), key: 'study_program_name_rs' },
+      { title: t('duration_years'), key: 'duration_years', width: '120px' },
+      { title: t('department_language'), key: 'language', width: '120px' },
+      { title: t('operations'), key: 'actions', sortable: false, width: '150px' }
+    ]);
 
     const filteredPrograms = computed(() => {
       if (!search.value) return programs.value;

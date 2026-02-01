@@ -136,7 +136,7 @@
 
 <script>
 import { onMounted } from 'vue';
-import moment from 'moment';
+import dayjs from '@/utils/dayjs';
 import { Databases, Query, Storage } from 'appwrite';
 import { config, appw } from "@/appwrite"; 
 
@@ -182,12 +182,12 @@ export default {
           throw new Error('Failed to fetch time');
         }
         const data = await response.json();
-        this.currentTime = moment(data.date).format('HH:mm:ss');
-        this.currentDate = moment(data.date).format('YYYY-MM-DD');
+        this.currentTime = dayjs(data.date).format('HH:mm:ss');
+        this.currentDate = dayjs(data.date).format('YYYY-MM-DD');
       } catch (error) {
         console.warn("Falling back to local time due to error:", error);
-        this.currentTime = moment().format('HH:mm:ss');
-        this.currentDate = moment().format('YYYY-MM-DD');
+        this.currentTime = dayjs().format('HH:mm:ss');
+        this.currentDate = dayjs().format('YYYY-MM-DD');
       }
     },
     async fetchContent() {
@@ -212,7 +212,7 @@ export default {
           } else if (doc.type === 'event') {
             this.events.push({
               title: doc.title,
-              date: moment(doc.event_date).format('YYYY-MM-DD'),
+              date: dayjs(doc.event_date).format('YYYY-MM-DD'),
               description: doc.description,
               image: imageUrl
             });

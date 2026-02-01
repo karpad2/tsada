@@ -4,7 +4,7 @@
     role="main"
     aria-label="Main school site content"
   >
-    <LazyWrapper><Hero /></LazyWrapper>
+   <Hero />
     <LazyWrapper><PromotionImage /></LazyWrapper>
     <LazyWrapper><SlideModules mode="courses" /></LazyWrapper>
     <LazyWrapper><SlideModules mode="news" /></LazyWrapper>

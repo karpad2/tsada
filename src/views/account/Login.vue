@@ -378,6 +378,7 @@ import { ref, computed, onMounted } from "vue";
 import { Account } from "appwrite";
 import { appw, user } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+import { RoleService } from "@/services/RoleService";
 import router from "@/router";
 
 export default {
@@ -418,6 +419,24 @@ export default {
 
     const isLoggedin = computed(() => loadingStore.userLoggedin);
 
+    const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer'];
+
+    const loadUserRoleFromLabels = (labels: string[]) => {
+      const role = labels?.find((l: string) => VALID_ROLES.includes(l)) || '';
+      loadingStore.setUserRole(role);
+    };
+
+    const loadUserAssignedClasses = async (userId: string) => {
+      try {
+        const roleService = RoleService.getInstance();
+        const classes = await roleService.getUserAssignedClasses(userId);
+        loadingStore.setAssignedClasses(classes);
+      } catch (err) {
+        console.error('Failed to load assigned classes:', err);
+        loadingStore.setAssignedClasses([]);
+      }
+    };
+
     const checkLogin = async () => {
       try {
         const account = new Account(appw);
@@ -425,6 +444,12 @@ export default {
         loadingStore.setUserLoggedin(true);
         username.value = session.name || session.email;
         loadingStore.setuid(session.$id);
+
+        // Load user role from labels
+        loadUserRoleFromLabels(session.labels || []);
+        if (loadingStore.userRole === 'teacher') {
+          await loadUserAssignedClasses(session.$id);
+        }
 
         // Format account creation date
         if (session.registration) {
@@ -456,6 +481,15 @@ export default {
         loadingStore.setUserLoggedin(true);
         loadingStore.setuid(response.userId);
         username.value = response.email;
+
+        // Load user role from labels
+        const account = new Account(appw);
+        const userData = await account.get();
+        loadUserRoleFromLabels(userData.labels || []);
+        if (loadingStore.userRole === 'teacher') {
+          await loadUserAssignedClasses(response.userId);
+        }
+
         getUserSettings();
 
         // Success - clear form
@@ -491,6 +525,9 @@ export default {
         await account.deleteSession("current");
         loadingStore.setUserLoggedin(false);
         loadingStore.setuid("");
+        loadingStore.setUserRole('');
+        loadingStore.setAssignedClasses([]);
+        RoleService.getInstance().clearCache();
         router.push("/home");
       } catch (err) {
         console.error("Logout failed", err);

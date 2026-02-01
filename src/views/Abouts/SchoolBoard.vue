@@ -386,7 +386,7 @@ export default {
     computed: {
         admin(): boolean {
             const cc = useLoadingStore();
-            return cc.userLoggedin;
+            return cc.userLoggedin && (cc.userRole === 'admin' || cc.userRole === 'editor');
         },
 
         currentLanguage() {

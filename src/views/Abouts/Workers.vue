@@ -188,7 +188,7 @@ export default defineComponent({
     let observer: IntersectionObserver | null = null;
 
     // Computed properties
-    const isAdmin = computed(() => loadingStore.userLoggedin);
+    const isAdmin = computed(() => loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor'));
     const currentLanguage = computed(() => loadingStore.language);
 
     // Watch for language changes

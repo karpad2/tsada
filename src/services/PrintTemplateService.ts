@@ -35,6 +35,10 @@ export interface FieldPosition {
   maxWidth?: number;
   /** Igazítás: left, center, right */
   align?: 'left' | 'center' | 'right';
+  /** Ha true, a mező áthúzva jelenik meg nyomtatáskor (ha nincs adat) */
+  strikethrough?: boolean;
+  /** Áthúzás szélessége mm-ben (alapértelmezett: maxWidth vagy 30mm) */
+  strikethroughWidth?: number;
 }
 
 /**
@@ -90,11 +94,13 @@ export interface PrintTemplate {
    * Dokumentum típus:
    * - 'grade_book_base': Üres főkönyv sablon (beiratkozáskor nyomtatandó alap adatok)
    * - 'grade_book_year': Évfolyam jegyek (1-4. év oszlopai)
+   * - 'grade_book_matura': Érettségi vizsga szekció
+   * - 'grade_book_certificates': Oklevelek/bizonyítványok szekció
    * - 'certificate': Bizonyítvány
    * - 'enrollment': Beiratkozási lap
    * - 'custom': Egyéb
    */
-  documentType: 'grade_book_base' | 'grade_book_year' | 'certificate' | 'enrollment' | 'custom';
+  documentType: 'grade_book_base' | 'grade_book_year' | 'grade_book_matura' | 'grade_book_certificates' | 'certificate' | 'enrollment' | 'custom';
   /** Papírméret */
   paperSize: {
     width: number;
@@ -110,6 +116,8 @@ export interface PrintTemplate {
     x: number;
     y: number;
   };
+  /** Űrlap nyelvi variáns: kétnyelvű (szerb+magyar) vagy egynyelvű (szerb) */
+  formLanguage?: 'bilingual' | 'serbian';
   /** Létrehozás/módosítás időpontja */
   createdAt?: string;
   updatedAt?: string;
@@ -142,12 +150,33 @@ export class PrintTemplateService {
   async getTemplate(
     studyProgramId: string | null,
     year: number,
-    documentType: string = 'grade_book'
+    documentType: string = 'grade_book',
+    formLanguage: 'bilingual' | 'serbian' = 'bilingual'
   ): Promise<PrintTemplate | null> {
     try {
       // Először keresünk specifikus sablont a szakhoz
       if (studyProgramId) {
+        const queries = [
+          Query.equal('studyProgramId', studyProgramId),
+          Query.equal('year', year),
+          Query.equal('documentType', documentType),
+          Query.limit(1)
+        ];
+        // formLanguage szűrő - ha van ilyen mező az adatbázisban
+        queries.push(Query.equal('formLanguage', formLanguage));
+
         const specific = await this.databases.listDocuments(
+          ERP_DB,
+          config.erp_print_templates,
+          queries
+        );
+
+        if (specific.documents.length > 0) {
+          return this.parseTemplate(specific.documents[0]);
+        }
+
+        // Fallback: próbáljuk formLanguage nélkül (régi sablonok kompatibilitás)
+        const specificNoLang = await this.databases.listDocuments(
           ERP_DB,
           config.erp_print_templates,
           [
@@ -158,13 +187,32 @@ export class PrintTemplateService {
           ]
         );
 
-        if (specific.documents.length > 0) {
-          return this.parseTemplate(specific.documents[0]);
+        if (specificNoLang.documents.length > 0) {
+          return this.parseTemplate(specificNoLang.documents[0]);
         }
       }
 
       // Ha nincs specifikus, keresünk általános sablont (studyProgramId = null)
+      const generalQueries = [
+        Query.isNull('studyProgramId'),
+        Query.equal('year', year),
+        Query.equal('documentType', documentType),
+        Query.limit(1)
+      ];
+      generalQueries.push(Query.equal('formLanguage', formLanguage));
+
       const general = await this.databases.listDocuments(
+        ERP_DB,
+        config.erp_print_templates,
+        generalQueries
+      );
+
+      if (general.documents.length > 0) {
+        return this.parseTemplate(general.documents[0]);
+      }
+
+      // Fallback: formLanguage nélkül (régi sablonok)
+      const generalNoLang = await this.databases.listDocuments(
         ERP_DB,
         config.erp_print_templates,
         [
@@ -175,8 +223,8 @@ export class PrintTemplateService {
         ]
       );
 
-      if (general.documents.length > 0) {
-        return this.parseTemplate(general.documents[0]);
+      if (generalNoLang.documents.length > 0) {
+        return this.parseTemplate(generalNoLang.documents[0]);
       }
 
       return null;
@@ -214,6 +262,7 @@ export class PrintTemplateService {
         studyProgramId: template.studyProgramId,
         year: template.year,
         documentType: template.documentType,
+        formLanguage: template.formLanguage || 'bilingual',
         paperSize: JSON.stringify(template.paperSize),
         fields: JSON.stringify(template.fields),
         gradesTable: template.gradesTable ? JSON.stringify(template.gradesTable) : null,
@@ -303,15 +352,23 @@ export class PrintTemplateService {
       return this.getDefaultBaseTemplate();
     }
 
+    if (documentType === 'grade_book_matura') {
+      return this.getDefaultMaturaTemplate();
+    }
+
+    if (documentType === 'grade_book_certificates') {
+      return this.getDefaultCertificatesTemplate();
+    }
+
     return {
       name: `Általános főkönyv - ${year}. évfolyam`,
       studyProgramId: null,
       year,
       documentType: 'grade_book_year',
       paperSize: {
-        width: 420,
-        height: 297,
-        name: 'A3 Fekvő'
+        width: 297,
+        height: 420,
+        name: 'A3 Álló'
       },
       fields: this.getDefaultYearFields(year),
       gradesTable: this.getDefaultGradesTable(year),
@@ -330,21 +387,117 @@ export class PrintTemplateService {
       year: 0,
       documentType: 'grade_book_base',
       paperSize: {
-        width: 420,
-        height: 297,
-        name: 'A3 Fekvő'
+        width: 297,
+        height: 420,
+        name: 'A3 Álló'
       },
       fields: [
-        // Fejléc - diák alapadatai
-        { fieldId: 'student_name', label: 'Diák neve', x: 50, y: 15, fontSize: 12 },
-        { fieldId: 'birth_date', label: 'Születési dátum', x: 50, y: 25, fontSize: 10 },
-        { fieldId: 'birth_place', label: 'Születési hely', x: 120, y: 25, fontSize: 10 },
-        { fieldId: 'mother_name', label: 'Anyja neve', x: 50, y: 35, fontSize: 10 },
-        { fieldId: 'jmbg', label: 'JMBG', x: 200, y: 35, fontSize: 10, letterSpacing: 3 },
-        { fieldId: 'study_program', label: 'Szak', x: 50, y: 45, fontSize: 10 },
-        { fieldId: 'enrollment_date', label: 'Beiratkozás dátuma', x: 200, y: 45, fontSize: 10 },
-        { fieldId: 'enrollment_number', label: 'Anyakönyvi szám', x: 300, y: 15, fontSize: 10 },
-        { fieldId: 'school_name', label: 'Iskola neve', x: 150, y: 5, fontSize: 11, align: 'center' }
+        // Fejléc - "број" bal felső sarok, "Број у регистру" középen, "JMB" jobb oldalon
+        { fieldId: 'enrollmentNumber', label: 'Број / Szám', x: 15.0, y: 14.0, fontSize: 10 },
+        { fieldId: 'registryNumber', label: 'Број у регистру / Belső sorszám', x: 78.0, y: 14.0, fontSize: 10 },
+        { fieldId: 'jmbg', label: 'JMB', x: 187.0, y: 14.0, fontSize: 9, letterSpacing: 2.2 },
+        // Diák neve - egy sorban szerb + magyar (a képen: "Варга Даниела / Varga Daniella")
+        { fieldId: 'studentNameRs', label: 'Diák neve (szerb)', x: 15.0, y: 32.0, fontSize: 11 },
+        { fieldId: 'studentName', label: 'Diák neve (magyar)', x: 148.0, y: 32.0, fontSize: 11 },
+        // Születési hely/dátum sor
+        { fieldId: 'birthDate', label: 'Születési dátum', x: 15.0, y: 38.5, fontSize: 9 },
+        { fieldId: 'birthPlaceRs', label: 'Születési hely (szerb)', x: 70.0, y: 38.5, fontSize: 9 },
+        { fieldId: 'birthPlace', label: 'Születési hely (magyar)', x: 160.0, y: 38.5, fontSize: 9 },
+        // Szülők neve sor
+        { fieldId: 'fatherName', label: 'Apa neve', x: 15.0, y: 45.0, fontSize: 9 },
+        { fieldId: 'motherName', label: 'Anya neve', x: 175.0, y: 45.0, fontSize: 9 },
+        // Szak / képzési profil sorok
+        { fieldId: 'studyProgramRs', label: 'Szak (szerb)', x: 15.0, y: 52.0, fontSize: 9 },
+        { fieldId: 'studyProgram', label: 'Szak (magyar)', x: 15.0, y: 58.0, fontSize: 9 },
+        { fieldId: 'educationType', label: 'Képzés típusa (rendes/rendkívüli)', x: 100.0, y: 64.0, fontSize: 8 },
+        { fieldId: 'educationDuration', label: 'Képzés időtartama', x: 215.0, y: 64.0, fontSize: 8 },
+        // Beiratkozás adatai
+        { fieldId: 'enrollmentDate', label: 'Beiratkozás dátuma', x: 15.0, y: 64.0, fontSize: 9 },
+        { fieldId: 'generation', label: 'Generáció / évfolyam', x: 60.0, y: 64.0, fontSize: 8 },
+        // Szülő adatai (a képen: alul az "érdeklődő szülő" címe)
+        { fieldId: 'parentName', label: 'Szülő neve', x: 15.0, y: 70.0, fontSize: 9 },
+        { fieldId: 'parentAddress', label: 'Szülő címe', x: 100.0, y: 70.0, fontSize: 9 },
+        { fieldId: 'parentPhone', label: 'Szülő telefonszáma', x: 200.0, y: 70.0, fontSize: 9 },
+        // Egyéb opciók
+        { fieldId: 'foreignLanguage', label: 'Idegen nyelv', x: 15.0, y: 76.0, fontSize: 8 },
+        { fieldId: 'religionOption', label: 'Hittan/Polgári', x: 100.0, y: 76.0, fontSize: 8 }
+      ],
+      globalOffset: { x: 0, y: 0 }
+    };
+  }
+
+  /**
+   * Alapértelmezett érettségi sablon
+   */
+  private getDefaultMaturaTemplate(): PrintTemplate {
+    return {
+      name: 'Főkönyv érettségi',
+      studyProgramId: null,
+      year: 4,
+      documentType: 'grade_book_matura',
+      paperSize: {
+        width: 297,
+        height: 420,
+        name: 'A3 Álló'
+      },
+      fields: [
+        // "Ученик-ца је полагао-ла / A tanuló" fejléc sor
+        // A képen: "року школске / vizsgaidőszakban a  2024/25  године/годіне..."
+        { fieldId: 'maturaSchoolYear', label: 'Tanév (року школске)', x: 125.0, y: 230.0, fontSize: 8 },
+        { fieldId: 'maturaYear', label: 'Vizsgaidőszak éve', x: 175.0, y: 230.0, fontSize: 8 },
+        { fieldId: 'maturaClassYear', label: 'Évfolyam ...ás, -es, -ös tanévben', x: 220.0, y: 236.0, fontSize: 8 },
+        // Érettségi tárgyak (kétnyelvű: "На матурском испиту полагао-на је..." sor utáni sorok)
+        // Bal oldalon tárgy neve, jobb oldalon () jegy szám és () szöveges
+        { fieldId: 'maturaSubject1Name', label: '1. tárgy neve', x: 15.0, y: 255.0, fontSize: 8 },
+        { fieldId: 'maturaSubject1Grade', label: '1. tárgy jegy', x: 210.0, y: 255.0, fontSize: 9 },
+        { fieldId: 'maturaSubject2Name', label: '2. tárgy neve', x: 15.0, y: 262.0, fontSize: 8 },
+        { fieldId: 'maturaSubject2Grade', label: '2. tárgy jegy', x: 210.0, y: 262.0, fontSize: 9 },
+        { fieldId: 'maturaSubject3Name', label: '3. tárgy neve (szakmai-elméleti)', x: 15.0, y: 269.0, fontSize: 8 },
+        { fieldId: 'maturaSubject3Grade', label: '3. tárgy jegy', x: 210.0, y: 269.0, fontSize: 9 },
+        // "На матурском испиту - érettségi vizsgán" - gyakorlati rész
+        { fieldId: 'maturaPracticalDesc', label: 'Gyakorlati vizsga leírás', x: 15.0, y: 282.0, fontSize: 8 },
+        { fieldId: 'maturaPracticalGrade', label: 'Gyakorlati jegy', x: 210.0, y: 282.0, fontSize: 9 },
+        // "и добио оцену / és osztályzatot kapott" sor
+        { fieldId: 'maturaFinalGrade', label: 'Végső jegy (szám+szöveg)', x: 120.0, y: 295.0, fontSize: 9 },
+        // "Ученик је положио-на / A tanuló a(z)" - eredmény sor
+        { fieldId: 'maturaResult', label: 'Eredménnyel tette le (успехом)', x: 175.0, y: 305.0, fontSize: 9 },
+        { fieldId: 'maturaDate', label: 'Keltezés', x: 15.0, y: 305.0, fontSize: 8 }
+      ],
+      globalOffset: { x: 0, y: 0 }
+    };
+  }
+
+  /**
+   * Alapértelmezett oklevelek/bizonyítványok sablon
+   */
+  private getDefaultCertificatesTemplate(): PrintTemplate {
+    return {
+      name: 'Főkönyv oklevelek',
+      studyProgramId: null,
+      year: 4,
+      documentType: 'grade_book_certificates',
+      paperSize: {
+        width: 297,
+        height: 420,
+        name: 'A3 Álló'
+      },
+      fields: [
+        // "Деловодни број и датум дипломе / Az oklevél iktatószáma és keltezése"
+        { fieldId: 'diplomaNumber', label: 'Oklevél iktatószám + dátum', x: 15.0, y: 318.0, fontSize: 8 },
+        { fieldId: 'diplomaDate', label: 'Oklevél keltezés', x: 160.0, y: 318.0, fontSize: 8 },
+        // "Деловодни број и датум уверења / A bizonylat iktatószáma és keltezése"
+        { fieldId: 'certificateNumber', label: 'Bizonylat iktatószám', x: 15.0, y: 326.0, fontSize: 8 },
+        { fieldId: 'certificateDate', label: 'Bizonylat keltezés', x: 160.0, y: 326.0, fontSize: 8 },
+        // "Серијски број дипломе - уверења / Az oklevél-bizonylat sorozatszáma"
+        { fieldId: 'serialNumber', label: 'Sorozatszám', x: 15.0, y: 334.0, fontSize: 8 },
+        // Jobb oldalon: aláírások ("Одељенски старешина / Osztályfőnök", "Председник испитне комисије")
+        { fieldId: 'classTeacherSign', label: 'Osztályfőnök', x: 195.0, y: 318.0, fontSize: 8 },
+        { fieldId: 'examCommitteeChair', label: 'Vizsgabizottság elnöke', x: 195.0, y: 328.0, fontSize: 8 },
+        // "Примио-ла дипломе - уверење / Átvette az oklevelet - bizonylatot"
+        { fieldId: 'receivedSignature', label: 'Átvette (aláírás)', x: 15.0, y: 345.0, fontSize: 8 },
+        { fieldId: 'receivedDate', label: 'Átvétel dátuma', x: 160.0, y: 345.0, fontSize: 8 },
+        // "НАПОМЕНЕ / MEGJEGYZÉSEK"
+        { fieldId: 'notes', label: 'Megjegyzések', x: 15.0, y: 358.0, fontSize: 8, maxWidth: 265 }
       ],
       globalOffset: { x: 0, y: 0 }
     };
@@ -354,28 +507,31 @@ export class PrintTemplateService {
    * Alapértelmezett évfolyam mezők (jegyek oszlopa)
    */
   private getDefaultYearFields(year: number): FieldPosition[] {
-    // Oszlop pozíciók évfolyamonként (A3 fekvő lapon)
+    // Oszlop pozíciók évfolyamonként (A3 álló lapon - 297mm széles)
+    // A képek alapján: a 4 év oszlopai a tantárgy nevek után, ~30mm szélesek
     const columnOffsets: Record<number, number> = {
-      1: 30,   // 1. év oszlop kezdete
-      2: 130,  // 2. év oszlop kezdete
-      3: 230,  // 3. év oszlop kezdete
-      4: 330   // 4. év oszlop kezdete
+      1: 148.0,  // 1. év oszlop kezdete
+      2: 178.0,  // 2. év oszlop kezdete
+      3: 208.0,  // 3. év oszlop kezdete
+      4: 238.0   // 4. év oszlop kezdete
     };
 
-    const baseX = columnOffsets[year] || 30;
+    const baseX = columnOffsets[year] || 148.0;
 
     return [
-      { fieldId: 'school_year', label: 'Tanév', x: baseX + 10, y: 55, fontSize: 9 },
-      { fieldId: 'class_name', label: 'Osztály', x: baseX + 50, y: 55, fontSize: 9 },
-      { fieldId: 'class_teacher', label: 'Osztályfőnök', x: baseX + 10, y: 62, fontSize: 8 },
-      { fieldId: 'final_grade', label: 'Tanulmányi átlag', x: baseX + 10, y: 250, fontSize: 10 },
-      { fieldId: 'absences_total', label: 'Össz. mulasztás', x: baseX + 10, y: 258, fontSize: 9 },
-      { fieldId: 'absences_justified', label: 'Igazolt', x: baseX + 50, y: 258, fontSize: 9 },
-      { fieldId: 'absences_unjustified', label: 'Igazolatlan', x: baseX + 70, y: 258, fontSize: 9 },
-      { fieldId: 'behavior', label: 'Magatartás', x: baseX + 10, y: 266, fontSize: 9 },
-      { fieldId: 'diligence', label: 'Szorgalom', x: baseX + 50, y: 266, fontSize: 9 },
-      { fieldId: 'date', label: 'Keltezés', x: baseX + 10, y: 280, fontSize: 9 },
-      { fieldId: 'director_signature', label: 'Igazgató', x: baseX + 60, y: 280, fontSize: 8 }
+      // Fejléc mezők (a tantárgy táblázat fölötti "Школска година" sorban)
+      { fieldId: 'schoolYear', label: 'Tanév', x: baseX, y: 83.0, fontSize: 7 },
+      { fieldId: 'className', label: 'Osztály (разр./oszt.)', x: baseX, y: 89.5, fontSize: 7 },
+      // Alul: Vladanje/Magaviselet szekció (hátlap teteje, de azonos lapon)
+      { fieldId: 'behaviorText', label: 'Vladanje/Magaviselet', x: baseX, y: 320.0, fontSize: 7 },
+      { fieldId: 'generalSuccess', label: 'Általános siker / Opšti uspeh', x: baseX, y: 328.0, fontSize: 7 },
+      { fieldId: 'finalGrade', label: 'Átlagosztályzat / Prosečna ocena', x: baseX, y: 335.0, fontSize: 8 },
+      { fieldId: 'absencesTotal', label: 'Össz. mulasztás', x: baseX, y: 342.0, fontSize: 7 },
+      { fieldId: 'absencesJustified', label: 'Igazolt', x: baseX + 12.0, y: 342.0, fontSize: 7 },
+      { fieldId: 'absencesUnjustified', label: 'Igazolatlan', x: baseX + 22.0, y: 342.0, fontSize: 7 },
+      { fieldId: 'classTeacher', label: 'Osztályfőnök', x: baseX, y: 350.0, fontSize: 7 },
+      { fieldId: 'date', label: 'Keltezés', x: baseX, y: 357.0, fontSize: 7 },
+      { fieldId: 'directorSignature', label: 'Igazgató', x: baseX, y: 364.0, fontSize: 7 }
     ];
   }
 
@@ -383,21 +539,22 @@ export class PrintTemplateService {
    * Alapértelmezett jegytáblázat konfiguráció
    */
   private getDefaultGradesTable(year: number): GradesTableConfig {
+    // A3 álló lapon a jegy oszlopok pozíciói (a képek alapján)
     const columnOffsets: Record<number, number> = {
-      1: 30,
-      2: 130,
-      3: 230,
-      4: 330
+      1: 148.0,
+      2: 178.0,
+      3: 208.0,
+      4: 238.0
     };
 
-    const baseX = columnOffsets[year] || 30;
+    const baseX = columnOffsets[year] || 148.0;
 
     return {
       startX: baseX,
-      startY: 75,
-      rowHeight: 7,
-      gradeColumnOffsetX: 70,
-      fontSize: 10,
+      startY: 96.0,      // Tantárgyak listája innen indul (a fejléc sorok alatt)
+      rowHeight: 6.2,     // Sorok magassága mm-ben (a képen kb 6-6.5mm)
+      gradeColumnOffsetX: 12.0,  // A jegy a tantárgy név után ennyi mm-re van
+      fontSize: 8,
       subjects: []  // Ezt a TemplateEditor-ban töltjük ki a tantárgyak alapján
     };
   }
@@ -412,6 +569,7 @@ export class PrintTemplateService {
       studyProgramId: doc.studyProgramId,
       year: doc.year,
       documentType: doc.documentType,
+      formLanguage: doc.formLanguage || 'bilingual',
       paperSize: typeof doc.paperSize === 'string' ? JSON.parse(doc.paperSize) : doc.paperSize,
       fields: typeof doc.fields === 'string' ? JSON.parse(doc.fields) : doc.fields,
       gradesTable: doc.gradesTable

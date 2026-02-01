@@ -41,6 +41,15 @@
               hint="Ha üres, általános sablon"
               persistent-hint
             ></v-select>
+            <v-select
+              v-model="formLanguage"
+              :items="formLanguageOptions"
+              item-title="label"
+              item-value="value"
+              label="Űrlap nyelve"
+              density="compact"
+              class="mt-2"
+            ></v-select>
           </v-card-text>
         </v-card>
 
@@ -207,7 +216,7 @@
                   label="X pozíció"
                   suffix="mm"
                   type="number"
-                  step="0.5"
+                  step="0.1"
                   density="compact"
                 ></v-text-field>
               </v-col>
@@ -217,7 +226,7 @@
                   label="Y pozíció"
                   suffix="mm"
                   type="number"
-                  step="0.5"
+                  step="0.1"
                   density="compact"
                 ></v-text-field>
               </v-col>
@@ -276,6 +285,23 @@
               density="compact"
               hide-details
             ></v-checkbox>
+            <v-checkbox
+              v-model="placedFields[selectedFieldKey].strikethrough"
+              label="Kihúzás ha üres"
+              density="compact"
+              hide-details
+              class="mt-2"
+            ></v-checkbox>
+            <v-text-field
+              v-if="placedFields[selectedFieldKey].strikethrough"
+              v-model.number="placedFields[selectedFieldKey].strikethroughWidth"
+              label="Kihúzás szélesség"
+              suffix="mm"
+              type="number"
+              step="0.1"
+              density="compact"
+              class="mt-2"
+            ></v-text-field>
           </v-card-text>
         </v-card>
 
@@ -381,7 +407,8 @@
                 class="placed-field"
                 :class="{
                   'selected': selectedFieldKey === key,
-                  'dragging': draggingField === key
+                  'dragging': draggingField === key,
+                  'has-strikethrough': field.strikethrough
                 }"
                 :style="getFieldStyle(field)"
                 @mousedown.stop="startDragField(key, $event)"
@@ -389,6 +416,7 @@
                 <div class="field-content" :style="getFieldContentStyle(field)">
                   {{ viewMode === 'preview' ? getPreviewValue(key) : getFieldLabel(key) }}
                 </div>
+                <div v-if="field.strikethrough && viewMode === 'edit'" class="strikethrough-indicator" :style="{ width: field.strikethroughWidth + 'mm' }"></div>
                 <div v-if="selectedFieldKey === key && viewMode === 'edit'" class="field-handles">
                   <div class="handle handle-e" @mousedown.stop="startResize(key, 'e', $event)"></div>
                 </div>
@@ -477,6 +505,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { notify } from '@kyvg/vue3-notification';
+import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 import PrintTemplateService, { type PrintTemplate, type FieldPosition } from '@/services/PrintTemplateService';
 import ErpService from '@/services/ErpService';
 
@@ -489,6 +519,8 @@ interface PlacedField {
   bold: boolean;
   letterSpacing: number;
   lineHeight: number;
+  strikethrough: boolean;
+  strikethroughWidth: number;
 }
 
 interface GradeRow {
@@ -528,10 +560,14 @@ const STORAGE_KEY = 'erp_print_templates';
 export default defineComponent({
   name: 'TemplateEditor',
   setup() {
+    const { openDialog } = useConfirmDialog();
+
     // Document types
     const documentTypes = [
       { value: 'grade_book_base', label: 'Főkönyv alap (beiratkozás)' },
-      { value: 'grade_book_year', label: 'Főkönyv évfolyam' },
+      { value: 'grade_book_year', label: 'Főkönyv évfolyam (jegyek)' },
+      { value: 'grade_book_matura', label: 'Főkönyv érettségi' },
+      { value: 'grade_book_certificates', label: 'Főkönyv oklevelek' },
       { value: 'certificate', label: 'Bizonyítvány' },
       { value: 'enrollment', label: 'Beiratkozási lap' },
       { value: 'custom', label: 'Egyéni' }
@@ -556,19 +592,30 @@ export default defineComponent({
 
     const fontFamilies = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana'];
 
+    // Nyelvi variánsok
+    const formLanguageOptions = [
+      { value: 'bilingual', label: 'Kétnyelvű (szerb + magyar)' },
+      { value: 'serbian', label: 'Egynyelvű (szerb)' }
+    ];
+
     // Alap mezők - beiratkozáskor (grade_book_base)
     const baseFields = [
-      { key: 'studentName', label: 'Diák neve' },
+      { key: 'enrollmentNumber', label: 'Anyakönyvi szám' },
+      { key: 'registryNumber', label: 'Belső sorszám' },
+      { key: 'studentName', label: 'Diák neve (magyar)' },
       { key: 'studentNameRs', label: 'Diák neve (szerb)' },
+      { key: 'fatherName', label: 'Apa neve' },
+      { key: 'motherName', label: 'Anya neve' },
       { key: 'birthDate', label: 'Születési dátum' },
-      { key: 'birthPlace', label: 'Születési hely' },
+      { key: 'birthPlace', label: 'Születési hely (magyar)' },
       { key: 'birthPlaceRs', label: 'Születési hely (szerb)' },
-      { key: 'motherName', label: 'Anyja neve' },
       { key: 'jmbg', label: 'JMBG' },
       { key: 'studyProgram', label: 'Szak (magyar)' },
       { key: 'studyProgramRs', label: 'Szak (szerb)' },
+      { key: 'educationType', label: 'Képzés típusa (rendes/rendkívüli)' },
+      { key: 'educationDuration', label: 'Képzés időtartama' },
       { key: 'enrollmentDate', label: 'Beiratkozás dátuma' },
-      { key: 'enrollmentNumber', label: 'Anyakönyvi szám' },
+      { key: 'generation', label: 'Generáció' },
       { key: 'schoolName', label: 'Iskola neve' },
       { key: 'foreignLanguage', label: 'Idegen nyelv' },
       { key: 'religionOption', label: 'Hittan/Polgári' },
@@ -584,21 +631,54 @@ export default defineComponent({
       { key: 'className', label: 'Osztály neve' },
       { key: 'classTeacher', label: 'Osztályfőnök' },
       { key: 'finalGrade', label: 'Tanulmányi átlag' },
+      { key: 'behaviorText', label: 'Magaviselet (szöveges)' },
+      { key: 'generalSuccess', label: 'Általános siker' },
       { key: 'absencesTotal', label: 'Össz. mulasztás' },
       { key: 'absencesJustified', label: 'Igazolt mulasztás' },
       { key: 'absencesUnjustified', label: 'Igazolatlan mulasztás' },
-      { key: 'behavior', label: 'Magatartás' },
-      { key: 'diligence', label: 'Szorgalom' },
       { key: 'date', label: 'Keltezés' },
       { key: 'directorSignature', label: 'Igazgató aláírás' },
       { key: 'dateNow', label: 'Mai dátum' }
     ];
 
+    // Érettségi mezők (grade_book_matura)
+    const maturaFields = [
+      { key: 'maturaSchoolYear', label: 'Tanév' },
+      { key: 'maturaYear', label: 'Vizsgaidőszak éve' },
+      { key: 'maturaClassYear', label: 'Évfolyam szám' },
+      { key: 'maturaSubject1Name', label: '1. tárgy neve' },
+      { key: 'maturaSubject1Grade', label: '1. tárgy jegy' },
+      { key: 'maturaSubject2Name', label: '2. tárgy neve' },
+      { key: 'maturaSubject2Grade', label: '2. tárgy jegy' },
+      { key: 'maturaSubject3Name', label: '3. tárgy neve (szakmai)' },
+      { key: 'maturaSubject3Grade', label: '3. tárgy jegy' },
+      { key: 'maturaPracticalDesc', label: 'Gyakorlati vizsga leírás' },
+      { key: 'maturaPracticalGrade', label: 'Gyakorlati vizsga jegy' },
+      { key: 'maturaFinalGrade', label: 'Összesített eredmény' },
+      { key: 'maturaResult', label: 'Eredménnyel tette le' },
+      { key: 'maturaDate', label: 'Érettségi keltezés' }
+    ];
+
+    // Oklevelek/bizonyítványok mezők (grade_book_certificates)
+    const certificatesFields = [
+      { key: 'diplomaNumber', label: 'Oklevél iktatószám' },
+      { key: 'diplomaDate', label: 'Oklevél keltezés' },
+      { key: 'certificateNumber', label: 'Bizonylat iktatószám' },
+      { key: 'certificateDate', label: 'Bizonylat keltezés' },
+      { key: 'serialNumber', label: 'Sorozatszám (szerijszki broj)' },
+      { key: 'classTeacherSign', label: 'Osztályfőnök aláírás' },
+      { key: 'examCommitteeChair', label: 'Vizsgabizottság elnöke' },
+      { key: 'receivedDate', label: 'Átvétel dátuma' },
+      { key: 'receivedSignature', label: 'Átvette (aláírás)' },
+      { key: 'notes', label: 'Megjegyzések' }
+    ];
+
     // State - sablon azonosítás
-    const documentType = ref<'grade_book_base' | 'grade_book_year' | 'certificate' | 'enrollment' | 'custom'>('grade_book_base');
+    const documentType = ref<'grade_book_base' | 'grade_book_year' | 'grade_book_matura' | 'grade_book_certificates' | 'certificate' | 'enrollment' | 'custom'>('grade_book_base');
     const selectedYear = ref(0);
     const selectedStudyProgramId = ref<string | null>(null);
     const currentTemplateId = ref<string | null>(null);
+    const formLanguage = ref<'bilingual' | 'serbian'>('bilingual');
 
     // Study programs és subjects
     const studyProgramOptions = ref<StudyProgram[]>([]);
@@ -615,13 +695,17 @@ export default defineComponent({
 
     // Dinamikusan számított elérhető mezők
     const availableFields = computed(() => {
-      if (documentType.value === 'grade_book_base') {
-        return baseFields;
-      } else if (documentType.value === 'grade_book_year') {
-        return yearFields;
-      } else {
-        // Egyéb típusoknál minden mezőt megjelenítünk
-        return [...baseFields, ...yearFields];
+      switch (documentType.value) {
+        case 'grade_book_base':
+          return baseFields;
+        case 'grade_book_year':
+          return yearFields;
+        case 'grade_book_matura':
+          return maturaFields;
+        case 'grade_book_certificates':
+          return certificatesFields;
+        default:
+          return [...baseFields, ...yearFields];
       }
     });
 
@@ -629,7 +713,7 @@ export default defineComponent({
     const zoomLevel = ref(50);
     const showGrid = ref(true);
     const snapToGrid = ref(true);
-    const gridSize = 5; // mm
+    const gridSize = 1; // mm (tized mm-es finomhangolás a number inputokon)
 
     const placedFields = ref<Record<string, PlacedField>>({});
     const gradeRows = ref<GradeRow[]>([]);
@@ -692,7 +776,9 @@ export default defineComponent({
         fontFamily: 'Arial',
         bold: false,
         letterSpacing: 0,
-        lineHeight: 1.2
+        lineHeight: 1.2,
+        strikethrough: false,
+        strikethroughWidth: 30
       };
       selectedFieldKey.value = key;
     };
@@ -721,6 +807,7 @@ export default defineComponent({
 
     const getPreviewValue = (key: string) => {
       const sampleData: Record<string, string> = {
+        // Alap mezők
         studentName: 'Kovács János',
         studentNameRs: 'Јанош Ковач',
         birthDate: '2008.05.15.',
@@ -734,7 +821,54 @@ export default defineComponent({
         foreignLanguage: 'Angol',
         religionOption: 'Hittan',
         parentName: 'Kovács István',
-        dateNow: new Date().toLocaleDateString('hu-HU')
+        dateNow: new Date().toLocaleDateString('hu-HU'),
+        fatherName: 'Kovács István',
+        motherName: 'Kiss Mária',
+        enrollmentNumber: '123/2024',
+        registryNumber: '45',
+        parentAddress: 'Szabadka, Kossuth u. 12.',
+        parentPhone: '+381 24 123 456',
+        enrollmentDate: '2024.09.01.',
+        educationType: 'Rendes',
+        educationDuration: '4 év',
+        generation: '2024/2028',
+        // Évfolyam mezők
+        className: 'I-1',
+        classTeacher: 'Nagy Péter',
+        finalGrade: '4.52',
+        behaviorText: 'примерно / példás',
+        generalSuccess: 'врло добар / jó',
+        absencesTotal: '45',
+        absencesJustified: '40',
+        absencesUnjustified: '5',
+        date: '2025.06.15.',
+        directorSignature: 'Dr. Szabó Endre',
+        // Érettségi mezők
+        maturaSchoolYear: '2027/2028',
+        maturaYear: '2028',
+        maturaClassYear: 'IV',
+        maturaSubject1Name: 'Magyar nyelv és irodalom',
+        maturaSubject1Grade: '5 (öt)',
+        maturaSubject2Name: 'Matematika',
+        maturaSubject2Grade: '4 (négy)',
+        maturaSubject3Name: 'Szakmai tárgy',
+        maturaSubject3Grade: '5 (öt)',
+        maturaPracticalDesc: 'Gyakorlati érettségi vizsga',
+        maturaPracticalGrade: '5 (öt)',
+        maturaFinalGrade: 'Jeles (5)',
+        maturaResult: 'одличним успехом / jeles eredménnyel',
+        maturaDate: '2028.06.20.',
+        // Oklevelek mezők
+        diplomaNumber: '03-123/2028',
+        diplomaDate: '2028.06.25.',
+        certificateNumber: '05-456/2028',
+        certificateDate: '2028.06.25.',
+        serialNumber: 'А-123456',
+        classTeacherSign: 'Nagy Péter',
+        examCommitteeChair: 'Dr. Horvát Anna',
+        receivedDate: '2028.07.01.',
+        receivedSignature: 'Kovács István',
+        notes: 'Megjegyzés példa'
       };
       return sampleData[key] || key;
     };
@@ -862,7 +996,9 @@ export default defineComponent({
         fontSize: field.fontSize,
         letterSpacing: field.letterSpacing || undefined,
         maxWidth: field.width || undefined,
-        align: 'left' as const
+        align: 'left' as const,
+        strikethrough: field.strikethrough || undefined,
+        strikethroughWidth: field.strikethroughWidth || undefined
       }));
     };
 
@@ -878,7 +1014,9 @@ export default defineComponent({
           fontFamily: 'Arial',
           bold: false,
           letterSpacing: field.letterSpacing || 0,
-          lineHeight: 1.2
+          lineHeight: 1.2,
+          strikethrough: field.strikethrough || false,
+          strikethroughWidth: field.strikethroughWidth || 30
         };
       }
       return result;
@@ -894,6 +1032,7 @@ export default defineComponent({
           studyProgramId: selectedStudyProgramId.value,
           year: selectedYear.value,
           documentType: documentType.value,
+          formLanguage: formLanguage.value,
           paperSize: {
             width: pageWidth.value,
             height: pageHeight.value,
@@ -920,13 +1059,13 @@ export default defineComponent({
         const saved = await PrintTemplateService.saveTemplate(template);
         if (saved) {
           currentTemplateId.value = saved.$id || null;
-          alert('Sablon sikeresen mentve az adatbázisba!');
+          notify({ type: 'success', text: 'Sablon sikeresen mentve az adatbázisba!' });
         } else {
-          alert('Hiba a sablon mentésekor!');
+          notify({ type: 'error', text: 'Hiba a sablon mentésekor!' });
         }
       } catch (error) {
         console.error('Save error:', error);
-        alert('Hiba történt a mentés során!');
+        notify({ type: 'error', text: 'Hiba történt a mentés során!' });
       } finally {
         saving.value = false;
       }
@@ -972,6 +1111,7 @@ export default defineComponent({
         documentType.value = t.documentType;
         selectedYear.value = t.year;
         selectedStudyProgramId.value = t.studyProgramId;
+        formLanguage.value = t.formLanguage || 'bilingual';
         pageWidth.value = t.paperSize.width;
         pageHeight.value = t.paperSize.height;
         placedFields.value = convertFromFieldPositions(t.fields);
@@ -1002,7 +1142,14 @@ export default defineComponent({
     };
 
     const deleteTemplate = async (id: string) => {
-      if (!confirm('Biztosan törölni szeretnéd a sablont?')) return;
+      const confirmed = await openDialog({
+        title: 'Sablon törlése',
+        message: 'Biztosan törölni szeretnéd a sablont?',
+        confirmText: 'Törlés',
+        color: 'error',
+        icon: 'mdi-delete'
+      });
+      if (!confirmed) return;
 
       try {
         const success = await PrintTemplateService.deleteTemplate(id);
@@ -1087,6 +1234,8 @@ export default defineComponent({
       const labels: Record<string, string> = {
         'grade_book_base': 'Főkönyv alap',
         'grade_book_year': 'Főkönyv évfolyam',
+        'grade_book_matura': 'Főkönyv érettségi',
+        'grade_book_certificates': 'Főkönyv oklevelek',
         'certificate': 'Bizonyítvány',
         'enrollment': 'Beiratkozási lap',
         'custom': 'Egyéni'
@@ -1098,7 +1247,7 @@ export default defineComponent({
     // Ez a főkönyv bal oldalára kerül, ahol a tantárgy nevek vannak előre nyomtatva
     const addSubjectNameFields = () => {
       if (allSubjects.value.length === 0) {
-        alert('Nincsenek betöltött tantárgyak!');
+        notify({ type: 'warning', text: 'Nincsenek betöltött tantárgyak!' });
         return;
       }
 
@@ -1117,7 +1266,9 @@ export default defineComponent({
           fontFamily: 'Arial',
           bold: false,
           letterSpacing: 0,
-          lineHeight: 1.2
+          lineHeight: 1.2,
+          strikethrough: false,
+          strikethroughWidth: 30
         };
 
         // Hozzáadjuk a mezőlistához is, ha még nincs
@@ -1169,11 +1320,13 @@ export default defineComponent({
       yearOptions,
       paperSizes,
       fontFamilies,
+      formLanguageOptions,
       availableFields,
       documentType,
       selectedYear,
       selectedStudyProgramId,
       currentTemplateId,
+      formLanguage,
       studyProgramOptions,
       allSubjects,
       saving,
@@ -1307,6 +1460,20 @@ export default defineComponent({
 
 .placed-field:hover {
   background: rgba(25, 118, 210, 0.15);
+}
+
+.placed-field.has-strikethrough {
+  border-color: #e65100;
+}
+
+.strikethrough-indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 0;
+  border-top: 2px dashed #e65100;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .field-content {

@@ -5,11 +5,11 @@
         <v-card>
           <v-card-title class="d-flex align-center">
             <v-icon class="mr-2">mdi-book-open-variant</v-icon>
-            Tantárgyak kezelése
+            {{ $t('manage_subjects') }}
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="openCreateDialog">
               <v-icon left>mdi-plus</v-icon>
-              Új tantárgy
+              {{ $t('new_subject') }}
             </v-btn>
           </v-card-title>
 
@@ -18,7 +18,7 @@
             <v-text-field
               v-model="search"
               prepend-inner-icon="mdi-magnify"
-              label="Keresés..."
+              :label="$t('search_content')"
               single-line
               hide-details
               clearable
@@ -51,7 +51,7 @@
               <template #no-data>
                 <div class="text-center py-4">
                   <v-icon size="64" color="grey">mdi-book-open-variant</v-icon>
-                  <p class="mt-2">Nincsenek tantárgyak</p>
+                  <p class="mt-2">{{ $t('no_subjects') }}</p>
                 </div>
               </template>
             </v-data-table>
@@ -65,7 +65,7 @@
       <v-card>
         <v-card-title>
           <v-icon class="mr-2">{{ editingSubject ? 'mdi-pencil' : 'mdi-plus' }}</v-icon>
-          {{ editingSubject ? 'Tantárgy szerkesztése' : 'Új tantárgy' }}
+          {{ editingSubject ? $t('edit_subject') : $t('new_subject') }}
         </v-card-title>
         <v-card-text>
           <v-form ref="formRef" v-model="formValid">
@@ -73,25 +73,25 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.name_hu"
-                  label="Magyar név"
-                  :rules="[v => !!v || 'Kötelező mező']"
+                  :label="$t('subject_name_hu')"
+                  :rules="[v => !!v || $t('required_field')]"
                   required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.name_rs"
-                  label="Szerb név"
-                  :rules="[v => !!v || 'Kötelező mező']"
+                  :label="$t('subject_name_rs')"
+                  :rules="[v => !!v || $t('required_field')]"
                   required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model.number="form.subject_code"
-                  label="Tantárgy kód (sorszám)"
+                  :label="$t('subject_code')"
                   type="number"
-                  hint="Opcionális - sorrendezéshez"
+                  :hint="$t('optional_for_ordering')"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -99,9 +99,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showDialog = false">Mégse</v-btn>
+          <v-btn variant="text" @click="showDialog = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="primary" :loading="isSaving" :disabled="!formValid" @click="saveSubject">
-            {{ editingSubject ? 'Mentés' : 'Létrehozás' }}
+            {{ editingSubject ? $t('save') : $t('create') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -112,15 +112,15 @@
       <v-card>
         <v-card-title class="text-error">
           <v-icon color="error" class="mr-2">mdi-alert</v-icon>
-          Törlés megerősítése
+          {{ $t('confirm_delete') }}
         </v-card-title>
         <v-card-text>
-          Biztosan törölni szeretnéd a(z) <strong>{{ deletingSubject?.name_hu }}</strong> tantárgyat?
+          {{ $t('confirm_delete_subject', { name: deletingSubject?.name_hu }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showDeleteDialog = false">Mégse</v-btn>
-          <v-btn color="error" :loading="isDeleting" @click="deleteSubject">Törlés</v-btn>
+          <v-btn variant="text" @click="showDeleteDialog = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="error" :loading="isDeleting" @click="deleteSubject">{{ $t('delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -129,11 +129,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { ErpService, type Subject } from '@/services/ErpService';
 
 export default defineComponent({
   name: 'SubjectsAdmin',
   setup() {
+    const { t } = useI18n();
     const erpService = ErpService.getInstance();
 
     const subjects = ref<Subject[]>([]);
@@ -156,12 +158,12 @@ export default defineComponent({
       subject_code: null as number | null
     });
 
-    const headers = [
-      { title: 'Kód', key: 'subject_code', width: '80px' },
-      { title: 'Magyar név', key: 'name_hu' },
-      { title: 'Szerb név', key: 'name_rs' },
-      { title: 'Műveletek', key: 'actions', sortable: false, width: '120px' }
-    ];
+    const headers = computed(() => [
+      { title: t('subject_code'), key: 'subject_code', width: '80px' },
+      { title: t('subject_name_hu'), key: 'name_hu' },
+      { title: t('subject_name_rs'), key: 'name_rs' },
+      { title: t('operations'), key: 'actions', sortable: false, width: '120px' }
+    ]);
 
     const filteredSubjects = computed(() => {
       if (!search.value) return subjects.value;

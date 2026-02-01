@@ -1,4 +1,4 @@
-import moment from 'moment/min/moment-with-locales';
+import dayjs from '@/utils/dayjs';
 import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
 import { Databases, ID, Query } from "appwrite";
@@ -25,14 +25,14 @@ export const formatTime = (dateString: string): string => {
     const locale = loadingStore.language;
 
     if (locale === "rs" || locale === "sr") {
-        moment.locale('sr');
+        dayjs.locale('sr');
     } else if (locale === "hu") {
-        moment.locale('hu');
+        dayjs.locale('hu');
     } else if (locale === "en") {
-        moment.locale('en');
+        dayjs.locale('en');
     }
 
-    return moment(dateString).format("LLL");
+    return dayjs(dateString).format("LLL");
 };
 
 export const getLocalizedCategoryName = (category: any): string => {

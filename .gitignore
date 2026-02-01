@@ -60,10 +60,11 @@ firebase-adminsdk*.json
 # Appwrite konfigurációk privát adatokkal
 appwrite.json
 .appwrite/
+képek/
 
 # Claude és AI eszközök
 .claude/settings.local.json
-
+.claude/mcp.json
 # Adatbázis fájlok
 *.db
 *.sqlite
