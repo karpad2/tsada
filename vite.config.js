@@ -25,18 +25,32 @@ export default defineConfig({
         navigationPreload: true,
         runtimeCaching: [
           {
+            // Appwrite Storage files (images, previews, downloads) - cache first, they don't change
+            urlPattern: /^https:\/\/appwrite\.tsada\.edu\.rs\/v1\/storage\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'appwrite-storage-cache',
+              expiration: {
+                maxEntries: 500,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              }
+            }
+          },
+          {
+            // Appwrite API calls (database, account, etc.) - network first with fallback
             urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 5 * 60 // 5 minutes for API data
               },
-              networkTimeoutSeconds: 3
+              networkTimeoutSeconds: 10
             }
           },
           {
+            // Static images (local assets with file extensions)
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'CacheFirst',
             options: {

@@ -1,8 +1,8 @@
 <template>
-  <div class="container mx-auto flex flex-wrap" style="min-height: 1020px;">
+  <div class="container mx-auto flex justify-center">
     <!-- Első kép container -->
-    <div class="m-auto p-5 w-full md:w-1/2">
-      <div class="image-container">
+    <div class="m-auto p-5 w-full single-image-wrapper">
+      <div class="image-container single-mode">
         <!-- Placeholder/skeleton mindig látható -->
         <div class="image-placeholder" :class="{ 'fade-out': img1Loaded }">
           <div class="skeleton-content">
@@ -34,41 +34,11 @@
         </div>
       </div>
     </div>
-
-    <!-- Második kép container -->
-    <div v-if="!promoimage2off" class="m-auto p-5 w-full md:w-1/2">
-      <div class="image-container">
-        <!-- Placeholder/skeleton mindig látható -->
-        <div class="image-placeholder" :class="{ 'fade-out': img2Loaded }">
-          <div class="skeleton-content">
-            <div class="skeleton-shimmer"></div>
-          </div>
-        </div>
-        
-        <!-- Tényleges kép -->
-        <img 
-          id="promo-img2" 
-          :src="img2" 
-          alt="promo_image" 
-          loading="lazy"
-          decoding="async"
-          @load="onImg2Load"
-          @error="onImgError"
-          class="promo-image"
-          :class="{ 'fade-in': img2Loaded, 'error': img2Error }"
-        />
-        
-        <!-- Error overlay -->
-        <div v-if="img2Error" class="error-overlay">
-          <div class="error-content">
-            <svg class="w-12 h-12 text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-            </svg>
-            <p class="text-sm text-gray-500">Kép betöltése sikertelen</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  
+    <!-- Második kép container - jelenleg kikapcsolva -->
+    <!-- <div v-if="!promoimage2off" class="m-auto p-5 w-full md:w-1/2">
+      ...
+    </div> -->
   </div>
 </template>
 
@@ -83,17 +53,12 @@ export default defineComponent({
   data() {
     return {
       img1: "",
-      img2: "",
-      promoimage2off: false,
       img1Loaded: false,
-      img2Loaded: false,
       img1Error: false,
-      img2Error: false,
       isDestroyed: false,
       retryCount: 0,
       maxRetries: 2,
       img1Timer: null as NodeJS.Timeout | null,
-      img2Timer: null as NodeJS.Timeout | null,
     };
   },
   async created() {
@@ -107,10 +72,6 @@ export default defineComponent({
       clearTimeout(this.img1Timer);
       this.img1Timer = null;
     }
-    if (this.img2Timer) {
-      clearTimeout(this.img2Timer);
-      this.img2Timer = null;
-    }
   },
   methods: {
     async getPromo() {
@@ -118,66 +79,27 @@ export default defineComponent({
       const storage = new Storage(appw);
 
       try {
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 8000)
         );
 
-        const promoOffResult = Promise.race([
-          database.getDocument(config.website_db, config.general_settings, "promoimage2_turn_off"),
-          timeoutPromise
-        ]);
-
-        const img1Result = Promise.race([
+        const img1Res = await Promise.race([
           database.getDocument(config.website_db, config.general_settings, "promoimage1"),
           timeoutPromise
         ]);
 
-        const promoOffRes = await promoOffResult;
-        this.promoimage2off = promoOffRes.setting_status === "1";
-
-        const requests = [img1Result];
-        if (!this.promoimage2off) {
-          requests.push(
-            Promise.race([
-              database.getDocument(config.website_db, config.general_settings, "promoimage2"),
-              timeoutPromise
-            ])
-          );
-        }
-
-        const results = await Promise.all(requests);
-        const [img1Res, img2Res] = results;
-
-        // Optimalizált képparaméterek
         this.img1 = storage.getFilePreview(
           config.website_images,
           img1Res.setting_data,
-          800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
+          800, 0, "center", 88, 0, "000000", 0, 1, 0, "000000", "webp"
         );
 
-        // Timeout beállítás az első képhez - 10 másodperc után mutatja a hibát
         this.img1Timer = setTimeout(() => {
           if (!this.img1Loaded && !this.img1Error) {
             this.img1Error = true;
             this.img1Loaded = true;
           }
         }, 10000);
-
-        if (!this.promoimage2off && img2Res) {
-          this.img2 = storage.getFilePreview(
-            config.website_images,
-            img2Res.setting_data,
-            800, 0, "center", 88, 5, "FFFFFF", 15, 1, 0, "FFFFFF", "webp"
-          );
-
-          // Timeout beállítás a második képhez - 10 másodperc után mutatja a hibát
-          this.img2Timer = setTimeout(() => {
-            if (!this.img2Loaded && !this.img2Error) {
-              this.img2Error = true;
-              this.img2Loaded = true;
-            }
-          }, 10000);
-        }
 
       } catch (err) {
         console.error("Promo image fetch error:", err);
@@ -206,67 +128,20 @@ export default defineComponent({
       }, 100);
     },
 
-    onImg2Load() {
-      if (this.isDestroyed) return;
-
-      // Timer törlése sikeres betöltés esetén
-      if (this.img2Timer) {
-        clearTimeout(this.img2Timer);
-        this.img2Timer = null;
-      }
-
-      this.img2Loaded = true;
-      this.img2Error = false;
-
-      // Kis késleltetés a smooth átmenet érdekében
-      setTimeout(() => {
-        this.animateImage("#promo-img2", true);
-      }, 100);
-    },
-
-    onImgError(event: Event) {
-      const target = event.target as HTMLImageElement;
-      console.error("Image load error:", event);
-
-      // NE állítsd be azonnal a hibát, hanem hagyd, hogy a timer kezelje
-      // A timer majd 10 másodperc után mutatja a hibát, ha nem töltött be
-      if (target.id === "promo-img1") {
-        console.log("Image 1 error - waiting for timer...");
-      } else if (target.id === "promo-img2") {
-        console.log("Image 2 error - waiting for timer...");
-      }
+    onImgError() {
+      console.log("Image 1 error - waiting for timer...");
     },
 
     animateImage(selector: string, isSecond: boolean) {
       const element = document.querySelector(selector);
       if (!element || this.isDestroyed) return;
 
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
-      if (prefersReducedMotion) {
-        // Egyszerű fade animáció
-        gsap.to(selector, { 
-          duration: 0.6, 
-          opacity: 1,
-          ease: "power2.out"
-        });
-      } else {
-        // Subtilis, elegáns animáció
-        gsap.fromTo(
-          selector,
-          {
-            scale: 0.95,
-            opacity: 0.8,
-          },
-          {
-            duration: 1.2,
-            delay: isSecond ? 0.3 : 0,
-            scale: 1,
-            opacity: 1,
-            ease: "power3.out",
-          }
-        );
-      }
+      gsap.to(selector, {
+        duration: 0.6,
+        opacity: 1,
+        delay: isSecond ? 0.2 : 0,
+        ease: "power2.out",
+      });
     }
   }
 });
@@ -277,7 +152,7 @@ export default defineComponent({
 .image-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 300 / 856; /* Fix arány */
+  aspect-ratio: 300 / 856;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
@@ -298,14 +173,12 @@ export default defineComponent({
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transform: scale(0.95);
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, opacity;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
 }
 
 .promo-image.fade-in {
   opacity: 1;
-  transform: scale(1);
 }
 
 /* Image placeholder - fix pozíció és méret */
@@ -387,13 +260,26 @@ export default defineComponent({
   padding: 20px;
 }
 
+/* Single image mode - when only one promo image is shown */
+.single-image-wrapper {
+  max-width: 66%;
+}
+
+.image-container.single-mode {
+  aspect-ratio: 3 / 4;
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
   .image-container {
     aspect-ratio: 16 / 12;
     border-radius: 12px;
   }
-  
+
+  .image-container.single-mode {
+    aspect-ratio: 3 / 4;
+  }
+
   .image-container:hover {
     transform: none;
   }

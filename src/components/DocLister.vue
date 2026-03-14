@@ -57,8 +57,9 @@ export default{
     },
     mounted()
     {
-        this.setupHeaders();
+        // Set admin FIRST, then setup headers (which depends on admin value)
         this.admin = this.loadingStore.userLoggedin && (this.loadingStore.userRole === 'admin' || this.loadingStore.userRole === 'editor');
+        this.setupHeaders();
         this.synchronize_documents();
     },
     methods:{

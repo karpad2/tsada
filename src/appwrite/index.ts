@@ -12,6 +12,9 @@ const account = new Account(appw);
 const databases = new Databases(appw);
 const storage = new Storage(appw);
 
+// Valid user roles that can be extracted from Appwrite user labels
+const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer'];
+
 interface AppwriteConfig {
     website_db: string;
     website_images: string;
@@ -51,16 +54,25 @@ class AppwriteService {
 
             if (user) {
                 loading.setUserLoggedin(true);
+                loading.setuid(user.$id);
+
+                // Extract user role from labels
+                const labels = user.labels || [];
+                const role = labels.find((label: string) => VALID_ROLES.includes(label)) || '';
+                loading.setUserRole(role);
+
                 return {
                     $id: user.$id,
                     name: user.name,
                     email: user.email,
-                    status: true
+                    status: true,
+                    roles: labels
                 };
             }
         } catch (error) {
             console.error('Auth check failed:', error);
             loading.setUserLoggedin(false);
+            loading.setUserRole('');
         }
 
         return null;

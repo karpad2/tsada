@@ -60,6 +60,17 @@
             </button>
           </div>
 
+          <!-- Admin action buttons -->
+          <div v-if="mode === 'news'" class="flex gap-2 mb-4">
+            <button
+              @click="$router.push('/admin/news-order')"
+              class="px-4 py-2 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-200 flex items-center gap-1"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>
+              {{ $t('manage_news_order') }}
+            </button>
+          </div>
+
           <!-- Admin filter buttons -->
           <div class="flex gap-2 mb-4">
             <button
@@ -174,7 +185,7 @@
         <article
           v-for="course in displayedCourses"
           :key="course.id"
-          class="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 fade-slide border border-gray-100 dark:border-gray-700"
+          class="group relative overflow-hidden rounded-xl dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 fade-slide border border-gray-100 dark:border-gray-700"
           @click="courseOpen(course.id)"
           @keydown.enter="courseOpen(course.id)"
           @keydown.space.prevent="courseOpen(course.id)"
@@ -193,8 +204,15 @@
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
+            <!-- Pinned indicator -->
+            <div v-if="course.pinned"
+                 class="absolute top-3 left-3 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>
+              {{ $t('pinned') }}
+            </div>
+
             <!-- Visibility indicator -->
-            <div v-if="admin && !course.visible" 
+            <div v-if="admin && !course.visible"
                  class="absolute top-3 right-3 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
               {{ $t('invisible') }}
             </div>
@@ -208,7 +226,7 @@
               </span>
             </div>
             
-            <h2 class="text-xl font-semibold text-gray-900  leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2">
               {{ course.title }}
             </h2>
             
@@ -263,6 +281,9 @@ import { convertifserbian as convertIfSerbian, getStatus } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
 import gsap from 'gsap';
 
+const db = new Databases(appw);
+const storage = new Storage(appw);
+
 export default defineComponent({
   name: 'SlideModules',
   props: {
@@ -298,7 +319,7 @@ export default defineComponent({
       return this.allCourses.filter(course => course.visible).length;
     },
     hiddenCount() {
-      return this.allCourses.filter(course => !course.visible).length;
+      return this.allCourses.length - this.visibleCount;
     },
     displayedCourses() {
       let filtered = [...this.allCourses];
@@ -319,6 +340,14 @@ export default defineComponent({
         filtered = filtered.filter(course => !course.visible);
       }
 
+      // Sort: pinned items first (by sort_order), then regular items (by original order)
+      filtered.sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        if (a.pinned && b.pinned) return a.sort_order - b.sort_order;
+        return 0; // keep original order for non-pinned
+      });
+
       return filtered;
     }
   },
@@ -332,15 +361,14 @@ export default defineComponent({
     this.$nextTick(() => {
       gsap.fromTo(
         '.fade-slide',
-        { opacity: 0, y: 30, scale: 0.95 },
-        { 
-          duration: 0.8, 
-          opacity: 1, 
-          y: 0, 
-          scale: 1, 
-          stagger: 0.05, 
+        { opacity: 0, y: 20 },
+        {
+          duration: 0.6,
+          opacity: 1,
+          y: 0,
+          stagger: 0.04,
           ease: 'power2.out',
-          clearProps: 'transform' // Clean up after animation
+          clearProps: 'all'
         }
       );
     });
@@ -361,9 +389,6 @@ export default defineComponent({
       this.isLoading = true;
 
       try {
-        const db = new Databases(appw);
-        const storage = new Storage(appw);
-
         const filters = [
           Query.equal('type', this.mode),
           Query.limit(this.limit),
@@ -380,6 +405,8 @@ export default defineComponent({
             'default_image',
             'visible',
             'notNews',
+            'pinned',
+            'sort_order',
             '$createdAt',
           ]),
           ...(this.mode === 'news' ? [Query.or([Query.isNull('notNews'), Query.equal('notNews', false)])] : []),
@@ -395,6 +422,8 @@ export default defineComponent({
           return {
             id: doc.$id,
             visible: doc.visible,
+            pinned: doc.pinned || false,
+            sort_order: doc.sort_order || 0,
             title:
               lang === 'en'
                 ? doc.title_en
@@ -416,9 +445,9 @@ export default defineComponent({
                   0,
                   'center',
                   90,
-                  5,
+                  0,
                   'FFFFFF',
-                  15,
+                  0,
                   1,
                   0,
                   'FFFFFF',
@@ -451,7 +480,6 @@ export default defineComponent({
     },
     async newStuff() {
       try {
-        const db = new Databases(appw);
         const doc = await db.createDocument(config.website_db, config.about_us_db, ID.unique(), {
           type: this.mode,
           aboutCategories: config.news_category_in_text,
@@ -500,8 +528,9 @@ export default defineComponent({
 
 <style scoped>
 .fade-slide {
-  will-change: transform, opacity;
+  will-change: opacity;
 }
+
 
 /* Line clamp utilities if not available in Tailwind */
 .line-clamp-2 {

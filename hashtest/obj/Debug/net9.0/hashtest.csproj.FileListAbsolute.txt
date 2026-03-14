@@ -1,0 +1,15 @@
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.AssemblyInfo.cs
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.sourcelink.json
+C:\Users\Admin\Desktop\tsada\hashtest\bin\Debug\net9.0\hashtest.exe
+C:\Users\Admin\Desktop\tsada\hashtest\bin\Debug\net9.0\hashtest.deps.json
+C:\Users\Admin\Desktop\tsada\hashtest\bin\Debug\net9.0\hashtest.runtimeconfig.json
+C:\Users\Admin\Desktop\tsada\hashtest\bin\Debug\net9.0\hashtest.dll
+C:\Users\Admin\Desktop\tsada\hashtest\bin\Debug\net9.0\hashtest.pdb
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.dll
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\refint\hashtest.dll
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.pdb
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\hashtest.genruntimeconfig.cache
+C:\Users\Admin\Desktop\tsada\hashtest\obj\Debug\net9.0\ref\hashtest.dll

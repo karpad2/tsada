@@ -8,12 +8,18 @@
         <!-- Header Section -->
         <div v-if="!state.videoId" class="flex flex-wrap w-full mb-20 p-2 rounded">
           <div class="w-full mb-6 lg:mb-0">
-            <h1 
-              id="render_title" 
-              class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white"
-            >
-              {{ localizedTitle }}
-            </h1>
+            <div class="flex items-center gap-3 flex-wrap">
+              <h1
+                id="render_title"
+                class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white"
+              >
+                {{ localizedTitle }}
+              </h1>
+              <span v-if="state.pinned" class="inline-flex items-center gap-1 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium mb-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>
+                {{ $t('pinned_news') }}
+              </span>
+            </div>
             <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
           </div>
           <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-gray-600 dark:text-white">
@@ -103,7 +109,7 @@
   <script lang="ts">
   import { defineComponent, reactive, computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { Client, Databases, Storage, Query, Account } from 'appwrite';
+  import { Databases, Storage, Query } from 'appwrite';
   import { useLoadingStore } from '@/stores/loading';
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
@@ -136,6 +142,7 @@
     galleryId: string;
     hasDocuments: boolean;
     showDate: boolean;
+    pinned: boolean;
     euFundingEnabled: boolean;
   }
   
@@ -173,41 +180,32 @@
         galleryId: '',
         hasDocuments: false,
         showDate: false,
+        pinned: false,
         euFundingEnabled: false
       });
   
+      const database = new Databases(appw);
+
       // Computed Properties
       const contentId = computed(() => route.params.id as string);
       
       const currentLanguage = computed(() => loadingStore.language);
       
-      const localizedTitle = computed(() => {
-        switch (currentLanguage.value) {
-          case 'sr':
-          case 'rs':
-            return convertifserbian(state.titleRs);
-          case 'hu':
-            return state.titleHu;
-          case 'en':
-            return state.titleEn;
-          default:
-            return state.title;
-        }
-      });
-  
-      const localizedContent = computed(() => {
-        switch (currentLanguage.value) {
-          case 'sr':
-          case 'rs':
-            return state.contentRs;
-          case 'hu':
-            return state.contentHu;
-          case 'en':
-            return state.contentEn;
-          default:
-            return state.content;
-        }
-      });
+      const pickByLang = <T>(rs: T, hu: T, en: T, fallback: T): T => {
+        const lang = currentLanguage.value;
+        if (lang === 'sr' || lang === 'rs') return rs;
+        if (lang === 'hu') return hu;
+        if (lang === 'en') return en;
+        return fallback;
+      };
+
+      const localizedTitle = computed(() =>
+        pickByLang(convertifserbian(state.titleRs), state.titleHu, state.titleEn, state.title)
+      );
+
+      const localizedContent = computed(() =>
+        pickByLang(state.contentRs, state.contentHu, state.contentEn, state.content)
+      );
   
       const videoLink = computed(() => {
         return state.videoId && state.videoId !== '' 
@@ -220,19 +218,13 @@
       });
   
       // Methods
-      const initializeAdmin = async () => {
+      const initializeAdmin = () => {
         const role = loadingStore.userRole;
         state.admin = loadingStore.userLoggedin && (role === 'admin' || role === 'editor');
-        if (state.admin) {
-          const account = new Account(appw);
-          console.log(account.client);
-        }
       };
   
       const loadContent = async () => {
         try {
-          const database = new Databases(appw);
-          
           // Load additional content sections
           const additionalContent = await database.listDocuments(
             config.website_db,
@@ -258,6 +250,7 @@
           state.ytVideos = mainContent.yt_video || null;
           state.galleryFlag = mainContent.has_gallery;
           state.showDate = mainContent.show_date;
+          state.pinned = mainContent.pinned || false;
           state.videoId = mainContent.video || '';
           state.date = mainContent.$createdAt;
           state.euFundingEnabled = mainContent.eu_funding_enabled || false;
@@ -297,43 +290,14 @@
       };
   
       const formatDate = (dateString: string): string => {
-        const language = currentLanguage.value;
-
-        switch (language) {
-          case 'rs':
-          case 'sr':
-            dayjs.locale('sr');
-            break;
-          case 'hu':
-            dayjs.locale('hu');
-            break;
-          case 'en':
-            dayjs.locale('en');
-            break;
-        }
-
+        const locale = pickByLang('sr', 'hu', 'en', 'sr');
+        dayjs.locale(locale);
         return dayjs(dateString).format('LL');
       };
 
       const getLocalizedComponentContent = (component: any): string => {
-        const lang = currentLanguage.value;
-
-        // First try the language-specific content fields
-        switch (lang) {
-          case 'sr':
-          case 'rs':
-            if (component.content_rs) return component.content_rs;
-            break;
-          case 'hu':
-            if (component.content_hu) return component.content_hu;
-            break;
-          case 'en':
-            if (component.content_en) return component.content_en;
-            break;
-        }
-
-        // Fallback to the 'text' field if language-specific content is empty
-        return component.text || '';
+        return pickByLang(component.content_rs, component.content_hu, component.content_en, null)
+          || component.text || '';
       };
   
       const getYouTubeEmbedUrl = (url: string): string => {
@@ -407,19 +371,11 @@
       watch(() => state.euFundingEnabled, (newValue) => {
         loadingStore.setCurrentPageEuFunding(newValue);
       });
-      /*
-      // Lifecycle
       onMounted(async () => {
-        await initializeAdmin();
+        initializeAdmin();
         await loadContent();
         animateTitle();
       });
-      */
-     onMounted(async () => {
-  await initializeAdmin();
-  await loadContent();
-  animateTitle();
-});
 
 // 🔥 Route param figyelés — EZ A MEGOLDÁS
 watch(
@@ -507,6 +463,21 @@ watch(
   
   .content-section :deep(img) {
     @apply rounded-lg shadow-md max-w-full h-auto mx-auto my-6;
+  }
+
+  /* Small inline images: emojis, icons, flags etc. */
+  .content-section :deep(img[width]:not([width=""])) {
+    all: revert;
+    display: inline;
+    vertical-align: middle;
+  }
+
+  .content-section :deep(img[class*="emoji"]),
+  .content-section :deep(img[data-emoji]),
+  .content-section :deep(img[src*="emoji"]) {
+    all: revert;
+    display: inline;
+    vertical-align: middle;
   }
   
   .video-container {

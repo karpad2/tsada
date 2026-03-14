@@ -69,5 +69,10 @@
     "dc_bans":"dc_bans",
     "dc_reactions":"dc_reactions",
     "dc_roles":"dc_roles",
-    "dc_users":"dc_users"
+    "dc_users":"dc_users",
+    "dc_servers":"dc_servers",
+    "dc_server_members":"dc_server_members",
+    "dc_server_channels":"dc_server_channels",
+    "dc_custom_emojis":"dc_custom_emojis",
+    "dc_contacts":"dc_contacts"
 }

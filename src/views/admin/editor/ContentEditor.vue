@@ -3,8 +3,10 @@
     <!-- General Controls -->
     <GeneralControlsSection
       :visible="formData.visible"
+      :pinned="formData.pinned"
       :not-news="formData.notNews"
       :show-date-value="formData.show_date"
+      :show-pinned="true"
       :show-not-news="true"
       :show-date="true"
       :show-facebook-share="true"
@@ -14,6 +16,7 @@
       @delete="deleteContent"
       @facebook-share="shareFacebook"
       @update:visible="updateField('visible', $event)"
+      @update:pinned="updateField('pinned', $event)"
       @update:notNews="updateField('notNews', $event)"
       @update:showDate="updateField('show_date', $event)"
     >
@@ -113,10 +116,10 @@
 
     <!-- Documents Section -->
     <section class="documents-section mb-6">
-      <v-switch 
-        v-model="formData.documents_flag" 
-        :label="$t('documents_flag')" 
-        @change="handleDocumentsToggle" 
+      <v-switch
+        v-model="formData.documents_flag"
+        :label="$t('documents_flag')"
+        @change="handleDocumentsToggle"
       />
       <div v-if="formData.documents_flag" class="mt-4">
         <DocLister :_id="id" />
@@ -280,6 +283,8 @@ interface FormData {
   album_flag: boolean
   gallery_id: string
   notNews: boolean
+  pinned: boolean
+  sort_order: number
   eu_funding_enabled: boolean
 }
 
@@ -332,6 +337,8 @@ export default defineComponent({
       album_flag: false,
       gallery_id: "",
       notNews: false,
+      pinned: false,
+      sort_order: 0,
       eu_funding_enabled: false
     })
 
@@ -398,6 +405,8 @@ export default defineComponent({
           yt_video: document.yt_video || "",
           visible: document.visible || false,
           notNews: document.notNews || false,
+          pinned: document.pinned || false,
+          sort_order: document.sort_order || 0,
           show_date: document.show_date || false,
           documents_flag: document.has_documents || false,
           album_flag: document.has_gallery || false,
@@ -440,6 +449,8 @@ export default defineComponent({
           gallery: formData.gallery_id || null,
           default_image: default_image.value,
           notNews: formData.notNews,
+          pinned: formData.pinned,
+          sort_order: formData.sort_order,
           show_date: formData.show_date,
           eu_funding_enabled: formData.eu_funding_enabled
         }
@@ -548,7 +559,6 @@ export default defineComponent({
 
     const handleDocumentsToggle = (): void => {
       save()
-      // Additional document synchronization logic if needed
     }
 
     const handleCreateGallery = async (): Promise<void> => {

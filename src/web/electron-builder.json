@@ -1,0 +1,22 @@
+{
+  "appId": "com.heist.game",
+  "productName": "HEIST",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*"
+  ],
+  "mac": {
+    "target": "dmg",
+    "category": "public.app-category.games"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Game"
+  }
+}

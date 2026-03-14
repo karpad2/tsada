@@ -11,6 +11,15 @@
             />
 
             <v-switch
+                v-if="showPinned"
+                :model-value="pinned"
+                @update:model-value="$emit('update:pinned', $event)"
+                :label="$t('pinned_news')"
+                color="orange"
+                @change="$emit('save')"
+            />
+
+            <v-switch
                 v-if="showNotNews"
                 :model-value="notNews"
                 @update:model-value="$emit('update:notNews', $event)"
@@ -80,10 +89,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'GeneralControlsSection',
-    emits: ['save', 'delete', 'facebook-share', 'update:visible', 'update:notNews', 'update:showDate'],
+    emits: ['save', 'delete', 'facebook-share', 'update:visible', 'update:pinned', 'update:notNews', 'update:showDate'],
     props: {
         // Status controls
         visible: {
+            type: Boolean,
+            default: false
+        },
+        pinned: {
             type: Boolean,
             default: false
         },
@@ -114,6 +127,10 @@ export default defineComponent({
         showVisible: {
             type: Boolean,
             default: true
+        },
+        showPinned: {
+            type: Boolean,
+            default: false
         },
         showNotNews: {
             type: Boolean,

@@ -269,6 +269,13 @@ export function createRouter() {
       meta: { requiresAuth: true, roles: ['admin', 'teacher'] },
       component: () => import('../views/admin/erp/TemplateEditor.vue')
     },
+    // News Order Manager
+    {
+      path:'/admin/news-order',
+      name:'news_order_manager',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/NewsOrderManager.vue')
+    },
     // Sponsors Editor
     {
       path:'/admin/sponsors',
@@ -337,9 +344,14 @@ export function createRouter() {
       component: () => import('../views/TV/TVView.vue')      
     },
     {
+      path:'/heist',
+      name:'heist_game',
+      component: () => import('../views/HeistGame.vue')
+    },
+    {
       path:'/:pathMatch(.*)*',
       name:'missingpage',
-      component: () => import('../views/MissingPage.vue')      
+      component: () => import('../views/MissingPage.vue')
     }
   ]
 })
@@ -354,40 +366,19 @@ router.beforeEach((to, from, next) => {
   if (from.fullPath && from.fullPath !== to.fullPath) {
     trackNavigation(from.fullPath, to.fullPath, 'router');
   }
-  if(fullPath.indexOf("erasmus") !== -1)
-  {
-    loadingStore.setErasmus(true);
-    
-  }
-  else
-  {
-    loadingStore.setErasmus(false);
-    loadingStore.setCurrentPageEuFunding(false);
-  }
-  if(fullPath.indexOf("/moodle") !== -1)
-    {
-      window.location.replace("https://moodle.tsada.edu.rs");
-    }
+  const isErasmus = fullPath.includes('erasmus');
+  loadingStore.setErasmus(isErasmus);
+  if (!isErasmus) loadingStore.setCurrentPageEuFunding(false);
 
-  if(fullPath.indexOf("/about/birthday") !== -1)
-    {
-      loadingStore.setfireworkSetting(true);
-    }
-    else
-    {
-      loadingStore.setfireworkSetting(false);
-    }
-    if(fullPath.indexOf("/tvview") !== -1)
-      {
-        loadingStore.sethideheaders(true);
-      }
-      else
-      {
-        loadingStore.sethideheaders(false);
-      }
+  if (fullPath.includes('/moodle')) {
+    window.location.replace('https://moodle.tsada.edu.rs');
+  }
+
+  loadingStore.setfireworkSetting(fullPath.includes('/about/birthday'));
+  loadingStore.sethideheaders(fullPath.includes('/tvview') || fullPath.includes('/dc') || fullPath.includes('/heist'));
 
   // Role-based access control
-  const requiresAuth = to.meta?.requiresAuth || fullPath.indexOf("admin") !== -1;
+  const requiresAuth = to.meta?.requiresAuth || fullPath.includes('admin');
 
   if (requiresAuth && !loadingStore.userLoggedin) {
     router.push("/home");
@@ -413,62 +404,59 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
+const TITLE_MAP: Record<string, string> = {
+  'home': 'Početna ~ TSADA',
+  'about': 'O nama ~ TSADA',
+  'workers': 'Zaposleni ~ TSADA',
+  'workerstimetable': 'Raspored zaposlenih ~ TSADA',
+  'classlist': 'Lista učenika ~ TSADA',
+  'parentvisiting': 'Roditeljski sastanak ~ TSADA',
+  'birthday': 'Rođendani ~ TSADA',
+  'timetable': 'Raspored časova ~ TSADA',
+  'parentscouncil': 'Savet roditelja ~ TSADA',
+  'pepsi': 'PEPSI ~ TSADA',
+  'SchoolBoard': 'Školski odbor ~ TSADA',
+  'studentcouncil': 'Učenički parlament ~ TSADA',
+  'documents': 'Dokumenti ~ TSADA',
+  'studentdocuments': 'Studentski dokumenti ~ TSADA',
+  'gallery': 'Galerija ~ TSADA',
+  'contact': 'Kontakt ~ TSADA',
+  'login': 'Prijava ~ TSADA',
+  'erasmus_apply': 'Erasmus prijava ~ TSADA',
+  'erasmus_results': 'Erasmus rezultati ~ TSADA',
+  'presentation': 'Prezentacija ~ TSADA',
+  'tvpresentation': 'TV prikaz ~ TSADA',
+  'messages': 'Poruke ~ TSADA',
+  'content_editor': 'Uređivanje sadržaja ~ TSADA',
+  'worker_editor': 'Uređivanje zaposlenih ~ TSADA',
+  'document_editor': 'Uređivanje dokumenata ~ TSADA',
+  'text_document_editor': 'Uređivanje tekstualnih dokumenata ~ TSADA',
+  'student_document_editor': 'Uređivanje studentskih dokumenata ~ TSADA',
+  'gallery_editor': 'Uređivanje galerije ~ TSADA',
+  'class_editor': 'Uređivanje klasa ~ TSADA',
+  'slide_editor': 'Uređivanje slajdova ~ TSADA',
+  'send_notification': 'Push értesítések ~ TSADA',
+  'messaging_center': 'Appwrite Messaging ~ TSADA',
+  'forms_admin': 'Űrlapok kezelése ~ TSADA',
+  'form_builder': 'Űrlap szerkesztő ~ TSADA',
+  'form_responses': 'Űrlap válaszok ~ TSADA',
+  'form_view': 'Űrlap kitöltése ~ TSADA',
+  'erp_subjects_admin': 'Tantárgyak kezelése ~ TSADA',
+  'erp_study_programs_admin': 'Szakok kezelése ~ TSADA',
+  'erp_class_teacher': 'Osztályfőnöki felület ~ TSADA',
+  'erp_print_manager': 'Nyomtatás kezelő ~ TSADA',
+  'erp_template_editor': 'Sablon szerkesztő ~ TSADA',
+  'news_order_manager': 'Hírek sorrendje ~ TSADA',
+  'sponsors_editor': 'Szponzorok szerkesztő ~ TSADA',
+  'menu_editor': 'Menü szerkesztő ~ TSADA',
+  'heist_game': 'HEIST ~ TSADA',
+  'missingpage': 'Stranica nije pronađena ~ TSADA'
+};
+
 router.afterEach((to, from) => {
   const loadingStore = useLoadingStore();
 
-  // Set page title
-  const getPageTitle = (routeName: string): string => {
-    const titleMap: { [key: string]: string } = {
-      'home': 'Početna ~ TSADA',
-      'about': 'O nama ~ TSADA',
-      'workers': 'Zaposleni ~ TSADA',
-      'workerstimetable': 'Raspored zaposlenih ~ TSADA',
-      'classlist': 'Lista učenika ~ TSADA',
-      'parentvisiting': 'Roditeljski sastanak ~ TSADA',
-      'birthday': 'Rođendani ~ TSADA',
-      'timetable': 'Raspored časova ~ TSADA',
-      'parentscouncil': 'Savet roditelja ~ TSADA',
-      'pepsi': 'PEPSI ~ TSADA',
-      'SchoolBoard': 'Školski odbor ~ TSADA',
-      'studentcouncil': 'Učenički parlament ~ TSADA',
-      'documents': 'Dokumenti ~ TSADA',
-      'studentdocuments': 'Studentski dokumenti ~ TSADA',
-      'gallery': 'Galerija ~ TSADA',
-      'contact': 'Kontakt ~ TSADA',
-      'login': 'Prijava ~ TSADA',
-      'erasmus_apply': 'Erasmus prijava ~ TSADA',
-      'erasmus_results': 'Erasmus rezultati ~ TSADA',
-      'presentation': 'Prezentacija ~ TSADA',
-      'tvpresentation': 'TV prikaz ~ TSADA',
-      'messages': 'Poruke ~ TSADA',
-      'content_editor': 'Uređivanje sadržaja ~ TSADA',
-      'worker_editor': 'Uređivanje zaposlenih ~ TSADA',
-      'document_editor': 'Uređivanje dokumenata ~ TSADA',
-      'text_document_editor': 'Uređivanje tekstualnih dokumenata ~ TSADA',
-      'student_document_editor': 'Uređivanje studentskih dokumenata ~ TSADA',
-      'gallery_editor': 'Uređivanje galerije ~ TSADA',
-      'class_editor': 'Uređivanje klasa ~ TSADA',
-      'slide_editor': 'Uređivanje slajdova ~ TSADA',
-      'send_notification': 'Push értesítések ~ TSADA',
-      'messaging_center': 'Appwrite Messaging ~ TSADA',
-      'forms_admin': 'Űrlapok kezelése ~ TSADA',
-      'form_builder': 'Űrlap szerkesztő ~ TSADA',
-      'form_responses': 'Űrlap válaszok ~ TSADA',
-      'form_view': 'Űrlap kitöltése ~ TSADA',
-      'erp_subjects_admin': 'Tantárgyak kezelése ~ TSADA',
-      'erp_study_programs_admin': 'Szakok kezelése ~ TSADA',
-      'erp_class_teacher': 'Osztályfőnöki felület ~ TSADA',
-      'erp_print_manager': 'Nyomtatás kezelő ~ TSADA',
-      'erp_template_editor': 'Sablon szerkesztő ~ TSADA',
-      'sponsors_editor': 'Szponzorok szerkesztő ~ TSADA',
-      'menu_editor': 'Menü szerkesztő ~ TSADA',
-      'missingpage': 'Stranica nije pronađena ~ TSADA'
-    };
-
-    return titleMap[routeName] || `${routeName} ~ TSADA`;
-  };
-
-  const pageTitle = getPageTitle(to.name as string);
+  const pageTitle = TITLE_MAP[to.name as string] || `${to.name} ~ TSADA`;
   document.title = pageTitle;
 
   // Track page view

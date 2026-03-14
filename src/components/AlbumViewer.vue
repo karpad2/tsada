@@ -307,6 +307,9 @@ import { Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { useLoadingStore } from '@/stores/loading';
 
+const database = new Databases(appw);
+const storage = new Storage(appw);
+
 export default defineComponent({
   name: 'SlideModules',
   props: {
@@ -389,9 +392,6 @@ export default defineComponent({
       this.isLoading = true;
 
       try {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
-
         if (this.page === 0) {
           const { title_hu, title_en, title_rs } = await database.getDocument(
             config.website_db,
@@ -534,9 +534,6 @@ export default defineComponent({
       this.isDeleting = true;
 
       try {
-        const storage = new Storage(appw);
-        const database = new Databases(appw);
-
         await Promise.all(
           brokenImages.map(async (brokenImage) => {
             const course = this.courses.find(({ img }) => img === brokenImage);
@@ -567,12 +564,16 @@ export default defineComponent({
 
     // ===== VIEWER METHODS =====
     
-    openImage(index: number) {
+    showImage(index: number) {
       this.currentImageIndex = index;
-      this.showViewer = true;
       this.resetZoom();
       this.viewerLoading = true;
       this.viewerError = false;
+    },
+
+    openImage(index: number) {
+      this.showImage(index);
+      this.showViewer = true;
       document.body.style.overflow = 'hidden';
     },
 
@@ -584,19 +585,13 @@ export default defineComponent({
 
     nextImage() {
       if (this.currentImageIndex < this.courses.length - 1) {
-        this.currentImageIndex++;
-        this.resetZoom();
-        this.viewerLoading = true;
-        this.viewerError = false;
+        this.showImage(this.currentImageIndex + 1);
       }
     },
 
     previousImage() {
       if (this.currentImageIndex > 0) {
-        this.currentImageIndex--;
-        this.resetZoom();
-        this.viewerLoading = true;
-        this.viewerError = false;
+        this.showImage(this.currentImageIndex - 1);
       }
     },
 
