@@ -22,11 +22,13 @@
 
 </template>
 <script>
-import {Client,Databases,ID,Storage,Query,Functions } from "appwrite";
-import {appw,config} from "@/appwrite";
+import { Databases, ID, Query } from "appwrite";
+import { appw, config } from "@/appwrite";
 import dayjs from '@/utils/dayjs';
-import {useLoadingStore} from "@/stores/loading";
+import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
+
+const database = new Databases(appw);
 
 export default{
     data()
@@ -82,65 +84,33 @@ export default{
         },
         async synchronize_documents()
         {
-            const database = new Databases(appw);
-
-                this.doc_loaded=false;
                 this.documents=[];
-                let local=this.loadingStore.language;
-                let documents_cucc= await database.listDocuments(config.website_db, config.text_documents,[
-                Query.equal("texts",this._id)]);
+                const local = this.loadingStore.language;
+                const { documents: docs } = await database.listDocuments(config.website_db, config.text_documents,[
+                    Query.equal("texts",this._id)
+                ]);
 
-                await documents_cucc.documents.forEach(async el2 => {
-                let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
-                a.id=el2.$id;
-                if(local=="en"||local=="hu")
-                {
-                    a.name=el2.document_title_hu;
-                    //a.role=el2.role;
-                    a.contact=el2.contact;
-                }
-                else if(local=="rs"||local=="sr")
-                {
-                    a.name=convertifserbian(el2.document_title_rs);
-                    //a.role=convertifserbian(el2.role);
-                    a.contact=el2.contact;
-                }
-                
-                else
-                {
-    
-                //a.img= await storage.getFileView(config.website_images,el2.worker_img).href;
-                }
-                a.id=el2.$id;
-                a.doc_id=el2.document_id;
-                a.date=el2.$createdAt;    
-                this.documents.push(a);
-               
-                })
+                this.documents = docs.map(el2 => {
+                    const isSerbian = local === "rs" || local === "sr";
+                    return {
+                        name: isSerbian ? convertifserbian(el2.document_title_rs) : el2.document_title_hu,
+                        contact: el2.contact || "",
+                        img: "",
+                        id: el2.$id,
+                        doc_id: el2.document_id,
+                        date: el2.$createdAt,
+                    };
+                });
         },
         async new_stuff()
         {
-            const database = new Databases(appw);
-            const l= await database.createDocument(config.website_db, config.text_documents,ID.unique(),{"texts":this._id});
+            const l = await database.createDocument(config.website_db, config.text_documents,ID.unique(),{"texts":this._id});
             this.$router.push("/admin/text-document-editor/"+l.$id);
         },
         rt_time(a)
-                {   let local=this.loadingStore.language;
-                    if(local=="rs"||local=="sr")
-                    {
-                        dayjs.locale('sr');
-                    }
-                    else if(local=="hu")
-                    {
-                        dayjs.locale('hu');
-                    }
-                    else if(local=="en")
-                    {
-                        dayjs.locale('en');
-                    }
-                    else {
-
-                    }
+                {
+                    const local = this.loadingStore.language;
+                    dayjs.locale(local === "rs" || local === "sr" ? 'sr' : local);
                     return dayjs(a).format("LLL");
                 },
 

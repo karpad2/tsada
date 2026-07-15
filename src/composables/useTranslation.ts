@@ -142,7 +142,6 @@ export function useTranslation() {
         const placeholder = `⟪${counter}⟫`;
         htmlMap.set(placeholder, match);
         counter++;
-        console.log(`🛡️ Protected: ${match.substring(0, 50)}${match.length > 50 ? '...' : ''}`);
         return placeholder;
       });
     });
@@ -166,7 +165,6 @@ export function useTranslation() {
       const regex = new RegExp(escapedPlaceholder, 'g');
       restoredText = restoredText.replace(regex, originalTag);
 
-      console.log(`🔧 Restored: ${placeholder} -> ${originalTag.substring(0, 30)}${originalTag.length > 30 ? '...' : ''}`);
     });
 
     return restoredText;
@@ -193,8 +191,6 @@ export function useTranslation() {
     // Védelem: HTML tagek kigyűjtése és placeholder-ekkel helyettesítése
     const { cleanText, htmlMap } = protectHtmlTags(text);
 
-    console.log('🛡️ Protected HTML tags:', htmlMap.size);
-
     const providers = [
       {
         name: 'LibreTranslate (AI)',
@@ -212,14 +208,10 @@ export function useTranslation() {
 
     for (const provider of providers) {
       try {
-        console.log(`🔄 Trying translation with ${provider.name}...`);
         const result = await provider.fn();
         if (result && result !== cleanText) {
-          console.log(`✅ Translation successful with ${provider.name}`);
-
           // HTML tagek visszarakása a lefordított szövegbe
           const restoredResult = restoreHtmlTags(result, htmlMap);
-          console.log('🔧 HTML tags restored');
 
           return restoredResult;
         }

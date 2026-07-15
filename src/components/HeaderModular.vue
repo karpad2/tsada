@@ -2,12 +2,12 @@
   <header
     :class="{ mobile_force: styleComputedForMobile }"
     style="z-index: 200"
-    class="navbar transition-all delay-150 pt-5 text-gray-600 backdrop-filter bg-opacity-50 bg-gray-300 dark:bg-gray-900 backdrop-blur-lg body-font sticky top-0"
+    class="navbar glass-nav transition-all duration-300 pt-3 pb-2 text-gray-600 body-font sticky top-0"
     id="home"
   >
     <div
       :class="[{ 'flex-col': isMobileView }, { 'flex-row': !isMobileView }]"
-      class="container mx-auto flex flex-wrap items-center"
+      class="container mx-auto flex flex-wrap items-center px-2"
     >
       <!-- Header Top Section -->
       <div class="flex items-center">
@@ -21,26 +21,26 @@
         <!-- Logo and Brand -->
         <router-link
           to="/home"
-          class="flex flex-row items-center title-font font-medium text-gray-900 mb-4 md:mb-0"
+          class="flex flex-row items-center title-font font-medium text-gray-900 mb-2 md:mb-0 group"
         >
           <img
             src="@a/tsada_logo.png"
             alt="logo"
-            class="size-20 text-white p-1 bg-sky-400/15 rounded-full"
+            class="size-16 md:size-18 text-white p-1.5 bg-sky-400/20 ring-1 ring-sky-400/30 rounded-full object-contain shadow-lg shadow-sky-500/10 group-hover:ring-sky-400/50 transition-all duration-300"
             loading="lazy"
             width="80"
-            height="80"
+            height="70"
           />
-          <span class="ml-1 max-sm:hidden text-xl dark:text-white">
+          <span class="ml-2 max-sm:hidden text-lg md:text-xl font-semibold dark:text-white tracking-tight">
             {{ $t('school_name') }}
           </span>
 
-          <Certop class="h-28 w-28" />
+          <Certop class="h-24 w-24 md:h-28 md:w-28" />
 
           <img
             src="@a/Erasmus_Logo.svg"
             alt="erasmus+"
-            class="w-36 h-12 text-white p-2"
+            class="w-28 md:w-36 h-10 md:h-12 text-white p-1.5 opacity-90"
             loading="lazy"
             width="144"
             height="48"
@@ -50,10 +50,10 @@
             v-if="showEuFunding || true"
             src="@a/eu_co_funded.png"
             alt="Co-funded by the European Union"
-            class="w-32 h-12 text-white p-1"
+            class="w-28 md:w-32 h-auto text-white p-1 object-contain opacity-90"
             loading="lazy"
             width="128"
-            height="48"
+            height="30"
           />
         </router-link>
       </div>
@@ -62,9 +62,9 @@
       <nav
         v-if="showMobileMenu"
         :class="[
-          { 'flex-col w-full px-4 max-h-[70vh] overflow-y-auto': isMobileView },
+          { 'flex-col w-full px-3 max-h-[70vh] overflow-y-auto mt-2 rounded-2xl glass pb-3': isMobileView },
           { 'mx-auto': isMobileView || isTabletMode },
-          { 'flex-row': !isMobileView }
+          { 'flex-row gap-0.5': !isMobileView }
         ]"
         class="md:ml-auto flex items-center text-base justify-center"
       >
@@ -86,9 +86,9 @@
               <router-link
                 v-if="group.type === 'direct-link' && group.to"
                 :to="group.to"
-                class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
-                       hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
-                       shadow-md shadow-transparent hover:shadow-sky-500/10
+                class="nav-link px-3.5 py-2 rounded-xl font-medium transition-all duration-300 ease-out
+                       hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-md
+                       hover:shadow-md hover:shadow-sky-500/15
                        text-gray-800 dark:text-white
                        relative overflow-hidden"
               >
@@ -99,9 +99,9 @@
               <button
                 v-else-if="group.type === 'direct-link' && group.items.length > 0 && group.items[0].action"
                 @click="group.items[0].action"
-                class="px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
-                       hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
-                       shadow-md shadow-transparent hover:shadow-sky-500/10
+                class="nav-link px-3.5 py-2 rounded-xl font-medium transition-all duration-300 ease-out
+                       hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-md
+                       hover:shadow-md hover:shadow-sky-500/15
                        text-gray-800 dark:text-white
                        relative overflow-hidden"
               >
@@ -287,15 +287,6 @@ const mobileMenuItems = computed(() => {
 </script>
 
 <style scoped>
-.navbar {
-  backdrop-filter: blur(10px);
-  background-color: rgba(243, 244, 246, 0.8);
-}
-
-.dark .navbar {
-  background-color: rgba(17, 24, 39, 0.8);
-}
-
 .mobile_force {
   position: relative !important;
 }
@@ -312,6 +303,16 @@ const mobileMenuItems = computed(() => {
   z-index: 300;
 }
 
+.nav-link.router-link-active {
+  background: rgba(14, 165, 233, 0.12);
+  box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.2);
+}
+
+.dark .nav-link.router-link-active {
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
   .navbar {
@@ -323,15 +324,5 @@ const mobileMenuItems = computed(() => {
     padding-left: 0;
     padding-right: 0;
   }
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.delay-150 {
-  transition-delay: 150ms;
 }
 </style>

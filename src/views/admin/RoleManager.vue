@@ -1,10 +1,15 @@
 <template>
-  <v-container class="py-6">
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container class="pa-0 py-2">
     <v-row>
       <v-col cols="12">
-        <div class="d-flex align-center mb-6">
+        <div class="page-header d-flex align-center mb-2">
           <v-icon size="32" color="primary" class="mr-3">mdi-shield-account</v-icon>
-          <h1 class="text-h4 font-weight-bold text-black">{{ $t('role_manager') }}</h1>
+          <div>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('role_manager') }}</h1>
+            <div class="section-accent !mb-0"></div>
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -243,6 +248,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -253,6 +260,8 @@ import { RoleService, type UserRole, type UserRoleDocument } from '@/services/Ro
 import { useLoadingStore } from '@/stores/loading';
 import { useI18n } from 'vue-i18n';
 
+const databases = new Databases(appw);
+
 interface ClassItem {
   $id: string;
   displayName: string;
@@ -262,7 +271,6 @@ export default defineComponent({
   name: 'RoleManager',
   setup() {
     const { t } = useI18n();
-    const databases = new Databases(appw);
     const roleService = RoleService.getInstance();
     const loadingStore = useLoadingStore();
 

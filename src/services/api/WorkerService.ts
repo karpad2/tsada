@@ -92,7 +92,8 @@ export class WorkerService extends BaseApiService<Worker> {
   private config = appwriteService.config
 
   constructor() {
-    super(appwriteService.config.website_db, appwriteService.config.workers)
+    // BaseApiService(collectionId, databaseId)
+    super(appwriteService.config.workers, appwriteService.config.website_db)
   }
 
   static getInstance(): WorkerService {

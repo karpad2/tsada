@@ -1,16 +1,15 @@
 <template>
-    <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-            <div class="flex flex-wrap w-full mb-20">
-                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
-                        {{ title }}
-                    </h1>
-                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                </div>
+    <section class="page-shell">
+        <div class="page-panel container">
+            <div class="page-header">
+                <h1 class="section-title !text-2xl sm:!text-3xl">
+                    {{ title }}
+                </h1>
+                <div class="section-accent !w-20"></div>
             </div>
 
             <div v-if="loaded" class="m-auto w-full">
+                <div class="page-table-wrap overflow-hidden">
                 <v-data-table
                     height="400"
                     :headers="headers"
@@ -35,10 +34,11 @@
 
                     <template #bottom />
                 </v-data-table>
+                </div>
 
-                <v-btn v-if="admin" @click="handleCreateDocument" class="m-5">
+                <button v-if="admin" @click="handleCreateDocument" class="glass-btn mt-5 px-6 py-2.5 text-white font-medium rounded-full">
                     {{ $t("add_new_document_in_that_category") }}
-                </v-btn>
+                </button>
             </div>
         </div>
     </section>
@@ -59,6 +59,8 @@ import {
     type DocumentItem
 } from "@/utils/documentUtils";
 
+const db = new Databases(appw);
+
 export default defineComponent({
     name: "DocumentLister",
     setup() {
@@ -75,7 +77,6 @@ export default defineComponent({
 
         const loadDocuments = async () => {
             try {
-                const db = new Databases(appw);
                 documents.value = [];
 
                 const categoryId = route.params.id as string || route.params.category as string;

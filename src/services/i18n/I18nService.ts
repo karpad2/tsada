@@ -16,6 +16,12 @@ export interface MultiLangContent {
 /**
  * Internationalization service
  */
+const LOCALE_MAP: Record<string, string> = {
+  'hu': 'hu-HU',
+  'sr': 'sr-RS',
+  'en': 'en-GB'
+}
+
 export class I18nService {
   private static instance: I18nService
   private currentLanguage = 'hu'
@@ -212,13 +218,7 @@ export class I18nService {
     const dateObj = typeof date === 'string' ? new Date(date) : date
 
     try {
-      const locales: Record<string, string> = {
-        'hu': 'hu-HU',
-        'sr': 'sr-RS',
-        'en': 'en-GB'
-      }
-
-      return dateObj.toLocaleDateString(locales[lang] || 'hu-HU', {
+      return dateObj.toLocaleDateString(LOCALE_MAP[lang] || 'hu-HU', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -235,13 +235,7 @@ export class I18nService {
     const lang = languageCode || this.currentLanguage
 
     try {
-      const locales: Record<string, string> = {
-        'hu': 'hu-HU',
-        'sr': 'sr-RS',
-        'en': 'en-GB'
-      }
-
-      return number.toLocaleString(locales[lang] || 'hu-HU')
+      return number.toLocaleString(LOCALE_MAP[lang] || 'hu-HU')
     } catch (error) {
       return number.toString()
     }

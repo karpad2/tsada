@@ -1,13 +1,10 @@
 <template>
-    <section class="text-gray-600 ">
-        <div class="container px-5 mx-auto backdrop-filter bg-opacity-50 dark:bg-slate-500/50 bg-gray-100 backdrop-blur-lg" style="min-height: 70vh;">
-            <video-background :src="video_link" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
-                overlay="linear-gradient(45deg,#2a4ae430,#0EA5E950)">
-                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 id="render_title" class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-100">{{ $t("erasmus_apply") }}</h1>
-                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                </div>
-            </video-background>
+    <section class="page-shell">
+        <div class="page-panel container">
+            <div class="page-header">
+                <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">{{ $t("erasmus_apply") }}</h1>
+                <div class="section-accent !w-20"></div>
+            </div>
 
             <div class="pb-2 w-full dark:text-white">
                 <v-form ref="form">
@@ -38,9 +35,12 @@
 </template>
 
 <script lang="ts">
-import { Client, Databases, ID, Storage, Query } from "appwrite";
+import { Databases, ID, Storage, Query } from "appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { appw, config } from "@/appwrite";
+
+const database = new Databases(appw);
+
 export default {
     data() {
         return {
@@ -59,7 +59,7 @@ export default {
     },
     methods: {
         async save() {
-            const database = new Databases(appw);
+
 
             // Calculate the score before saving
             //this.calculateScore();
@@ -85,7 +85,6 @@ export default {
 
                 // Notify the user of success
                 this.$notify(this.$t('apply_saved'));
-                console.log('Save successful:', result);
             } catch (error) {
                 // Handle any errors during the document update
                 console.error('Error saving data:', error);
@@ -138,7 +137,7 @@ export default {
             this.save();
         },
         async getData() {
-            const database = new Databases(appw);
+
             const loadingStore = useLoadingStore();
             
             // Fetch the document data using the document ID from the route params
@@ -157,7 +156,6 @@ export default {
                 this.location = n.erasmusLocation.$id;
             }
             
-            console.log('Form data loaded:', n);
         }
     },
     mounted() {

@@ -1,13 +1,11 @@
 <template>
-    <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-            <div class="flex flex-wrap w-full mb-20">
-                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
-                        {{ $t('documents') }}
-                    </h1>
-                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                </div>
+    <section class="page-shell">
+        <div class="page-panel container">
+            <div class="page-header">
+                <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">
+                    {{ $t('documents') }}
+                </h1>
+                <div class="section-accent !w-20"></div>
             </div>
 
             <div v-if="!loaded">
@@ -23,11 +21,12 @@
                     </v-btn>
                 </div>
 
-                <div v-for="role in roles" :key="role.id" class="popups">
-                    <h2 class="sm:text-2xl text-lg font-medium mb-3 text-gray-900 dark:text-white">
+                <div v-for="role in roles" :key="role.id" class="popups mb-8">
+                    <h2 class="page-section-title">
                         {{ role.role }}
                     </h2>
                     
+                    <div class="page-table-wrap overflow-hidden">
                     <v-data-table 
                         height="400" 
                         :headers="headers" 
@@ -52,6 +51,7 @@
 
                         <template #bottom></template>
                     </v-data-table>
+                    </div>
 
                     <div v-if="admin" class="flex gap-3 mt-4 flex-wrap">
                         <v-btn @click="new_stuff(role.id)" color="primary" class="m-2">
@@ -234,7 +234,6 @@ import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
-import gsap from "gsap";
 import Loading from "@/components/Loading.vue";
 import {
     formatTime,
@@ -247,6 +246,7 @@ import {
     type CategoryItem
 } from "@/utils/documentUtils";
 
+const database = new Databases(appw);
 
 interface CategoryData {
     category_name_rs: string;
@@ -308,13 +308,15 @@ export default {
         this.setupHeaders();
 
         // Title animation
-        gsap.fromTo("#render_title", {
-            opacity: 0,
-            x: "50%",
-        }, {
-            duration: 1.5,
-            opacity: 1,
-            x: 0,
+        import('gsap').then(({ default: gsap }) => {
+            gsap.fromTo("#render_title", {
+                opacity: 0,
+                x: "50%",
+            }, {
+                duration: 1.5,
+                opacity: 1,
+                x: 0,
+            });
         });
 
         await this.load_workers_base();
@@ -394,7 +396,6 @@ export default {
 
         async createNewCategory(): Promise<void> {
             try {
-                const database = new Databases(appw);
                 await database.createDocument(
                     config.website_db,
                     config.document_categories_db,
@@ -412,8 +413,7 @@ export default {
                 await this.load_workers_base();
                 
                 // Success notification (you might want to add a toast/snackbar here)
-                console.log('Category created successfully');
-                
+
             } catch (error) {
                 console.error('Error creating new category:', error);
                 // Error notification (you might want to add a toast/snackbar here)
@@ -445,7 +445,6 @@ export default {
 
         async updateCategory(): Promise<void> {
             try {
-                const database = new Databases(appw);
                 await database.updateDocument(
                     config.website_db,
                     config.document_categories_db,
@@ -462,8 +461,7 @@ export default {
                 await this.load_workers_base();
                 
                 // Success notification
-                console.log('Category updated successfully');
-                
+
             } catch (error) {
                 console.error('Error updating category:', error);
                 // Error notification
@@ -485,11 +483,9 @@ export default {
             if (!this.categoryToDelete) return;
 
             try {
-                const database = new Databases(appw);
-                
                 // First, check if category has any documents
                 const documentsResponse = await database.listDocuments(
-                    config.website_db, 
+                    config.website_db,
                     config.documents_db,
                     [Query.equal("documentCategories", [this.categoryToDelete.id])]
                 );
@@ -520,8 +516,7 @@ export default {
                 await this.load_workers_base();
                 
                 // Success notification
-                console.log('Category deleted successfully');
-                
+
             } catch (error) {
                 console.error('Error deleting category:', error);
                 // Error notification
@@ -537,14 +532,16 @@ export default {
 
                 // Animate elements after loading
                 this.$nextTick(() => {
-                    gsap.fromTo(".popups", {
-                        opacity: 0,
-                        y: "50%",
-                    }, {
-                        duration: 1.2,
-                        opacity: 1,
-                        y: 0,
-                        stagger: 0.1
+                    import('gsap').then(({ default: gsap }) => {
+                        gsap.fromTo(".popups", {
+                            opacity: 0,
+                            y: "50%",
+                        }, {
+                            duration: 1.2,
+                            opacity: 1,
+                            y: 0,
+                            stagger: 0.1
+                        });
                     });
                 });
 

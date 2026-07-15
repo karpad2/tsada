@@ -3,8 +3,10 @@
 <img v-else src="https://dummyimage.com/720x400" alt="Content" class="transition duration-300 ease-in-out " />
 </template>
 <script>
-import { Client, Databases, ID,Storage } from "appwrite";
+import { Storage } from "appwrite";
 import {appw,config} from "@/appwrite";
+
+const storage = new Storage(appw);
 
 export default {
     name: 'Image',
@@ -23,17 +25,14 @@ export default {
     },
     methods:{
         async load_image_from_base() {
-        const storage = new Storage(appw);
-        try {
-            const fileInfo = await storage.getFileInfo(this.img);
-            this.image = await storage.getFileView(config.website_images, this.img);
-            console.log(this.image);
-            this.load = false;
-        } catch (error) {
-            console.log('File does not exist', error);
-            this.load = true;
+            try {
+                this.image = storage.getFileView(config.website_images, this.img);
+                this.load = false;
+            } catch (error) {
+                console.error('File does not exist', error);
+                this.load = true;
+            }
         }
-    }
     }
 }
 </script>

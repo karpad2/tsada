@@ -226,6 +226,8 @@ import { notify } from '@kyvg/vue3-notification';
 import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 
+const database = new Databases(appw);
+
 interface TextComponent {
     $id: string;
     doc_id: string;
@@ -254,7 +256,6 @@ export default defineComponent({
     emits: ['update'],
     setup(props, { emit }) {
         const { t } = useI18n();
-        const database = new Databases(appw);
 
         // State
         const components = ref<TextComponent[]>([]);

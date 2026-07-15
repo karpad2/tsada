@@ -1,2 +1,12 @@
-User-Agent: *
+User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /dc
+Disallow: /heist
+Disallow: /tv
+Disallow: /presentation
+Disallow: /sterasmus
+
+Sitemap: https://tsada.edu.rs/sitemap.xml

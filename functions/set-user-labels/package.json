@@ -1,0 +1,19 @@
+{
+  "name": "set-user-labels",
+  "version": "1.0.0",
+  "description": "Securely update Appwrite user labels (roles) — admin only",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5",
+    "prettier": "^3.2.5"
+  }
+}

@@ -41,25 +41,25 @@
             />
 
             <!-- Selected Form Info -->
-            <v-card v-if="selectedForm" variant="outlined" class="mt-4">
-                <v-card-title class="text-body-2 d-flex align-center">
-                    <v-icon left size="small" class="mr-2">mdi-form-select</v-icon>
+            <div v-if="selectedForm" class="block-preview mt-4">
+                <div class="block-preview-title d-flex align-center">
+                    <v-icon left size="small" color="primary" class="mr-2">mdi-form-select</v-icon>
                     {{ selectedForm.title }}
                     <v-spacer />
                     <v-btn size="x-small" color="primary" variant="tonal" @click="editSelectedForm">
                         <v-icon size="small">mdi-pencil</v-icon>
                         {{ $t('edit') }}
                     </v-btn>
-                </v-card-title>
-                <v-card-text>
-                    <v-chip size="small" color="info" class="mr-2">
+                </div>
+                <div class="block-preview-body">
+                    <v-chip size="small" color="info" class="mr-2" variant="tonal">
                         {{ selectedForm.fieldCount || 0 }} {{ $t('fields') }}
                     </v-chip>
-                    <v-chip size="small" :color="selectedForm.active ? 'success' : 'warning'">
+                    <v-chip size="small" :color="selectedForm.active ? 'success' : 'warning'" variant="tonal">
                         {{ selectedForm.active ? $t('active') : $t('inactive') }}
                     </v-chip>
-                </v-card-text>
-            </v-card>
+                </div>
+            </div>
 
             <v-alert v-else type="info" variant="tonal" density="compact" class="mt-3">
                 <v-icon left size="small">mdi-information</v-icon>
@@ -339,6 +339,8 @@ import { nanoid } from 'nanoid';
 import { notify } from '@kyvg/vue3-notification';
 import draggable from 'vuedraggable';
 
+const database = new Databases(appw);
+
 export default defineComponent({
     name: 'FormBlockEditor',
     components: { draggable },
@@ -349,7 +351,6 @@ export default defineComponent({
     },
     emits: ['update:settings', 'save'],
     setup(props, { emit }) {
-        const database = new Databases(appw);
         const formsService = FormsService.getInstance();
 
         // State
@@ -643,9 +644,29 @@ export default defineComponent({
 }
 
 .options-editor {
-    background: rgba(var(--v-theme-surface-variant), 0.3);
-    border-radius: 8px;
+    background: rgba(14, 165, 233, 0.06);
+    border-radius: 0.75rem;
     padding: 12px;
+    border: 1px solid rgba(14, 165, 233, 0.12);
+}
+
+.block-preview {
+    border-radius: 0.85rem;
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.block-preview-title {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(14, 165, 233, 0.12);
+    background: rgba(14, 165, 233, 0.06);
+}
+
+.block-preview-body {
+    padding: 0.85rem;
 }
 
 /* Dark mode */
@@ -655,5 +676,10 @@ export default defineComponent({
 
 :deep(.v-theme--dark) .inline-form-builder {
     background: rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .block-preview {
+    background: rgba(15, 23, 42, 0.45);
+    border-color: rgba(148, 163, 184, 0.16);
 }
 </style>

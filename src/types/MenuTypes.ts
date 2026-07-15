@@ -19,7 +19,7 @@ export interface MenuCondition {
   setting?: 'erasmus-apply' | 'erasmus-list'
 }
 
-// --- Code-defined registry types (MenuRegistry.ts) ---
+// --- Menu structure types (from menu.json) ---
 
 export type MenuGroupType = 'dropdown' | 'direct-link' | 'language-selector'
 
@@ -46,48 +46,6 @@ export interface MenuGroupDefinition {
   to?: string
   condition?: MenuCondition
   items: MenuItemDefinition[]
-}
-
-// --- Appwrite-stored config types (overlay on registry) ---
-
-export interface MenuItemConfig {
-  id: string
-  enabled: boolean
-  order: number
-}
-
-export interface MenuGroupConfig {
-  id: string
-  enabled: boolean
-  order: number
-  items?: MenuItemConfig[]
-}
-
-export interface CustomLink {
-  id: string
-  labels: Record<string, string>
-  to?: string
-  href?: string
-  parentGroupId: string
-  order: number
-  enabled: boolean
-}
-
-export interface CustomGroup {
-  id: string
-  type: 'dropdown' | 'direct-link'
-  labels: Record<string, string>
-  to?: string
-  order: number
-  enabled: boolean
-  items: CustomLink[]
-}
-
-export interface MenuConfig {
-  version: number
-  groups: MenuGroupConfig[]
-  customLinks?: CustomLink[]
-  customGroups?: CustomGroup[]
 }
 
 // --- Runtime resolved types ---

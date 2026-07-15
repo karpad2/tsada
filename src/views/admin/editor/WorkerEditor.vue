@@ -1,13 +1,19 @@
 <template>
-    <div class="worker-editor container px-5 mx-auto bg-white">
+    <div class="worker-editor admin-panel container px-5 mx-auto">
+        <div class="page-header mb-2">
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('workers') }}</h1>
+            <div class="section-accent !w-20"></div>
+        </div>
+
         <!-- Header Controls -->
-        <section class="header-section mb-6">
-            <div class="action-buttons flex gap-2 mb-4">
+        <section class="editor-toolbar mb-6">
+            <div class="editor-toolbar-actions action-buttons" style="margin-left: 0;">
                 <v-btn
                     @click="save"
                     :disabled="isLoading('save')"
                     :loading="isLoading('save')"
                     color="success"
+                    prepend-icon="mdi-content-save"
                 >
                     {{ $t('save') }}
                 </v-btn>
@@ -15,13 +21,17 @@
                     @click="deleteContent"
                     :disabled="isAnyLoading()"
                     color="error"
+                    variant="outlined"
+                    prepend-icon="mdi-delete"
                 >
                     {{ $t('delete') }}
                 </v-btn>
                 <v-btn
                     @click="$router.go(-1)"
                     :disabled="isAnyLoading()"
-                    color="secondary"
+                    variant="outlined"
+                    color="primary"
+                    prepend-icon="mdi-arrow-left"
                 >
                     {{ $t("goback") }}
                 </v-btn>
@@ -40,7 +50,11 @@
         />
 
         <!-- Worker Information Fields -->
-        <section class="worker-info-section mb-6">
+        <section class="editor-section worker-info-section mb-6">
+            <div class="editor-section-title">
+                <span class="section-icon"><v-icon size="small" color="white">mdi-account</v-icon></span>
+                {{ $t('workers') }}
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <v-text-field
                     :model-value="formData.worker_name_hu"
@@ -48,6 +62,8 @@
                     :counter="100"
                     :label="$t('worker_name_hu')"
                     hide-details
+                    variant="outlined"
+                    density="comfortable"
                     @change="handleFieldChange"
                 />
 
@@ -57,6 +73,8 @@
                     :counter="100"
                     :label="$t('worker_name_rs')"
                     hide-details
+                    variant="outlined"
+                    density="comfortable"
                     @change="handleFieldChange"
                 />
 
@@ -66,6 +84,8 @@
                     :counter="100"
                     :label="$t('contact')"
                     hide-details
+                    variant="outlined"
+                    density="comfortable"
                     @change="handleFieldChange"
                     class="md:col-span-2"
                 />
@@ -73,12 +93,15 @@
         </section>
 
         <!-- Receiving Hours Settings -->
-        <section class="receiving-hours-section">
-            <h3 class="text-lg font-medium mb-4">{{ $t('receiving_hours_settings') }}</h3>
+        <section class="editor-section receiving-hours-section">
+            <div class="editor-section-title">
+                <span class="section-icon"><v-icon size="small" color="white">mdi-clock-outline</v-icon></span>
+                {{ $t('receiving_hours_settings') }}
+            </div>
 
             <!-- Pedagógus fogadóóra -->
-            <v-card class="mb-4">
-                <v-card-title>{{ $t('p_receiving_hour') }}</v-card-title>
+            <v-card class="mb-4" elevation="0" rounded="lg">
+                <v-card-title class="editor-lang-header">{{ $t('p_receiving_hour') }}</v-card-title>
                 <v-card-text>
                     <div v-for="(schedule, index) in formData.p_receiving_schedules" :key="'p_' + index" class="mb-3 p-3 border rounded">
                         <div class="flex gap-4 items-center flex-wrap">
@@ -125,8 +148,8 @@
             </v-card>
 
             <!-- Ügyfélszolgálati fogadóóra -->
-            <v-card class="mb-4">
-                <v-card-title>{{ $t('u_receiving_hour') }}</v-card-title>
+            <v-card class="mb-4" elevation="0" rounded="lg">
+                <v-card-title class="editor-lang-header">{{ $t('u_receiving_hour') }}</v-card-title>
                 <v-card-text>
                     <div v-for="(schedule, index) in formData.u_receiving_schedules" :key="'u_' + index" class="mb-3 p-3 border rounded">
                         <div class="flex gap-4 items-center flex-wrap">
@@ -179,6 +202,8 @@
 import { defineComponent, ref, computed } from 'vue';
 import { Databases, Storage } from 'appwrite';
 import { appw, config } from '@/appwrite';
+
+const database = new Databases(appw);
 import { useEditor } from '@/composables/useEditor';
 import { getFilePreview, parseScheduleData, stringifyScheduleData } from '@/utils/editorUtils';
 import { useLoadingStore } from '@/stores/loading';
@@ -200,8 +225,6 @@ export default defineComponent({
 
         // Load worker data
         const loadWorkerData = async (id: string) => {
-            const database = new Databases(appw);
-
             try {
                 const workerDoc = await database.getDocument(config.website_db, config.workers, id);
 
@@ -414,27 +437,27 @@ export default defineComponent({
 }
 
 .header-section {
-    background-color: #f9fafb;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 12px;
     padding: 16px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .dark .header-section {
-    background-color: #111827;
-    border-color: #374151;
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(148, 163, 184, 0.15);
 }
 
 .worker-info-section {
-    background-color: #f9fafb;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 12px;
     padding: 16px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .dark .worker-info-section {
-    background-color: #111827;
-    border-color: #374151;
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(148, 163, 184, 0.15);
 }
 
 .receiving-hours-section {

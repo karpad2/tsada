@@ -4,6 +4,8 @@ import { convertifserbian } from "@/lang";
 import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 
+const database = new Databases(appw);
+
 export interface DocumentItem {
     id: string;
     doc_id: string;
@@ -64,7 +66,6 @@ export const getLocalizedDocumentTitle = (document: any): string => {
 };
 
 export const createNewDocument = async (categoryId: string) => {
-    const database = new Databases(appw);
     return await database.createDocument(
         config.website_db,
         config.documents_db,
@@ -74,7 +75,6 @@ export const createNewDocument = async (categoryId: string) => {
 };
 
 export const archiveCategory = async (categoryId: string, archived: boolean = true) => {
-    const database = new Databases(appw);
     return await database.updateDocument(
         config.website_db,
         config.document_categories_db,
@@ -85,7 +85,6 @@ export const archiveCategory = async (categoryId: string, archived: boolean = tr
 
 export const loadDocumentsForCategory = async (categoryId: string): Promise<DocumentItem[]> => {
     try {
-        const database = new Databases(appw);
         const documentsResponse = await database.listDocuments(
             config.website_db,
             config.documents_db,
@@ -110,7 +109,6 @@ export const loadDocumentsForCategory = async (categoryId: string): Promise<Docu
 
 export const loadCategoriesWithDocuments = async (showArchived: boolean = false): Promise<CategoryItem[]> => {
     try {
-        const database = new Databases(appw);
         const categories: CategoryItem[] = [];
 
         // Load active categories

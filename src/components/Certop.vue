@@ -21,7 +21,6 @@ export default{
     {
         const loadingStore = useLoadingStore();
         let local=loadingStore.language;
-        console.log(local);
         if (local=="rs"||"sr")
         {
             this.c_rs=true;

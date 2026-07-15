@@ -1,83 +1,84 @@
 <template>
-  <div class="send-notification-page min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
-    <div class="max-w-4xl mx-auto">
+  <div class="send-notification-page page-shell py-8 px-4">
+    <div class="page-panel container max-w-4xl admin-dark-form">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-black text-white mb-2">{{ $t('send_push_notification') }}</h1>
-        <p class="text-gray-300">{{ $t('send_push_description') }}</p>
+      <div class="page-header">
+        <h1 class="section-title">{{ $t('send_push_notification') }}</h1>
+        <div class="section-accent"></div>
+        <p class="page-subtitle">{{ $t('send_push_description') }}</p>
       </div>
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="stat-card glass-card p-6 rounded-2xl">
           <div class="flex items-center gap-4">
-            <div class="icon-wrapper bg-purple-500/20 p-3 rounded-xl">
-              <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="icon-wrapper bg-sky-500/15 p-3 rounded-xl">
+              <svg class="w-8 h-8 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">{{ $t('subscribers') }}</p>
-              <p class="text-white text-2xl font-bold">{{ stats.totalSubscribers }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('subscribers') }}</p>
+              <p class="text-gray-900 dark:text-white text-2xl font-bold">{{ stats.totalSubscribers }}</p>
             </div>
           </div>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
           <div class="flex items-center gap-4">
-            <div class="icon-wrapper bg-pink-500/20 p-3 rounded-xl">
-              <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="icon-wrapper bg-sky-500/15 p-3 rounded-xl">
+              <svg class="w-8 h-8 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">{{ $t('sent_today') }}</p>
-              <p class="text-white text-2xl font-bold">{{ stats.sentToday }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('sent_today') }}</p>
+              <p class="text-gray-900 dark:text-white text-2xl font-bold">{{ stats.sentToday }}</p>
             </div>
           </div>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
           <div class="flex items-center gap-4">
-            <div class="icon-wrapper bg-green-500/20 p-3 rounded-xl">
-              <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="icon-wrapper bg-emerald-500/15 p-3 rounded-xl">
+              <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <p class="text-gray-400 text-sm">{{ $t('total_sent') }}</p>
-              <p class="text-white text-2xl font-bold">{{ stats.totalSent }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('total_sent') }}</p>
+              <p class="text-gray-900 dark:text-white text-2xl font-bold">{{ stats.totalSent }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Notification Form -->
-      <div class="glass-card p-8 rounded-3xl mb-8">
+      <div class="glass rounded-2xl p-8 mb-8">
         <form @submit.prevent="sendNotification">
           <!-- Title -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">{{ $t('notification_title') }} *</label>
+            <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('notification_title') }} *</label>
             <input
               v-model="notification.title"
               type="text"
               required
               maxlength="50"
-              class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              class="page-input w-full"
               :placeholder="$t('notification_title_placeholder')"
             />
-            <p class="text-sm text-gray-400 mt-1">{{ notification.title.length }}/50</p>
+            <p class="text-sm text-gray-500 mt-1">{{ notification.title.length }}/50</p>
           </div>
 
           <!-- Body -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">{{ $t('notification_body') }} *</label>
+            <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('notification_body') }} *</label>
             <textarea
               v-model="notification.body"
               required
               maxlength="200"
               rows="4"
-              class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
+              class="page-input w-full resize-none"
               :placeholder="$t('notification_body_placeholder')"
             ></textarea>
             <p class="text-sm text-gray-400 mt-1">{{ notification.body.length }}/200</p>
@@ -85,32 +86,32 @@
 
           <!-- Icon URL (Optional) -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">{{ $t('icon_url_optional') }}</label>
+            <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('icon_url_optional') }}</label>
             <input
               v-model="notification.icon"
               type="url"
-              class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              class="page-input w-full"
               placeholder="https://example.com/icon.png"
             />
           </div>
 
           <!-- Action URL -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">{{ $t('action_url') }}</label>
+            <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('action_url') }}</label>
             <input
               v-model="notification.actionUrl"
               type="url"
-              class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              class="page-input w-full"
               placeholder="https://tsada.edu.rs/news"
             />
           </div>
 
           <!-- Tag (for grouping) -->
           <div class="mb-6">
-            <label class="block text-white font-semibold mb-2">{{ $t('notification_category') }}</label>
+            <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('notification_category') }}</label>
             <select
               v-model="notification.tag"
-              class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              class="page-input w-full"
             >
               <option value="">{{ $t('no_category') }}</option>
               <option value="announcement">{{ $t('announcement') }}</option>
@@ -127,22 +128,22 @@
               <input
                 v-model="notification.requireInteraction"
                 type="checkbox"
-                class="w-5 h-5 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                class="w-5 h-5 text-sky-600 rounded focus:ring-sky-500"
               />
-              <span class="text-white">{{ $t('require_interaction') }}</span>
+              <span class="text-gray-900 dark:text-white">{{ $t('require_interaction') }}</span>
             </label>
           </div>
 
           <!-- Preview -->
           <div class="mb-8">
-            <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+            <h3 class="text-gray-900 dark:text-white font-semibold mb-4 flex items-center gap-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
               {{ $t('preview') }}
             </h3>
-            <div class="notification-preview bg-white rounded-xl p-4 shadow-lg max-w-md">
+            <div class="notification-preview glass-card rounded-xl p-4 max-w-md">
               <div class="flex gap-3">
                 <img
                   :src="notification.icon || '/favicon.png'"
@@ -151,8 +152,8 @@
                   @error="(e) => (e.target as HTMLImageElement).src = '/favicon.png'"
                 />
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-bold text-gray-900 truncate">{{ notification.title || $t('notification_title') }}</h4>
-                  <p class="text-sm text-gray-600 line-clamp-2">{{ notification.body || $t('notification_body') + '...' }}</p>
+                  <h4 class="font-bold text-gray-900 dark:text-white truncate">{{ notification.title || $t('notification_title') }}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{{ notification.body || $t('notification_body') + '...' }}</p>
                   <p class="text-xs text-gray-400 mt-1">{{ currentTime }}</p>
                 </div>
               </div>
@@ -164,7 +165,7 @@
             <button
               type="submit"
               :disabled="isSending || !isFormValid"
-              class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/50 disabled:cursor-not-allowed"
+              class="flex-1 glass-btn px-6 py-4 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span v-if="!isSending" class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +185,7 @@
             <button
               type="button"
               @click="resetForm"
-              class="px-6 py-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all duration-300"
+              class="px-6 py-4 btn-ghost-glass rounded-xl font-semibold"
             >
               {{ $t('delete') }}
             </button>
@@ -194,26 +195,26 @@
 
       <!-- Recent Notifications -->
       <div class="glass-card p-8 rounded-3xl">
-        <h2 class="text-2xl font-bold text-white mb-6">{{ $t('recent_notifications') }}</h2>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ $t('recent_notifications') }}</h2>
 
         <div v-if="recentNotifications.length === 0" class="text-center py-12">
-          <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
-          <p class="text-gray-400">{{ $t('no_notifications_sent') }}</p>
+          <p class="text-gray-500 dark:text-gray-400">{{ $t('no_notifications_sent') }}</p>
         </div>
 
         <div v-else class="space-y-4">
           <div
             v-for="notif in recentNotifications"
             :key="notif.$id"
-            class="notification-item bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all"
+            class="notification-item glass rounded-xl p-4 hover:border-sky-300 transition-all"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
-                <h4 class="font-semibold text-white mb-1">{{ notif.title }}</h4>
-                <p class="text-sm text-gray-300 mb-2">{{ notif.body }}</p>
-                <div class="flex items-center gap-4 text-xs text-gray-400">
+                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">{{ notif.title }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ notif.body }}</p>
+                <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                   <span>{{ formatDate(notif.sent_at) }}</span>
                   <span class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +226,7 @@
               </div>
               <span
                 v-if="notif.tag"
-                class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium"
+                class="glass-badge px-3 py-1 rounded-full text-xs font-medium"
               >
                 {{ notif.tag }}
               </span>
@@ -243,6 +244,8 @@ import { useI18n } from 'vue-i18n';
 import { notify } from '@kyvg/vue3-notification';
 import { Databases, Query } from 'appwrite';
 import { config, appw } from '@/appwrite';
+
+const database = new Databases(appw);
 import dayjs from '@/utils/dayjs';
 
 const { t } = useI18n();
@@ -285,7 +288,7 @@ onMounted(async () => {
 });
 
 async function loadStats() {
-  const database = new Databases(appw);
+
 
   try {
     // Get total subscribers
@@ -316,7 +319,7 @@ async function loadStats() {
 }
 
 async function loadRecentNotifications() {
-  const database = new Databases(appw);
+
 
   try {
     const result = await database.listDocuments(
@@ -336,7 +339,7 @@ async function sendNotification() {
   isSending.value = true;
 
   try {
-    const database = new Databases(appw);
+  
 
     // Save notification to log
     await database.createDocument(
@@ -388,24 +391,16 @@ function formatDate(dateString: string) {
 </script>
 
 <style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-}
-
 .notification-preview {
   animation: preview-pulse 2s ease-in-out infinite;
 }
 
 @keyframes preview-pulse {
   0%, 100% {
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.2);
   }
   50% {
-    box-shadow: 0 8px 30px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 8px 30px rgba(56, 189, 248, 0.3);
   }
 }
 

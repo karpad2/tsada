@@ -1,26 +1,25 @@
 <template>
-    <section class="text-gray-600 min-h-screen">
+    <section class="page-shell">
       <div 
         v-if="state.loaded" 
-        class="container px-5 mx-auto backdrop-filter bg-opacity-50 dark:bg-slate-500/50 bg-gray-100 backdrop-blur-lg" 
-        style="min-height: 70vh;"
+        class="page-panel container"
       >
         <!-- Header Section -->
-        <div v-if="!state.videoId" class="flex flex-wrap w-full mb-20 p-2 rounded">
+        <div v-if="!state.videoId" class="flex flex-wrap w-full mb-12 p-2 rounded">
           <div class="w-full mb-6 lg:mb-0">
             <div class="flex items-center gap-3 flex-wrap">
               <h1
                 id="render_title"
-                class="sm:text-3xl p-3 text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white"
+                class="sm:text-3xl p-3 text-2xl font-semibold title-font mb-2 text-gray-900 dark:text-white tracking-tight"
               >
                 {{ localizedTitle }}
               </h1>
-              <span v-if="state.pinned" class="inline-flex items-center gap-1 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium mb-2">
+              <span v-if="state.pinned" class="inline-flex items-center gap-1 glass-panel !bg-orange-500/85 text-white px-3 py-1 rounded-full text-sm font-medium mb-2">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>
                 {{ $t('pinned_news') }}
               </span>
             </div>
-            <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
+            <div class="section-accent !w-20 ml-3"></div>
           </div>
           <p v-if="shouldShowDate" class="align-bottom ml-3 leading-relaxed text-gray-600 dark:text-white">
             <strong>{{ $t("date") }}</strong>: {{ formatDate(state.date) }} | 
@@ -113,7 +112,6 @@
   import { useLoadingStore } from '@/stores/loading';
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
-  import gsap from 'gsap';
   import dayjs from '@/utils/dayjs';
   import { jsPDF } from 'jspdf';
   import html2canvas from 'html2canvas';
@@ -121,7 +119,10 @@
   import Loading from '@/components/Loading.vue';
   import DocLister from '@/components/DocLister.vue';
   import ContentBlockRenderer from '@/components/shared/ContentBlockRenderer.vue';
-  
+  import { useSEO } from '@/composables/useSEO';
+
+  const database = new Databases(appw);
+
   interface ContentState {
     loaded: boolean;
     admin: boolean;
@@ -158,6 +159,7 @@
       const route = useRoute();
       const router = useRouter();
       const loadingStore = useLoadingStore();
+      const { setSEO } = useSEO();
       const pdfContent = ref(null);
   
       const state = reactive<ContentState>({
@@ -183,8 +185,6 @@
         pinned: false,
         euFundingEnabled: false
       });
-  
-      const database = new Databases(appw);
 
       // Computed Properties
       const contentId = computed(() => route.params.id as string);
@@ -256,8 +256,6 @@
           state.euFundingEnabled = mainContent.eu_funding_enabled || false;
 
           // Update global store for header
-          console.log('🔵 MDRenderer: eu_funding_enabled from DB:', mainContent.eu_funding_enabled);
-          console.log('🔵 MDRenderer: Setting store to:', state.euFundingEnabled);
           loadingStore.setCurrentPageEuFunding(state.euFundingEnabled);
 
           // Set localized content
@@ -268,8 +266,39 @@
           state.contentHu = mainContent.text_hu || '';
           state.contentEn = mainContent.text_en || '';
   
-          // Set document title
-          document.title = localizedTitle.value;
+          // Set document title + full SEO meta for crawlers/social after content load
+          const pageTitle = localizedTitle.value || 'Tehnička Škola Ada';
+          const plainDesc = String(localizedContent.value || '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 160);
+          document.title = pageTitle.includes('Tehnička') || pageTitle.includes('Škola')
+            ? pageTitle
+            : `${pageTitle} ~ Tehnička Škola Ada`;
+          setSEO({
+            title: pageTitle,
+            description: plainDesc || `Sadržaj sa sajta Tehničke škole Ada: ${pageTitle}`,
+            url: `https://tsada.edu.rs${route.fullPath}`,
+            type: 'article',
+            publishedTime: state.date,
+            modifiedTime: state.lastModified,
+            structuredData: {
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: pageTitle,
+              description: plainDesc || pageTitle,
+              datePublished: state.date,
+              dateModified: state.lastModified,
+              author: { '@type': 'Organization', name: 'Tehnička Škola Ada' },
+              publisher: {
+                '@type': 'EducationalOrganization',
+                name: 'Tehnička Škola Ada',
+                logo: { '@type': 'ImageObject', url: 'https://tsada.edu.rs/favicon.png' }
+              },
+              mainEntityOfPage: `https://tsada.edu.rs${route.fullPath}`
+            }
+          });
   
           // Handle gallery - kezeli mind a string ID-t (új Appwrite), mind az objektumot (régi)
           if (state.galleryFlag && mainContent.gallery) {
@@ -353,11 +382,13 @@
       };
   
       const animateTitle = () => {
-        gsap.fromTo(
-          '#render_title',
-          { opacity: 0, x: '150%' },
-          { duration: 1.5, opacity: 1, x: 0 }
-        );
+        import('gsap').then(({ default: gsap }) => {
+          gsap.fromTo(
+            '#render_title',
+            { opacity: 0, x: '150%' },
+            { duration: 1.5, opacity: 1, x: 0 }
+          );
+        });
       };
   
       // Watch for language changes

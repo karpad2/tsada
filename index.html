@@ -47,18 +47,10 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#0ea5e9">
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <!-- Preconnect only for critical first-party APIs (fonts are system / local MDI) -->
     <link rel="dns-prefetch" href="https://share.tsada.edu.rs">
-    <link rel="preconnect" href="https://cloud.appwrite.io" crossorigin>
-
-    <!-- Fonts with display=swap for performance -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://appwrite.tsada.edu.rs" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 
     <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
@@ -96,7 +88,26 @@
   <body>
     <div id="app"><!--app-html--></div>
     <script type="module" src="/src/main.ts"></script>
-    <noscript>You need to enable Javascript to run this website.</noscript>
+    <noscript>
+      <div style="max-width:720px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif">
+        <h1>Tehnička Škola Ada</h1>
+        <p>Tehnička škola Ada - najveća srednja stručna škola u opštini Ada. Mašinstvo, elektrotehnika, građevinarstvo.</p>
+        <nav>
+          <ul>
+            <li><a href="/">Početna</a></li>
+            <li><a href="/about/workers">Nastavno osoblje</a></li>
+            <li><a href="/about/classlist">Spisak razreda</a></li>
+            <li><a href="/about/timetable">Raspored časova</a></li>
+            <li><a href="/gallery">Galerija</a></li>
+            <li><a href="/documents">Dokumenta</a></li>
+            <li><a href="/contact">Kontakt</a></li>
+            <li><a href="/erasmus/apply">Erasmus+</a></li>
+          </ul>
+        </nav>
+        <p>Adresa: Moše Pijade 47, 24430 Ada, Srbija</p>
+        <p>Za punu funkcionalnost sajta potreban je JavaScript.</p>
+      </div>
+    </noscript>
     
     <!-- Error Message for Cache Issues with Countdown -->
     <div id="loadError" style="display: none; background: #ffcccb; padding: 10px; margin: 10px 0; text-align: center;">
@@ -111,15 +122,26 @@
       let countdownInterval;
       let countdownTime = 3; // seconds before auto reload
 
-      // Check if SPA loaded within a reasonable time
+      // Check if Vue SPA mounted (ignore static SEO prerender shells)
       window.addEventListener('load', function() {
         setTimeout(function() {
-          const essentialElement = document.querySelector('#app');
-          if (!essentialElement || essentialElement.innerHTML === '') {
-            document.getElementById('loadError').style.display = 'block';
-            startCountdown(); // Start countdown to automated repair
+          const app = document.querySelector('#app');
+          const vueMounted = app && (
+            app.querySelector('[data-v-app]') ||
+            app.__vue_app__ ||
+            (app.children.length > 0 && !document.getElementById('seo-prerender'))
+          );
+          // Only treat as failure if #app is empty or still only has SEO shell after timeout
+          const onlySeoShell = app && document.getElementById('seo-prerender') &&
+            !app.querySelector('[data-v-app]') && !app.__vue_app__;
+          if (!app || (!vueMounted && !document.getElementById('seo-prerender')) || onlySeoShell) {
+            // SEO shell alone is OK for crawlers; only show error if truly empty
+            if (!app || app.innerHTML.trim() === '') {
+              document.getElementById('loadError').style.display = 'block';
+              startCountdown();
+            }
           }
-        }, 3000); // 5-second timeout, adjust as necessary
+        }, 8000);
       });
 
       function startCountdown() {

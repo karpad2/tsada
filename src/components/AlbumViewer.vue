@@ -1,57 +1,73 @@
 <template>
   <section
     ref="scrollContainer"
-    class="text-gray-600 body-font p-5 overflow-x-hidden"
+    class="album-viewer page-shell text-gray-600 dark:text-gray-300 body-font overflow-x-hidden"
+    :class="{ 'p-2 sm:p-4': caption, 'p-0': !caption }"
     id="courses"
   >
-    <div class="container px-5 mx-auto">
+    <div :class="caption ? 'page-panel container !min-h-0' : 'px-1'">
       <!-- Header Section -->
-      <div v-if="caption" class="flex flex-wrap w-full mb-10">
-        <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
+      <div v-if="caption" class="page-header-row">
+        <div>
+          <h1 class="section-title !text-2xl sm:!text-3xl">
             {{ title }}
           </h1>
-          <div class="h-1 w-20 bg-sky-500 rounded"></div>
-          <p v-if="images.length > 0" class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
+          <div class="section-accent !w-20"></div>
+          <p v-if="images.length > 0" class="page-subtitle !mt-1">
             {{ images.length }} {{ $t("image") }}
           </p>
         </div>
+
+        <!-- Admin Controls -->
+        <div v-if="isAdmin" class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="glass-btn px-4 py-2 text-white text-sm font-medium rounded-full"
+            @click="editMode"
+          >
+            {{ $t('edit_gallery') }}
+          </button>
+          <button
+            type="button"
+            class="btn-ghost-glass text-sm"
+            :disabled="isDeleting"
+            @click="deleteBrokenImages"
+          >
+            <span v-if="isDeleting" class="inline-flex mr-1">
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            {{ isDeleting ? $t('deleting') : $t('delete_broken_images') }}
+          </button>
+        </div>
       </div>
 
-      <!-- Admin Controls -->
-      <div v-if="isAdmin" class="mb-5 mt-5 flex gap-2">
-        <VBtn @click="editMode">{{ $t('edit_gallery') }}</VBtn>
-        <VBtn 
-          @click="deleteBrokenImages"
-          :disabled="isDeleting"
-          class="relative"
-        >
-          <span v-if="isDeleting" class="mr-2">
-            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </span>
+      <!-- Admin Controls when no caption header -->
+      <div v-if="isAdmin && !caption" class="mb-4 flex flex-wrap gap-2">
+        <button type="button" class="glass-btn px-4 py-2 text-white text-sm font-medium rounded-full" @click="editMode">
+          {{ $t('edit_gallery') }}
+        </button>
+        <button type="button" class="btn-ghost-glass text-sm" :disabled="isDeleting" @click="deleteBrokenImages">
           {{ isDeleting ? $t('deleting') : $t('delete_broken_images') }}
-        </VBtn>
+        </button>
       </div>
 
       <!-- Image Gallery -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div class="album-grid">
         <div
           v-for="(course, index) in courses"
           :key="course.img"
-          class="gallery-item group relative cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-out"
+          class="album-item group relative cursor-pointer"
           @click="openImage(index)"
           @touchstart="onTouchStart"
           @touchend="onTouchEnd"
         >
-          <!-- Image -->
-          <figure class="relative overflow-hidden touch-target">
+          <figure class="relative overflow-hidden touch-target h-full">
             <img
               :src="course.img"
-              style="height: 280px"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-active:scale-105"
+              class="album-thumb w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-active:scale-105"
               loading="lazy"
               :alt="`${title} - Kép ${index + 1}`"
               @load="onImageLoad(course.img)"
@@ -60,63 +76,49 @@
             />
 
             <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300"></div>
-
-            <!-- Touch feedback -->
-            <div class="absolute inset-0 bg-white/20 opacity-0 group-active:opacity-100 transition-opacity duration-150 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
 
             <!-- Hover/Touch icon -->
             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-300">
-              <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full p-4 shadow-xl transform scale-90 group-hover:scale-100 group-active:scale-95 transition-transform duration-300">
-                <svg class="w-8 h-8 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="album-zoom-btn">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
 
             <!-- Image counter badge -->
-            <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-sm font-medium px-3 py-1 rounded-full touch-counter">
+            <div class="album-badge absolute top-3 left-3">
               {{ index + 1 }}
             </div>
 
-            <!-- Quick action button (mobile) -->
-            <div class="absolute top-3 right-3 md:hidden">
-              <button 
-                @click.stop="openImage(index)"
-                class="bg-black/70 backdrop-blur-sm text-white p-2 rounded-full touch-button transition-transform active:scale-90"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
-
             <!-- Loading overlay -->
-            <div 
+            <div
               v-if="!loadedImages.has(course.img) && !imageErrors.has(course.img)"
-              class="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+              class="absolute inset-0 album-loading flex items-center justify-center"
             >
               <div class="text-center">
-                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500 mx-auto mb-3"></div>
+                <div class="page-spinner mx-auto mb-3"></div>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">{{ $t("loading") }}...</p>
               </div>
             </div>
 
             <!-- Error state -->
-            <div 
+            <div
               v-if="imageErrors.has(course.img)"
-              class="absolute inset-0 bg-red-50 dark:bg-red-900/20 flex items-center justify-center"
+              class="absolute inset-0 bg-red-50/90 dark:bg-red-950/80 backdrop-blur-sm flex items-center justify-center"
             >
               <div class="text-center p-4">
-                <svg class="w-16 h-16 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 text-red-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                <p class="text-red-600 dark:text-red-400 text-sm font-medium">{{ $t("error_at_loading") }}</p>
-                <button 
+                <p class="text-red-600 dark:text-red-300 text-sm font-medium mb-2">{{ $t("error_at_loading") }}</p>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition-colors"
                   @click.stop="retryImage(course.img, index)"
-                  class="mt-2 px-3 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition-colors"
                 >
-                  Újrapróbálás
+                  {{ $t("retry") || 'Újrapróbálás' }}
                 </button>
               </div>
             </div>
@@ -125,40 +127,34 @@
       </div>
 
       <!-- Loading Skeletons -->
-      <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
+      <div v-if="isLoading" class="album-grid mt-4">
         <div
           v-for="n in limit"
           :key="`skeleton-${n}`"
-          class="bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 animate-pulse h-[280px] rounded-xl flex items-center justify-center"
+          class="album-skeleton animate-pulse"
         >
-          <div class="text-center">
-            <div class="w-16 h-16 bg-white/30 dark:bg-gray-600/30 rounded-full flex items-center justify-center mb-3 mx-auto">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div class="h-3 bg-white/40 dark:bg-gray-600/40 rounded w-20 mx-auto"></div>
-          </div>
+          <div class="w-12 h-12 rounded-full bg-sky-200/50 dark:bg-slate-600/50 mx-auto mb-2"></div>
+          <div class="h-2 w-16 mx-auto rounded bg-sky-200/40 dark:bg-slate-600/40"></div>
         </div>
       </div>
 
       <!-- Empty state -->
-      <div v-if="!isLoading && courses.length === 0" class="text-center py-16">
-        <div class="bg-gray-100 dark:bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+      <div v-if="!isLoading && courses.length === 0" class="page-state">
+        <div class="empty-icon mx-auto mb-4">
+          <svg class="w-10 h-10 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2"> {{$t("no_image_here")}}</h3>
-        <p class="text-gray-500 dark:text-gray-400"> {{ $t("this_gallery_empty") }}</p>
+        <h3 class="page-state-title">{{ $t("no_image_here") }}</h3>
+        <p class="page-state-text">{{ $t("this_gallery_empty") }}</p>
       </div>
 
       <!-- End indicator -->
       <div v-if="noMoreImages && courses.length > 0" class="text-center py-8">
-        <div class="flex items-center justify-center space-x-4 text-gray-400">
-          <div class="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-16"></div>
+        <div class="flex items-center justify-center space-x-4 text-gray-400 dark:text-gray-500">
+          <div class="h-px bg-gradient-to-r from-transparent via-sky-300/50 dark:via-sky-600/40 to-transparent w-16"></div>
           <span class="text-sm font-medium">{{ $t("gallery_end") }}</span>
-          <div class="h-px bg-gradient-to-l from-transparent via-gray-300 dark:via-gray-600 to-transparent w-16"></div>
+          <div class="h-px bg-gradient-to-l from-transparent via-sky-300/50 dark:via-sky-600/40 to-transparent w-16"></div>
         </div>
       </div>
     </div>
@@ -167,30 +163,31 @@
     <Teleport to="body">
       <div
         v-if="showViewer"
-        class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-sm"
+        class="album-lightbox fixed inset-0 z-[9999]"
         @click="closeViewer"
         @wheel="handleZoom"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
         @touchend="handleTouchEnd"
       >
-        <!-- Viewer Content -->
         <div class="relative w-full h-full flex items-center justify-center">
           <!-- Close Button -->
           <button
+            type="button"
+            class="lightbox-ctrl absolute top-4 right-4 z-10"
             @click="closeViewer"
-            class="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 touch-button"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          <!-- Navigation Buttons -->
+          <!-- Navigation -->
           <button
             v-if="currentImageIndex > 0"
+            type="button"
+            class="lightbox-ctrl absolute left-4 top-1/2 -translate-y-1/2 z-10"
             @click.stop="previousImage"
-            class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 touch-button"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -199,46 +196,33 @@
 
           <button
             v-if="currentImageIndex < courses.length - 1"
+            type="button"
+            class="lightbox-ctrl absolute right-4 top-1/2 -translate-y-1/2 z-10"
             @click.stop="nextImage"
-            class="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 touch-button"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
 
-          <!-- Image Counter -->
-          <div class="absolute top-4 left-4 z-10 bg-black/50 text-white px-4 py-2 rounded-full">
+          <!-- Counter -->
+          <div class="lightbox-pill absolute top-4 left-4 z-10">
             {{ currentImageIndex + 1 }} / {{ courses.length }}
           </div>
 
           <!-- Control Bar -->
-          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2 bg-black/50 rounded-full p-2">
-            <button
-              @click.stop="zoomOut"
-              class="text-white p-2 hover:bg-white/20 rounded-full transition-colors touch-button"
-              title="Kicsinyítés"
-            >
+          <div class="lightbox-toolbar absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+            <button type="button" class="lightbox-tool-btn" title="Kicsinyítés" @click.stop="zoomOut">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10h-6" />
               </svg>
             </button>
-
-            <button
-              @click.stop="resetZoom"
-              class="text-white p-2 hover:bg-white/20 rounded-full transition-colors touch-button"
-              title="Eredeti méret"
-            >
+            <button type="button" class="lightbox-tool-btn" title="Eredeti méret" @click.stop="resetZoom">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
               </svg>
             </button>
-
-            <button
-              @click.stop="zoomIn"
-              class="text-white p-2 hover:bg-white/20 rounded-full transition-colors touch-button"
-              title="Nagyítás"
-            >
+            <button type="button" class="lightbox-tool-btn" title="Nagyítás" @click.stop="zoomIn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
               </svg>
@@ -255,7 +239,7 @@
               v-if="currentImage"
               :src="currentImage.fullsize"
               :alt="`${title} - Kép ${currentImageIndex + 1}`"
-              class="max-w-none transition-transform duration-300 ease-out select-none"
+              class="max-w-full max-h-full object-contain transition-transform duration-300 ease-out select-none drop-shadow-2xl"
               :style="{
                 transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
                 transformOrigin: 'center center'
@@ -265,30 +249,20 @@
               @dragstart.prevent
             />
 
-            <!-- Viewer Loading -->
-            <div
-              v-if="viewerLoading"
-              class="absolute inset-0 flex items-center justify-center"
-            >
+            <div v-if="viewerLoading" class="absolute inset-0 flex items-center justify-center">
               <div class="text-center">
-                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+                <div class="page-spinner mx-auto mb-4 !border-white/30 !border-t-white"></div>
                 <p class="text-white text-lg">{{ $t("loading") }}...</p>
               </div>
             </div>
 
-            <!-- Viewer Error -->
-            <div
-              v-if="viewerError"
-              class="absolute inset-0 flex items-center justify-center"
-            >
+            <div v-if="viewerError" class="absolute inset-0 flex items-center justify-center">
               <div class="text-center">
-                <svg class="w-20 h-20 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
                 <p class="text-white text-lg mb-4">{{ $t("error_at_loading") }}</p>
                 <button
+                  type="button"
+                  class="px-4 py-2 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition-colors"
                   @click="retryViewerImage"
-                  class="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                 >
                   {{ $t("retry") }}
                 </button>
@@ -311,7 +285,7 @@ const database = new Databases(appw);
 const storage = new Storage(appw);
 
 export default defineComponent({
-  name: 'SlideModules',
+  name: 'AlbumViewer',
   props: {
     mode: { type: String, default: '' },
     caption: { type: Boolean, default: false },
@@ -329,7 +303,7 @@ export default defineComponent({
     noMoreImages: false,
     touchStartTime: 0,
     courses: [] as Array<{ img: string; fullsize: string; id: string; img_id: string }>,
-    
+
     // Viewer state
     showViewer: false,
     currentImageIndex: 0,
@@ -338,7 +312,7 @@ export default defineComponent({
     translateY: 0,
     viewerLoading: false,
     viewerError: false,
-    
+
     // Touch handling
     lastTouchDistance: 0,
     lastTouchX: 0,
@@ -346,7 +320,7 @@ export default defineComponent({
     isDragging: false,
     lastTouchTime: 0,
   }),
-  
+
   computed: {
     images(): string[] {
       return this.courses.map(course => course.img);
@@ -358,7 +332,6 @@ export default defineComponent({
   },
 
   watch: {
-    // Ha az id prop később érkezik meg (pl. async route), akkor is betöltjük
     id: {
       immediate: false,
       handler(newId) {
@@ -376,16 +349,14 @@ export default defineComponent({
     this.loadCourses();
     window.addEventListener('scroll', this.handleScroll, { passive: true });
     window.addEventListener('keydown', this.handleKeydown);
-
-    // Touch event optimization
     document.addEventListener('touchstart', () => {}, { passive: true });
   },
-  
+
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
     window.removeEventListener('keydown', this.handleKeydown);
   },
-  
+
   methods: {
     async loadCourses() {
       if (this.isLoading || this.noMoreImages || !this.id) return;
@@ -410,8 +381,6 @@ export default defineComponent({
           document.title = this.title;
         }
 
-        // A 'gallery' mező egy reláció - a Query.equal a kapcsolt dokumentum $id-jára működik
-        // Only show approved images publicly (non-admin users)
         const queries = [
           Query.equal('gallery', this.id),
           Query.offset(this.page * this.limit),
@@ -433,7 +402,6 @@ export default defineComponent({
 
         const newImages = await Promise.all(
           documents.map(async ({ $id, image_id }) => {
-            // Low-resolution thumbnail for gallery (600px for better mobile performance)
             const thumbnail = await storage.getFilePreview(
               config.gallery_pictures_storage,
               image_id,
@@ -450,7 +418,6 @@ export default defineComponent({
               'webp'
             );
 
-            // Higher-resolution image for viewer (1920px for better viewing experience)
             const fullsize = await storage.getFilePreview(
               config.gallery_pictures_storage,
               image_id,
@@ -507,16 +474,13 @@ export default defineComponent({
     },
 
     onTouchEnd() {
-      const touchDuration = Date.now() - this.touchStartTime;
-      if (touchDuration < 300) {
-        // Quick tap detected
-      }
+      // reserved for tap detection
     },
 
     async retryImage(src: string, index: number) {
       this.imageErrors.delete(src);
       this.loadedImages.delete(src);
-      
+
       const img = new Image();
       img.onload = () => this.onImageLoad(src);
       img.onerror = () => this.onImageError(src);
@@ -525,9 +489,8 @@ export default defineComponent({
 
     async deleteBrokenImages() {
       const brokenImages = this.images.filter((img) => !this.loadedImages.has(img) || this.imageErrors.has(img));
-      
+
       if (!brokenImages.length) {
-        console.log('No broken images found');
         return;
       }
 
@@ -549,8 +512,6 @@ export default defineComponent({
             this.imageErrors.delete(brokenImage);
           })
         );
-
-        console.log(`Deleted ${brokenImages.length} broken images`);
       } catch (error) {
         console.error('Failed to delete broken images:', error);
       } finally {
@@ -562,8 +523,6 @@ export default defineComponent({
       this.$router.push(`/admin/gallery-edit/${this.id}`);
     },
 
-    // ===== VIEWER METHODS =====
-    
     showImage(index: number) {
       this.currentImageIndex = index;
       this.resetZoom();
@@ -605,27 +564,27 @@ export default defineComponent({
     },
 
     resetZoom() {
-      this.scale = 1;
+      this.scale = 0.8;
       this.translateX = 0;
       this.translateY = 0;
     },
 
     constrainPosition() {
       if (!this.$refs.imageContainer) return;
-      
+
       const container = this.$refs.imageContainer as HTMLElement;
       const containerRect = container.getBoundingClientRect();
-      
+
       const maxTranslateX = Math.max(0, (containerRect.width * this.scale - containerRect.width) / 2);
       const maxTranslateY = Math.max(0, (containerRect.height * this.scale - containerRect.height) / 2);
-      
+
       this.translateX = Math.max(-maxTranslateX, Math.min(maxTranslateX, this.translateX));
       this.translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, this.translateY));
     },
 
     handleKeydown(e: KeyboardEvent) {
       if (!this.showViewer) return;
-      
+
       switch (e.key) {
         case 'Escape':
           this.closeViewer();
@@ -646,7 +605,6 @@ export default defineComponent({
           this.zoomOut();
           break;
         case '0':
-          e.preventDefault();
           this.resetZoom();
           break;
       }
@@ -655,7 +613,7 @@ export default defineComponent({
     handleZoom(e: WheelEvent) {
       if (!this.showViewer) return;
       e.preventDefault();
-      
+
       if (e.deltaY < 0) {
         this.zoomIn();
       } else {
@@ -663,75 +621,66 @@ export default defineComponent({
       }
     },
 
-    // Touch handling for mobile
     handleTouchStart(e: TouchEvent) {
-      if (e.touches.length === 1) {
-        this.isDragging = true;
-        this.lastTouchX = e.touches[0].clientX;
-        this.lastTouchY = e.touches[0].clientY;
-        this.lastTouchTime = Date.now();
-      } else if (e.touches.length === 2) {
-        // Pinch to zoom
-        this.isDragging = false;
+      if (!this.showViewer) return;
+
+      if (e.touches.length === 2) {
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
-        this.lastTouchDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+        this.lastTouchDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
         );
+      } else if (e.touches.length === 1) {
+        this.lastTouchX = e.touches[0].clientX;
+        this.lastTouchY = e.touches[0].clientY;
+        this.isDragging = true;
+        this.lastTouchTime = Date.now();
       }
     },
 
     handleTouchMove(e: TouchEvent) {
+      if (!this.showViewer) return;
       e.preventDefault();
-      
-      if (e.touches.length === 1 && this.isDragging) {
-        // Single finger drag
-        const deltaX = e.touches[0].clientX - this.lastTouchX;
-        const deltaY = e.touches[0].clientY - this.lastTouchY;
-        
-        this.translateX += deltaX;
-        this.translateY += deltaY;
-        
-        this.lastTouchX = e.touches[0].clientX;
-        this.lastTouchY = e.touches[0].clientY;
-        
-        this.constrainPosition();
-      } else if (e.touches.length === 2) {
-        // Pinch to zoom
+
+      if (e.touches.length === 2) {
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
-        const currentDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
         );
-        
+
         if (this.lastTouchDistance > 0) {
-          const scaleChange = currentDistance / this.lastTouchDistance;
+          const scaleChange = distance / this.lastTouchDistance;
           this.scale = Math.max(0.1, Math.min(5, this.scale * scaleChange));
         }
-        
-        this.lastTouchDistance = currentDistance;
+        this.lastTouchDistance = distance;
+      } else if (e.touches.length === 1 && this.isDragging && this.scale > 1) {
+        const deltaX = e.touches[0].clientX - this.lastTouchX;
+        const deltaY = e.touches[0].clientY - this.lastTouchY;
+
+        this.translateX += deltaX;
+        this.translateY += deltaY;
         this.constrainPosition();
+
+        this.lastTouchX = e.touches[0].clientX;
+        this.lastTouchY = e.touches[0].clientY;
       }
     },
 
     handleTouchEnd(e: TouchEvent) {
+      if (!this.showViewer) return;
+
       if (e.touches.length === 0) {
-        // Check for double tap
-        const touchDuration = Date.now() - this.lastTouchTime;
-        if (touchDuration < 300 && !this.isDragging) {
-          // Double tap to zoom
-          if (this.scale > 1) {
-            this.resetZoom();
-          } else {
-            this.scale = 2;
-            this.constrainPosition();
-          }
-        }
-        
         this.isDragging = false;
         this.lastTouchDistance = 0;
+
+        // Double-tap detection
+        const now = Date.now();
+        if (now - this.lastTouchTime < 300 && e.changedTouches.length === 1) {
+          // could toggle zoom - kept simple
+        }
       }
     },
 
@@ -746,10 +695,9 @@ export default defineComponent({
     },
 
     retryViewerImage() {
+      this.viewerLoading = true;
+      this.viewerError = false;
       if (this.currentImage) {
-        this.viewerLoading = true;
-        this.viewerError = false;
-        // Force image reload with cache busting
         const img = new Image();
         img.onload = () => this.onViewerImageLoad();
         img.onerror = () => this.onViewerImageError();
@@ -761,207 +709,181 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Touch-optimized gallery styles */
-.gallery-item {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.gallery-item:hover {
-  z-index: 10;
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+@media (min-width: 640px) {
+  .album-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 768px) {
+  .album-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .album-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px) {
+  .album-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
-/* Touch feedback */
-.gallery-item:active {
-  transform: translateY(-4px) scale(1.01);
-  transition-duration: 0.1s;
+.album-item {
+  height: 260px;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(14, 165, 233, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-/* Touch target optimization */
+.dark .album-item {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.album-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 12px 32px rgba(14, 165, 233, 0.18);
+}
+
+.album-thumb {
+  min-height: 260px;
+}
+
+.album-badge {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.album-zoom-btn {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+  transform: scale(0.9);
+  transition: transform 0.25s ease;
+}
+
+.group:hover .album-zoom-btn {
+  transform: scale(1);
+}
+
+.album-loading {
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.9), rgba(241, 245, 249, 0.9));
+}
+
+.dark .album-loading {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+}
+
+.album-skeleton {
+  height: 260px;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.12);
+}
+
+.dark .album-skeleton {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.empty-icon {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+/* Lightbox */
+.album-lightbox {
+  background: rgba(2, 6, 23, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lightbox-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.lightbox-ctrl:hover {
+  background: rgba(14, 165, 233, 0.45);
+  transform: scale(1.05);
+}
+
+.lightbox-pill {
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.lightbox-toolbar {
+  padding: 0.35rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+.lightbox-tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lightbox-tool-btn:hover {
+  background: rgba(14, 165, 233, 0.45);
+}
+
 .touch-target {
-  min-height: 280px;
-  position: relative;
-}
-
-.touch-button {
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   -webkit-tap-highlight-color: transparent;
-}
-
-.touch-counter {
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Improved mobile responsiveness */
-@media (max-width: 640px) {
-  .gallery-item {
-    transform: none;
-    transition: box-shadow 0.2s ease;
-  }
-  
-  .gallery-item:hover {
-    transform: none;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .gallery-item:active {
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
-  }
-  
-  .touch-target {
-    height: 250px;
-  }
-}
-
-/* Disable transitions for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .gallery-item,
-  .gallery-item:hover,
-  .gallery-item:active {
-    transition: none;
-    transform: none;
-  }
-}
-
-/* Improved glass effect */
-.gallery-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.gallery-item:hover::before {
-  opacity: 1;
-}
-
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-/* Loading animation improvements */
-@keyframes pulse-smooth {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.animate-pulse {
-  animation: pulse-smooth 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Better focus states for accessibility */
-.gallery-item:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-.touch-button:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Viewer specific styles */
-.cursor-move {
-  cursor: move;
-}
-
-/* Prevent text selection in viewer */
-.select-none {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Backdrop blur support check */
-@supports (backdrop-filter: blur(10px)) {
-  .backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-  }
-}
-
-/* Touch device specific improvements */
-@media (hover: none) and (pointer: coarse) {
-  .gallery-item:hover {
-    transform: none;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Larger touch targets on mobile */
-  .touch-button {
-    min-width: 48px;
-    min-height: 48px;
-  }
-}
-
-/* High DPI displays */
-@media (min-resolution: 2dppx) {
-  .gallery-item img {
-    image-rendering: crisp-edges;
-  }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-  .gallery-item::before {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-  }
-}
-
-/* Animation performance optimization */
-.gallery-item,
-.gallery-item img {
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-/* Remove will-change after animation */
-.gallery-item:not(:hover) {
-  will-change: auto;
 }
 </style>

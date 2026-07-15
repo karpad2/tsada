@@ -9,7 +9,7 @@ import { i18nService } from '@/services/i18n/I18nService'
 import { trackUserInteraction, trackLanguageChange, trackError } from '@/utils/analytics'
 import { RoleService } from '@/services/RoleService'
 import type { NavigationData, MenuItem } from '@/services/navigation/NavigationService'
-import type { MenuConfig, MenuGroupDefinition, ResolvedMenuGroup } from '@/types/MenuTypes'
+import type { MenuGroupDefinition, ResolvedMenuGroup } from '@/types/MenuTypes'
 
 export interface Language {
   code: string
@@ -32,8 +32,7 @@ export function useHeader() {
   // i18n
   const { t, locale } = useI18n()
 
-  // Menu config
-  const menuConfig = ref<MenuConfig | null>(null)
+  // Menu registry (from menu.json)
   const effectiveRegistry = ref<MenuGroupDefinition[]>([])
 
   // Reactive state
@@ -127,11 +126,8 @@ export function useHeader() {
       i18nService.setCurrentLanguage(loadingStore.language)
       setCurrentLanguageFlag(state.currentLanguage)
 
-      // Load navigation data and menu config in parallel
-      const [response, savedMenuConfig] = await Promise.all([
-        navigationService.getNavigationData(forceRefresh),
-        menuConfigService.loadMenuConfig()
-      ])
+      // Load navigation data
+      const response = await navigationService.getNavigationData(forceRefresh)
 
       if (response.success && response.data) {
         state.navigationData = response.data
@@ -139,9 +135,8 @@ export function useHeader() {
         throw new Error(response.error || 'Failed to load navigation data')
       }
 
-      // Apply menu config
-      menuConfig.value = savedMenuConfig
-      effectiveRegistry.value = menuConfigService.getEffectiveRegistry(savedMenuConfig)
+      // Load menu from JSON
+      effectiveRegistry.value = menuConfigService.getEffectiveRegistry()
     } catch (error: any) {
       console.error('Error initializing header:', error)
       state.error = error.message

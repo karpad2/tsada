@@ -1,5 +1,5 @@
-import { ID } from 'appwrite';
-import { appwriteService } from '@/appwrite';
+import { ID, Query } from 'appwrite';
+import { appwriteService, databases as db, storage as storageInstance, config as appwConfig } from '@/appwrite';
 import { fileManager, type FileUploadResult, type FileUploadOptions } from '@/appwrite/FileManagement';
 import { notify } from '@kyvg/vue3-notification';
 
@@ -400,11 +400,6 @@ export class GalleryManager {
 
     async addImageToGallery(galleryId: string, imageId: string): Promise<void> {
         try {
-            console.log('GalleryManager - Adding image to gallery:', {
-                galleryId,
-                imageId,
-                collection: this.config.gallery_images || this.config.album_images
-            });
             await this.documentManager.create(
                 this.config.gallery_images || this.config.album_images,
                 {
@@ -413,7 +408,6 @@ export class GalleryManager {
                 },
                 imageId
             );
-            console.log('GalleryManager - Successfully added image to gallery');
         } catch (error: any) {
             console.error('Error adding image to gallery:', error);
             throw error;
@@ -602,16 +596,15 @@ export interface EventData {
 
 // Fetch TV content (slides and events)
 export const fetchTVContent = async (): Promise<{ slides: SlideData[], events: EventData[] }> => {
-    const database = new Databases(appw);
-    const storage = new Storage(appw);
-
     try {
-        const contentData = await database.listDocuments(config.website_db, config.tv_slides);
+        const contentData = await db.listDocuments(appwConfig.website_db, appwConfig.tv_slides, [
+            Query.limit(100),
+        ]);
         const slides: SlideData[] = [];
         const events: EventData[] = [];
 
         for (const doc of contentData.documents) {
-            const imageUrl = doc.image ? storage.getFileView(config.website_images, doc.image).toString() : undefined;
+            const imageUrl = doc.image ? storageInstance.getFileView(appwConfig.website_images, doc.image).toString() : undefined;
 
             if (doc.type === 'slide') {
                 slides.push({
@@ -644,8 +637,6 @@ export const fetchTVContent = async (): Promise<{ slides: SlideData[], events: E
 
 // Save slide
 export const saveSlide = async (slideData: Partial<SlideData>, slideId?: string): Promise<string> => {
-    const database = new Databases(appw);
-
     const data = {
         type: 'slide',
         title: slideData.title || '',
@@ -656,10 +647,10 @@ export const saveSlide = async (slideData: Partial<SlideData>, slideId?: string)
 
     try {
         if (slideId) {
-            await database.updateDocument(config.website_db, config.tv_slides, slideId, data);
+            await db.updateDocument(appwConfig.website_db, appwConfig.tv_slides, slideId, data);
             return slideId;
         } else {
-            const result = await database.createDocument(config.website_db, config.tv_slides, ID.unique(), data);
+            const result = await db.createDocument(appwConfig.website_db, appwConfig.tv_slides, ID.unique(), data);
             return result.$id;
         }
     } catch (error) {
@@ -670,8 +661,6 @@ export const saveSlide = async (slideData: Partial<SlideData>, slideId?: string)
 
 // Save event
 export const saveEvent = async (eventData: Partial<EventData>, eventId?: string): Promise<string> => {
-    const database = new Databases(appw);
-
     const data = {
         type: 'event',
         title: eventData.title || '',
@@ -682,10 +671,10 @@ export const saveEvent = async (eventData: Partial<EventData>, eventId?: string)
 
     try {
         if (eventId) {
-            await database.updateDocument(config.website_db, config.tv_slides, eventId, data);
+            await db.updateDocument(appwConfig.website_db, appwConfig.tv_slides, eventId, data);
             return eventId;
         } else {
-            const result = await database.createDocument(config.website_db, config.tv_slides, ID.unique(), data);
+            const result = await db.createDocument(appwConfig.website_db, appwConfig.tv_slides, ID.unique(), data);
             return result.$id;
         }
     } catch (error) {
@@ -696,10 +685,8 @@ export const saveEvent = async (eventData: Partial<EventData>, eventId?: string)
 
 // Delete slide or event
 export const deleteTVContent = async (contentId: string): Promise<void> => {
-    const database = new Databases(appw);
-
     try {
-        await database.deleteDocument(config.website_db, config.tv_slides, contentId);
+        await db.deleteDocument(appwConfig.website_db, appwConfig.tv_slides, contentId);
     } catch (error) {
         console.error("Error deleting TV content:", error);
         throw error;
@@ -708,11 +695,9 @@ export const deleteTVContent = async (contentId: string): Promise<void> => {
 
 // Update slide/event order
 export const updateSlideOrder = async (slides: SlideData[]): Promise<void> => {
-    const database = new Databases(appw);
-
     try {
         const updatePromises = slides.map((slide, index) =>
-            database.updateDocument(config.website_db, config.tv_slides, slide.id, {
+            db.updateDocument(appwConfig.website_db, appwConfig.tv_slides, slide.id, {
                 sorrend: index.toString()
             })
         );

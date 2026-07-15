@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-screen w-full overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <div class="relative h-screen w-full overflow-hidden bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900">
     <!-- Animated Background Particles -->
     <div class="absolute inset-0 overflow-hidden">
       <div class="particles-container">
@@ -22,7 +22,7 @@
                 <!-- Image Section with Enhanced Styling -->
                 <div v-if="slides[currentSlide].image" class="w-full lg:w-1/2 image-container">
                   <div class="relative overflow-hidden rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-pink-500/20 z-10"></div>
+                    <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/20 to-cyan-500/20 z-10"></div>
                     <img
                       :src="slides[currentSlide].image"
                       alt="Slide Image"
@@ -58,7 +58,7 @@
     </div>
 
     <!-- Enhanced News Ticker with Glassmorphism -->
-    <div class="absolute bottom-0 w-full z-20 news-ticker-container backdrop-blur-md bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-purple-900/40 border-t border-white/10">
+    <div class="absolute bottom-0 w-full z-20 news-ticker-container backdrop-blur-md bg-gradient-to-r from-sky-900/40 via-slate-900/40 to-sky-900/40 border-t border-sky-400/10">
       <div class="flex items-center py-6 px-8">
         <div class="logo-container flex-shrink-0 mr-6">
           <img src="@/assets/tsada_logo.png" alt="School Logo" class="h-16 w-auto drop-shadow-lg" loading="lazy" width="64" height="64" />
@@ -88,7 +88,7 @@
     <div class="absolute bottom-24 right-8 z-20">
       <div class="glass-pill px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
         <div class="text-3xl md:text-4xl font-bold text-white tracking-wide">
-          {{ currentDate }} <span class="text-purple-300">•</span> {{ currentTime }}
+          {{ currentDate }} <span class="text-sky-300">•</span> {{ currentTime }}
         </div>
       </div>
     </div>
@@ -115,14 +115,14 @@
                   alt="Event Image"
                   class="w-full h-32 object-cover"
                 />
-                <div v-else class="w-full h-32 bg-gradient-to-br from-purple-500/30 to-pink-500/30 flex items-center justify-center rounded-xl">
+                <div v-else class="w-full h-32 bg-gradient-to-br from-sky-500/30 to-sky-400/30 flex items-center justify-center rounded-xl">
                   <span class="text-white/50 text-sm">{{ $t("noimage") }}</span>
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
               </div>
 
               <h4 class="text-xl font-bold text-white mb-2" v-html="event.title"></h4>
-              <p class="text-purple-300 text-sm mb-2 flex items-center">
+              <p class="text-sky-300 text-sm mb-2 flex items-center">
                 <span class="mr-2">📅</span>{{ event.date }}
               </p>
               <p class="text-base text-white/80 line-clamp-3" v-html="event.description"></p>
@@ -138,7 +138,9 @@
 import { onMounted } from 'vue';
 import dayjs from '@/utils/dayjs';
 import { Databases, Query, Storage } from 'appwrite';
-import { config, appw } from "@/appwrite"; 
+import { config, appw } from "@/appwrite";
+
+const database = new Databases(appw);
 
 export default {
   data() {
@@ -150,7 +152,7 @@ export default {
       slides: [],
       newsItems: [],
       events: [], 
-      slideBackgrounds: ['#f87171', '#60a5fa', '#34d399', '#a78bfa', '#fbbf24'],
+      slideBackgrounds: ['#f87171', '#60a5fa', '#34d399', '#38bdf8', '#fbbf24'],
       storage: null
     }
   },
@@ -159,7 +161,7 @@ export default {
   },
   methods: {
     getParticleStyle(index) {
-      const colors = ['#8b5cf6', '#ec4899', '#6366f1', '#a855f7', '#d946ef'];
+      const colors = ['#0ea5e9', '#38bdf8', '#06b6d4', '#22d3ee', '#7dd3fc'];
       const size = Math.random() * 4 + 2;
       const duration = Math.random() * 20 + 10;
       const delay = Math.random() * 5;
@@ -191,7 +193,6 @@ export default {
       }
     },
     async fetchContent() {
-      const database = new Databases(appw);
       try {
         const contentData = await database.listDocuments(config.website_db, config.tv_slides, [
           Query.orderAsc("sorrend")
@@ -224,16 +225,16 @@ export default {
       }
     },
     async fetchNewsItems() {
-      const database = new Databases(appw);
       try {
-        const newsData = await database.listDocuments(config.website_db, config.tv_slides);
+        const newsData = await database.listDocuments(config.website_db, config.tv_slides, [
+          Query.limit(100),
+        ]);
         this.newsItems = newsData.documents.map(doc => doc.news_text);
       } catch (error) {
         console.error("Error fetching news:", error);
       }
     },
     async fetchTemperature() {
-      const database = new Databases(appw);
       try {
         let k = await database.getDocument(config.website_db, config.general_settings, "temperature");
         this.currentTemperature = k.setting_data;
@@ -309,14 +310,14 @@ export default {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow:
-    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    0 8px 32px 0 rgba(14, 165, 233, 0.18),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
+  box-shadow: 0 12px 48px 0 rgba(14, 165, 233, 0.28);
 }
 
 .glass-pill {
@@ -381,19 +382,19 @@ export default {
    GRADIENT TEXT EFFECTS
    ============================================ */
 .text-gradient {
-  background: linear-gradient(135deg, #fff 0%, #e0e7ff 50%, #c7d2fe 100%);
+  background: linear-gradient(135deg, #fff 0%, #e0f2fe 50%, #bae6fd 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+  text-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
 }
 
 .text-gradient-alt {
-  background: linear-gradient(135deg, #fbbf24 0%, #f472b6 50%, #a78bfa 100%);
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #22d3ee 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+  text-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
 }
 
 /* ============================================
@@ -402,7 +403,7 @@ export default {
 .divider-line {
   height: 4px;
   width: 100px;
-  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  background: linear-gradient(90deg, #0ea5e9, #22d3ee);
   border-radius: 2px;
   animation: divider-grow 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
 }
@@ -432,8 +433,8 @@ export default {
 .progress-dot.active {
   width: 40px;
   border-radius: 6px;
-  background: linear-gradient(90deg, #8b5cf6, #ec4899);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.6);
 }
 
 /* ============================================
@@ -469,10 +470,10 @@ export default {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background: linear-gradient(135deg, #fbbf24, #f472b6);
+  background: linear-gradient(135deg, #38bdf8, #22d3ee);
   border-radius: 50%;
   margin-right: 12px;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
 }
 
 /* Double the content for seamless loop */
@@ -516,13 +517,13 @@ export default {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #8b5cf6, #ec4899);
+  background: linear-gradient(180deg, #0ea5e9, #38bdf8);
   border-radius: 10px;
   transition: background 0.3s;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #7c3aed, #db2777);
+  background: linear-gradient(180deg, #0284c7, #0ea5e9);
 }
 
 /* ============================================

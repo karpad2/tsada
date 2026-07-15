@@ -1,78 +1,71 @@
 <template>
-    <v-container fluid class="gallery-editor pa-6">
+    <div class="page-shell">
+    <div class="page-panel container">
+    <v-container fluid class="gallery-editor pa-0">
         <!-- Page Header -->
         <v-row>
             <v-col>
-                <v-card elevation="2" class="header-card mb-6" rounded>
-                    <v-card-title class="d-flex align-center bg-primary text-white pa-4">
-                        <v-icon left size="large">mdi-image-multiple</v-icon>
-                        <span class="text-h5">{{ $t('gallery_editor') }}</span>
-                        <v-spacer />
+                <div class="page-header mb-2">
+                    <div class="d-flex align-center flex-wrap gap-3">
+                        <h1 class="section-title !text-2xl sm:!text-3xl !mb-0">{{ $t('gallery_editor') }}</h1>
                         <v-chip
                             v-if="!isPhotographer"
                             :color="visible ? 'success' : 'warning'"
                             :prepend-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
                             variant="elevated"
+                            size="small"
                         >
                             {{ visible ? $t('visible') : $t('hidden') }}
                         </v-chip>
-                    </v-card-title>
+                    </div>
+                    <div class="section-accent !w-20"></div>
+                </div>
 
-                    <v-card-text class="pa-4">
-                        <!-- Quick Actions -->
-                        <div class="d-flex flex-wrap gap-3 align-center">
-                            <v-switch
-                                v-if="!isPhotographer"
-                                v-model="visible"
-                                :label="$t('make_visible')"
-                                color="success"
-                                inset
-                                hide-details
-                                @change="save"
-                            />
-
-                            <v-divider v-if="!isPhotographer" vertical class="mx-2" />
-
-                            <v-btn
-                                v-if="!isPhotographer"
-                                @click="save"
-                                color="success"
-                                size="large"
-                                prepend-icon="mdi-content-save"
-                                variant="elevated"
-                            >
-                                {{ $t('save_changes') }}
-                            </v-btn>
-
-                            <v-btn
-                                v-if="!isPhotographer"
-                                @click="delete_content"
-                                color="error"
-                                size="large"
-                                prepend-icon="mdi-delete"
-                                variant="outlined"
-                            >
-                                {{ $t('delete_gallery') }}
-                            </v-btn>
-
-                            <v-spacer />
-
-                            <!-- Gallery Statistics -->
-                            <div class="d-flex gap-4">
-                                <v-chip color="info" prepend-icon="mdi-image">
-                                    {{ images.length }} {{ $t('images') }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="default_image"
-                                    color="success"
-                                    prepend-icon="mdi-star"
-                                >
-                                    {{ $t('has_default') }}
-                                </v-chip>
-                            </div>
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <div class="editor-toolbar mb-6">
+                    <div class="editor-toolbar-switches">
+                        <v-switch
+                            v-if="!isPhotographer"
+                            v-model="visible"
+                            :label="$t('make_visible')"
+                            color="success"
+                            inset
+                            density="compact"
+                            hide-details
+                            @change="save"
+                        />
+                        <v-chip color="info" prepend-icon="mdi-image" size="small" variant="tonal">
+                            {{ images.length }} {{ $t('images') }}
+                        </v-chip>
+                        <v-chip
+                            v-if="default_image"
+                            color="success"
+                            prepend-icon="mdi-star"
+                            size="small"
+                            variant="tonal"
+                        >
+                            {{ $t('has_default') }}
+                        </v-chip>
+                    </div>
+                    <div class="editor-toolbar-actions">
+                        <v-btn
+                            v-if="!isPhotographer"
+                            @click="save"
+                            color="success"
+                            prepend-icon="mdi-content-save"
+                        >
+                            {{ $t('save_changes') }}
+                        </v-btn>
+                        <v-btn
+                            v-if="!isPhotographer"
+                            @click="delete_content"
+                            color="error"
+                            prepend-icon="mdi-delete"
+                            variant="outlined"
+                        >
+                            {{ $t('delete_gallery') }}
+                        </v-btn>
+                    </div>
+                </div>
             </v-col>
         </v-row>
 
@@ -80,8 +73,8 @@
         <v-row>
             <!-- File Upload Section -->
             <v-col cols="12" lg="6">
-                <v-card elevation="2" rounded>
-                    <v-card-title class="bg-primary text-white">
+                <v-card elevation="0" rounded="lg">
+                    <v-card-title class="editor-card-header">
                         <v-icon left>mdi-cloud-upload</v-icon>
                         {{ $t('file_upload') }}
                     </v-card-title>
@@ -114,16 +107,17 @@
 
             <!-- Language Fields Section -->
             <v-col v-if="!isPhotographer" cols="12" lg="6">
-                <v-card elevation="2" rounded class="language-card">
-                    <v-card-title class="bg-secondary text-white">
+                <v-card elevation="0" rounded="lg" class="language-card">
+                    <v-card-title class="editor-card-header">
                         <v-icon left>mdi-translate</v-icon>
                         {{ $t('multilanguage_content') }}
                     </v-card-title>
 
                     <v-card-text class="pa-6">
                         <!-- Serbian Fields -->
-                        <div class="mb-4">
-                            <h3 class="text-subtitle-1 mb-2">{{ $t('serbian') }}</h3>
+                        <div class="mb-4 editor-section !p-0 !mb-4 overflow-hidden">
+                            <div class="editor-lang-header lang-srb pa-3">{{ $t('serbian') }}</div>
+                            <div class="pa-3">
                             <v-text-field
                                 @change="save"
                                 v-model="title_rs"
@@ -141,11 +135,13 @@
                                 variant="outlined"
                                 hide-details="auto"
                             />
+                            </div>
                         </div>
 
                         <!-- Hungarian Fields -->
-                        <div class="mb-4">
-                            <h3 class="text-subtitle-1 mb-2">{{ $t('hungarian') }}</h3>
+                        <div class="mb-4 editor-section !p-0 !mb-4 overflow-hidden">
+                            <div class="editor-lang-header lang-hu pa-3">{{ $t('hungarian') }}</div>
+                            <div class="pa-3">
                             <v-text-field
                                 v-model="title_hu"
                                 :counter="100"
@@ -163,11 +159,13 @@
                                 variant="outlined"
                                 hide-details="auto"
                             />
+                            </div>
                         </div>
 
                         <!-- English Fields -->
-                        <div>
-                            <h3 class="text-subtitle-1 mb-2">{{ $t('english') }}</h3>
+                        <div class="editor-section !p-0 !mb-0 overflow-hidden">
+                            <div class="editor-lang-header lang-en pa-3">{{ $t('english') }}</div>
+                            <div class="pa-3">
                             <v-text-field
                                 v-model="title_en"
                                 :counter="100"
@@ -185,6 +183,7 @@
                                 variant="outlined"
                                 hide-details="auto"
                             />
+                            </div>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -194,274 +193,241 @@
         <!-- Pending Images Section (Admin/Editor only) -->
         <v-row v-if="!isPhotographer && pendingImages.length > 0">
             <v-col>
-                <v-card elevation="2" rounded>
-                    <v-card-title class="bg-warning text-white d-flex align-center">
-                        <v-icon left>mdi-clock-outline</v-icon>
-                        {{ $t('pending_approval') }}
-                        <v-spacer />
-                        <v-chip color="white" variant="elevated" text-color="warning" class="mr-3">
-                            {{ pendingImages.length }} {{ $t('images') }}
-                        </v-chip>
+                <div class="editor-section !p-0 overflow-hidden">
+                    <div class="ge-section-header ge-section-header--warning">
+                        <div class="d-flex align-center gap-2">
+                            <v-icon>mdi-clock-outline</v-icon>
+                            <span class="font-weight-bold">{{ $t('pending_approval') }}</span>
+                            <v-chip color="white" variant="elevated" text-color="warning" size="small">
+                                {{ pendingImages.length }} {{ $t('images') }}
+                            </v-chip>
+                        </div>
                         <v-btn
                             @click="approve_all"
                             color="success"
                             size="small"
                             prepend-icon="mdi-check-all"
-                            variant="elevated"
                         >
                             {{ $t('approve_all') }}
                         </v-btn>
-                    </v-card-title>
-
-                    <v-card-text class="pa-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    </div>
+                    <div class="pa-4">
+                        <div class="ge-image-grid">
                             <div
                                 v-for="image in pendingImages"
                                 :key="image.img_id"
-                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-orange-300"
+                                class="ge-image-card border-amber"
                             >
                                 <figure class="relative">
-                                    <img
-                                        :src="image.img"
-                                        alt="Pending image"
-                                        class="w-full h-48 object-cover"
-                                    />
-                                    <div class="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                        {{ $t("pending") }}
-                                    </div>
+                                    <img :src="image.img" alt="Pending image" class="ge-thumb" />
+                                    <div class="ge-badge ge-badge--amber">{{ $t("pending") }}</div>
                                 </figure>
-
-                                <div class="p-4">
-                                    <div class="flex gap-2 justify-end">
-                                        <v-btn
-                                            @click="approve_image(image.doc_id)"
-                                            size="small"
-                                            color="success"
-                                            variant="tonal"
-                                            prepend-icon="mdi-check"
-                                        >
-                                            {{ $t("approve") }}
-                                        </v-btn>
-                                        <v-btn
-                                            @click="reject_image(image.img_id, image.doc_id)"
-                                            size="small"
-                                            color="error"
-                                            variant="tonal"
-                                            prepend-icon="mdi-close"
-                                        >
-                                            {{ $t("reject") }}
-                                        </v-btn>
-                                    </div>
+                                <div class="ge-card-actions">
+                                    <v-btn
+                                        @click="approve_image(image.doc_id)"
+                                        size="small"
+                                        color="success"
+                                        variant="tonal"
+                                        prepend-icon="mdi-check"
+                                    >
+                                        {{ $t("approve") }}
+                                    </v-btn>
+                                    <v-btn
+                                        @click="reject_image(image.img_id, image.doc_id)"
+                                        size="small"
+                                        color="error"
+                                        variant="tonal"
+                                        prepend-icon="mdi-close"
+                                    >
+                                        {{ $t("reject") }}
+                                    </v-btn>
                                 </div>
                             </div>
                         </div>
-                    </v-card-text>
-                </v-card>
+                    </div>
+                </div>
             </v-col>
         </v-row>
 
         <!-- Delete Requested Images Section (Admin/Editor only) -->
         <v-row v-if="!isPhotographer && deleteRequestedImages.length > 0">
             <v-col>
-                <v-card elevation="2" rounded>
-                    <v-card-title class="bg-error text-white d-flex align-center">
-                        <v-icon left>mdi-delete-clock</v-icon>
-                        {{ $t('delete_requested') }}
-                        <v-spacer />
-                        <v-chip color="white" variant="elevated" text-color="error">
-                            {{ deleteRequestedImages.length }} {{ $t('images') }}
-                        </v-chip>
-                    </v-card-title>
-
-                    <v-card-text class="pa-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="editor-section !p-0 overflow-hidden">
+                    <div class="ge-section-header ge-section-header--error">
+                        <div class="d-flex align-center gap-2">
+                            <v-icon>mdi-delete-clock</v-icon>
+                            <span class="font-weight-bold">{{ $t('delete_requested') }}</span>
+                            <v-chip color="white" variant="elevated" text-color="error" size="small">
+                                {{ deleteRequestedImages.length }} {{ $t('images') }}
+                            </v-chip>
+                        </div>
+                    </div>
+                    <div class="pa-4">
+                        <div class="ge-image-grid">
                             <div
                                 v-for="image in deleteRequestedImages"
                                 :key="image.img_id"
-                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-red-300"
+                                class="ge-image-card border-red"
                             >
                                 <figure class="relative">
-                                    <img
-                                        :src="image.img"
-                                        alt="Delete requested image"
-                                        class="w-full h-48 object-cover opacity-70"
-                                    />
-                                    <div class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                        {{ $t("delete_requested") }}
-                                    </div>
+                                    <img :src="image.img" alt="Delete requested image" class="ge-thumb opacity-70" />
+                                    <div class="ge-badge ge-badge--red">{{ $t("delete_requested") }}</div>
                                 </figure>
-
-                                <div class="p-4">
-                                    <div class="flex gap-2 justify-end">
-                                        <v-btn
-                                            @click="approve_image(image.doc_id)"
-                                            size="small"
-                                            color="success"
-                                            variant="tonal"
-                                            prepend-icon="mdi-undo"
-                                        >
-                                            {{ $t("restore") }}
-                                        </v-btn>
-                                        <v-btn
-                                            @click="delete_picture(image.img_id, image.doc_id)"
-                                            size="small"
-                                            color="error"
-                                            variant="tonal"
-                                            prepend-icon="mdi-delete"
-                                        >
-                                            {{ $t("delete") }}
-                                        </v-btn>
-                                    </div>
+                                <div class="ge-card-actions">
+                                    <v-btn
+                                        @click="approve_image(image.doc_id)"
+                                        size="small"
+                                        color="success"
+                                        variant="tonal"
+                                        prepend-icon="mdi-undo"
+                                    >
+                                        {{ $t("restore") }}
+                                    </v-btn>
+                                    <v-btn
+                                        @click="delete_picture(image.img_id, image.doc_id)"
+                                        size="small"
+                                        color="error"
+                                        variant="tonal"
+                                        prepend-icon="mdi-delete"
+                                    >
+                                        {{ $t("delete") }}
+                                    </v-btn>
                                 </div>
                             </div>
                         </div>
-                    </v-card-text>
-                </v-card>
+                    </div>
+                </div>
             </v-col>
         </v-row>
 
         <!-- Approved Images Section -->
         <v-row v-if="approvedImages.length > 0">
             <v-col>
-                <v-card elevation="2" rounded>
-                    <v-card-title class="bg-info text-white">
-                        <v-icon left>mdi-eye</v-icon>
-                        {{ $t('approved_images') }}
-                        <v-spacer />
-                        <v-chip color="white" variant="elevated" text-color="info">
-                            {{ approvedImages.length }} {{ $t('images') }}
-                        </v-chip>
-                    </v-card-title>
-
-                    <v-card-text class="pa-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="editor-section !p-0 overflow-hidden">
+                    <div class="ge-section-header ge-section-header--sky">
+                        <div class="d-flex align-center gap-2">
+                            <v-icon>mdi-eye</v-icon>
+                            <span class="font-weight-bold">{{ $t('approved_images') }}</span>
+                            <v-chip color="white" variant="elevated" text-color="primary" size="small">
+                                {{ approvedImages.length }} {{ $t('images') }}
+                            </v-chip>
+                        </div>
+                    </div>
+                    <div class="pa-4">
+                        <div class="ge-image-grid">
                             <div
                                 v-for="image in approvedImages"
                                 :key="image.img_id"
-                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg"
+                                class="ge-image-card"
                             >
                                 <figure class="relative">
-                                    <img
-                                        :src="image.img"
-                                        alt="Gallery image"
-                                        class="w-full h-48 object-cover"
-                                    />
+                                    <img :src="image.img" alt="Gallery image" class="ge-thumb" />
                                     <div
                                         v-if="default_image === image.img_id"
-                                        class="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium"
+                                        class="ge-badge ge-badge--yellow"
                                     >
                                         {{ $t("default_picture") }}
                                     </div>
                                     <div
                                         v-if="!isPhotographer"
-                                        class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium"
+                                        class="ge-badge ge-badge--green ge-badge-right"
                                     >
                                         {{ $t("approved") }}
                                     </div>
                                 </figure>
-
-                                <div class="p-4">
-                                    <div class="flex gap-2 justify-end">
-                                        <v-btn
-                                            v-if="!isPhotographer && default_image !== image.img_id"
-                                            @click="set_as_default(image.img_id)"
-                                            size="small"
-                                            color="primary"
-                                            variant="tonal"
-                                        >
-                                            {{ $t("set_as_default") }}
-                                        </v-btn>
-                                        <!-- Admin/Editor can delete directly -->
-                                        <v-btn
-                                            v-if="!isPhotographer"
-                                            @click="delete_picture(image.img_id, image.doc_id)"
-                                            size="small"
-                                            color="error"
-                                            variant="tonal"
-                                        >
-                                            {{ $t("delete") }}
-                                        </v-btn>
-                                        <!-- Photographer can only request deletion for approved images -->
-                                        <v-btn
-                                            v-if="isPhotographer"
-                                            @click="request_delete(image.doc_id)"
-                                            size="small"
-                                            color="warning"
-                                            variant="tonal"
-                                            prepend-icon="mdi-delete-alert"
-                                        >
-                                            {{ $t("request_delete") }}
-                                        </v-btn>
-                                    </div>
+                                <div class="ge-card-actions">
+                                    <v-btn
+                                        v-if="!isPhotographer && default_image !== image.img_id"
+                                        @click="set_as_default(image.img_id)"
+                                        size="small"
+                                        color="primary"
+                                        variant="tonal"
+                                    >
+                                        {{ $t("set_as_default") }}
+                                    </v-btn>
+                                    <v-btn
+                                        v-if="!isPhotographer"
+                                        @click="delete_picture(image.img_id, image.doc_id)"
+                                        size="small"
+                                        color="error"
+                                        variant="tonal"
+                                    >
+                                        {{ $t("delete") }}
+                                    </v-btn>
+                                    <v-btn
+                                        v-if="isPhotographer"
+                                        @click="request_delete(image.doc_id)"
+                                        size="small"
+                                        color="warning"
+                                        variant="tonal"
+                                        prepend-icon="mdi-delete-alert"
+                                    >
+                                        {{ $t("request_delete") }}
+                                    </v-btn>
                                 </div>
                             </div>
                         </div>
-                    </v-card-text>
-                </v-card>
+                    </div>
+                </div>
             </v-col>
         </v-row>
 
         <!-- Photographer's Pending Images (Photographer sees their pending uploads) -->
         <v-row v-if="isPhotographer && pendingImages.length > 0">
             <v-col>
-                <v-card elevation="2" rounded>
-                    <v-card-title class="bg-warning text-white">
-                        <v-icon left>mdi-clock-outline</v-icon>
-                        {{ $t('pending_approval') }}
-                        <v-spacer />
-                        <v-chip color="white" variant="elevated" text-color="warning">
-                            {{ pendingImages.length }} {{ $t('images') }}
-                        </v-chip>
-                    </v-card-title>
-
-                    <v-card-text class="pa-6">
+                <div class="editor-section !p-0 overflow-hidden">
+                    <div class="ge-section-header ge-section-header--warning">
+                        <div class="d-flex align-center gap-2">
+                            <v-icon>mdi-clock-outline</v-icon>
+                            <span class="font-weight-bold">{{ $t('pending_approval') }}</span>
+                            <v-chip color="white" variant="elevated" text-color="warning" size="small">
+                                {{ pendingImages.length }} {{ $t('images') }}
+                            </v-chip>
+                        </div>
+                    </div>
+                    <div class="pa-4">
                         <v-alert type="info" variant="tonal" class="mb-4">
                             {{ $t('pending_images_info') }}
                         </v-alert>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="ge-image-grid">
                             <div
                                 v-for="image in pendingImages"
                                 :key="image.img_id"
-                                class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border-2 border-orange-300 opacity-80"
+                                class="ge-image-card border-amber opacity-90"
                             >
                                 <figure class="relative">
-                                    <img
-                                        :src="image.img"
-                                        alt="Pending image"
-                                        class="w-full h-48 object-cover"
-                                    />
-                                    <div class="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                        {{ $t("pending") }}
-                                    </div>
+                                    <img :src="image.img" alt="Pending image" class="ge-thumb" />
+                                    <div class="ge-badge ge-badge--amber">{{ $t("pending") }}</div>
                                 </figure>
-
-                                <div class="p-4">
-                                    <div class="flex gap-2 justify-end">
-                                        <v-btn
-                                            @click="delete_picture(image.img_id, image.doc_id)"
-                                            size="small"
-                                            color="error"
-                                            variant="tonal"
-                                        >
-                                            {{ $t("delete") }}
-                                        </v-btn>
-                                    </div>
+                                <div class="ge-card-actions">
+                                    <v-btn
+                                        @click="delete_picture(image.img_id, image.doc_id)"
+                                        size="small"
+                                        color="error"
+                                        variant="tonal"
+                                    >
+                                        {{ $t("delete") }}
+                                    </v-btn>
                                 </div>
                             </div>
                         </div>
-                    </v-card-text>
-                </v-card>
+                    </div>
+                </div>
             </v-col>
         </v-row>
     </v-container>
+    </div>
+    </div>
 </template>
 
 <script lang="ts">
-import { Client, Databases, ID, Storage, Query } from "appwrite";
+import { Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
-import { RoleService } from "@/services/RoleService";
 import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
+
+const db = new Databases(appw);
+const storage = new Storage(appw);
 
 export default {
     setup() {
@@ -502,21 +468,16 @@ export default {
     mounted() {
         this.getMD();
         this.gallery_id = this.$route.params.id as string;
-        console.log('Gallery ID from route:', this.gallery_id);
         window.addEventListener('beforeunload', this.handleBeforeUnload);
     },
-    onBeforeUnmount() {
+    beforeUnmount() {
         window.removeEventListener('beforeunload', this.handleBeforeUnload);
     },
     methods: {
         async getMD() {
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
-
             try {
-                console.log('Loading gallery data for ID:', this.$route.params.id);
-                let k = await database.listDocuments(config.website_db, config.gallery, [Query.equal("$id", this.$route.params.id as string)]);
-                console.log('Gallery documents found:', k.documents.length);
+                const galleryId = this.$route.params.id as string;
+                const k = await db.listDocuments(config.website_db, config.gallery, [Query.equal("$id", galleryId)]);
 
                 if (k.documents.length > 0) {
                     const doc = k.documents[0];
@@ -529,36 +490,19 @@ export default {
                     this.visible = doc.visible || false;
                     this.default_image = doc.default_image || "";
 
-                    console.log('Loading images for gallery:', this.$route.params.id);
-                    let l = await database.listDocuments(config.website_db, config.album_images, [Query.equal("gallery", this.$route.params.id as string)]);
-                    console.log('Images found:', l.documents.length, l.documents);
-                    this.images = [];
-
-                    l.documents.forEach(element => {
-                        console.log('Processing image:', element.image_id);
-                        let a = { img: "", img_id: "", doc_id: "", status: "approved" };
-                        a.img_id = element.image_id;
-                        a.doc_id = element.$id;
-                        a.status = element.status || "approved";
-                        a.img = storage.getFilePreview(
+                    const l = await db.listDocuments(config.website_db, config.album_images, [Query.equal("gallery", galleryId)]);
+                    this.images = l.documents.map(element => ({
+                        img: storage.getFilePreview(
                             config.gallery_pictures_storage,
                             element.image_id,
-                            300,
-                            0,
-                            'center',
-                            90,
-                            5,
-                            'FFFFFF',
-                            15,
-                            1,
-                            0,
-                            'FFFFFF',
-                            'webp'
-                        );
-                        console.log('Generated image URL:', a.img);
-                        this.images.push(a);
-                    });
-                    console.log('Total images loaded:', this.images.length);
+                            300, 0, 'center', 90,
+                            0, 'FFFFFF', 0,
+                            1, 0, 'FFFFFF', 'webp'
+                        ),
+                        img_id: element.image_id,
+                        doc_id: element.$id,
+                        status: element.status || "approved"
+                    }));
                 }
             } catch (error) {
                 console.error('Error loading gallery data:', error);
@@ -578,8 +522,6 @@ export default {
         },
 
         async save() {
-            const database = new Databases(appw);
-
             try {
                 const updateData: any = {
                     "title_rs": this.title_rs,
@@ -596,7 +538,7 @@ export default {
                     updateData.visible = this.visible;
                 }
 
-                const result = await database.updateDocument(
+                await db.updateDocument(
                     config.website_db,
                     config.gallery,
                     this.$route.params.id as string,
@@ -625,10 +567,8 @@ export default {
             });
             if (!galleryConfirmed) return;
 
-            const database = new Databases(appw);
-
             try {
-                await database.deleteDocument(config.website_db, config.gallery, this.$route.params.id as string);
+                await db.deleteDocument(config.website_db, config.gallery, this.$route.params.id as string);
                 this.$notify(this.$t('deleted'));
                 this.$router.push("/admin");
             } catch (error) {
@@ -641,15 +581,11 @@ export default {
         },
 
         async file_upload() {
-            const storage = new Storage(appw);
-            const database = new Databases(appw);
-
             if (!this.file_link) {
                 console.warn("no file");
                 return;
             }
 
-            console.log("file_upload started");
             this.uploading = true;
 
             try {
@@ -659,15 +595,13 @@ export default {
                         text: this.$t('file_upload_started')
                     });
 
-                    console.log('Uploading file:', element);
-
                     const result = await storage.createFile(
                         config.gallery_pictures_storage,
                         ID.unique(),
                         element
                     );
 
-                    let add_file_to_album = await database.createDocument(
+                    await db.createDocument(
                         config.website_db,
                         config.album_images,
                         ID.unique(),
@@ -677,8 +611,6 @@ export default {
                             "status": this.isPhotographer ? "pending" : "approved"
                         }
                     );
-
-                    console.log('Added file to album:', add_file_to_album);
 
                     this.$notify({
                         type: 'success',
@@ -699,9 +631,8 @@ export default {
         },
 
         async approve_image(docId: string) {
-            const database = new Databases(appw);
             try {
-                await database.updateDocument(config.website_db, config.album_images, docId, {
+                await db.updateDocument(config.website_db, config.album_images, docId, {
                     "status": "approved"
                 });
                 this.$notify({ type: 'success', text: this.$t('image_approved') });
@@ -713,11 +644,10 @@ export default {
         },
 
         async approve_all() {
-            const database = new Databases(appw);
             try {
                 await Promise.all(
                     this.pendingImages.map(img =>
-                        database.updateDocument(config.website_db, config.album_images, img.doc_id, {
+                        db.updateDocument(config.website_db, config.album_images, img.doc_id, {
                             "status": "approved"
                         })
                     )
@@ -743,9 +673,8 @@ export default {
         },
 
         async request_delete(docId: string) {
-            const database = new Databases(appw);
             try {
-                await database.updateDocument(config.website_db, config.album_images, docId, {
+                await db.updateDocument(config.website_db, config.album_images, docId, {
                     "status": "delete_requested"
                 });
                 this.$notify({ type: 'info', text: this.$t('delete_requested_notify') });
@@ -757,7 +686,6 @@ export default {
         },
 
         set_as_default(aa: string) {
-            console.log('Setting as default:', aa);
             this.default_image = aa;
             this.save();
         },
@@ -772,19 +700,16 @@ export default {
             });
             if (!imgConfirmed) return;
 
-            const storage = new Storage(appw);
-            const database = new Databases(appw);
-
             try {
                 await storage.deleteFile(config.gallery_pictures_storage, aa);
             } catch (ex) {
-                console.log("Error deleting from storage:", ex);
+                console.error("Error deleting from storage:", ex);
             }
 
             try {
-                await database.deleteDocument(config.website_db, config.album_images, bb);
+                await db.deleteDocument(config.website_db, config.album_images, bb);
             } catch (ex) {
-                console.log("Error deleting from database:", ex);
+                console.error("Error deleting from database:", ex);
             }
 
             await this.getMD(); // Reload images
@@ -798,41 +723,114 @@ export default {
     max-width: 1400px;
 }
 
-.header-card {
-    border-radius: 16px !important;
-}
-
 .language-card {
-    border-radius: 16px !important;
+    border-radius: 1rem !important;
+    overflow: hidden;
 }
 
-.grid {
+.ge-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1.15rem;
+    color: white;
+    font-weight: 600;
+}
+
+.ge-section-header--sky {
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+}
+
+.ge-section-header--warning {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.ge-section-header--error {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.ge-image-grid {
     display: grid;
-}
-
-.grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
 }
 
 @media (min-width: 640px) {
-    .sm\:grid-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .ge-image-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
 @media (min-width: 768px) {
-    .md\:grid-cols-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+    .ge-image-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-
 @media (min-width: 1024px) {
-    .lg\:grid-cols-4 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+    .ge-image-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-.gap-4 {
-    gap: 1rem;
+.ge-image-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dark .ge-image-card {
+    background: rgba(30, 41, 59, 0.55);
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    color: #e2e8f0;
+}
+
+.ge-image-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(14, 165, 233, 0.15);
+}
+
+.ge-image-card.border-amber {
+    border-color: rgba(245, 158, 11, 0.45);
+}
+
+.ge-image-card.border-red {
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+.ge-thumb {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+    display: block;
+}
+
+.ge-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ge-badge-right {
+    left: auto;
+    right: 0.5rem;
+}
+
+.ge-badge--amber { background: rgba(245, 158, 11, 0.9); }
+.ge-badge--red { background: rgba(239, 68, 68, 0.9); }
+.ge-badge--yellow { background: rgba(234, 179, 8, 0.9); }
+.ge-badge--green { background: rgba(34, 197, 94, 0.9); }
+
+.ge-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.85rem;
 }
 </style>

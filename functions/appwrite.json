@@ -1,3 +1,16 @@
 {
-    "projectId": "659ea7f886cf55d4528a"
+  "projectId": "659ea7f886cf55d4528a",
+  "functions": [
+    {
+      "$id": "set-user-labels",
+      "name": "Set User Labels",
+      "runtime": "node-18.0",
+      "entrypoint": "src/main.js",
+      "path": "set-user-labels",
+      "execute": ["users"],
+      "scopes": ["users.read", "users.write"],
+      "enabled": true,
+      "timeout": 15
+    }
+  ]
 }

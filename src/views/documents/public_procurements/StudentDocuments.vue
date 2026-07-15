@@ -1,33 +1,32 @@
 <template>
-    <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-                <div class="flex flex-wrap w-full mb-20">
-                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('studentdocuments') }}</h1>
-                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                    </div>
-                
+    <section class="page-shell">
+        <div class="page-panel container">
+                <div class="page-header">
+                    <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">{{ $t('studentdocuments') }}</h1>
+                    <div class="section-accent !w-20"></div>
                 </div>
-                <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups" :key="role.role">
-                <h1 class="sm:text-2xl text-sm font-medium   mb-3 text-gray-900  dark:text-white">{{ role.role }}</h1>
+                <div v-if="loaded"  v-for="role in roles" class="m-auto w-full popups mb-8" :key="role.role">
+                <h2 class="page-section-title">{{ role.role }}</h2>
+                <div class="page-table-wrap overflow-hidden">
                 <v-data-table  height="400" :headers="headers" :items="role.workers">
                     <template v-slot:item.date="{ item }">
         {{ rt_time(item.date) }}
         </template>
     
       <template v-slot:item.open="{ item }">
-        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book text-5xl"></i></router-link>
+        <router-link :to="'/document/'+item.doc_id"><i class="pi pi-book icon_size text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 transition-colors"></i></router-link>
        
       </template>
 
       <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/studentdocument/'+item.id"><i class="pi pi-cloud-upload text-5xl"></i></router-link>
+        <router-link :to="'/admin/studentdocument/'+item.id"><i class="pi pi-cloud-upload icon_size text-green-600 hover:text-green-800 transition-colors"></i></router-link>
        
       </template>
 
       <template #bottom></template>
                     </v-data-table>
-                    <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5">{{ $t('add_new_document_in_that_category') }}</v-btn>
+                </div>
+                    <v-btn v-if="admin" @click="new_stuff(role.id)" class="m-5" color="primary">{{ $t('add_new_document_in_that_category') }}</v-btn>
                 </div>
     </div>
     </section>
@@ -36,14 +35,16 @@
     </template>
     <script lang="ts">
     
-    import { Client, Databases, ID,Storage,Query } from "appwrite";
+    import { Databases, ID,Storage,Query } from "appwrite";
     import {appw,config} from "@/appwrite";
     import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
-    import gsap from "gsap";
     import dayjs from '@/utils/dayjs';
-    
+
+    const database = new Databases(appw);
+    const storage = new Storage(appw);
+
     export default {
         name: 'Workers',
         components: {
@@ -59,54 +60,57 @@
             this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
             document.title=this.$t("studentdocuments");
     
-            gsap.fromTo(
-        "#render_title",
-        {
-          opacity: 0,
-          x: "50%",
-        },
-        {
-          duration: 1.5,
-          opacity: 1,
-          x: 0,
-        }
-      );
-    
-     
-    
-    
+            import('gsap').then(({ default: gsap }) => {
+                gsap.fromTo(
+                    "#render_title",
+                    {
+                        opacity: 0,
+                        x: "50%",
+                    },
+                    {
+                        duration: 1.5,
+                        opacity: 1,
+                        x: 0,
+                    }
+                );
+
+                gsap.fromTo(
+                    ".popups",
+                    {
+                        opacity: 0,
+                        y: "50%",
+                    },
+                    {
+                        duration: 1.5,
+                        opacity: 1,
+                        y: 0,
+                    }
+                );
+            });
+
+
+
+
             //loadingStore.setLoading(true);
-            
+
             this.load_workers_base();
-            
+
             this.headers= [
                     { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
                     { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    
+
                     { title: this.$t("open_document"), align: 'start', key: 'open',width: '300px' },
-                    
+
                     ];
-        
+
 
         if(this.admin)
         {
             this.headers.push({ title: this.$t("edit_document"), align: 'start', key: 'edit',width: '300px' });
             this.colDefs.push({ field: 'edit', headerName:this.$t("edit_message"), sortable: true, filter: true });
         }
-    
-    
-                        gsap.fromTo(
-                        ".popups",
-                        {
-                        opacity: 0,
-                        y: "50%",
-                        },
-                        {
-                        duration: 1.5,
-                        opacity: 1,
-                        y: 0,
-                        }
-                    );                
+
+
         },
         data: () => ({
             workers: [
@@ -145,7 +149,6 @@
                 },
             async new_stuff(aaa)
             {
-                const database = new Databases(appw);
                 const l= await database.createDocument(config.website_db, config.st_documents,ID.unique(),{"stDocumentCategories":aaa});
                 this.$router.push("/admin/studentdocument/"+l.$id);
             },
@@ -155,16 +158,13 @@
             this.workers=[];
             this.roles=[];
             //console.log();
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
-    
             let local=loadingStore.language;
     
             //let missing_picture=storage.getFileView(config.website_images,config.missing_worker_picture).href;
             
             //this is f voodoo, and sucks, but it works
             
-            let k= await database.listDocuments(config.website_db, config.st_document_categories,[Query.orderAsc("listasorrend")]);
+            let k= await database.listDocuments(config.website_db, config.st_document_categories,[Query.orderAsc("listasorrend"), Query.limit(100)]);
     
             for (let i=0;i<k.documents.length;i++)
             {
@@ -191,7 +191,7 @@
                     name=convertifserbian(el1.category_name_rs);
                 }
                 //console.log(l);
-                await l.documents.forEach(async el2 => {
+                for (const el2 of l.documents) {
                 let a={name:"",contact:"",img:"",id:"",doc_id:"",date:""};
                 a.id=el2.$id;
                 if(local=="en"||local=="hu")
@@ -219,7 +219,7 @@
                 a.doc_id=el2.document_id;
                 a.date=el2.$createdAt;    
                 _works.push(a);
-            });
+            }
             let b={role:"",workers:[],id:""};
             b.id=el1.$id;
             b.role=name;
@@ -227,12 +227,10 @@
             this.roles.push(b);
     //        });
           }
-            console.log(this.roles);
             //loadingStore.setLoading(false);
             this.loaded=true;
             },
             onReady(params) {
-                    console.log('onReady');
     
                     //this.api = params.api;
                     //this.calculateRowCount();

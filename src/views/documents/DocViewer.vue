@@ -71,6 +71,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { Storage, Databases, Query } from 'appwrite'
 import { appw, config } from '@/appwrite'
 
+const storage = new Storage(appw)
+
 interface DocumentInfo {
 title: string
 filename: string
@@ -108,9 +110,7 @@ setup() {
     try {
       loading.value = true
       error.value = false
-      
-      const storage = new Storage(appw)
-      
+
       // Get file view URL
       const fileView = await storage.getFileView(config.documents_storage, documentId)
       pdfUrl.value = fileView
@@ -129,7 +129,6 @@ setup() {
         documentTitle.value = 'Document'
       }
       
-      console.log('Successfully loaded PDF:', pdfUrl.value)
       
     } catch (loadError: any) {
       console.error('Failed to load document:', loadError)
@@ -199,7 +198,6 @@ setup() {
   }
 
   const onFrameLoad = (): void => {
-    console.log('PDF iframe loaded successfully')
   }
 
   const onFrameError = (): void => {

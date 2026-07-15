@@ -1,14 +1,11 @@
 <template>
-    <section class="text-gray-600 ">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-                <div class="flex flex-wrap w-full mb-20">
-                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('erasmus_applies') }}</h1>
-                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                    </div>
-                
+    <section class="page-shell">
+        <div class="page-panel container">
+                <div class="page-header">
+                    <h1 class="section-title !text-2xl sm:!text-3xl">{{ $t('erasmus_applies') }}</h1>
+                    <div class="section-accent !w-20"></div>
                 </div>
-    <div v-if="loaded"   class="m-auto w-full">
+    <div v-if="loaded" class="m-auto w-full page-table-wrap overflow-hidden">
    
       
       <v-data-table  height="400" :headers="headers" :items="messages">
@@ -44,9 +41,12 @@
     </template>
     <script lang="ts">
     
-    import { Client, Databases, ID,Storage,Query } from "appwrite";
+    import { Databases, ID,Storage,Query } from "appwrite";
     import {appw,config} from "@/appwrite";
     import { convertifserbian } from "@/lang";
+
+    const database = new Databases(appw);
+    const storage = new Storage(appw);
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
     import dayjs from '@/utils/dayjs';
@@ -118,12 +118,10 @@
                 this.workers=[];
                 this.roles=[];
                 //console.log();
-                const database = new Databases(appw);
-                const storage = new Storage(appw);
                 const loadingStore = useLoadingStore();
                 let local=loadingStore.language;
                 let n= await database.listDocuments(config.website_db, config.erasmus_applies,[Query.orderDesc("$createdAt"),Query.limit(50)]);
-                await n.documents.forEach(async el2 => {
+                for (const el2 of n.documents) {
                     let a={name:"",class:"",contact:"",email:"",date:"",id:"",phone:"",mark:"",motivation_letter:"",other_document:""};
                         a.id=el2.$id;
                         a.date=el2.$createdAt;
@@ -135,17 +133,14 @@
                         a.motivation_letter=el2.link_motivation_letter;
                         a.other_document=el2.link_other_document;
                     this.messages.push(a);
-                    });
-                console.log(this.messages)
+                    }
                 //n.documents.forEach()
-                
-            
+
+
                 this.loaded=true;
                 },
                 async delete_content(aaa,bbb)
                 {
-                    const database = new Databases(appw);
-                    const storage = new Storage(appw);
                     try{
                     let n=await storage.deleteFile(config.fs_erasmus,bbb);
                     }

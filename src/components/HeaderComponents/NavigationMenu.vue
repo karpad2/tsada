@@ -119,6 +119,7 @@
           ],
         },
         { label: 'timetable', to: '/about/timetable' },
+        { label: 'class_schedule', to: '/about/class-schedule' },
         { label: 'teachers_receiving_hour', to: '/about/workerstimetable' },
         { label: 'parentsvisiting', to: '/about/parentvisiting' },
         { label: 'examslist', to: '/renderer/education/examslist' },
@@ -160,6 +161,7 @@
       children: [
         { label: 'messages', to: '/admin/messages' },
         { label: 'presentation_editor', to: '/admin/slide-editor' },
+        { label: 'tt_editor', to: '/admin/timetable-editor' },
         { label: 'logout', to: '/', action: 'logout' }, // Itt lehet `@click` is külön
       ],
     },

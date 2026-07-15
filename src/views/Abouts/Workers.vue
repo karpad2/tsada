@@ -1,17 +1,12 @@
 <template>
-  <section class="text-gray-600 dark:text-gray-300 min-h-screen transition-colors duration-300">
-    <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-800/40">
+  <section class="page-shell transition-colors duration-300">
+    <div class="page-panel container">
       <!-- Header section -->
-      <div class="flex flex-wrap w-full mb-20">
-        <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-          <h1
-            id="render_title"
-            class="sm:text-4xl text-3xl font-bold title-font mb-4 text-gray-900 dark:text-gray-100"
-          >
-            {{ $t('workers') }}
-          </h1>
-          <div class="h-1 w-20 bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-400 dark:to-blue-500 rounded-full"></div>
-        </div>
+      <div class="page-header">
+        <h1 id="render_title" class="section-title">
+          {{ $t('workers') }}
+        </h1>
+        <div class="section-accent !w-20"></div>
       </div>
 
       <div v-if="loaded">
@@ -30,9 +25,9 @@
           </div>
           
           <!-- Desktop táblázatos megjelenítés -->
-          <div class="hidden md:block overflow-hidden rounded-xl shadow-xl dark:shadow-2xl dark:shadow-gray-900/40">
-            <table class="min-w-full bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm border-0">
-              <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
+          <div class="hidden md:block page-table-wrap">
+            <table class="min-w-full border-0">
+              <thead>
                 <tr>
                   <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     {{ $t('name') }}
@@ -62,7 +57,7 @@
                       </div>
                       <div class="ml-6">
                         <div class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200">
-                          {{ worker.name }}
+                          <SvgName :name="worker.name" />
                         </div>
                       </div>
                     </div>
@@ -104,7 +99,7 @@
                     <div class="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div class="ml-4">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ worker.name }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1"><SvgName :name="worker.name" /></h3>
                     <div v-if="worker.contact" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                       <i :class="getContactIcon(worker.contact)" class="mr-2 text-sky-500"></i>
                       {{ worker.contact }}
@@ -150,13 +145,16 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUpdated, onUnmounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Client, Databases, ID, Storage, Query } from 'appwrite';
+import { Databases, ID, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { convertifserbian } from '@/lang';
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 import { useLoadingStore } from '@/stores/loading';
 import { useSEO } from '@/composables/useSEO';
-import gsap from 'gsap';
 import Loading from '@/components/Loading.vue';
+import SvgName from '@/components/shared/SvgName.vue';
 
 interface Worker {
   id: string;
@@ -173,7 +171,7 @@ interface Role {
 
 export default defineComponent({
   name: 'Workers',
-  components: { Loading },
+  components: { Loading, SvgName },
   setup() {
     // Composition API variables
     const { t } = useI18n();
@@ -272,7 +270,6 @@ export default defineComponent({
 
     const addNewWorker = async (roleId: string) => {
       try {
-        const database = new Databases(appw);
         const doc = await database.createDocument(
           config.website_db,
           config.workers,
@@ -287,49 +284,86 @@ export default defineComponent({
 
     const loadWorkers = async () => {
       try {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
         const local = loadingStore.language;
-        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture);
+        const missingPicture = storage
+          .getFilePreview(config.website_images, config.missing_worker_picture, 160, 160, 'center', 75)
+          .toString();
 
-        const roleDocs = await database.listDocuments(config.website_db, config.roles_db, [
-          Query.orderAsc('listasorrend'),
+        // 2 queries total instead of 1 + N roles (N+1 fix)
+        const [roleDocs, workersPage] = await Promise.all([
+          database.listDocuments(config.website_db, config.roles_db, [
+            Query.orderAsc('listasorrend'),
+            Query.limit(100),
+          ]),
+          database.listDocuments(config.website_db, config.workers, [
+            Query.select(['worker_name_hu', 'worker_name_rs', 'contact', 'worker_img', 'roles', '$id']),
+            Query.limit(100),
+          ]),
         ]);
 
-        const rolesPromises = roleDocs.documents.map(async (role) => {
-          const workersDocs = await database.listDocuments(config.website_db, config.workers, [
-            Query.select(['worker_name_hu', 'worker_name_rs', 'contact', 'worker_img', '$id']),
-            Query.equal('roles', [role.$id]),
-          ]);
+        // Paginate workers if more than 100
+        let allWorkerDocs = [...workersPage.documents];
+        if (workersPage.total > allWorkerDocs.length) {
+          const pages = Math.ceil(Math.min(workersPage.total, 500) / 100);
+          for (let p = 1; p < pages; p++) {
+            const page = await database.listDocuments(config.website_db, config.workers, [
+              Query.select(['worker_name_hu', 'worker_name_rs', 'contact', 'worker_img', 'roles', '$id']),
+              Query.limit(100),
+              Query.offset(p * 100),
+            ]);
+            allWorkerDocs.push(...page.documents);
+          }
+        }
 
+        const mapWorker = (worker: any): Worker => ({
+          id: worker.$id,
+          name:
+            local === 'rs' || local === 'sr'
+              ? convertifserbian(worker.worker_name_rs)
+              : worker.worker_name_hu,
+          contact: worker.contact,
+          img: worker.worker_img
+            ? storage
+                .getFilePreview(config.website_images, worker.worker_img, 160, 160, 'center', 75)
+                .toString()
+            : missingPicture,
+        });
+
+        allRoles.value = roleDocs.documents.map((role) => {
           const roleName =
             local === 'en'
               ? role.role_en
               : local === 'hu'
-              ? role.role_hu
-              : convertifserbian(role.role_rs);
+                ? role.role_hu
+                : convertifserbian(role.role_rs);
 
-          const workers: Worker[] = workersDocs.documents.map((worker) => ({
-            id: worker.$id,
-            name: local === 'rs' || local === 'sr' ? convertifserbian(worker.worker_name_rs) : worker.worker_name_hu,
-            contact: worker.contact,
-            img: worker.worker_img ? storage.getFileView(config.website_images, worker.worker_img) : missingPicture,
-          }));
+          const workers = allWorkerDocs
+            .filter((w) => {
+              const roles = w.roles;
+              if (!roles) return false;
+              if (Array.isArray(roles)) {
+                return roles.some(
+                  (r: any) => r === role.$id || r?.$id === role.$id
+                );
+              }
+              return roles === role.$id || roles?.$id === role.$id;
+            })
+            .map(mapWorker);
 
           return { id: role.$id, role: roleName, workers };
         });
-
-        allRoles.value = await Promise.all(rolesPromises);
         loaded.value = true;
         loadMoreRoles();
 
         // Animate roles after loading
         setTimeout(() => {
-          gsap.fromTo(
-            '.popups',
-            { opacity: 0, y: 30, scale: 0.95 },
-            { duration: 1, opacity: 1, y: 0, scale: 1, stagger: 0.15, ease: 'power3.out' }
-          );
+          import('gsap').then(({ default: gsap }) => {
+            gsap.fromTo(
+              '.popups',
+              { opacity: 0, y: 30, scale: 0.95 },
+              { duration: 1, opacity: 1, y: 0, scale: 1, stagger: 0.15, ease: 'power3.out' }
+            );
+          });
         }, 100);
       } catch (error) {
         console.error('Failed to load workers:', error);
@@ -356,11 +390,13 @@ export default defineComponent({
       setPageTitle(t('workers'));
 
       // Title animation
-      gsap.fromTo(
-        '#render_title',
-        { opacity: 0, x: -50, scale: 0.9 },
-        { duration: 1.2, opacity: 1, x: 0, scale: 1, ease: 'power3.out' }
-      );
+      import('gsap').then(({ default: gsap }) => {
+        gsap.fromTo(
+          '#render_title',
+          { opacity: 0, x: -50, scale: 0.9 },
+          { duration: 1.2, opacity: 1, x: 0, scale: 1, ease: 'power3.out' }
+        );
+      });
 
       loadWorkers();
     });

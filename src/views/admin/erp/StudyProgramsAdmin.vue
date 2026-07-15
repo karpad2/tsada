@@ -1,7 +1,13 @@
 <template>
-  <v-container fluid>
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
     <v-row>
       <v-col cols="12">
+        <div class="page-header">
+          <h1 class="section-title !text-2xl !mb-1">{{ $t('manage_study_programs') }}</h1>
+          <div class="section-accent !w-20"></div>
+        </div>
         <v-card>
           <v-card-title class="d-flex align-center">
             <v-icon class="mr-2">mdi-school</v-icon>
@@ -238,6 +244,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">

@@ -144,6 +144,24 @@ export class PrintTemplateService {
   }
 
   /**
+   * Sablon keresése adott feltételekkel (első találat vagy null)
+   */
+  private async findTemplate(programFilter: string, year: number, documentType: string, formLanguage?: string): Promise<PrintTemplate | null> {
+    const queries = [
+      programFilter === 'null' ? Query.isNull('studyProgramId') : Query.equal('studyProgramId', programFilter),
+      Query.equal('year', year),
+      Query.equal('documentType', documentType),
+      Query.limit(1)
+    ];
+    if (formLanguage) {
+      queries.push(Query.equal('formLanguage', formLanguage));
+    }
+
+    const result = await this.databases.listDocuments(ERP_DB, config.erp_print_templates, queries);
+    return result.documents.length > 0 ? this.parseTemplate(result.documents[0]) : null;
+  }
+
+  /**
    * Sablon lekérése szak és évfolyam alapján
    * Ha nincs specifikus sablon, az általános sablont adja vissza
    */
@@ -154,77 +172,17 @@ export class PrintTemplateService {
     formLanguage: 'bilingual' | 'serbian' = 'bilingual'
   ): Promise<PrintTemplate | null> {
     try {
-      // Először keresünk specifikus sablont a szakhoz
+      // Keresési sorrend: specifikus+nyelv, specifikus, általános+nyelv, általános
+      const searches: Array<[string, string | undefined]> = [];
+
       if (studyProgramId) {
-        const queries = [
-          Query.equal('studyProgramId', studyProgramId),
-          Query.equal('year', year),
-          Query.equal('documentType', documentType),
-          Query.limit(1)
-        ];
-        // formLanguage szűrő - ha van ilyen mező az adatbázisban
-        queries.push(Query.equal('formLanguage', formLanguage));
-
-        const specific = await this.databases.listDocuments(
-          ERP_DB,
-          config.erp_print_templates,
-          queries
-        );
-
-        if (specific.documents.length > 0) {
-          return this.parseTemplate(specific.documents[0]);
-        }
-
-        // Fallback: próbáljuk formLanguage nélkül (régi sablonok kompatibilitás)
-        const specificNoLang = await this.databases.listDocuments(
-          ERP_DB,
-          config.erp_print_templates,
-          [
-            Query.equal('studyProgramId', studyProgramId),
-            Query.equal('year', year),
-            Query.equal('documentType', documentType),
-            Query.limit(1)
-          ]
-        );
-
-        if (specificNoLang.documents.length > 0) {
-          return this.parseTemplate(specificNoLang.documents[0]);
-        }
+        searches.push([studyProgramId, formLanguage], [studyProgramId, undefined]);
       }
+      searches.push(['null', formLanguage], ['null', undefined]);
 
-      // Ha nincs specifikus, keresünk általános sablont (studyProgramId = null)
-      const generalQueries = [
-        Query.isNull('studyProgramId'),
-        Query.equal('year', year),
-        Query.equal('documentType', documentType),
-        Query.limit(1)
-      ];
-      generalQueries.push(Query.equal('formLanguage', formLanguage));
-
-      const general = await this.databases.listDocuments(
-        ERP_DB,
-        config.erp_print_templates,
-        generalQueries
-      );
-
-      if (general.documents.length > 0) {
-        return this.parseTemplate(general.documents[0]);
-      }
-
-      // Fallback: formLanguage nélkül (régi sablonok)
-      const generalNoLang = await this.databases.listDocuments(
-        ERP_DB,
-        config.erp_print_templates,
-        [
-          Query.isNull('studyProgramId'),
-          Query.equal('year', year),
-          Query.equal('documentType', documentType),
-          Query.limit(1)
-        ]
-      );
-
-      if (generalNoLang.documents.length > 0) {
-        return this.parseTemplate(generalNoLang.documents[0]);
+      for (const [programFilter, lang] of searches) {
+        const found = await this.findTemplate(programFilter, year, documentType, lang);
+        if (found) return found;
       }
 
       return null;

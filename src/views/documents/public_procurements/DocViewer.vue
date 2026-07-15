@@ -15,9 +15,12 @@
 //import { VuePdfPropsType } from 'vue3-pdfjs/components/vue-pdf/vue-pdf-props'; // Prop type definitions can also be imported
 //import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
 
-import { Client, Databases, ID,Storage,Query } from "appwrite";
+import { Databases, ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
 import { ref } from 'vue';
+
+const storage = new Storage(appw);
+
 export default {
     components: {
         
@@ -38,25 +41,18 @@ export default {
         }
     },
     mounted() {
-        console.log("started loading docviewer")
-        console.log(this.$route.params.id);
-
         this.loadpdf();
     },
     methods: {
         async loadpdf()
-        {   
-            const storage = new Storage(appw);
-            
+        {
             let tmp=await storage.getFileView(config.documents_storage,this.$route.params.id);
             this.pdf_file=tmp;
-            console.log(this.pdf_file);
             //this.pdf_link=pdf;
            /* const loadingTask = createLoadingTask(this.pdf_file)
       loadingTask.promise.then((pdf) => {
         numOfPages.value = pdf.numPages
       });*/
-            console.log(tmp);
             this.loading=false;
         
         }

@@ -1,43 +1,37 @@
 <template>
-  <section class="text-gray-600 dark:text-gray-300 min-h-screen transition-colors duration-300">
-    <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-800/40">
-      <div class="flex flex-wrap w-full mb-20">
-        <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-          <h1
-            id="render_title"
-            class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-gray-100"
-          >
-            {{ $t('teachers_receiving_hour') }}
-          </h1>
-          <div class="h-1 w-20 bg-sky-500 dark:bg-sky-400 rounded"></div>
-        </div>
+  <section class="page-shell transition-colors duration-300">
+    <div class="page-panel container">
+      <div class="page-header">
+        <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">
+          {{ $t('teachers_receiving_hour') }}
+        </h1>
+        <div class="section-accent !w-20"></div>
       </div>
 
       <div v-if="loaded" v-for="role in roles" :key="role.id" class="popups mb-8">
-        <h1 class="sm:text-2xl text-sm font-medium mb-3 text-gray-900 dark:text-gray-100">
+        <h2 class="page-section-title">
           {{ role.role }}
-        </h1>
+        </h2>
         
         <!-- Táblázatos megjelenítés desktop-on -->
-        <div class="hidden md:block overflow-x-auto">
-          <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg dark:shadow-gray-900/25 border border-gray-200 dark:border-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
+        <div class="hidden md:block page-table-wrap overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
+                <th>
                   
                 </th>
                 
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
+                <th>
                   {{ $t('p_receiving_hour') }}
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
+                <th>
                   {{ $t('u_receiving_hour') }}
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-600 dark:bg-gray-800">
-              <tr v-for="worker in role.workers" :key="worker.id" 
-                  class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800 transition-colors duration-200">
+            <tbody>
+              <tr v-for="worker in role.workers" :key="worker.id">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
@@ -101,18 +95,18 @@
         <!-- Kártya megjelenítés mobilra -->
         <div class="md:hidden space-y-4">
           <div v-for="worker in role.workers" :key="'card_' + worker.id" 
-               class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg dark:shadow-gray-900/25 p-4 border border-gray-200 dark:border-gray-700">
+               class="glass-card p-4 rounded-2xl">
             <div class="flex items-center mb-3">
-              <img class="h-12 w-12 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600" :src="worker.img" :alt="worker.name">
+              <img class="h-12 w-12 rounded-full object-cover ring-2 ring-sky-400/30" :src="worker.img" :alt="worker.name">
               <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-900">{{ worker.name }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-900">{{ worker.contact || '---' }}</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ worker.name }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ worker.contact || '---' }}</p>
               </div>
             </div>
             
             <!-- Pedagógus fogadóóra -->
             <div v-if="worker.p_receiving_schedules && worker.p_receiving_schedules.length > 0" class="mb-3">
-              <h4 class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
+              <h4 class="text-sm font-medium text-sky-600 dark:text-sky-400 mb-2 glass-badge px-2 py-1 rounded-lg">
                 {{ $t('p_receiving_hour') }}
               </h4>
               <div v-for="(schedule, idx) in worker.p_receiving_schedules" :key="'mobile_p_' + idx" 
@@ -134,7 +128,7 @@
 
             <!-- Ügyfélszolgálati fogadóóra -->
             <div v-if="worker.u_receiving_schedules && worker.u_receiving_schedules.length > 0">
-              <h4 class="text-sm font-medium text-green-600 dark:text-green-400 mb-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
+              <h4 class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-2 glass-badge !bg-emerald-500/15 !text-emerald-700 dark:!text-emerald-300 !border-emerald-500/25 px-2 py-1 rounded-lg">
                 {{ $t('u_receiving_hour') }}
               </h4>
               <div v-for="(schedule, idx) in worker.u_receiving_schedules" :key="'mobile_u_' + idx" 
@@ -165,9 +159,10 @@ import { defineComponent } from 'vue';
 import { Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { convertifserbian } from '@/lang';
-import { useLoadingStore } from '@/stores/loading';
-import gsap from 'gsap';
 
+const database = new Databases(appw);
+const storage = new Storage(appw);
+import { useLoadingStore } from '@/stores/loading';
 interface Schedule {
   day: string;
   period: string;
@@ -280,19 +275,23 @@ export default defineComponent({
   async mounted() {
     document.title = this.$t('teachers_receiving_hour');
 
-    gsap.fromTo(
-      '#render_title',
-      { opacity: 0, x: 50 },
-      { duration: 1, opacity: 1, x: 0, ease: 'power2.out' }
-    );
+    import('gsap').then(({ default: gsap }) => {
+      gsap.fromTo(
+        '#render_title',
+        { opacity: 0, x: 50 },
+        { duration: 1, opacity: 1, x: 0, ease: 'power2.out' }
+      );
+    });
 
     try {
       await this.loadWorkers();
-      gsap.fromTo(
-        '.popups',
-        { opacity: 0, y: 20 },
-        { duration: 0.8, opacity: 1, y: 0, stagger: 0.2, ease: 'power2.out' }
-      );
+      import('gsap').then(({ default: gsap }) => {
+        gsap.fromTo(
+          '.popups',
+          { opacity: 0, y: 20 },
+          { duration: 0.8, opacity: 1, y: 0, stagger: 0.2, ease: 'power2.out' }
+        );
+      });
     } catch (error) {
       console.error('Failed to load workers:', error);
     }
@@ -316,16 +315,36 @@ export default defineComponent({
 
     async loadWorkers() {
       const loadingStore = useLoadingStore();
-      const database = new Databases(appw);
-      const storage = new Storage(appw);
       const local = loadingStore.language;
 
       try {
-        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture);
-        const rolesRes = await database.listDocuments(config.website_db, config.roles_db, [
-          Query.orderAsc('listasorrend'),
-          Query.equal('has_receiving_hour', true),
+        const missingPicture = storage
+          .getFilePreview(config.website_images, config.missing_worker_picture, 160, 160, 'center', 75)
+          .toString();
+
+        // 2 queries instead of 1 + N roles
+        const [rolesRes, workersRes] = await Promise.all([
+          database.listDocuments(config.website_db, config.roles_db, [
+            Query.orderAsc('listasorrend'),
+            Query.equal('has_receiving_hour', true),
+            Query.limit(100),
+          ]),
+          database.listDocuments(config.website_db, config.workers, [
+            Query.limit(100),
+          ]),
         ]);
+
+        let allWorkerDocs = [...workersRes.documents];
+        if (workersRes.total > allWorkerDocs.length) {
+          const pages = Math.ceil(Math.min(workersRes.total, 500) / 100);
+          for (let p = 1; p < pages; p++) {
+            const page = await database.listDocuments(config.website_db, config.workers, [
+              Query.limit(100),
+              Query.offset(p * 100),
+            ]);
+            allWorkerDocs.push(...page.documents);
+          }
+        }
 
         this.roles = [];
         for (const roleDoc of rolesRes.documents) {
@@ -335,11 +354,16 @@ export default defineComponent({
           else if (local === 'hu') roleName = roleDoc.role_hu;
           else if (local === 'rs' || local === 'sr') roleName = convertifserbian(roleDoc.role_rs);
 
-          const workersRes = await database.listDocuments(config.website_db, config.workers, [
-            Query.equal('roles', [roleId]),
-          ]);
+          const roleWorkers = allWorkerDocs.filter((worker) => {
+            const roles = worker.roles;
+            if (!roles) return false;
+            if (Array.isArray(roles)) {
+              return roles.some((r: any) => r === roleId || r?.$id === roleId);
+            }
+            return roles === roleId || roles?.$id === roleId;
+          });
 
-          const workers = workersRes.documents.map((worker) => {
+          const workers = roleWorkers.map((worker) => {
             let p_receiving_schedules = [];
             let u_receiving_schedules = [];
             
@@ -384,7 +408,9 @@ export default defineComponent({
               name: local === 'en' || local === 'hu' ? worker.worker_name_hu : convertifserbian(worker.worker_name_rs),
               contact: worker.contact || '',
               img: worker.worker_img
-                ? storage.getFileView(config.website_images, worker.worker_img)
+                ? storage
+                    .getFilePreview(config.website_images, worker.worker_img, 160, 160, 'center', 75)
+                    .toString()
                 : missingPicture,
               p_receiving_schedules,
               u_receiving_schedules,

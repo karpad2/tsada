@@ -1,16 +1,18 @@
 <template>
   <main
-    class=" text-gray-900 dark:text-white transition-all"
+    class="text-gray-900 dark:text-white transition-all"
     role="main"
     aria-label="Main school site content"
   >
-   <Hero />
-    <LazyWrapper><PromotionImage /></LazyWrapper>
-    <LazyWrapper><SlideModules mode="courses" /></LazyWrapper>
-    <LazyWrapper><SlideModules mode="news" /></LazyWrapper>
-    <LazyWrapper><Map /></LazyWrapper>
-    <LazyWrapper><Sponsors mode="sponsors" /></LazyWrapper>
-    <LazyWrapper><Sponsors mode="usefullinks" /></LazyWrapper>
+    <Hero />
+    <div class="space-y-2 md:space-y-4 pb-8">
+      <LazyWrapper><PromotionImage /></LazyWrapper>
+      <LazyWrapper><SlideModules mode="courses" /></LazyWrapper>
+      <LazyWrapper><SlideModules mode="news" /></LazyWrapper>
+      <LazyWrapper><Map /></LazyWrapper>
+      <LazyWrapper><Sponsors mode="sponsors" /></LazyWrapper>
+      <LazyWrapper><Sponsors mode="usefullinks" /></LazyWrapper>
+    </div>
   </main>
 </template>
 

@@ -1,8 +1,14 @@
 <template>
-    <div v-if="!loading" class="relative mb-4 container px-5 mx-auto bg-white">
-        <div>
-            <v-btn @click="delete_content" class="m-5">{{ $t('delete') }}</v-btn>
-            <VBtn @click="$router.go(-1)" class="m-5">{{ $t("goback") }}</VBtn>
+    <div v-if="!loading" class="relative mb-4 admin-panel container px-5 mx-auto">
+        <div class="page-header mb-2">
+            <h1 class="section-title !text-2xl !mb-1">{{ $t('classlist') }}</h1>
+            <div class="section-accent !w-16"></div>
+        </div>
+        <div class="editor-toolbar mb-4">
+            <div class="editor-toolbar-actions" style="margin-left: 0;">
+                <v-btn @click="delete_content" color="error" variant="outlined" prepend-icon="mdi-delete">{{ $t('delete') }}</v-btn>
+                <v-btn @click="$router.go(-1)" variant="outlined" color="primary" prepend-icon="mdi-arrow-left">{{ $t("goback") }}</v-btn>
+            </div>
         </div>
 
         <div>
@@ -246,11 +252,13 @@
 </template>
 
 <script lang="ts">
-import { Client, Databases, ID, Storage, Query } from "appwrite";
+import { Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { convertifserbian } from "@/lang";
 import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
+
+const database = new Databases(appw);
 
 interface Schedule {
     day: string;
@@ -447,7 +455,6 @@ export default {
         },
 
         async getMD() {
-            const database = new Databases(appw);
             const cc = useLoadingStore();
             
             try {
@@ -466,7 +473,7 @@ export default {
                         a.id = element.$id;
                         this.workers.push(a);
                     } catch (ex) {
-                        console.log('Worker feldolgozási hiba:', ex);
+                        // Worker processing error - silently skip
                     }
                 }
                 
@@ -498,13 +505,13 @@ export default {
                     // Ha objektum, akkor $id-t használunk, ha string (ID), akkor közvetlenül
                     this.masterchief = typeof k.workers === 'object' ? k.workers?.$id || "" : k.workers || "";
                 } catch (ex) {
-                    console.log('Masterchief hiba:', ex);
+                    // Masterchief error - silently skip
                 }
 
                 try {
                     this.course = typeof k.courses === 'object' ? k.courses?.$id || "" : k.courses || "";
                 } catch (ex) {
-                    console.log('Course hiba:', ex);
+                    // Course error - silently skip
                 }
                 
                 this.language = k.language || "";
@@ -519,7 +526,6 @@ export default {
                         this.receiving_schedules = [];
                     }
                 } catch (e) {
-                    console.log('Receiving schedules parsing hiba:', e);
                     this.receiving_schedules = [];
                 }
             } catch (error) {
@@ -530,8 +536,6 @@ export default {
 
         async save() {
             try {
-                const database = new Databases(appw);
-                
                 const updateData: any = {
                     "year": this.year,
                     "designation": this.delegation,
@@ -572,8 +576,7 @@ export default {
             if (!confirmed) return;
             
             try {
-                const database = new Databases(appw);
-                await database.deleteDocument(config.website_db, config.classlist, this.$route.params.id);  
+                await database.deleteDocument(config.website_db, config.classlist, this.$route.params.id);
                 this.$notify(this.$t('deleted'));
                 this.$router.push("/about/classlist");
             } catch (error) {
@@ -590,7 +593,6 @@ export default {
         async getParliamentMembers() {
             if (!this.$route.params.id) return;
             
-            const database = new Databases(appw);
             try {
                 let k = await database.listDocuments(config.website_db, config.parliament_members, [
                     Query.equal("classList", this.$route.params.id),
@@ -639,8 +641,6 @@ export default {
                 return;
             }
 
-            const database = new Databases(appw);
-            
             try {
                 const documentData = {
                     // Javított attribútum nevek, hogy illeszkedjenek az adatbázis sémához:
@@ -704,8 +704,6 @@ export default {
                 icon: 'mdi-delete'
             });
             if (!memberConfirmed) return;
-            
-            const database = new Databases(appw);
             
             try {
                 await database.deleteDocument(config.website_db, config.parliament_members, memberId);

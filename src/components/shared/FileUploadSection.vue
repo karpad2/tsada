@@ -1,6 +1,6 @@
 <template>
-    <v-card class="file-upload-section mb-6" elevation="2" rounded>
-        <v-card-title class="bg-primary text-white">
+    <v-card class="file-upload-section mb-6" elevation="0" rounded="lg">
+        <v-card-title class="editor-card-header">
             <v-icon left>{{ uploadType === 'image' ? 'mdi-image-multiple' : 'mdi-file-document' }}</v-icon>
             {{ $t('file_upload') }}
         </v-card-title>

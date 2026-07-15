@@ -1,18 +1,19 @@
 <template>
     <!-- Top Hero -->
-    <video-background v-if="loaded" :src="integrated_video" style="min-height: 205px; margin-top: -5px;" class="flex flex-wrap w-full mb-20">
-    <section class="text-gray-600 body-font" id="about">
+    <video-background v-if="loaded" :src="integrated_video" style="min-height: 220px; margin-top: -5px;" class="hero-inside flex flex-wrap w-full mb-12 relative overflow-hidden">
+    <div class="hero-inside-overlay absolute inset-0 pointer-events-none"></div>
+    <section class="text-gray-600 body-font relative z-10 w-full" id="about">
        
-        <div class="container mx-auto text-white flex px-5 py-5 md:flex-row flex-col items-center">
+        <div class="container mx-auto text-white flex px-5 py-6 md:flex-row flex-col items-center">
             <div
-                class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
-                <h1 id="hero-heading-text" class="title-font py-8 sm:text-4xl text-3xl mb-4 font-medium items-center text-white">
+                class="glass-panel rounded-3xl p-6 md:p-8 max-w-xl lg:flex-grow md:w-1/2 flex flex-col md:items-start md:text-left mb-4 md:mb-0 items-center text-center">
+                <h1 id="hero-heading-text" class="title-font py-2 sm:text-4xl text-3xl mb-2 font-semibold items-center text-white tracking-tight drop-shadow-lg">
                     {{ $t('cometous') }}
                     <br class="hidden lg:inline-block" />
                 </h1>
-                <p v-if="false" class="mb-8 leading-relaxed items-center">
+                <p v-if="false" class="mb-8 leading-relaxed items-center text-white/90">
                 {{ $t('whycomehere') }} 
-                <span class="font-medium text-sky-400">{{ $t("msc") }}</span>.
+                <span class="font-semibold text-sky-300">{{ $t("msc") }}</span>.
                 </p>
                 
             </div>
@@ -29,10 +30,12 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Client, Databases, ID,Storage } from "appwrite";
+import { Databases, Storage, Query } from "appwrite";
 import {appw,config,randomIntFromInterval} from "@/appwrite";
-import { VaButton } from 'vuestic-ui/web-components';
-import gsap from "gsap";
+
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 //import video from "@a/videoplayback.webm"
 
 
@@ -41,25 +44,26 @@ export default {
     components: {
     Swiper,
     SwiperSlide,
-    VaButton
 },
     mounted() {
         
        this.load_mp_images_from_base();
        this.load_mp_videos_from_base();
 
-    gsap.fromTo(
-    "#hero-heading-text",
-    {
-      opacity: 0,
-      x: "-100%",
-    },
-    {
-      duration: 1.5,
-      opacity: 1,
-      x: 0,
-    }
-  );
+    import('gsap').then(({ default: gsap }) => {
+      gsap.fromTo(
+        "#hero-heading-text",
+        {
+          opacity: 0,
+          x: "-100%",
+        },
+        {
+          duration: 1.5,
+          opacity: 1,
+          x: 0,
+        }
+      );
+    });
     },
     data:  () => ({
         swiper: null,
@@ -77,31 +81,41 @@ export default {
         }
     }),
     methods:{
-        async load_mp_images_from_base()
-        {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
-        let l= await database.listDocuments(config.website_db, config.main_page_gallery);
-        
-        l.documents.forEach(element => {
-            this.images.push(storage.getFileView(config.website_images,element.file_id));
-        });
+        async load_mp_images_from_base() {
+            const l = await database.listDocuments(config.website_db, config.main_page_gallery, [
+                Query.limit(50),
+            ]);
+            this.images = l.documents.map(element =>
+                storage.getFilePreview(config.website_images, element.file_id, 1280, 0, 'center', 82).toString()
+            );
         },
-        async load_mp_videos_from_base()
-        {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
-        let l= await database.listDocuments(config.website_db, config.hero_videos);
-        
-        let k= randomIntFromInterval(0,l.documents.length-1);
-        this.integrated_video=l.documents[k].link;
-        this.loaded=true;
+        async load_mp_videos_from_base() {
+            try {
+                const l = await database.listDocuments(config.website_db, config.hero_videos, [
+                    Query.limit(50),
+                ]);
+                if (l.documents.length > 0) {
+                    const k = randomIntFromInterval(0, l.documents.length - 1);
+                    this.integrated_video = l.documents[k].link;
+                }
+            } finally {
+                this.loaded = true;
+            }
         },
         }
     }
 
 </script>
 <style>
+.hero-inside-overlay {
+  background: linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.5) 0%,
+    rgba(14, 165, 233, 0.18) 50%,
+    rgba(15, 23, 42, 0.3) 100%
+  );
+}
+
 .swiper-slide {
   background-position: center;
   background-size: cover;
@@ -111,6 +125,4 @@ export default {
   display: block;
   width: 100%;
 }
-
-
 </style>

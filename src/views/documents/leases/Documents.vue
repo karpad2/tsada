@@ -1,13 +1,11 @@
 <template>
-    <section class="text-gray-600 min-h-screen">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-            <div class="flex flex-wrap w-full mb-20">
-                <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                    <h1 id="render_title" class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
-                        {{ $t('documents') }}
-                    </h1>
-                    <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                </div>
+    <section class="page-shell">
+        <div class="page-panel container">
+            <div class="page-header">
+                <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">
+                    {{ $t('documents') }}
+                </h1>
+                <div class="section-accent !w-20"></div>
             </div>
 
             <div v-if="!loaded">
@@ -15,11 +13,12 @@
             </div>
 
             <div v-else class="space-y-8">
-                <div v-for="role in roles" :key="role.id" class="popups">
-                    <h2 class="sm:text-2xl text-lg font-medium mb-3 text-gray-900 dark:text-white">
+                <div v-for="role in roles" :key="role.id" class="popups mb-8">
+                    <h2 class="page-section-title">
                         {{ role.role }}
                     </h2>
 
+                    <div class="page-table-wrap overflow-hidden">
                     <v-data-table
                         height="400"
                         :headers="headers"
@@ -32,7 +31,7 @@
 
                         <template v-slot:item.open="{ item }">
                             <router-link :to="`/document/${item.doc_id}`">
-                                <i class="pi pi-book icon_size text-blue-600 hover:text-blue-800 transition-colors"></i>
+                                <i class="pi pi-book icon_size text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 transition-colors"></i>
                             </router-link>
                         </template>
 
@@ -44,6 +43,7 @@
 
                         <template #bottom></template>
                     </v-data-table>
+                    </div>
 
                     <div v-if="admin" class="flex gap-3 mt-4 flex-wrap">
                         <v-btn @click="new_stuff(role.id)" color="primary" class="m-2">
@@ -79,7 +79,6 @@
 </template>
 
 <script lang="ts">
-import gsap from "gsap";
 import { useLoadingStore } from "@/stores/loading";
 import Loading from "@/components/Loading.vue";
 import {
@@ -126,13 +125,15 @@ export default {
         }
 
         // Title animation
-        gsap.fromTo("#render_title", {
-            opacity: 0,
-            x: "50%",
-        }, {
-            duration: 1.5,
-            opacity: 1,
-            x: 0,
+        import('gsap').then(({ default: gsap }) => {
+            gsap.fromTo("#render_title", {
+                opacity: 0,
+                x: "50%",
+            }, {
+                duration: 1.5,
+                opacity: 1,
+                x: 0,
+            });
         });
 
         await this.load_workers_base();
@@ -181,14 +182,16 @@ export default {
 
                 // Animate elements after loading
                 this.$nextTick(() => {
-                    gsap.fromTo(".popups", {
-                        opacity: 0,
-                        y: "50%",
-                    }, {
-                        duration: 1.2,
-                        opacity: 1,
-                        y: 0,
-                        stagger: 0.1
+                    import('gsap').then(({ default: gsap }) => {
+                        gsap.fromTo(".popups", {
+                            opacity: 0,
+                            y: "50%",
+                        }, {
+                            duration: 1.2,
+                            opacity: 1,
+                            y: 0,
+                            stagger: 0.1
+                        });
                     });
                 });
 

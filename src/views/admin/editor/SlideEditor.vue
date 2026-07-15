@@ -1,20 +1,28 @@
 <template>
-  <div class="slide-editor container px-5 mx-auto bg-white">
+  <div class="slide-editor admin-panel container px-5 mx-auto">
+    <div class="page-header mb-2">
+      <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('edit_slide') }}</h1>
+      <div class="section-accent !w-20"></div>
+    </div>
+
     <!-- Header Controls -->
-    <section class="header-section mb-6">
-      <div class="action-buttons flex gap-2 mb-4">
+    <section class="editor-toolbar mb-6">
+      <div class="editor-toolbar-actions action-buttons" style="margin-left: 0;">
         <v-btn
           @click="saveCurrentSlide"
           :disabled="isLoading('save')"
           :loading="isLoading('save')"
           color="success"
+          prepend-icon="mdi-content-save"
         >
           {{ currentSlideId ? $t('save_changes') : $t('add_slide') }}
         </v-btn>
         <v-btn
           @click="resetSlideForm"
           :disabled="isAnyLoading()"
-          color="secondary"
+          variant="outlined"
+          color="primary"
+          prepend-icon="mdi-refresh"
         >
           {{ $t('reset_form') }}
         </v-btn>
@@ -23,19 +31,18 @@
 
     <!-- Slide Management Section -->
     <section class="slide-form-section mb-6">
-      <v-card class="pa-6" elevation="2">
-        <v-card-title class="text-h6 mb-4">
+      <v-card class="pa-0 overflow-hidden" elevation="0" rounded="lg">
+        <v-card-title class="editor-card-header">
           <v-icon left>mdi-monitor-screenshot</v-icon>
           {{ $t("edit_slide") }}
         </v-card-title>
-
-        <v-card-text>
+        <v-card-text class="pa-6">
           <v-text-field
             v-model="slideForm.title"
             :label="$t('title')"
             counter="100"
-            outlined
-            dense
+            variant="outlined"
+            density="comfortable"
             class="mb-4"
             @input="handleFieldChange"
           />
@@ -61,8 +68,8 @@
 
     <!-- Slides List Section -->
     <section class="slides-list-section mb-12">
-      <v-card elevation="2">
-        <v-card-title class="text-h6">
+      <v-card elevation="0" rounded="lg" class="overflow-hidden">
+        <v-card-title class="editor-card-header">
           <v-icon left>mdi-view-list</v-icon>
           {{ $t('slides_list') }}
         </v-card-title>
@@ -72,7 +79,6 @@
             :items="slides"
             :headers="slideHeaders"
             :loading="isLoading('fetch')"
-            class="elevation-1"
           >
             <template v-slot:item.actions="{ item, index }">
               <div class="d-flex gap-2">
@@ -560,15 +566,15 @@ export default defineComponent({
 }
 
 .header-section {
-  background-color: #f9fafb;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .dark .header-section {
-  background-color: #111827;
-  border-color: #374151;
+  background: rgba(30, 41, 59, 0.45);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 .slide-form-section,

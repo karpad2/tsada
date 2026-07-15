@@ -1,4 +1,6 @@
 <template>
+  <div class="page-shell">
+  <div class="page-panel container !p-2">
   <v-container fluid class="pa-0">
     <v-row no-gutters>
       <!-- Left Sidebar: Fields & Settings -->
@@ -501,6 +503,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">

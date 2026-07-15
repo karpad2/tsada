@@ -1,5 +1,11 @@
 <template>
-  <v-container fluid>
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
+    <div class="page-header">
+      <h1 class="section-title !text-2xl !mb-1">Nyomtatás</h1>
+      <div class="section-accent !w-20"></div>
+    </div>
     <v-row>
       <!-- Left Panel: Settings -->
       <v-col cols="12" lg="4">
@@ -435,6 +441,8 @@
       }
     </component>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -445,6 +453,8 @@ import { appw, config } from '@/appwrite';
 import { loadRelations, commonRelations, erpRelations } from '@/appwrite/relationHelper';
 import { ErpService, type StudyProgram, type SchoolYear } from '@/services/ErpService';
 import PrintTemplateService, { type PrintTemplate } from '@/services/PrintTemplateService';
+
+const databases = new Databases(appw);
 
 interface FieldPosition {
   label: string;
@@ -480,7 +490,6 @@ const STORAGE_KEY = 'erp_print_settings';
 export default defineComponent({
   name: 'PrintManager',
   setup() {
-    const databases = new Databases(appw);
     const erpService = ErpService.getInstance();
 
     // Hierarchikus menü: Fő dokumentum típusok

@@ -1,6 +1,6 @@
 <template>
     <section class="text-gray-600 ">
-        <div  class="container  px-5  mx-auto backdrop-filter bg-opacity-50  dark:bg-slate-500/50  bg-gray-100  backdrop-blur-lg" style="min-height: 70vh;">            
+        <div class="page-panel container">            
                 <video-background  :src="video_link" style="min-height: 200px;" class="flex flex-wrap w-full mb-20 p-2 rounded"
                 overlay="linear-gradient(45deg,#2a4ae430,#0EA5E950)"  >
                     <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
@@ -98,7 +98,7 @@
     </template>
     <script lang="ts">
     
-    import {Client,Databases,ID,Storage,Query } from "appwrite";
+    import {Databases,ID,Storage,Query } from "appwrite";
     import {useLoadingStore} from "@/stores/loading";
     import {appw,config} from "@/appwrite";
     import 'swiper/css';
@@ -108,9 +108,11 @@
     import { Swiper, SwiperSlide } from 'swiper/vue';
     import { EffectFade, Navigation, Pagination } from 'swiper/modules';
     import {convertifserbian} from "@/lang";
-    import gsap from "gsap";
 import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
-    
+
+    const database = new Databases(appw);
+    const storage = new Storage(appw);
+
     export default {
         components: {
             Swiper,SwiperSlide
@@ -154,7 +156,6 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
             this.erasmus_applied=cc.erasmus_apply;
             this.admin = cc.userLoggedin && (cc.userRole === 'admin' || cc.userRole === 'editor');
             let v2="659d5e6949ae7294f9f1";
-            const storage = new Storage(appw);
             document.title=this.$t("erasmus_apply");
             this.getErasmusSettings();
             if(cc.ErasmusAppliedID==null)
@@ -172,7 +173,6 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
         methods:{
             async queriing()
             {
-              const database = new Databases(appw);
               const cc=useLoadingStore();
               let l= await database.getDocument(config.website_db, config.erasmus_applies,cc.ErasmusAppliedID);
               this.name=l.name;
@@ -188,7 +188,6 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
             async submit()
             {
               const cc=useLoadingStore();
-              const database = new Databases(appw);
               if(!cc.ErasmusAppliedID)
             {
               const l= await database.createDocument(config.website_db, config.erasmus_applies,ID.unique(),
@@ -226,10 +225,8 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
                     return;
                 } 
             this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
             //console.log(this.file_link[0]);
 
-            const storage = new Storage(appw);
             const result = await storage.createFile(
             config.fs_erasmus, // bucketId
             ID.unique(), // fileId
@@ -251,10 +248,8 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
                     return;
                 } 
             this.$notify(this.$t('file_upload_in_progress'));
-            console.log("file_upload");
             //console.log(this.file_motivation_letter);
 
-            const storage = new Storage(appw);
             const result = await storage.createFile(
             config.fs_erasmus, // bucketId
             ID.unique(), // fileId
@@ -271,7 +266,6 @@ import ErasmusApplies from "../admin/erasmus/ErasmusApplies.vue";
             async getErasmusSettings()
           {
             const cc=useLoadingStore();
-            const database = new Databases(appw);
 
             let l,k;
             //l= await database.getDocument(config.website_db,config.general_settings,"erasmus_list");

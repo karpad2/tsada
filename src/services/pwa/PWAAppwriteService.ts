@@ -1,21 +1,26 @@
-import { Client, Databases, Storage, Account, Query, ID } from 'appwrite'
-import { config } from '@/appwrite'
+import { ID } from 'appwrite'
+import {
+  appw,
+  config,
+  databases as sharedDatabases,
+  storage as sharedStorage,
+  user as sharedAccount,
+  APPWRITE_ENDPOINT,
+  APPWRITE_PROJECT_ID
+} from '@/appwrite'
 import { PWAApiService, type PWAApiOptions } from './PWAApiService'
-
-// Appwrite endpoint configuration
-const APPWRITE_ENDPOINT = 'https://appwrite.tsada.edu.rs/v1'
-const APPWRITE_PROJECT_ID = '659ea7f886cf55d4528a'
 
 /**
  * PWA-optimized Appwrite service wrapper
- * Provides intelligent caching and offline support for Appwrite operations
+ * Uses the shared Appwrite client (same session cookies as the rest of the app).
+ * Provides intelligent caching and offline support for Appwrite operations.
  */
 export class PWAAppwriteService {
   private static instance: PWAAppwriteService
-  private client: Client
-  private databases: Databases
-  private storage: Storage
-  private account: Account
+  private client = appw
+  private databases = sharedDatabases
+  private storage = sharedStorage
+  private account = sharedAccount
   private pwaApi: PWAApiService
 
   static getInstance(): PWAAppwriteService {
@@ -26,13 +31,6 @@ export class PWAAppwriteService {
   }
 
   private constructor() {
-    this.client = new Client()
-      .setEndpoint(APPWRITE_ENDPOINT)
-      .setProject(APPWRITE_PROJECT_ID)
-
-    this.databases = new Databases(this.client)
-    this.storage = new Storage(this.client)
-    this.account = new Account(this.client)
     this.pwaApi = PWAApiService.getInstance()
   }
 
@@ -351,16 +349,15 @@ export class PWAAppwriteService {
   // Private helper methods
 
   private buildUrl(...paths: string[]): string {
-    return `${config.url}/v1/${paths.join('/')}`
+    // APPWRITE_ENDPOINT already includes /v1
+    return `${APPWRITE_ENDPOINT}/${paths.join('/')}`
   }
 
   private getHeaders(): Record<string, string> {
     return {
       'Content-Type': 'application/json',
-      'X-Appwrite-Project': config.project_id,
-      'X-SDK-Version': 'appwrite:web:11.0.0',
-      'X-SDK-Name': 'Web',
-      'X-SDK-Language': 'javascript'
+      'X-Appwrite-Project': APPWRITE_PROJECT_ID,
+      'X-Appwrite-Response-Format': '1.6.0'
     }
   }
 

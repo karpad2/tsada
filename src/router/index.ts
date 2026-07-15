@@ -54,8 +54,13 @@ export function createRouter() {
     {
       path: '/about/timetable',
       name: 'timetable',
-     
+
       component: () => import('../views/Abouts/Timetable.vue')
+    },
+    {
+      path: '/about/class-schedule',
+      name: 'class_schedule',
+      component: () => import('../views/Abouts/ClassSchedule.vue')
     },
     {
       path: '/about/parentscouncil',
@@ -276,6 +281,13 @@ export function createRouter() {
       meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/editor/NewsOrderManager.vue')
     },
+    // Timetable Editor
+    {
+      path:'/admin/timetable-editor',
+      name:'timetable_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/editor/TimetableEditor.vue')
+    },
     // Sponsors Editor
     {
       path:'/admin/sponsors',
@@ -289,13 +301,6 @@ export function createRouter() {
       name:'role_manager',
       meta: { requiresAuth: true, roles: ['admin'] },
       component: () => import('../views/admin/RoleManager.vue')
-    },
-    // Menu Editor (Admin only)
-    {
-      path:'/admin/menu-editor',
-      name:'menu_editor',
-      meta: { requiresAuth: true, roles: ['admin'] },
-      component: () => import('../views/admin/MenuEditor.vue')
     },
     {
       path:'/dc',
@@ -413,6 +418,8 @@ const TITLE_MAP: Record<string, string> = {
   'parentvisiting': 'Roditeljski sastanak ~ TSADA',
   'birthday': 'Rođendani ~ TSADA',
   'timetable': 'Raspored časova ~ TSADA',
+  'class_schedule': 'Raspored odeljenja ~ TSADA',
+  'timetable_editor': 'Uređivač rasporeda ~ TSADA',
   'parentscouncil': 'Savet roditelja ~ TSADA',
   'pepsi': 'PEPSI ~ TSADA',
   'SchoolBoard': 'Školski odbor ~ TSADA',

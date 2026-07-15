@@ -1,70 +1,89 @@
 <template>
-  <div
-    v-if="updateAvailable"
-    class="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-4 max-w-sm"
-  >
-    <div class="flex items-start space-x-3">
-      <div class="flex-shrink-0">
-        <i class="pi pi-refresh text-blue-600 text-xl"></i>
-      </div>
-      <div class="flex-1">
-        <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-          {{ $t('new_version_available') }}
-        </h3>
-        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-          {{ $t('update_app_message') }}
-        </p>
-        <div class="flex space-x-2 mt-3">
+  <!-- New version available -->
+  <Transition name="pwa-slide">
+    <div
+      v-if="updateAvailable"
+      class="pwa-toast fixed bottom-4 right-4 z-[60] max-w-sm w-[calc(100%-2rem)]"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="pwa-toast-inner glass-strong rounded-2xl p-4 shadow-xl">
+        <div class="flex items-start gap-3">
+          <div class="pwa-icon pwa-icon--sky shrink-0">
+            <i class="pi pi-refresh text-sky-600 dark:text-sky-300"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+              {{ $t('new_version_available') }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              {{ $t('update_app_message') }}
+            </p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button
+                type="button"
+                class="glass-btn text-white text-xs font-semibold px-4 py-2 rounded-full disabled:opacity-50"
+                :disabled="updating"
+                @click="updateApp"
+              >
+                <i v-if="updating" class="pi pi-spin pi-spinner mr-1"></i>
+                {{ updating ? $t('updating') : $t('update_button') }}
+              </button>
+              <button
+                type="button"
+                class="btn-ghost-glass text-xs px-3 py-2"
+                :disabled="updating"
+                @click="dismissUpdate"
+              >
+                {{ $t('later') }}
+              </button>
+            </div>
+          </div>
           <button
-            @click="updateApp"
-            :disabled="updating"
-            class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors disabled:opacity-50"
-          >
-            <i v-if="updating" class="pi pi-spin pi-spinner mr-1"></i>
-            {{ updating ? $t('updating') : $t('update_button') }}
-          </button>
-          <button
+            type="button"
+            class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
+            :aria-label="$t('later')"
             @click="dismissUpdate"
-            class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs px-3 py-1 rounded transition-colors"
           >
-            {{ $t('later') }}
+            <i class="pi pi-times"></i>
           </button>
         </div>
       </div>
-      <button
-        @click="dismissUpdate"
-        class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-      >
-        <i class="pi pi-times"></i>
-      </button>
     </div>
-  </div>
+  </Transition>
 
-  <!-- Offline ready notification -->
-  <div
-    v-if="offlineReady && !updateAvailable"
-    class="fixed bottom-4 right-4 z-50 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg shadow-lg p-4 max-w-sm"
-  >
-    <div class="flex items-start space-x-3">
-      <div class="flex-shrink-0">
-        <i class="pi pi-check-circle text-green-600 text-xl"></i>
+  <!-- Offline ready -->
+  <Transition name="pwa-slide">
+    <div
+      v-if="offlineReady && !updateAvailable"
+      class="pwa-toast fixed bottom-4 right-4 z-[60] max-w-sm w-[calc(100%-2rem)]"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="pwa-toast-inner glass-strong rounded-2xl p-4 shadow-xl">
+        <div class="flex items-start gap-3">
+          <div class="pwa-icon pwa-icon--green shrink-0">
+            <i class="pi pi-check-circle text-emerald-600 dark:text-emerald-300"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+              {{ $t('offline_ready') }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              {{ $t('offline_ready_message') }}
+            </p>
+          </div>
+          <button
+            type="button"
+            class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
+            @click="offlineReady = false"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
       </div>
-      <div class="flex-1">
-        <h3 class="text-sm font-medium text-green-900 dark:text-green-100">
-          {{ $t('offline_ready') }}
-        </h3>
-        <p class="text-sm text-green-700 dark:text-green-200 mt-1">
-          {{ $t('offline_ready_message') }}
-        </p>
-      </div>
-      <button
-        @click="offlineReady = false"
-        class="flex-shrink-0 text-green-400 hover:text-green-600"
-      >
-        <i class="pi pi-times"></i>
-      </button>
     </div>
-  </div>
+  </Transition>
 </template>
 
 <script lang="ts">
@@ -83,14 +102,15 @@ export default defineComponent({
     } = usePWA()
 
     const updateApp = async () => {
+      if (updating.value) return
       updating.value = true
       try {
         await pwaUpdate()
       } catch (error) {
-        console.error('Update failed:', error)
-      } finally {
+        console.error('[PWA] Update failed:', error)
         updating.value = false
       }
+      // On success the page typically reloads via controllerchange
     }
 
     const dismissUpdate = () => {
@@ -109,12 +129,33 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Animation for entering/leaving */
-.v-enter-active, .v-leave-active {
+.pwa-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pwa-icon--sky {
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+}
+
+.pwa-icon--green {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.pwa-slide-enter-active,
+.pwa-slide-leave-active {
   transition: all 0.3s ease;
 }
-.v-enter-from, .v-leave-to {
+
+.pwa-slide-enter-from,
+.pwa-slide-leave-to {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateX(1.5rem);
 }
 </style>

@@ -1,23 +1,18 @@
 <template>
-  <section class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800" id="courses">
-    <div class="container mx-auto px-6 py-12">
+  <section class="page-shell" id="courses">
+    <div class="page-panel container">
       <!-- Header Section -->
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12">
-        <div class="mb-6 lg:mb-0">
-          <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+      <div class="page-header-row">
+        <div>
+          <h1 class="section-title">
             {{ $t("classlist") }}
           </h1>
-          <div class="flex items-center space-x-4">
-            <div class="h-1 w-24 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full"></div>
-            <p class="text-gray-600 dark:text-gray-300">
-              
-            </p>
-          </div>
+          <div class="section-accent"></div>
         </div>
         
         <div v-if="admin" class="flex space-x-4">
           <button
-            class="btn-primary-modern"
+            class="glass-btn text-white font-medium px-5 py-2.5 rounded-full inline-flex items-center"
             :disabled="loading"
             @click="levelUpClasses"
           >
@@ -182,9 +177,7 @@
 </template>
 
 <script lang="ts">
-import { Databases, ID, Query } from "appwrite";
-import { appw, config } from "@/appwrite";
-import { loadRelations, commonRelations } from "@/appwrite/relationHelper";
+import { classService } from "@/services/api/ClassService";
 import { convertifserbian } from "@/lang";
 import { useLoadingStore } from "@/stores/loading";
 import { setDocumentTitle } from "@/composables/useSEO";
@@ -329,21 +322,13 @@ export default {
     async fetchClasses() {
       this.loading = true;
       this.error = null;
-      const db = new Databases(appw);
       const store = useLoadingStore();
       const locale = store.language;
 
       try {
-        const response = await db.listDocuments(
-          config.website_db,
-          config.classlist,
-          [Query.orderAsc("year"), Query.orderAsc("designation")]
-        );
+        const response = await classService.listClasses({ withRelations: true });
 
-        // Betöltjük a workers és courses relációkat
-        const docsWithRelations = await loadRelations(response.documents, commonRelations.classes);
-
-        this.classes = docsWithRelations.map(doc => {
+        this.classes = response.documents.map(doc => {
           // Fogadóórák feldolgozása
           let receiving_schedules: Schedule[] = [];
           try {
@@ -353,7 +338,7 @@ export default {
               receiving_schedules = doc.receiving_schedules;
             }
           } catch (e) {
-            console.log('Receiving schedules parsing hiba:', e);
+            console.error('Receiving schedules parsing hiba:', e);
             receiving_schedules = [];
           }
 
@@ -387,9 +372,8 @@ export default {
     async new_stuff() {
       this.loading = true;
       this.error = null;
-      const db = new Databases(appw);
       try {
-        const newDoc = await db.createDocument(config.website_db, config.classlist, ID.unique(), { year: 1 });
+        const newDoc = await classService.createClass({ year: 1 });
         await this.$router.push(`/admin/class-edit/${newDoc.$id}`);
       } catch (err) {
         this.error = this.$t("create_error");
@@ -402,9 +386,8 @@ export default {
     async levelUpClasses() {
       this.loading = true;
       this.error = null;
-      const db = new Databases(appw);
       try {
-        const response = await db.listDocuments(config.website_db, config.classlist);
+        const response = await classService.listClasses({ withRelations: false });
         // A levelUpClasses-ben nem szükséges a relációkat betölteni,
         // mert csak az évfolyamot frissítjük és töröljük a 4. éveseket
         const classesToUpdate: string[] = [];
@@ -423,12 +406,12 @@ export default {
         for (const docId of classesToUpdate) {
           const doc = response.documents.find(d => d.$id === docId);
           if (doc) {
-            await db.updateDocument(config.website_db, config.classlist, docId, { year: doc.year + 1 });
+            await classService.updateClass(docId, { year: doc.year + 1 });
           }
         }
 
         for (const classId of classesToDelete) {
-          await db.deleteDocument(config.website_db, config.classlist, classId);
+          await classService.deleteClass(classId);
         }
 
         await this.fetchClasses();
@@ -496,24 +479,33 @@ export default {
 </script>
 
 <style scoped>
-/* Button Styles */
-.btn-primary-modern {
-  @apply inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
-}
-
 /* Loading Animation */
 .loading-spinner {
-  @apply w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  border: 3px solid rgba(14, 165, 233, 0.2);
+  border-top-color: #0ea5e9;
+  animation: page-spin 0.8s linear infinite;
 }
 
 /* Error Card */
 .error-card {
-  @apply flex flex-col items-center justify-center py-16 px-8 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800;
+  @apply flex flex-col items-center justify-center py-16 px-8 rounded-2xl;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 /* Add New Class Card */
 .add-class-card {
-  @apply relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 min-h-80;
+  @apply relative overflow-hidden rounded-2xl cursor-pointer min-h-80 border-2 border-dashed border-sky-400/40 hover:border-sky-500/70;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.08);
+}
+
+.dark .add-class-card {
+  background: rgba(30, 41, 59, 0.55);
 }
 
 .add-class-content {
@@ -526,7 +518,22 @@ export default {
 
 /* Class Cards */
 .class-card {
-  @apply relative overflow-hidden rounded-2xl backdrop-blur-sm border border-white/20 dark:border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 min-h-80 cursor-pointer;
+  @apply relative overflow-hidden rounded-2xl min-h-80 cursor-pointer;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .class-card {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+.class-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(14, 165, 233, 0.18);
 }
 
 .class-card::before {

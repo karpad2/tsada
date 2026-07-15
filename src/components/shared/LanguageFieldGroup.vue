@@ -1,13 +1,13 @@
 <template>
-    <v-card class="language-field-group" elevation="1" rounded>
-        <v-card-title class="language-header d-flex align-center pa-3" :class="getLanguageColor(languageKey)">
-            <v-icon left>{{ getLanguageIcon(languageKey) }}</v-icon>
+    <v-card class="language-field-group mb-4" elevation="0" rounded="lg">
+        <v-card-title class="editor-lang-header d-flex align-center pa-3" :class="'lang-' + languageKey">
+            <v-icon left color="primary">{{ getLanguageIcon(languageKey) }}</v-icon>
             <span class="text-h6">{{ $t(languageKey) }}</span>
             <v-spacer />
             <v-switch
                 :model-value="enabled"
                 @update:model-value="$emit('update:enabled', $event)"
-                color="white"
+                color="primary"
                 inset
                 hide-details
                 @change="$emit('save')"
@@ -76,9 +76,9 @@
 
                 <!-- Content Editor -->
                 <div v-if="showContent" class="mt-4">
-                    <v-card variant="outlined" rounded>
-                        <v-card-title class="text-body-1 pa-3 bg-grey-lighten-4">
-                            <v-icon left size="small">mdi-file-document-edit</v-icon>
+                    <v-card variant="outlined" rounded="lg">
+                        <v-card-title class="text-body-1 pa-3 editor-lang-header !rounded-none">
+                            <v-icon left size="small" color="primary">mdi-file-document-edit</v-icon>
                             {{ $t(`${languageKey}_content`) }}
                         </v-card-title>
                         <v-card-text class="pa-2">
@@ -154,13 +154,7 @@ export default defineComponent({
 
         // Methods
         const getLanguageColor = (lang: string): string => {
-            const colors = {
-                rs: 'bg-red-darken-1 text-white',
-                srb: 'bg-red-darken-1 text-white',
-                hu: 'bg-green-darken-1 text-white',
-                en: 'bg-blue-darken-1 text-white'
-            };
-            return colors[lang as keyof typeof colors] || 'bg-grey-darken-1 text-white';
+            return `lang-${lang}`;
         };
 
         const getLanguageIcon = (lang: string): string => {

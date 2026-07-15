@@ -1,22 +1,20 @@
 <template>
-  <div class="sponsors-editor container px-5 mx-auto bg-white">
+  <div class="sponsors-editor admin-panel container px-5 mx-auto">
     <!-- Header -->
-    <section class="mb-6">
-      <div class="flex flex-wrap w-full mb-6">
-        <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
-            {{ $t('sponsors_editor') }}
-          </h1>
-          <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-        </div>
-      </div>
+    <section class="mb-4 page-header">
+      <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">
+        {{ $t('sponsors_editor') }}
+      </h1>
+      <div class="section-accent !w-20"></div>
     </section>
 
     <!-- Mode Tabs -->
-    <v-tabs v-model="activeTab" color="primary" class="mb-6">
-      <v-tab value="sponsors">{{ $t('sponsors') }}</v-tab>
-      <v-tab value="usefullinks">{{ $t('usefullinks') }}</v-tab>
-    </v-tabs>
+    <div class="editor-section !py-2 mb-6">
+      <v-tabs v-model="activeTab" color="primary" class="mb-0">
+        <v-tab value="sponsors">{{ $t('sponsors') }}</v-tab>
+        <v-tab value="usefullinks">{{ $t('usefullinks') }}</v-tab>
+      </v-tabs>
+    </div>
 
     <!-- Add/Edit Form -->
     <section class="mb-6">
@@ -173,6 +171,9 @@
 import { defineComponent, ref, computed, watch, onMounted, reactive } from 'vue';
 import { Databases, Storage, Query, ID } from 'appwrite';
 import { appw, config } from '@/appwrite';
+
+const db = new Databases(appw);
+const st = new Storage(appw);
 import FileUploadSection from '@/components/shared/FileUploadSection.vue';
 import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 import { useI18n } from 'vue-i18n';
@@ -231,8 +232,7 @@ export default defineComponent({
 
     const imagePreviewUrl = computed(() => {
       if (!form.imageId) return null;
-      const storage = new Storage(appw);
-      return storage.getFilePreview(
+      return st.getFilePreview(
         config.website_images,
         form.imageId,
         200, 0, "center", 90, 5, 'FFFFFF', 0, 1, 0, 'FFFFFF', "webp"
@@ -242,11 +242,9 @@ export default defineComponent({
     const loadItems = async () => {
       loading.value = true;
       try {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
         const cfg = collectionConfig.value;
 
-        const response = await database.listDocuments(
+        const response = await db.listDocuments(
           config.website_db,
           cfg.collectionId,
           [Query.orderAsc('sorrend')]
@@ -257,7 +255,7 @@ export default defineComponent({
           url: doc[cfg.urlField] || '',
           imageId: doc[cfg.imageField] || '',
           imageUrl: doc[cfg.imageField]
-            ? storage.getFilePreview(
+            ? st.getFilePreview(
                 config.website_images,
                 doc[cfg.imageField],
                 200, 0, "center", 90, 5, 'FFFFFF', 0, 1, 0, 'FFFFFF', "webp"
@@ -275,7 +273,6 @@ export default defineComponent({
     const saveItem = async () => {
       saving.value = true;
       try {
-        const database = new Databases(appw);
         const cfg = collectionConfig.value;
 
         const data: Record<string, any> = {
@@ -285,14 +282,14 @@ export default defineComponent({
         };
 
         if (currentEditId.value) {
-          await database.updateDocument(
+          await db.updateDocument(
             config.website_db,
             cfg.collectionId,
             currentEditId.value,
             data
           );
         } else {
-          await database.createDocument(
+          await db.createDocument(
             config.website_db,
             cfg.collectionId,
             ID.unique(),
@@ -327,9 +324,8 @@ export default defineComponent({
       if (!confirmed) return;
 
       try {
-        const database = new Databases(appw);
         const cfg = collectionConfig.value;
-        await database.deleteDocument(config.website_db, cfg.collectionId, id);
+        await db.deleteDocument(config.website_db, cfg.collectionId, id);
         await loadItems();
       } catch (error) {
         console.error('Error deleting item:', error);
@@ -347,7 +343,6 @@ export default defineComponent({
     };
 
     const swapOrder = async (indexA: number, indexB: number) => {
-      const database = new Databases(appw);
       const cfg = collectionConfig.value;
 
       const itemA = items.value[indexA];
@@ -362,8 +357,8 @@ export default defineComponent({
 
       try {
         await Promise.all([
-          database.updateDocument(config.website_db, cfg.collectionId, itemA.id, { sorrend: newOrderA }),
-          database.updateDocument(config.website_db, cfg.collectionId, itemB.id, { sorrend: newOrderB })
+          db.updateDocument(config.website_db, cfg.collectionId, itemA.id, { sorrend: newOrderA }),
+          db.updateDocument(config.website_db, cfg.collectionId, itemB.id, { sorrend: newOrderB })
         ]);
         await loadItems();
       } catch (error) {

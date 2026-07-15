@@ -1,44 +1,30 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <!-- Hero Header -->
-        <div class="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-            <div class="absolute inset-0 bg-black/20"></div>
-            <!-- Background decoration -->
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-            
-            <div class="relative container mx-auto px-6 py-12">
-                <div class="max-w-4xl">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
+    <div class="page-shell">
+        <!-- Main Content -->
+        <div class="page-panel container">
+            <div class="page-header-row">
+                <div>
+                    <div class="inline-flex items-center gap-3 mb-2">
+                        <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-400 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/25">
+                            <i class="pi pi-building text-white text-lg"></i>
                         </div>
-                        <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('school_board') }}</h1>
+                        <h1 class="section-title !mb-0">{{ $t('school_board') }}</h1>
                     </div>
-                    <p class="text-blue-100 text-lg mb-6 leading-relaxed">
-                        {{ $t('sb_subtitle') }}
-                    </p>
-                    <div class="flex gap-4">
-                        <button 
-                            v-if="admin"
-                            @click="showEditor = true"
-                            class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-xl hover:bg-white/20 transition-all duration-200 border border-white/20"
-                        >
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                           {{ $t("add_a_member") }}
-                        </button>
-                    </div>
+                    <div class="section-accent"></div>
+                    <p class="page-subtitle">{{ $t('sb_subtitle') }}</p>
                 </div>
+                <button 
+                    v-if="admin"
+                    @click="showEditor = true"
+                    class="glass-btn inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-full"
+                >
+                    <i class="pi pi-plus"></i>
+                    {{ $t("add_a_member") }}
+                </button>
             </div>
-        </div>
 
-        <!-- Debug Info -->
-        <div v-if="debugMode" class="container mx-auto px-6 py-4">
-            <div class="bg-gray-100 rounded-lg p-4 text-sm">
+            <!-- Debug Info -->
+            <div v-if="debugMode" class="glass rounded-xl p-4 text-sm mb-6">
                 <h3 class="font-bold mb-2">Debug Info:</h3>
                 <p><strong>Loading:</strong> {{ loading }}</p>
                 <p><strong>Members count:</strong> {{ boardMembers.length }}</p>
@@ -49,56 +35,36 @@
                     <pre>{{ JSON.stringify(boardMembers[0], null, 2) }}</pre>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="container mx-auto px-6 py-8">
             <!-- Loading State -->
-            <div v-if="loading" class="flex flex-col items-center justify-center py-20">
-                <div class="relative">
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
-                </div>
-                <p class="mt-4 text-gray-600 font-medium">{{ $t('loading_data') }}</p>
+            <div v-if="loading" class="page-state">
+                <div class="page-spinner"></div>
+                <p class="page-state-text mt-4">{{ $t('loading_data') }}</p>
             </div>
 
             <!-- Error State -->
-            <div v-if="error" class="text-center py-20">
-                <div class="max-w-md mx-auto">
-                    <div class="text-red-400 mb-6">
-                        <svg class="mx-auto h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $t("error") }}</h3>
-                    <p class="text-gray-600 mb-4">{{ error }}</p>
-                    <button 
-                        @click="loadData"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors duration-200"
-                    >
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        {{ $t("retry") }}
-                    </button>
-                </div>
+            <div v-if="error" class="page-state">
+                <h3 class="page-state-title">{{ $t("error") }}</h3>
+                <p class="page-state-text">{{ error }}</p>
+                <button 
+                    @click="loadData"
+                    class="glass-btn inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-full"
+                >
+                    {{ $t("retry") }}
+                </button>
             </div>
 
             <!-- School Board Members Table -->
-            <div v-if="!loading && !error && sortedMembers.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div v-if="!loading && !error && sortedMembers.length > 0" class="page-table-wrap overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 text-white px-6 py-5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-white/10 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold">{{ $t('school_board') }}</h3>
-                                <p class="text-gray-300 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
-                            </div>
+                <div class="page-table-bar">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-white/15 rounded-lg">
+                            <i class="pi pi-building"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">{{ $t('school_board') }}</h3>
+                            <p class="text-white/80 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
                         </div>
                     </div>
                 </div>
@@ -106,19 +72,19 @@
                 <!-- Table Content -->
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gray-50 border-b border-gray-200">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">#</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('name') }}</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('role') }}</th>
-                                <th v-if="admin" class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t("operations") }}</th>
+                                <th>#</th>
+                                <th>{{ $t('name') }}</th>
+                                <th>{{ $t('role') }}</th>
+                                <th v-if="admin">{{ $t("operations") }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody>
                             <tr 
                                 v-for="(member, index) in sortedMembers" 
                                 :key="member.$id || member.id"
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group"
+                                class="group"
                             >
                                 <!-- Number -->
                                 <td class="px-6 py-4">
@@ -138,7 +104,7 @@
                                 <!-- Name -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <div class="text-base font-semibold text-gray-900">
+                                        <div class="text-base font-semibold text-gray-900 dark:text-white">
                                             {{ getDisplayName(member) }}
                                         </div>
                                         <div v-if="isPresidentOrVice(member)" class="flex items-center">
@@ -346,9 +312,11 @@
 </template>
 
 <script lang="ts">
-import { Client, Databases, Query, ID } from "appwrite";
+import { Databases, Query, ID } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+
+const database = new Databases(appw);
 import { convertifserbian } from '@/lang';
 
 interface BoardMember {
@@ -465,15 +433,12 @@ export default {
                 throw new Error('School board collection ID not configured');
             }
 
-            const database = new Databases(appw);
             try {
                 const response = await database.listDocuments(
                     config.website_db,
                     config.school_board,
                     [Query.limit(200), Query.orderAsc('$createdAt')]
                 );
-
-                console.log('Raw school board data:', response.documents);
 
                 this.boardMembers = response.documents.map((doc: any) => ({
                     $id: doc.$id,
@@ -482,8 +447,6 @@ export default {
                     name_rs: doc.name_rs || '',
                     role: doc.role || ''
                 }));
-
-                console.log('Processed board members:', this.boardMembers);
                 
             } catch (error: any) {
                 console.error('Board members load error:', error);
@@ -596,7 +559,6 @@ export default {
             
             this.deleting = true;
             try {
-                const database = new Databases(appw);
                 await database.deleteDocument(
                     config.website_db,
                     config.school_board,
@@ -631,8 +593,6 @@ export default {
             
             this.saving = true;
             try {
-                const database = new Databases(appw);
-                
                 const memberData = {
                     name_hu: this.memberForm.name_hu.trim(),
                     name_rs: this.memberForm.name_rs.trim(),

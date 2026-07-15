@@ -1,53 +1,48 @@
 <template>
-    <div class="relative mb-4 container  px-5  mx-auto bg-white" >
-        <div>
-            <v-btn @click="delete_content" class="m-5">{{ $t('delete') }}</v-btn>
-            <VBtn @click="$router.go(-1)" class="m-5">{{ $t("goback") }}</VBtn>
-            <VBtn v-if="false" @click="$router.go('mailto:'+email)" class="m-5">{{ $t("reply_back") }}</VBtn>
+    <div class="page-shell">
+    <div class="page-panel container">
+        <div class="page-header-row">
+            <div>
+              <h1 class="section-title !text-2xl !mb-1">{{ $t('messages') }}</h1>
+              <div class="section-accent !w-16"></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <v-btn @click="delete_content" color="error">{{ $t('delete') }}</v-btn>
+              <v-btn @click="$router.go(-1)" variant="outlined">{{ $t("goback") }}</v-btn>
+              <v-btn v-if="false" @click="$router.go('mailto:'+email)">{{ $t("reply_back") }}</v-btn>
+            </div>
         </div>
 
-    <div>
-            
-<div class="flex flex-wrap -m-4">
-
-
-</div>
-<div class="relative mb-4 container px-10">
-            
-            <div >
-            <v-text-field
+        <div class="space-y-4">
+          <v-text-field
             disabled
             v-model="name"
             :counter="100"
             :label="$t('name')"
             hide-details
-            
           ></v-text-field>
-        </div>
-        <div >
           <v-text-field
             disabled
             v-model="email"
             :counter="100"
             :label="$t('email')"
             hide-details
-            
           ></v-text-field>
+          <div style="min-height: 300px;" class="glass rounded-xl p-4 print_content" v-html="message"></div>
         </div>
-        
-        <div style="min-height: 300px;" class="bg-slate-100" v-html="message"></div>
     </div>
-             
-    </div>
-</div>    
+    </div>    
         
     
 </template>
 <script lang="ts">
-import {Client,Databases,ID,Storage,Query } from "appwrite";
+import {Databases,ID,Storage,Query } from "appwrite";
 import {appw,config} from "@/appwrite";
 
 import {useLoadingStore} from "@/stores/loading";
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 
 export default{
 data()
@@ -73,8 +68,6 @@ methods:{
     async getMD()
         {
             
-            const database = new Databases(appw);
-            const storage = new Storage(appw);
             const cc=useLoadingStore();
             //just fucking kill me
             let mode="";
@@ -149,8 +142,6 @@ methods:{
     
     async delete_content()
     {
-        const database = new Databases(appw);
-        //const storage = new Storage(appw);
         let k= await database.deleteDocument(config.website_db, config.mess_coll,this.$route.params.id);  
         this.$notify(this.$t('deleted'));
         this.$router.push("/admin/messages");

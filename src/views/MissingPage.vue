@@ -1,18 +1,22 @@
 <template>
-    <div class="flex flex-col justify-center items-center text-center h-screen px-4">
-      <h1 class="text-5xl font-bold text-red-600 mb-6">404 – {{ $t("error") }}</h1>
-      <p class="text-gray-600 dark:text-gray-300 mb-8">{{ $t("not_found_message") || "Az oldal nem található." }}</p>
-      <VBtn color="primary" @click="$router.go(-1)">
+  <div class="page-shell flex flex-col justify-center items-center text-center px-4 py-20">
+    <div class="page-panel !min-h-0 max-w-lg w-full page-state">
+      <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-sky-500/15 border border-sky-400/30 flex items-center justify-center">
+        <span class="text-2xl font-bold text-sky-600 dark:text-sky-400">404</span>
+      </div>
+      <h1 class="page-state-title text-3xl mb-3">{{ $t("error") }}</h1>
+      <p class="page-state-text mb-8">{{ $t("not_found_message") || "Az oldal nem található." }}</p>
+      <button class="glass-btn px-8 py-3 text-white font-semibold rounded-full" @click="$router.go(-1)">
         {{ $t("goback") }}
-      </VBtn>
+      </button>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    mounted() {
-      document.title = "404 – " + this.$t("error");
-    }
-  };
-  </script>
-  
+  </div>
+</template>
+
+<script>
+export default {
+  mounted() {
+    document.title = "404 – " + this.$t("error");
+  }
+};
+</script>

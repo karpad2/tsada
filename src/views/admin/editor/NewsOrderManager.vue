@@ -1,13 +1,14 @@
 <template>
-  <div class="container px-5 mx-auto py-8">
+  <div class="page-shell">
+  <div class="page-panel container">
     <!-- Header -->
-    <div class="flex flex-wrap justify-between items-center mb-8">
+    <div class="page-header-row">
       <div>
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+        <h1 class="section-title !text-2xl sm:!text-3xl">
           {{ $t('news_order_manager') }}
         </h1>
-        <div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full mb-3"></div>
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
+        <div class="section-accent"></div>
+        <p class="page-subtitle">
           {{ $t('news_order_description') }}
         </p>
       </div>
@@ -42,13 +43,13 @@
       <!-- Pinned / Featured news -->
       <div>
         <div class="flex items-center gap-2 mb-4">
-          <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-sky-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
           </svg>
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
             {{ $t('pinned_news') }}
           </h2>
-          <span class="bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs px-2 py-0.5 rounded-full">
+          <span class="glass-badge text-xs px-2 py-0.5 rounded-full">
             {{ pinnedItems.length }}
           </span>
         </div>
@@ -60,12 +61,12 @@
           handle=".drag-handle"
           ghost-class="ghost-card"
           animation="200"
-          class="space-y-2 min-h-[100px] bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-3 border-2 border-dashed border-orange-200 dark:border-orange-800"
+          class="space-y-2 min-h-[100px] bg-sky-50/50 dark:bg-sky-900/10 rounded-xl p-3 border-2 border-dashed border-sky-200 dark:border-sky-800"
           @change="onOrderChange"
         >
           <template #item="{ element, index }">
             <div
-              class="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-lg p-3 shadow-sm border border-orange-200 dark:border-orange-700 hover:shadow-md transition-shadow cursor-default"
+              class="flex items-center gap-3 glass-card rounded-lg p-3 border border-sky-200 dark:border-sky-700 hover:shadow-md transition-shadow cursor-default"
             >
               <div class="drag-handle cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +74,7 @@
                 </svg>
               </div>
 
-              <span class="text-sm font-bold text-orange-500 w-6 text-center">{{ index + 1 }}</span>
+              <span class="text-sm font-bold text-sky-500 w-6 text-center">{{ index + 1 }}</span>
 
               <img
                 v-if="element.img"
@@ -97,7 +98,7 @@
               <v-btn
                 size="x-small"
                 variant="text"
-                color="orange"
+                color="primary"
                 @click="unpinItem(element)"
                 :title="$t('unpin_news')"
               >
@@ -195,7 +196,7 @@
               <v-btn
                 size="x-small"
                 variant="text"
-                color="orange"
+                color="primary"
                 @click="pinItem(element)"
                 :title="$t('pin_news')"
               >
@@ -220,6 +221,7 @@
     <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000">
       {{ snackbarText }}
     </v-snackbar>
+  </div>
   </div>
 </template>
 

@@ -43,7 +43,6 @@ export class AnalyticsManager {
             device_type: this.getDeviceType()
         });
 
-        console.log('📊 Page view tracked:', page_path);
     }
 
     // Enhanced event tracking
@@ -63,7 +62,6 @@ export class AnalyticsManager {
 
         this.gtag?.event(event.action, eventData);
 
-        console.log('📊 Event tracked:', event.action, eventData);
     }
 
     // User interaction tracking
@@ -200,7 +198,6 @@ export class AnalyticsManager {
             user_properties: properties
         });
 
-        console.log('👤 User properties set:', properties);
     }
 
     // Admin actions tracking

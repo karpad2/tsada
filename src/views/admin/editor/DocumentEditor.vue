@@ -1,43 +1,50 @@
 <template>
-    <div class="document-editor dark:bg-slate-600">
+    <div class="document-editor admin-panel">
       <!-- Loading overlay -->
       <v-overlay :value="isLoading" absolute>
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
   
       <!-- Header with actions -->
-      <v-card class="mb-4 header-card" elevation="2">
-        <v-card-title class="pb-2 header-gradient white--text">
-          <v-icon left color="white">mdi-file-document-edit</v-icon>
-          {{ $t('document_editor') }}
-          
-          <v-spacer></v-spacer>
-          
-          <!-- Action buttons -->
-          <div class="action-buttons">
-            <v-btn 
-              color="success" 
-              :disabled="!hasChanges || isUploading"
-              :loading="isSaving"
-              @click="saveDocument"
-              class="mr-2"
-              :class="{ pulse: hasChanges && !isSaving }"
-            >
-              <v-icon left>mdi-content-save</v-icon>
-              {{ $t('save') }}
-            </v-btn>
-            
-            <v-btn 
-              color="error" 
-              @click="confirmDelete"
-              :disabled="isUploading || isSaving"
-            >
-              <v-icon left>mdi-delete</v-icon>
-              {{ $t('delete') }}
-            </v-btn>
-          </div>
-        </v-card-title>
-      </v-card>
+      <div class="page-header mb-2">
+        <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('document_editor') }}</h1>
+        <div class="section-accent !w-20"></div>
+      </div>
+      <div class="editor-toolbar mb-4">
+        <div class="editor-toolbar-switches">
+          <v-icon color="primary" class="mr-1">mdi-file-document-edit</v-icon>
+          <span class="text-body-1 font-weight-medium">{{ $t('document_editor') }}</span>
+        </div>
+        <div class="editor-toolbar-actions action-buttons">
+          <v-btn 
+            color="success" 
+            :disabled="!hasChanges || isUploading"
+            :loading="isSaving"
+            @click="saveDocument"
+            prepend-icon="mdi-content-save"
+            :class="{ pulse: hasChanges && !isSaving }"
+          >
+            {{ $t('save') }}
+          </v-btn>
+          <v-btn 
+            color="error" 
+            variant="outlined"
+            @click="confirmDelete"
+            :disabled="isUploading || isSaving"
+            prepend-icon="mdi-delete"
+          >
+            {{ $t('delete') }}
+          </v-btn>
+          <v-btn
+            variant="outlined"
+            color="primary"
+            prepend-icon="mdi-arrow-left"
+            @click="$router.go(-1)"
+          >
+            {{ $t('goback') }}
+          </v-btn>
+        </div>
+      </div>
   
       <!-- File upload section with translation -->
       <FileUploadSection
@@ -53,8 +60,8 @@
       />
   
       <!-- Multi-language titles -->
-      <v-card class="titles-card" elevation="1">
-        <v-card-title class="subtitle-1 card-header">
+      <v-card class="titles-card editor-section !p-0 overflow-hidden" elevation="0">
+        <v-card-title class="subtitle-1 editor-card-header">
           <v-icon left>mdi-translate</v-icon>
           {{ $t('multilingual_titles') }}
 
@@ -64,7 +71,7 @@
           <v-btn
             v-if="hasAnyTitle"
             @click="showTranslateDialog = true"
-            color="primary"
+            color="white"
             variant="tonal"
             size="small"
             class="mr-2"
@@ -279,7 +286,7 @@
   </template>
   
   <script lang="ts">
-  import { Client, Databases, ID, Storage, Query, Functions } from "appwrite";
+  import { Databases, ID, Storage, Query } from "appwrite";
   import { appw, config } from "@/appwrite";
   import { useLoadingStore } from "@/stores/loading";
   import FileUploadSection from "@/components/shared/FileUploadSection.vue";
@@ -417,10 +424,6 @@
     },
   
     async mounted() {
-      console.log('🚀 DocumentEditor mounted');
-      console.log('Props:', { modded: this.modded });
-      console.log('Route:', this.$route);
-      
       // Validate configuration first
       if (!this.validateConfiguration()) {
         return; // Stop execution if config is invalid
@@ -430,7 +433,7 @@
       this.setupBeforeUnloadHandler();
     },
   
-    beforeDestroy() {
+    beforeUnmount() {
       this.cleanupBeforeUnloadHandler();
       this.clearAutoSaveTimer();
     },
@@ -661,7 +664,6 @@
         }
 
         const best = entries[0];
-        console.log('🔍 AI detected source language:', best.code, 'with text:', best.text);
         return { code: best.code, text: best.text };
       },
 
@@ -702,16 +704,12 @@
             return;
           }
 
-          console.log('🤖 Starting AI translation from', source.code, 'to', targetLanguages);
-
           const totalSteps = targetLanguages.length;
           let completed = 0;
 
           // Fordítás minden célnyelvre
           for (const targetLang of targetLanguages) {
             try {
-              console.log(`🔄 Translating to ${targetLang}...`);
-
               const translated = await translateWithAI(
                 source.text,
                 source.code,
@@ -722,8 +720,6 @@
               this.titles[targetLang] = translated;
               completed++;
               this.translationProgress = (completed / totalSteps) * 100;
-
-              console.log(`✅ Translated to ${targetLang}:`, translated);
 
               // Kis késleltetés a rate limiting elkerülésére
               await new Promise(resolve => setTimeout(resolve, 500));
@@ -887,11 +883,7 @@
   
   <style scoped>
   .document-editor {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 24px;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    /* shell styles from .admin-panel / .document-editor in main.css */
   }
   
   /* Header styling */
@@ -902,7 +894,7 @@
   }
   
   .header-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
     position: relative;
     overflow: hidden;
   }
@@ -1159,7 +1151,6 @@
   /* Dark mode support */
   @media (prefers-color-scheme: dark) {
     .document-editor {
-      background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
       color: #e2e8f0;
     }
 
@@ -1259,7 +1250,6 @@
 
   /* Force dark mode when html has dark class */
   :global(.dark) .document-editor {
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
     color: #e2e8f0;
   }
 

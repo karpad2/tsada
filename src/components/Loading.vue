@@ -39,31 +39,31 @@
 <style>
 /* Dark mode styles - unscoped to work with html.dark */
 html.dark .loading-container {
-    background: #1a1a1a !important;
+    background: #0b1220 !important;
 }
 
 html.dark .skeleton-logo {
-    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
     background-size: 200% 100% !important;
 }
 
 html.dark .skeleton-nav-item {
-    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
     background-size: 200% 100% !important;
 }
 
 html.dark .skeleton-title {
-    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
     background-size: 200% 100% !important;
 }
 
 html.dark .skeleton-text {
-    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
     background-size: 200% 100% !important;
 }
 
 html.dark .skeleton-card {
-    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%) !important;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
     background-size: 200% 100% !important;
 }
 </style>
@@ -74,7 +74,7 @@ html.dark .skeleton-card {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: #f9fafb;
+    background: #f0f7fc;
     padding: 20px;
 }
 
@@ -95,7 +95,7 @@ html.dark .skeleton-card {
 .skeleton-logo {
     width: 120px;
     height: 60px;
-    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background: linear-gradient(90deg, #e0f2fe 25%, #f0f9ff 50%, #e0f2fe 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 8px;
@@ -109,7 +109,7 @@ html.dark .skeleton-card {
 .skeleton-nav-item {
     width: 80px;
     height: 20px;
-    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background: linear-gradient(90deg, #e0f2fe 25%, #f0f9ff 50%, #e0f2fe 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 4px;
@@ -123,7 +123,7 @@ html.dark .skeleton-card {
 .skeleton-title {
     width: 60%;
     height: 40px;
-    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background: linear-gradient(90deg, #e0f2fe 25%, #f0f9ff 50%, #e0f2fe 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 8px;
@@ -133,7 +133,7 @@ html.dark .skeleton-card {
 .skeleton-text {
     width: 100%;
     height: 20px;
-    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background: linear-gradient(90deg, #e0f2fe 25%, #f0f9ff 50%, #e0f2fe 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 4px;
@@ -153,7 +153,7 @@ html.dark .skeleton-card {
 
 .skeleton-card {
     height: 200px;
-    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background: linear-gradient(90deg, #e0f2fe 25%, #f0f9ff 50%, #e0f2fe 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 12px;

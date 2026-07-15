@@ -1,37 +1,44 @@
 <template>
-    <v-card class="content-blocks-editor" elevation="2" rounded>
-        <v-card-title class="d-flex align-center pa-4 bg-sky-600 text-white">
-            <v-icon left>mdi-view-dashboard-variant</v-icon>
-            <span class="text-h6 ml-2">{{ $t('content_blocks') }}</span>
-            <v-spacer />
+    <div class="content-blocks-editor">
+        <div class="blocks-toolbar">
+            <div class="blocks-toolbar-left">
+                <span class="blocks-toolbar-icon">
+                    <v-icon size="small" color="white">mdi-view-dashboard-variant</v-icon>
+                </span>
+                <span class="blocks-toolbar-title">{{ $t('content_blocks') }}</span>
+                <v-chip size="small" color="primary" variant="tonal" class="ml-2">
+                    {{ filteredBlocks.length }} {{ $t('blocks') }}
+                </v-chip>
+            </div>
 
-            <!-- Language Filter -->
-            <v-btn-toggle
-                v-model="currentLanguage"
-                mandatory
-                density="compact"
-                color="white"
-                class="mr-3"
-            >
-                <v-btn value="rs" size="small">RS</v-btn>
-                <v-btn value="hu" size="small">HU</v-btn>
-                <v-btn value="en" size="small">EN</v-btn>
-            </v-btn-toggle>
+            <div class="blocks-toolbar-right">
+                <v-btn-toggle
+                    v-model="currentLanguage"
+                    mandatory
+                    density="compact"
+                    color="primary"
+                    divided
+                    class="lang-toggle"
+                >
+                    <v-btn value="rs" size="small">RS</v-btn>
+                    <v-btn value="hu" size="small">HU</v-btn>
+                    <v-btn value="en" size="small">EN</v-btn>
+                </v-btn-toggle>
+            </div>
+        </div>
 
-            <v-chip size="small" color="white" variant="flat" class="text-sky-600">
-                {{ filteredBlocks.length }} {{ $t('blocks') }}
-            </v-chip>
-        </v-card-title>
-
-        <v-card-text class="pa-4">
+        <div class="blocks-body pa-4">
             <!-- Empty State -->
-            <div v-if="filteredBlocks.length === 0" class="empty-state text-center py-8">
-                <v-icon size="64" color="grey-lighten-1">mdi-puzzle-plus-outline</v-icon>
-                <p class="text-body-1 text-grey mt-4">{{ $t('no_blocks_for_language', { lang: getLanguageName(currentLanguage) }) }}</p>
+            <div v-if="filteredBlocks.length === 0" class="empty-state text-center py-10">
+                <div class="empty-icon-wrap mx-auto mb-4">
+                    <v-icon size="40" color="primary">mdi-puzzle-plus-outline</v-icon>
+                </div>
+                <p class="text-body-1 text-medium-emphasis mb-4">
+                    {{ $t('no_blocks_for_language', { lang: getLanguageName(currentLanguage) }) }}
+                </p>
                 <v-btn
                     color="primary"
-                    variant="tonal"
-                    class="mt-4"
+                    class="glass-btn-like"
                     @click="showAddBlockDialog = true"
                 >
                     <v-icon left>mdi-plus</v-icon>
@@ -48,28 +55,31 @@
                 ghost-class="ghost-block"
                 @end="onDragEnd"
             >
-                <template #item="{ element, index }">
-                    <v-card
-                        class="block-item mb-4"
-                        :class="{ 'border-primary': expandedBlock === element.$id }"
-                        variant="outlined"
-                        rounded
+                <template #item="{ element }">
+                    <div
+                        class="block-item mb-3"
+                        :class="[
+                            getBlockHeaderClass(element.type),
+                            { 'is-expanded': expandedBlock === element.$id }
+                        ]"
                     >
                         <!-- Block Header -->
-                        <v-card-title
-                            class="block-header d-flex align-center pa-3"
-                            :class="getBlockHeaderClass(element.type)"
-                        >
-                            <v-icon class="drag-handle cursor-move mr-2" color="white">
+                        <div class="block-header d-flex align-center pa-3">
+                            <v-icon class="drag-handle cursor-move mr-2" color="primary">
                                 mdi-drag-vertical
                             </v-icon>
 
-                            <v-chip size="small" :color="getBlockTypeColor(element.type)" variant="flat" class="mr-2">
+                            <v-chip
+                                size="small"
+                                :color="getBlockTypeColor(element.type)"
+                                variant="tonal"
+                                class="mr-2"
+                            >
                                 <v-icon left size="small">{{ getBlockTypeIcon(element.type) }}</v-icon>
                                 {{ $t(`block_type_${element.type || 'text'}`) }}
                             </v-chip>
 
-                            <span class="text-body-1 font-weight-medium text-white ml-2">
+                            <span class="text-body-1 font-weight-medium block-title-text">
                                 {{ element.title || $t('untitled_block') }}
                             </span>
 
@@ -79,7 +89,7 @@
                                 v-model="element.visible"
                                 density="compact"
                                 hide-details
-                                color="white"
+                                color="primary"
                                 class="mr-2"
                                 @change="saveBlock(element)"
                             />
@@ -88,7 +98,7 @@
                                 icon
                                 size="small"
                                 variant="text"
-                                color="white"
+                                color="primary"
                                 @click="toggleExpand(element.$id)"
                             >
                                 <v-icon>
@@ -100,17 +110,16 @@
                                 icon
                                 size="small"
                                 variant="text"
-                                color="white"
+                                color="error"
                                 @click="confirmDelete(element)"
                             >
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
-                        </v-card-title>
+                        </div>
 
                         <!-- Block Content (Expanded) -->
                         <v-expand-transition>
-                            <v-card-text v-if="expandedBlock === element.$id" class="pa-4">
-                                <!-- Block Title -->
+                            <div v-if="expandedBlock === element.$id" class="block-body pa-4">
                                 <v-text-field
                                     v-model="element.title"
                                     :label="$t('block_title')"
@@ -121,7 +130,6 @@
                                     @change="saveBlock(element)"
                                 />
 
-                                <!-- Type-specific Editor -->
                                 <component
                                     :is="getBlockEditorComponent(element.type)"
                                     :block="element"
@@ -130,10 +138,8 @@
                                     @save="saveBlock(element)"
                                 />
 
-                                <!-- Block Actions -->
                                 <div class="d-flex justify-end mt-4 gap-2">
                                     <v-btn
-                                        variant="tonal"
                                         color="primary"
                                         size="small"
                                         @click="saveBlock(element)"
@@ -143,9 +149,9 @@
                                         {{ $t('save') }}
                                     </v-btn>
                                 </div>
-                            </v-card-text>
+                            </div>
                         </v-expand-transition>
-                    </v-card>
+                    </div>
                 </template>
             </draggable>
 
@@ -155,22 +161,22 @@
                 color="primary"
                 variant="outlined"
                 block
-                class="mt-4"
+                class="mt-2 add-block-btn"
                 @click="showAddBlockDialog = true"
             >
                 <v-icon left>mdi-plus</v-icon>
                 {{ $t('add_block') }} ({{ getLanguageName(currentLanguage) }})
             </v-btn>
-        </v-card-text>
+        </div>
 
         <!-- Add Block Dialog -->
-        <v-dialog v-model="showAddBlockDialog" max-width="500">
-            <v-card>
-                <v-card-title class="text-h6 pa-4">
-                    <v-icon left color="primary">mdi-puzzle-plus</v-icon>
+        <v-dialog v-model="showAddBlockDialog" max-width="520">
+            <v-card class="blocks-dialog" rounded="lg">
+                <v-card-title class="editor-card-header">
+                    <v-icon left>mdi-puzzle-plus</v-icon>
                     {{ $t('add_new_block') }} ({{ getLanguageName(currentLanguage) }})
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="pa-4">
                     <v-row>
                         <v-col
                             v-for="blockType in blockTypes"
@@ -178,27 +184,24 @@
                             cols="6"
                             sm="4"
                         >
-                            <v-card
+                            <div
                                 class="block-type-card text-center pa-4"
-                                variant="outlined"
-                                :color="selectedBlockType === blockType.value ? 'primary' : undefined"
+                                :class="{ 'is-selected': selectedBlockType === blockType.value }"
                                 @click="selectedBlockType = blockType.value"
-                                hover
                             >
                                 <v-icon size="32" :color="blockType.color">{{ blockType.icon }}</v-icon>
-                                <p class="text-body-2 mt-2 mb-0">{{ $t(blockType.label) }}</p>
-                            </v-card>
+                                <p class="text-body-2 mt-2 mb-0 font-weight-medium">{{ $t(blockType.label) }}</p>
+                            </div>
                         </v-col>
                     </v-row>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="pa-4 pt-0">
                     <v-spacer />
                     <v-btn variant="text" @click="showAddBlockDialog = false">
                         {{ $t('cancel') }}
                     </v-btn>
                     <v-btn
                         color="primary"
-                        variant="flat"
                         @click="addBlock"
                         :loading="isAdding"
                         :disabled="!selectedBlockType"
@@ -211,8 +214,8 @@
 
         <!-- Delete Confirmation Dialog -->
         <v-dialog v-model="deleteDialog" max-width="400">
-            <v-card>
-                <v-card-title class="text-h6">
+            <v-card class="blocks-dialog" rounded="lg">
+                <v-card-title class="text-h6 pa-4">
                     <v-icon left color="error">mdi-alert</v-icon>
                     {{ $t('confirm_delete') }}
                 </v-card-title>
@@ -220,14 +223,13 @@
                     {{ $t('delete_block_confirmation') }}
                     <strong v-if="blockToDelete">{{ blockToDelete.title || $t('untitled_block') }}</strong>?
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="pa-4 pt-0">
                     <v-spacer />
                     <v-btn variant="text" @click="deleteDialog = false">
                         {{ $t('cancel') }}
                     </v-btn>
                     <v-btn
                         color="error"
-                        variant="flat"
                         @click="deleteBlock"
                         :loading="isDeleting"
                     >
@@ -236,7 +238,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-card>
+    </div>
 </template>
 
 <script lang="ts">
@@ -254,6 +256,8 @@ import GalleryBlockEditor from './blocks/GalleryBlockEditor.vue';
 import VideoBlockEditor from './blocks/VideoBlockEditor.vue';
 import FormBlockEditor from './blocks/FormBlockEditor.vue';
 import DocumentBlockEditor from './blocks/DocumentBlockEditor.vue';
+
+const database = new Databases(appw);
 
 interface ContentBlock {
     $id: string;
@@ -293,7 +297,6 @@ export default defineComponent({
     emits: ['update'],
     setup(props, { emit }) {
         const { t } = useI18n();
-        const database = new Databases(appw);
         const loadingStore = useLoadingStore();
 
         // State
@@ -331,11 +334,11 @@ export default defineComponent({
 
         // Block types configuration
         const blockTypes: BlockType[] = [
-            { value: 'text', label: 'block_type_text', icon: 'mdi-text-box', color: 'blue' },
-            { value: 'gallery', label: 'block_type_gallery', icon: 'mdi-image-multiple', color: 'green' },
-            { value: 'video', label: 'block_type_video', icon: 'mdi-video', color: 'red' },
-            { value: 'form', label: 'block_type_form', icon: 'mdi-form-select', color: 'purple' },
-            { value: 'document', label: 'block_type_document', icon: 'mdi-file-document', color: 'orange' }
+            { value: 'text', label: 'block_type_text', icon: 'mdi-text-box', color: 'primary' },
+            { value: 'gallery', label: 'block_type_gallery', icon: 'mdi-image-multiple', color: 'success' },
+            { value: 'video', label: 'block_type_video', icon: 'mdi-video', color: 'error' },
+            { value: 'form', label: 'block_type_form', icon: 'mdi-form-select', color: 'info' },
+            { value: 'document', label: 'block_type_document', icon: 'mdi-file-document', color: 'warning' }
         ];
 
         // Block editor component mapping
@@ -359,18 +362,18 @@ export default defineComponent({
 
         const getBlockTypeColor = (type: string): string => {
             const blockType = blockTypes.find(bt => bt.value === type);
-            return blockType?.color || 'blue';
+            return blockType?.color || 'primary';
         };
 
         const getBlockHeaderClass = (type: string): string => {
             const colorMap: Record<string, string> = {
-                text: 'bg-blue-darken-1',
-                gallery: 'bg-green-darken-1',
-                video: 'bg-red-darken-1',
-                form: 'bg-purple-darken-1',
-                document: 'bg-orange-darken-1'
+                text: 'block-type-text',
+                gallery: 'block-type-gallery',
+                video: 'block-type-video',
+                form: 'block-type-form',
+                document: 'block-type-document'
             };
-            return colorMap[type] || 'bg-grey-darken-1';
+            return colorMap[type] || 'block-type-text';
         };
 
         const parseSettings = (settings: string): Record<string, any> => {
@@ -651,44 +654,183 @@ export default defineComponent({
 
 <style scoped>
 .content-blocks-editor {
-    border-radius: 16px !important;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.08);
+}
+
+:global(.dark) .content-blocks-editor {
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.blocks-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1.15rem;
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+    color: white;
+}
+
+.blocks-toolbar-left,
+.blocks-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.blocks-toolbar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.blocks-toolbar-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.lang-toggle {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 9999px !important;
+}
+
+.lang-toggle :deep(.v-btn) {
+    color: white !important;
+    min-width: 2.5rem;
+}
+
+.blocks-body {
+    min-height: 120px;
 }
 
 .block-item {
-    transition: all 0.3s ease;
-    border-radius: 12px !important;
+    border-radius: 0.85rem;
     overflow: hidden;
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+:global(.dark) .block-item {
+    background: rgba(15, 23, 42, 0.55);
+    border-color: rgba(148, 163, 184, 0.16);
 }
 
 .block-item:hover {
-    border-color: rgb(var(--v-theme-primary)) !important;
+    border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.12);
+}
+
+.block-item.is-expanded {
+    border-color: rgba(14, 165, 233, 0.5);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
 }
 
 .block-header {
-    border-radius: 0;
-    transition: background-color 0.3s ease;
+    border-left: 3px solid #0ea5e9;
+    background: rgba(14, 165, 233, 0.06);
+}
+
+.block-type-text .block-header { border-left-color: #0ea5e9; background: rgba(14, 165, 233, 0.08); }
+.block-type-gallery .block-header { border-left-color: #16a34a; background: rgba(22, 163, 74, 0.08); }
+.block-type-video .block-header { border-left-color: #dc2626; background: rgba(220, 38, 38, 0.08); }
+.block-type-form .block-header { border-left-color: #0284c7; background: rgba(2, 132, 199, 0.08); }
+.block-type-document .block-header { border-left-color: #d97706; background: rgba(217, 119, 6, 0.08); }
+
+:global(.dark) .block-header {
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.block-title-text {
+    color: #0f172a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40%;
+}
+
+:global(.dark) .block-title-text {
+    color: #f1f5f9;
+}
+
+.block-body {
+    border-top: 1px solid rgba(14, 165, 233, 0.12);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+:global(.dark) .block-body {
+    background: rgba(15, 23, 42, 0.35);
+    border-top-color: rgba(148, 163, 184, 0.12);
 }
 
 .drag-handle {
-    cursor: move;
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .ghost-block {
-    opacity: 0.5;
-    background: rgb(var(--v-theme-primary-lighten-4));
+    opacity: 0.45;
+    border: 2px dashed rgba(14, 165, 233, 0.5) !important;
+}
+
+.empty-icon-wrap {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 165, 233, 0.12);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.add-block-btn {
+    border-style: dashed !important;
+    border-radius: 0.85rem !important;
 }
 
 .block-type-card {
     cursor: pointer;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    background: rgba(255, 255, 255, 0.55);
     transition: all 0.2s ease;
 }
 
 .block-type-card:hover {
     transform: translateY(-2px);
+    border-color: rgba(14, 165, 233, 0.45);
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.12);
 }
 
-.empty-state {
-    color: rgba(var(--v-theme-on-surface), 0.6);
+.block-type-card.is-selected {
+    border-color: #0ea5e9;
+    background: rgba(14, 165, 233, 0.12);
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+}
+
+:global(.dark) .block-type-card {
+    background: rgba(30, 41, 59, 0.55);
+    border-color: rgba(148, 163, 184, 0.18);
+}
+
+.blocks-dialog {
+    overflow: hidden;
 }
 
 .cursor-move {
@@ -699,19 +841,19 @@ export default defineComponent({
     gap: 8px;
 }
 
-/* Block type colors */
-.bg-blue-darken-1 { background-color: #1976d2 !important; }
-.bg-green-darken-1 { background-color: #388e3c !important; }
-.bg-red-darken-1 { background-color: #d32f2f !important; }
-.bg-purple-darken-1 { background-color: #7b1fa2 !important; }
-.bg-orange-darken-1 { background-color: #f57c00 !important; }
-.bg-grey-darken-1 { background-color: #616161 !important; }
-
-/* Responsive */
 @media (max-width: 600px) {
     .block-header {
         flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .block-title-text {
+        max-width: 100%;
+    }
+
+    .blocks-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 </style>

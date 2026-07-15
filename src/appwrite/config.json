@@ -74,5 +74,7 @@
     "dc_server_members":"dc_server_members",
     "dc_server_channels":"dc_server_channels",
     "dc_custom_emojis":"dc_custom_emojis",
-    "dc_contacts":"dc_contacts"
+    "dc_contacts":"dc_contacts",
+    "timetable_configs":"timetable_configs",
+    "timetable_classes":"timetable_classes"
 }

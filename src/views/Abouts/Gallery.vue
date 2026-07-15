@@ -1,29 +1,27 @@
 <template>
   <section
-    class="text-gray-600 body-font p-5 min-h-screen"
+    class="page-shell p-2 sm:p-4"
     id="courses"
     role="main"
     aria-label="Gallery section"
     :aria-busy="loading"
   >
-    <div class="container px-5 mx-auto">
+    <div class="page-panel container !min-h-0">
       <!-- Header -->
-      <div class="flex flex-wrap w-full mb-10">
-        <div class="lg:w-1/2 w-full mb-6">
+      <div class="page-header-row">
+        <div>
           <h1
-            class="sm:text-3xl text-2xl font-medium title-font text-gray-900 dark:text-white"
+            class="section-title !text-2xl sm:!text-3xl"
             id="gallery-heading"
           >
             {{ $t("gallery") }}
           </h1>
-          <div class="h-1 w-20 bg-sky-500 rounded"></div>
+          <div class="section-accent !w-20"></div>
         </div>
         
         <!-- Item counter -->
-        <div class="lg:w-1/2 w-full flex justify-end items-center">
-          <div v-if="totalItems > 0" class="text-sm text-gray-500 dark:text-gray-400">
-            {{ courses.length }} / {{ totalItems }} {{ $t("items") }}
-          </div>
+        <div v-if="totalItems > 0" class="glass-badge px-3 py-1 rounded-full text-sm font-medium">
+          {{ courses.length }} / {{ totalItems }} {{ $t("items") }}
         </div>
       </div>
 
@@ -40,7 +38,7 @@
           role="button"
           aria-label="Add new gallery item"
         >
-          <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-sky-400 dark:hover:border-sky-500 transition-all duration-300">
+          <div class="relative overflow-hidden rounded-2xl glass-card border-2 border-dashed !border-sky-400/40 hover:!border-sky-500/70">
             <div class="aspect-[4/3] flex items-center justify-center">
               <div class="text-center">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -67,7 +65,7 @@
           role="button"
           :aria-label="`Open ${course.title}`"
         >
-          <div class="relative overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
+          <div class="relative overflow-hidden rounded-2xl glass-card">
             <!-- Image -->
             <div class="relative aspect-[4/3] overflow-hidden">
               <img
@@ -97,13 +95,13 @@
                 </span>
               </div>
               
-              <h3 class="text-lg font-semibold text-gray-900  line-clamp-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300">
                 {{ course.title }}
               </h3>
               
               <p 
                 v-if="course.text" 
-                class="mt-2 text-sm text-gray-600  line-clamp-2"
+                class="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2 gallery-card-text"
                 v-html="course.text"
               ></p>
             </div>
@@ -118,12 +116,12 @@
           class="gallery-card m-3"
           aria-hidden="true"
         >
-          <div class="animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700">
-            <div class="aspect-[4/3] bg-gray-300 dark:bg-gray-600 rounded-t-xl"></div>
+          <div class="animate-pulse rounded-2xl glass-card">
+            <div class="aspect-[4/3] bg-sky-100/50 dark:bg-slate-700/50 rounded-t-2xl"></div>
             <div class="p-4 space-y-3">
-              <div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/3"></div>
-              <div class="h-5 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
-              <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
+              <div class="h-3 bg-sky-100/60 dark:bg-slate-700/60 rounded-lg w-1/3"></div>
+              <div class="h-5 bg-sky-100/60 dark:bg-slate-700/60 rounded-lg w-full"></div>
+              <div class="h-4 bg-sky-100/60 dark:bg-slate-700/60 rounded-lg w-3/4"></div>
             </div>
           </div>
         </div>
@@ -154,7 +152,7 @@
       >
         <button
           @click="loadMore"
-          class="px-8 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 focus:bg-sky-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 font-medium"
+          class="glass-btn px-8 py-3 text-white rounded-full font-medium"
         >
           {{ $t("load_more") }}
         </button>
@@ -198,6 +196,9 @@ import { defineComponent } from "vue";
 import { Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 import { useLoadingStore } from "@/stores/loading";
 import { setDocumentTitle } from "@/composables/useSEO";
 
@@ -285,9 +286,6 @@ export default defineComponent({
       this.loading = true;
 
       try {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
-        
         const queries = [
           Query.select([
             "title_hu", "title_en", "title_rs",
@@ -385,7 +383,6 @@ export default defineComponent({
       if (this.loading) return;
       
       try {
-        const database = new Databases(appw);
         const newDoc = await database.createDocument(
           config.website_db,
           config.gallery,
@@ -482,6 +479,15 @@ export default defineComponent({
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* HTML excerpt inside cards – force readable dark text */
+.gallery-card-text :deep(*) {
+  color: inherit !important;
+}
+
+.dark .gallery-card-text {
+  color: #d1d5db;
 }
 
 /* Animations */

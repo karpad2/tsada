@@ -171,15 +171,21 @@ export default defineComponent({
 
 <style scoped>
 .content-block {
-  margin-bottom: 2rem;
-  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(14, 165, 233, 0.12);
+  box-shadow: 0 2px 12px rgba(14, 165, 233, 0.05);
 }
 
 .block-title {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  color: inherit;
+  margin-bottom: 0.85rem;
+  color: #0f172a;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(14, 165, 233, 0.15);
 }
 
 .text-block .block-content {
@@ -193,8 +199,9 @@ export default defineComponent({
 .text-block .block-content :deep(img) {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   margin: 1rem 0;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.1);
 }
 
 .video-wrapper {
@@ -202,59 +209,62 @@ export default defineComponent({
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  border-radius: 12px;
+  border-radius: 0.85rem;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 28px rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.15);
 }
 
 .video-wrapper iframe {
-  border-radius: 12px;
+  border-radius: 0.85rem;
+  display: block;
 }
 
 .gallery-block,
 .document-block {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
+  /* inherit glass shell */
 }
 
 .form-block {
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: rgba(14, 165, 233, 0.05);
 }
 
 .empty-block {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: #64748b;
   font-style: italic;
+  border-radius: 0.75rem;
+  background: rgba(148, 163, 184, 0.08);
 }
 
 .unknown-block {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 0.75rem;
   padding: 1rem;
   color: #92400e;
 }
 
 /* Dark mode */
-:deep(.dark) .content-block {
+:global(.dark) .content-block {
   color: #f3f4f6;
+  background: rgba(30, 41, 59, 0.45);
+  border-color: rgba(148, 163, 184, 0.14);
 }
 
-:deep(.dark) .block-title {
+:global(.dark) .block-title {
   color: #f9fafb;
+  border-bottom-color: rgba(56, 189, 248, 0.15);
 }
 
-:deep(.dark) .gallery-block,
-:deep(.dark) .document-block {
-  border-top-color: rgba(255, 255, 255, 0.1);
+:global(.dark) .form-block {
+  background: rgba(56, 189, 248, 0.06);
 }
 
-:deep(.dark) .form-block {
-  background: rgba(255, 255, 255, 0.05);
+:global(.dark) .empty-block {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.08);
 }
 
 /* Responsive */

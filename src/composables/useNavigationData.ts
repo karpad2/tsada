@@ -4,6 +4,8 @@ import { appw, config } from '@/appwrite';
 import { convertifserbian } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
 
+const database = new Databases(appw);
+
 interface MenuItem {
   name?: string;
   title?: string;
@@ -46,7 +48,6 @@ export function useNavigationData() {
 
   const fetchAbouts = async (): Promise<void> => {
     try {
-      const database = new Databases(appw);
       const result = await database.listDocuments(
         config.website_db,
         config.about_us_db,
@@ -54,6 +55,7 @@ export function useNavigationData() {
           Query.equal('show_at_the_header_from_about', true),
           Query.select(['title_hu', 'title_en', 'title_rs', '$id']),
           Query.orderAsc('sorrend'),
+          Query.limit(100),
         ]
       );
 
@@ -70,13 +72,13 @@ export function useNavigationData() {
 
   const fetchErasmus = async (): Promise<void> => {
     try {
-      const database = new Databases(appw);
       const result = await database.listDocuments(
         config.website_db,
         config.about_us_db,
         [
           Query.equal('type', 'erasmus'),
           Query.select(['title_hu', 'title_en', 'title_rs', '$id']),
+          Query.limit(100),
         ]
       );
 
@@ -93,13 +95,13 @@ export function useNavigationData() {
 
   const fetchStudents = async (): Promise<void> => {
     try {
-      const database = new Databases(appw);
       const result = await database.listDocuments(
         config.website_db,
         config.about_us_db,
         [
           Query.equal('type', 'students'),
           Query.select(['title_hu', 'title_en', 'title_rs', '$id']),
+          Query.limit(100),
         ]
       );
 
@@ -116,7 +118,6 @@ export function useNavigationData() {
 
   const fetchErasmusSettings = async (): Promise<void> => {
     try {
-      const database = new Databases(appw);
       const [listSetting, applySetting] = await Promise.all([
         database.getDocument(config.website_db, config.general_settings, 'erasmus_list'),
         database.getDocument(config.website_db, config.general_settings, 'erasmus_apply_on'),

@@ -1,12 +1,15 @@
 <template>
-  <v-container fluid>
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
     <!-- Header -->
     <v-row class="mb-4">
       <v-col>
-        <div class="d-flex align-center justify-space-between">
+        <div class="d-flex align-center justify-space-between flex-wrap ga-4">
           <div>
-            <h1 class="text-h4 font-weight-bold">Válaszok</h1>
-            <p class="text-body-2 text-medium-emphasis mt-1" v-if="form">{{ form.title }}</p>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">Válaszok</h1>
+            <div class="section-accent !mb-2"></div>
+            <p class="page-subtitle !mt-0" v-if="form">{{ form.title }}</p>
           </div>
           <div class="d-flex ga-2">
             <v-btn variant="outlined" prepend-icon="mdi-download" :disabled="responses.length === 0" @click="exportToCSV">
@@ -277,6 +280,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script setup lang="ts">

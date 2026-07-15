@@ -36,7 +36,7 @@ export default {
 </script>
 
 <template>
-  <Index class=" dark:bg-gray-600 bg-slate-50">
+  <Index class="app-ambient">
     <notifications position="top right"/>
     <RouterView :key="routeKey" />
     <PWAUpdatePrompt />

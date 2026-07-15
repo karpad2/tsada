@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-950">
+  <div class="page-shell">
     <!-- Login form -->
-    <div v-if="!isLoggedin" class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <div v-if="!isLoggedin" class="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12">
       <div class="max-w-md w-full">
         <!-- Logo/Brand section -->
         <div class="text-center mb-8 fade-in">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/30 dark:shadow-blue-500/20 mb-4">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-sky-500 to-sky-400 shadow-2xl shadow-sky-500/30 mb-4">
             <i class="pi pi-user text-3xl text-white"></i>
           </div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t("login") }}</h1>
-          <p class="text-gray-700 dark:text-gray-300">{{ $t("welcome_back") }}</p>
+          <h1 class="section-title !text-3xl justify-center">{{ $t("login") }}</h1>
+          <p class="page-subtitle">{{ $t("welcome_back") }}</p>
         </div>
 
         <!-- Login Card -->
-        <div class="card-slide-up bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="card-slide-up glass-strong rounded-2xl overflow-hidden">
           <div class="p-8">
             <!-- Error message -->
             <Transition name="error-fade">
@@ -140,45 +140,45 @@
     </div>
 
     <!-- Logged in view -->
-    <div v-else class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <div v-else class="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12">
       <div class="max-w-2xl w-full">
         <!-- Account Card -->
-        <div class="card-slide-up bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
-          <!-- Header with gradient background -->
-          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10">
+        <div class="card-slide-up glass-strong rounded-2xl overflow-hidden">
+          <!-- Header with sky gradient -->
+          <div class="bg-gradient-to-r from-sky-500 to-sky-400 px-8 py-10">
             <div class="flex items-center justify-between">
               <div class="flex-1">
                 <h1 class="text-3xl font-bold text-white mb-2">
                   {{ $t("account_page") }}
                 </h1>
-                <p class="text-blue-100 text-lg">
+                <p class="text-sky-50 text-lg">
                   {{ $t("welcome") }}, <span class="font-semibold">{{ username }}</span>!
                 </p>
               </div>
-              <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40 shadow-xl">
+              <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40 shadow-xl shadow-sky-500/20">
                 <i class="pi pi-user text-4xl text-white"></i>
               </div>
             </div>
           </div>
 
           <!-- Account Info Section -->
-          <div class="px-8 py-6 border-b-2 border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-4 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
-              <div class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 shadow-lg">
+          <div class="px-8 py-6 border-b border-sky-200/40 dark:border-slate-600/40">
+            <div class="flex items-center gap-4 p-5 glass-card rounded-xl">
+              <div class="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-sky-500 to-sky-400 shadow-lg shadow-sky-500/30">
                 <i class="pi pi-envelope text-white text-xl"></i>
               </div>
               <div>
-                <p class="text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide font-bold">Email</p>
+                <p class="text-xs text-sky-700 dark:text-sky-300 uppercase tracking-wide font-bold">Email</p>
                 <p class="text-gray-900 dark:text-white font-semibold text-lg">{{ username }}</p>
               </div>
             </div>
           </div>
 
           <!-- Account Stats -->
-          <div class="px-8 py-6 border-b-2 border-gray-200 dark:border-gray-700">
+          <div class="px-8 py-6 border-b border-sky-200/40 dark:border-slate-600/40">
             <div class="flex items-center gap-3 mb-5">
-              <div class="p-2.5 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40">
-                <i class="pi pi-chart-line text-purple-700 dark:text-purple-300 text-xl"></i>
+              <div class="p-2.5 rounded-xl glass-badge">
+                <i class="pi pi-chart-line text-sky-600 dark:text-sky-300 text-xl"></i>
               </div>
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                 {{ $t("account_info") }}
@@ -187,26 +187,26 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Registration Date -->
-              <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-5 border-2 border-green-200 dark:border-green-800 hover:shadow-lg transition-all">
+              <div class="glass-card rounded-xl p-5">
                 <div class="flex items-center gap-3">
-                  <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-green-600 shadow-md">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 shadow-md shadow-sky-500/25">
                     <i class="pi pi-calendar text-white text-lg"></i>
                   </div>
                   <div>
-                    <p class="text-xs text-green-800 dark:text-green-300 uppercase tracking-wide font-bold">{{ $t('registration') }}</p>
+                    <p class="text-xs text-sky-700 dark:text-sky-300 uppercase tracking-wide font-bold">{{ $t('registration') }}</p>
                     <p class="font-bold text-gray-900 dark:text-white">{{ accountCreatedAt || 'N/A' }}</p>
                   </div>
                 </div>
               </div>
 
               <!-- Last Login -->
-              <div class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-5 border-2 border-blue-200 dark:border-blue-800 hover:shadow-lg transition-all">
+              <div class="glass-card rounded-xl p-5">
                 <div class="flex items-center gap-3">
-                  <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-600 shadow-md">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-sky-500 to-sky-400 shadow-md shadow-sky-500/25">
                     <i class="pi pi-clock text-white text-lg"></i>
                   </div>
                   <div>
-                    <p class="text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide font-bold">{{ $t('last_login') }}</p>
+                    <p class="text-xs text-sky-700 dark:text-sky-300 uppercase tracking-wide font-bold">{{ $t('last_login') }}</p>
                     <p class="font-bold text-gray-900 dark:text-white">{{ lastLogin || $t('just_now') }}</p>
                   </div>
                 </div>
@@ -215,10 +215,10 @@
           </div>
 
           <!-- Settings section -->
-          <div class="px-8 py-6 border-b-2 border-gray-200 dark:border-gray-700">
+          <div class="px-8 py-6 border-b border-sky-200/40 dark:border-slate-600/40">
             <div class="flex items-center gap-3 mb-5">
-              <div class="p-2.5 rounded-xl bg-gradient-to-br from-slate-100 to-gray-100 dark:from-slate-900/40 dark:to-gray-900/40">
-                <i class="pi pi-cog text-slate-700 dark:text-slate-300 text-xl"></i>
+              <div class="p-2.5 rounded-xl glass-badge">
+                <i class="pi pi-cog text-sky-600 dark:text-sky-300 text-xl"></i>
               </div>
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                 {{ $t("settings") }}
@@ -227,17 +227,17 @@
 
             <div class="space-y-4">
               <!-- Animation Setting -->
-              <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-5 border-2 border-purple-200 dark:border-purple-800 hover:shadow-lg transition-all">
+              <div class="glass-card rounded-xl p-5">
                 <div class="flex items-center justify-between">
                   <div class="flex items-start gap-3">
-                    <div class="flex items-center justify-center w-11 h-11 rounded-lg bg-purple-600 shadow-md">
+                    <div class="flex items-center justify-center w-11 h-11 rounded-lg bg-gradient-to-br from-sky-500 to-sky-400 shadow-md shadow-sky-500/25">
                       <i class="pi pi-sparkles text-white"></i>
                     </div>
                     <div>
                       <p class="font-bold text-gray-900 dark:text-white">
                         {{ $t('background_animation') }}
                       </p>
-                      <p class="text-sm text-purple-900 dark:text-purple-300 mt-0.5">
+                      <p class="text-sm text-sky-800 dark:text-sky-300 mt-0.5">
                         {{ $t('toggle_background_animation') }}
                       </p>
                     </div>
@@ -253,17 +253,17 @@
               </div>
 
               <!-- Password Change Button -->
-              <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-5 border-2 border-amber-200 dark:border-amber-800 hover:shadow-lg transition-all">
+              <div class="glass-card rounded-xl p-5">
                 <div class="flex items-center justify-between">
                   <div class="flex items-start gap-3">
-                    <div class="flex items-center justify-center w-11 h-11 rounded-lg bg-amber-600 shadow-md">
+                    <div class="flex items-center justify-center w-11 h-11 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 shadow-md shadow-sky-500/25">
                       <i class="pi pi-lock text-white"></i>
                     </div>
                     <div>
                       <p class="font-bold text-gray-900 dark:text-white">
                         {{ $t('change_password') }}
                       </p>
-                      <p class="text-sm text-amber-900 dark:text-amber-300 mt-0.5">
+                      <p class="text-sm text-sky-800 dark:text-sky-300 mt-0.5">
                         {{ $t('change_password_description') }}
                       </p>
                     </div>
@@ -282,7 +282,7 @@
           </div>
 
           <!-- Action buttons -->
-          <div class="px-8 py-6 bg-gray-50/50 dark:bg-slate-900/30">
+          <div class="px-8 py-6">
             <v-btn
               color="error"
               size="large"
@@ -546,7 +546,6 @@ export default {
     const set_user_setting = () => {
       loadingStore.setAnimation(animation_backgound.value);
       // TODO: Save to Appwrite database
-      console.log("Animation background changed:", animation_backgound.value);
     };
 
     const sendPasswordReset = async () => {

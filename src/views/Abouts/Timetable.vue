@@ -1,50 +1,41 @@
 <template>
-  <section class="text-gray-600 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-    <div class="container px-5 mx-auto backdrop-filter bg-opacity-60 dark:bg-slate-500/30 bg-white/70 backdrop-blur-xl rounded-xl shadow-2xl mx-4 my-8" style="min-height: 70vh;">
-      <video-background
-        :src="video_link"
-        style="min-height: 280px;"
-        class="flex flex-wrap w-full mb-12 p-6 rounded-2xl overflow-hidden relative"
-        overlay="linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.2))">
-        <div class="lg:w-1/2 w-full mb-6 lg:mb-0 z-10 relative">
-          <div class="inline-flex items-center mb-4">
-            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full flex items-center justify-center mr-4">
-              <i class="pi pi-clock text-white text-xl"></i>
-            </div>
-            <h1 id="render_title" class="sm:text-4xl text-3xl font-bold title-font text-white drop-shadow-lg">
-              {{ $t("timetable") }}
-            </h1>
+  <section class="page-shell">
+    <div class="page-panel container">
+      <div class="page-header">
+        <div class="inline-flex items-center gap-3 mb-2">
+          <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-400 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/25">
+            <i class="pi pi-clock text-white text-lg"></i>
           </div>
-          <div class="h-1.5 w-32 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full shadow-lg"></div>
-          <p class="mt-4 text-gray-100 text-lg font-medium opacity-90">
-          
-          </p>
+          <h1 id="render_title" class="section-title !mb-0">
+            {{ $t("timetable") }}
+          </h1>
         </div>
-      </video-background>
+        <div class="section-accent"></div>
+      </div>
 
       <!-- Enhanced timetable with modern design -->
-      <div class="pb-8 w-full">
-        <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-slate-700/50 overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-500 to-teal-500 px-6 py-4">
-            <h2 class="text-white font-bold text-xl flex items-center">
+      <div class="pb-4 w-full">
+        <div class="page-table-wrap overflow-hidden">
+          <div class="page-table-bar">
+            <h2 class="text-white font-semibold text-lg flex items-center">
               <i class="pi pi-calendar mr-3"></i>
-              
+              {{ $t("timetable") }}
             </h2>
           </div>
           
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
-                <tr class="bg-gray-50/80 dark:bg-slate-700/50">
-                  <th class="px-6 py-4 text-left text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-slate-600">
-                    <div class="flex items-center">
-                      <i class="pi pi-sun mr-2 text-yellow-500"></i>
+                <tr>
+                  <th>
+                    <div class="flex items-center text-base normal-case tracking-normal">
+                      <i class="pi pi-sun mr-2 text-amber-400"></i>
                       {{ $t("morning") }}
                     </div>
                   </th>
-                  <th class="px-6 py-4 text-left text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-slate-600">
-                    <div class="flex items-center">
-                      <i class="pi pi-moon mr-2 text-blue-500"></i>
+                  <th>
+                    <div class="flex items-center text-base normal-case tracking-normal">
+                      <i class="pi pi-moon mr-2 text-sky-400"></i>
                       {{ $t("afternoon") }}
                     </div>
                   </th>
@@ -141,10 +132,11 @@
 import { Databases, Query, Storage } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 import { convertifserbian } from "@/lang";
 import dayjs from '@/utils/dayjs';
-import gsap from "gsap";
-
 export default {
   data() {
     return {
@@ -190,21 +182,22 @@ export default {
       this.headers.push({ title: this.$t("edit_document"), key: "edit", align: "center", width: "120px" });
     }
 
-    const storage = new Storage(appw);
     const fallbackVideoId = "659d5e6949ae7294f9f1";
     this.video_link = storage.getFileView(config.website_images, fallbackVideoId);
 
     // Enhanced animation
-    gsap.timeline()
-      .fromTo("#render_title", 
-        { opacity: 0, x: "100%", scale: 0.8 }, 
-        { duration: 1.2, opacity: 1, x: 0, scale: 1, ease: "back.out(1.7)" }
-      )
-      .fromTo(".timetable-card", 
-        { opacity: 0, y: 50 }, 
-        { duration: 0.8, opacity: 1, y: 0, stagger: 0.1 }, 
-        "-=0.5"
-      );
+    import('gsap').then(({ default: gsap }) => {
+      const tl = gsap.timeline();
+      tl.fromTo("#render_title",
+          { opacity: 0, x: "100%", scale: 0.8 },
+          { duration: 1.2, opacity: 1, x: 0, scale: 1, ease: "back.out(1.7)" }
+        )
+        .fromTo(".timetable-card",
+          { opacity: 0, y: 50 },
+          { duration: 0.8, opacity: 1, y: 0, stagger: 0.1 },
+          "-=0.5"
+        );
+    });
 
     await this.synchronize_documents();
   },
@@ -216,7 +209,6 @@ export default {
     },
 
     async synchronize_documents() {
-      const database = new Databases(appw);
       const cc = useLoadingStore();
       const local = cc.language;
       this.documents = [];

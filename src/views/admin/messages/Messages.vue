@@ -1,23 +1,18 @@
 <template>
-    <section class="text-gray-600 ">
-        <div class="container px-5 py-20 mx-auto bg-slate-100/30 dark:bg-slate-300/30">
-                <div class="flex flex-wrap w-full mb-20">
-                    <div class="lg:w-1/3 w-full mb-6 lg:mb-0">
-                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white" >{{ $t('messages') }}</h1>
-                        <div class="h-1 w-20 bg-sky-500/100 rounded"></div>
-                    </div>
-                
+    <section class="page-shell">
+        <div class="page-panel container">
+                <div class="page-header">
+                    <h1 class="section-title !text-2xl sm:!text-3xl">{{ $t('messages') }}</h1>
+                    <div class="section-accent !w-20"></div>
                 </div>
-    <div v-if="loaded"   class="m-auto w-full">
-   
-      
+    <div v-if="loaded" class="m-auto w-full page-table-wrap overflow-hidden">
       <v-data-table  height="400" :headers="headers" :items="messages" :items-per-page="-1"> 
         <template v-slot:item.date="{ item }">
         {{ rt_time(item.date) }}
         </template>
     
       <template v-slot:item.edit="{ item }">
-        <router-link :to="'/admin/message/'+item.id"><i class="pi pi-envelope text-5xl"></i></router-link>
+        <router-link :to="'/admin/message/'+item.id"><i class="pi pi-envelope text-3xl text-sky-500"></i></router-link>
        
       </template>
       <template #bottom></template>
@@ -31,15 +26,16 @@
     </template>
     <script lang="ts">
     
-    import { Client, Databases, ID,Storage,Query } from "appwrite";
+    import { Databases, ID,Storage,Query } from "appwrite";
     import {appw,config} from "@/appwrite";
     import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
     import {reactive,ref} from "vue";
     import dayjs from '@/utils/dayjs';
-    
-    
-    
+
+    const database = new Databases(appw);
+    const storage = new Storage(appw);
+
     export default {
         name: 'Workers',
         components: {
@@ -93,19 +89,16 @@
                 this.workers=[];
                 this.roles=[];
                 //console.log();
-                const database = new Databases(appw);
-                const storage = new Storage(appw);
                 let local=loadingStore.language;
-                let n= await database.listDocuments(config.website_db, config.mess_coll,[Query.orderDesc("$createdAt")]);
-                await n.documents.forEach(async el2 => {
+                let n= await database.listDocuments(config.website_db, config.mess_coll,[Query.orderDesc("$createdAt"), Query.limit(100)]);
+                for (const el2 of n.documents) {
                     let a={name:"",contact:"",email:"",date:"",id:""};
                         a.id=el2.$id;
                         a.date=el2.$createdAt;
                         a.name=el2.name;
                         a.email=el2.email;
                     this.messages.push(a);
-                    });
-                console.log(this.messages)
+                    }
                 //n.documents.forEach()
                 
             

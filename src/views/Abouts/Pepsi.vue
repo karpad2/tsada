@@ -1,49 +1,7 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <!-- Hero Header -->
-      <div class="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-        <div class="absolute inset-0 bg-black/20"></div>
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-        <div class="relative container mx-auto px-6 py-12">
-          <div class="max-w-4xl">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div class="w-12 h-12 flex items-center justify-center">
-                  <i class="pi pi-briefcase text-white text-2xl"></i>
-                </div>
-              </div>
-              <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('services') }}</h1>
-            </div>
-            <p class="text-blue-100 text-lg mb-6 leading-relaxed">
-              {{ $t('services_subtitle') }}
-            </p>
-            <div class="flex gap-4">
-              <button
-                v-if="isAdmin"
-                @click="openEditModal"
-                class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-xl hover:bg-white/20 transition-all duration-200 border border-white/20"
-              >
-                <i class="pi pi-plus w-5 h-5"></i>
-                {{ $t('add_new_service') }}
-              </button>
-  
-              <button
-                v-if="isAdmin"
-                @click="toggleEditMode"
-                class="inline-flex items-center gap-2 px-6 py-3 backdrop-blur-sm text-white font-medium rounded-xl transition-all duration-200 border border-white/20"
-                :class="editMode ? 'bg-red-600/80 hover:bg-red-700/80' : 'bg-green-600/80 hover:bg-green-700/80'"
-              >
-                <i :class="editMode ? 'pi pi-times' : 'pi pi-pencil'" class="w-5 h-5"></i>
-                {{ editMode ? $t('exit_edit_mode') : $t('enter_edit_mode') }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-  
+    <div class="page-shell">
       <!-- Edit Mode Banner -->
-      <div v-if="editMode && isAdmin" class="bg-orange-500 text-white px-6 py-3 text-center">
+      <div v-if="editMode && isAdmin" class="mx-4 mt-4 glass-badge !bg-amber-500/20 !text-amber-800 dark:!text-amber-200 !border-amber-500/30 px-6 py-3 text-center rounded-2xl">
         <div class="flex items-center justify-center gap-2">
           <i class="pi pi-exclamation-triangle"></i>
           <span class="font-medium">{{ $t('edit_mode_active') || 'Szerkesztési mód aktív - Kattints bármelyik szolgáltatásra a szerkesztéshez' }}</span>
@@ -51,14 +9,43 @@
       </div>
   
       <!-- Main Content -->
-      <div class="container mx-auto px-6 py-8">
-        <!-- Loading State -->
-        <div v-if="!loaded" class="flex flex-col items-center justify-center py-20">
-          <div class="relative">
-            <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
-            <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
+      <div class="page-panel container">
+        <div class="page-header-row">
+          <div>
+            <div class="inline-flex items-center gap-3 mb-2">
+              <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-400 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/25">
+                <i class="pi pi-briefcase text-white text-lg"></i>
+              </div>
+              <h1 class="section-title !mb-0">{{ $t('services') }}</h1>
+            </div>
+            <div class="section-accent"></div>
+            <p class="page-subtitle">{{ $t('services_subtitle') }}</p>
           </div>
-          <p class="mt-4 text-gray-600 font-medium">{{ $t('loading_data') || 'Adatok betöltése...' }}</p>
+          <div class="flex flex-wrap gap-3">
+            <button
+              v-if="isAdmin"
+              @click="openEditModal"
+              class="glass-btn inline-flex items-center gap-2 px-5 py-2.5 text-white font-medium rounded-full"
+            >
+              <i class="pi pi-plus"></i>
+              {{ $t('add_new_service') }}
+            </button>
+            <button
+              v-if="isAdmin"
+              @click="toggleEditMode"
+              class="btn-ghost-glass"
+              :class="editMode ? '!bg-red-500/15 !text-red-600 !border-red-500/30' : ''"
+            >
+              <i :class="editMode ? 'pi pi-times' : 'pi pi-pencil'"></i>
+              {{ editMode ? $t('exit_edit_mode') : $t('enter_edit_mode') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="!loaded" class="page-state">
+          <div class="page-spinner"></div>
+          <p class="page-state-text mt-4">{{ $t('loading_data') || 'Adatok betöltése...' }}</p>
         </div>
   
         <!-- Services Grid -->
@@ -66,7 +53,7 @@
           <div
             v-for="service in services"
             :key="service.id"
-            class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 transform relative"
+            class="glass-card rounded-2xl overflow-hidden relative"
             :class="{
               'hover:shadow-xl hover:-translate-y-1': !editMode,
               'hover:shadow-xl hover:border-blue-300 cursor-pointer': editMode,
@@ -82,7 +69,7 @@
             </div>
   
             <!-- Service Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white relative">
+            <div class="page-table-bar p-6 relative">
               <button
                 v-if="isAdmin && !editMode"
                 @click.stop="editService(service)"
@@ -507,6 +494,9 @@
   import { defineComponent } from 'vue';
   import { Databases, Storage, Query, ID } from 'appwrite';
   import { appw, config } from '@/appwrite';
+
+  const database = new Databases(appw);
+  const storage = new Storage(appw);
   import { convertifserbian } from '@/lang';
   import { useLoadingStore } from '@/stores/loading';
   import Loading from '@/components/Loading.vue';
@@ -722,8 +712,6 @@
   
       async loadServices() {
         try {
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
           const loadingStore = useLoadingStore();
           const local = loadingStore.language || 'hu';
           const missingPicture = storage.getFileView(
@@ -792,11 +780,11 @@
   
       async loadWorkers() {
         try {
-          const database = new Databases(appw);
-          const storage = new Storage(appw);
           const loadingStore = useLoadingStore();
           const local = loadingStore.language || 'hu';
-          const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture) as unknown as string;
+          const missingPicture = storage
+            .getFilePreview(config.website_images, config.missing_worker_picture, 96, 96, 'center', 75)
+            .toString();
   
           const { documents } = await database.listDocuments(config.website_db, config.workers, [
             Query.select(['worker_name_hu', 'worker_name_rs', 'worker_img', '$id']),
@@ -809,7 +797,11 @@
               (local === 'rs' || local === 'sr')
                 ? convertifserbian(worker.worker_name_rs || '')
                 : (worker.worker_name_hu || ''),
-            img: worker.worker_img ? (storage.getFileView(config.website_images, worker.worker_img) as unknown as string) : missingPicture,
+            img: worker.worker_img
+              ? storage
+                  .getFilePreview(config.website_images, worker.worker_img, 96, 96, 'center', 75)
+                  .toString()
+              : missingPicture,
           }));
         } catch (error) {
           console.error('Error loading workers:', error);
@@ -878,8 +870,6 @@
           .map((s) => ({ day: s.day, start: s.start, end: s.end, location: s.location || '' }));
   
         try {
-          const database = new Databases(appw);
-  
           const serviceData = {
             // DB mezőnév egységesen: workers
             workers: this.newService.worker,
@@ -925,7 +915,6 @@
         if (!this.serviceToDelete) return;
   
         try {
-          const database = new Databases(appw);
           await database.deleteDocument(config.website_db, config.services, this.serviceToDelete);
           await this.loadServices();
           this.showDeleteConfirm = false;

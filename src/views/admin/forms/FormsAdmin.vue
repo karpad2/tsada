@@ -1,12 +1,15 @@
 <template>
-  <v-container fluid>
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
     <!-- Header -->
     <v-row class="mb-4">
       <v-col>
-        <div class="d-flex align-center justify-space-between">
+        <div class="d-flex align-center justify-space-between flex-wrap ga-4">
           <div>
-            <h1 class="text-h4 font-weight-bold dark:text-white  ">{{ $t('forms_management') }}</h1>
-            <p class="text-body-2 text-medium-emphasis mt-1">{{ $t('forms_subtitle') }}</p>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('forms_management') }}</h1>
+            <div class="section-accent !mb-2"></div>
+            <p class="page-subtitle !mt-0">{{ $t('forms_subtitle') }}</p>
           </div>
           <div class="d-flex ga-2">
             <v-btn color="primary" prepend-icon="mdi-plus" @click="createNewForm">
@@ -149,6 +152,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script setup lang="ts">

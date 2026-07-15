@@ -169,7 +169,6 @@ export class PWAApiService {
     for (const item of queueCopy) {
       try {
         await fetch(item.url, item.options)
-        console.log('Offline request processed:', item.url)
       } catch (error) {
         console.error('Failed to process offline request:', error)
         // Re-queue if failed
@@ -197,6 +196,8 @@ export class PWAApiService {
       try {
         const response = await fetch(url, {
           ...options,
+          // Required for Appwrite session cookies (same-site / CORS)
+          credentials: options.credentials ?? 'include',
           signal: AbortSignal.timeout(10000) // 10s timeout
         })
 
@@ -315,12 +316,10 @@ export class PWAApiService {
   private initOfflineHandler(): void {
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => {
-        console.log('Back online, processing queue...')
         this.processOfflineQueue()
       })
 
       window.addEventListener('offline', () => {
-        console.log('Gone offline')
       })
     }
   }

@@ -1,13 +1,14 @@
 <template>
-  <v-container class="py-8" style="max-width: 720px;">
+  <section class="page-shell">
+  <v-container class="page-panel py-8" style="max-width: 720px;">
     <!-- Loading State -->
-    <v-card v-if="isLoading" class="text-center pa-12">
+    <v-card v-if="isLoading" class="glass-card text-center pa-12 rounded-2xl">
       <v-progress-circular indeterminate color="primary" size="48" />
       <p class="text-body-1 text-medium-emphasis mt-4">Űrlap betöltése...</p>
     </v-card>
 
     <!-- Error State -->
-    <v-card v-else-if="error" class="text-center pa-12">
+    <v-card v-else-if="error" class="glass-card text-center pa-12 rounded-2xl">
       <v-icon size="64" color="error">mdi-alert-circle-outline</v-icon>
       <h2 class="text-h5 font-weight-bold mt-4">{{ error }}</h2>
       <p class="text-body-2 text-medium-emphasis mt-2">Az űrlap nem található vagy nem elérhető.</p>
@@ -17,7 +18,7 @@
     </v-card>
 
     <!-- Form Not Active -->
-    <v-card v-else-if="form && !form.settings.active" class="text-center pa-12">
+    <v-card v-else-if="form && !form.settings.active" class="glass-card text-center pa-12 rounded-2xl">
       <v-icon size="64" color="warning">mdi-lock-outline</v-icon>
       <h2 class="text-h5 font-weight-bold mt-4">Az űrlap jelenleg nem aktív</h2>
       <p class="text-body-2 text-medium-emphasis mt-2">Ez az űrlap ideiglenesen le van zárva.</p>
@@ -27,7 +28,7 @@
     </v-card>
 
     <!-- Success State -->
-    <v-card v-else-if="isSubmitted" class="text-center pa-12">
+    <v-card v-else-if="isSubmitted" class="glass-card text-center pa-12 rounded-2xl">
       <v-icon size="64" color="success">mdi-check-circle-outline</v-icon>
       <h2 class="text-h5 font-weight-bold mt-4">Köszönjük!</h2>
       <p class="text-body-1 text-medium-emphasis mt-2">
@@ -59,12 +60,12 @@
       </p>
 
       <!-- Form Header -->
-      <v-card class="mb-4">
-        <div class="bg-primary pa-1 rounded-t" />
+      <v-card class="glass-strong mb-4 rounded-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-sky-500 to-sky-400 pa-1 rounded-t" />
         <v-card-text class="pt-6">
-          <h1 class="text-h4 font-weight-bold mb-2">{{ form.title }}</h1>
+          <h1 class="section-title !text-2xl sm:!text-3xl !mb-2">{{ form.title }}</h1>
           <p v-if="form.description" class="text-body-1 text-medium-emphasis">{{ form.description }}</p>
-          <p v-if="form.settings.collectEmail" class="text-caption text-primary mt-4">
+          <p v-if="form.settings.collectEmail" class="text-caption text-sky-600 dark:text-sky-400 mt-4">
             * Email cím megadása kötelező
           </p>
         </v-card-text>
@@ -73,7 +74,7 @@
       <!-- Form Fields -->
       <v-form @submit.prevent="submitForm">
         <!-- Email Field (if collecting) -->
-        <v-card v-if="form.settings.collectEmail" class="mb-4">
+        <v-card v-if="form.settings.collectEmail" class="glass-card mb-4 rounded-2xl">
           <v-card-text>
             <div class="text-subtitle-1 font-weight-medium mb-2">
               Email cím
@@ -94,7 +95,7 @@
         <v-card
           v-for="field in form.fields"
           :key="field.id"
-          class="mb-4"
+          class="glass-card mb-4 rounded-2xl"
         >
           <v-card-text>
             <div class="text-subtitle-1 font-weight-medium mb-1">
@@ -249,7 +250,7 @@
         </v-card>
 
         <!-- Submit Area -->
-        <v-card>
+        <v-card class="glass-card rounded-2xl">
           <v-card-text class="d-flex align-center justify-space-between">
             <v-btn variant="text" @click="clearForm">
               Űrlap törlése
@@ -260,6 +261,7 @@
               size="large"
               :loading="isSubmitting"
               prepend-icon="mdi-send"
+              class="glass-btn"
             >
               Beküldés
             </v-btn>
@@ -268,6 +270,7 @@
       </v-form>
     </template>
   </v-container>
+  </section>
 </template>
 
 <script setup lang="ts">

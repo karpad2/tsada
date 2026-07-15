@@ -3,15 +3,14 @@
     <!-- Trigger Button -->
     <button
       @click="!isHover && toggle()"
-      class="glass-button px-4 py-2 rounded-lg font-medium transition-all duration-300 ease-out
-             hover:bg-white/10 dark:hover:bg-gray-800/30 hover:backdrop-blur-md
+      class="glass-button px-3.5 py-2 rounded-xl font-medium transition-all duration-300 ease-out
+             hover:bg-white/40 dark:hover:bg-white/10 hover:backdrop-blur-md
              text-gray-800 dark:text-white
              flex items-center gap-2
-             relative overflow-hidden
-             shadow-md shadow-transparent"
+             relative overflow-hidden"
       :class="{
-        'bg-white/10 dark:bg-gray-800/30 backdrop-blur-md border border-white/20 dark:border-gray-700/50 !shadow-lg': isOpen,
-        'hover:!shadow-sky-500/10': !isOpen
+        'bg-white/40 dark:bg-white/10 backdrop-blur-md border border-sky-400/30 shadow-md shadow-sky-500/15': isOpen,
+        'hover:shadow-md hover:shadow-sky-500/15': !isOpen
       }"
     >
       <slot name="trigger">

@@ -48,15 +48,15 @@
         </v-row>
 
         <!-- Preview -->
-        <v-card v-if="localSettings.galleryId" variant="outlined" class="mt-4">
-            <v-card-title class="text-body-2">
-                <v-icon left size="small">mdi-eye</v-icon>
+        <div v-if="localSettings.galleryId" class="block-preview mt-4">
+            <div class="block-preview-title">
+                <v-icon left size="small" color="primary">mdi-eye</v-icon>
                 {{ $t('preview') }}
-            </v-card-title>
-            <v-card-text>
+            </div>
+            <div class="block-preview-body">
                 <AlbumViewer :caption="false" :id="localSettings.galleryId" />
-            </v-card-text>
-        </v-card>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -68,6 +68,8 @@ import { useLoadingStore } from '@/stores/loading';
 import { convertifserbian } from '@/lang';
 import AlbumViewer from '@/components/AlbumViewer.vue';
 
+const database = new Databases(appw);
+
 export default defineComponent({
     name: 'GalleryBlockEditor',
     components: { AlbumViewer },
@@ -78,7 +80,6 @@ export default defineComponent({
     },
     emits: ['update:settings', 'save'],
     setup(props, { emit }) {
-        const database = new Databases(appw);
         const loadingStore = useLoadingStore();
 
         const galleries = ref<any[]>([]);
@@ -153,3 +154,32 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+.block-preview {
+    border-radius: 0.85rem;
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.block-preview-title {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(14, 165, 233, 0.12);
+    background: rgba(14, 165, 233, 0.06);
+}
+
+.block-preview-body {
+    padding: 0.85rem;
+}
+
+:global(.dark) .block-preview {
+    background: rgba(15, 23, 42, 0.45);
+    border-color: rgba(148, 163, 184, 0.16);
+}
+</style>

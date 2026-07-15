@@ -1,23 +1,21 @@
 <template>
-  <section class="text-gray-600 body-font min-h-screen" id="courses">
-    <div v-if="loaded" class="container px-5 py-24 mx-auto">
-      <div class="flex flex-wrap w-full mb-20">
-        <div class="lg:w-1/2 w-full mb-6 lg:mb-0">
-          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 dark:text-white">
-            {{ $t('parentsvisiting') }}
-          </h1>
-          <div class="h-1 w-20 bg-sky-500 rounded"></div>
-        </div>
+  <section class="page-shell" id="courses">
+    <div v-if="loaded" class="page-panel container">
+      <div class="page-header">
+        <h1 class="section-title !text-2xl sm:!text-3xl">
+          {{ $t('parentsvisiting') }}
+        </h1>
+        <div class="section-accent !w-20"></div>
       </div>
 
       <div class="flex flex-wrap -m-4">
         <div v-for="classItem in classes" :key="classItem.id" class="xl:w-1/3 md:w-1/2 p-4">
-          <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transition-all duration-300 hover:shadow-lg">
+          <div class="glass-card p-6 rounded-2xl h-full">
             <div class="flex items-center mb-4">
-              <img class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" 
+              <img class="w-16 h-16 bg-sky-100/50 dark:bg-slate-700/50 object-cover object-center flex-shrink-0 rounded-full mr-4 ring-2 ring-sky-400/20" 
                    :src="classItem.chief_img" :alt="classItem.chief">
               <div class="flex-grow">
-                <h2 class="text-gray-900 dark:text-white title-font font-medium text-lg">
+                <h2 class="text-gray-900 dark:text-white font-semibold text-lg">
                   {{ classItem.chief }}
                 </h2>
                 <p class="text-gray-500 dark:text-gray-400">{{ classItem._class }}</p>
@@ -25,11 +23,11 @@
             </div>
             
             <div v-if="classItem.receiving_schedules && classItem.receiving_schedules.length > 0">
-              <h3 class="text-sky-500 text-xs font-medium title-font mb-2">
+              <h3 class="text-sky-600 dark:text-sky-400 text-xs font-semibold uppercase tracking-wide mb-2">
                 {{ $t('classroom_chief_receiving_hour') }}
               </h3>
               <div v-for="(schedule, idx) in classItem.receiving_schedules" :key="idx" 
-                   class="mb-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                   class="mb-3 pb-3 border-b border-sky-500/10 dark:border-white/10 last:border-b-0">
                 <div class="flex justify-between items-start">
                   <div class="flex-grow">
                     <p class="text-gray-900 dark:text-white font-medium text-sm">
@@ -52,15 +50,20 @@
         </div>
       </div>
     </div>
-    <Loading v-else />
+    <div v-else class="page-panel container page-state">
+      <Loading />
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Client, Databases, Storage, Query } from 'appwrite';
+import { Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { loadRelations, commonRelations } from '@/appwrite/relationHelper';
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
 import { convertifserbian } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
 import Loading from '@/components/Loading.vue';
@@ -195,11 +198,11 @@ export default defineComponent({
     
     async loadCourses() {
       try {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
         const loadingStore = useLoadingStore();
         const local = loadingStore.language;
-        const missingPicture = storage.getFileView(config.website_images, config.missing_worker_picture);
+        const missingPicture = storage
+          .getFilePreview(config.website_images, config.missing_worker_picture, 160, 160, 'center', 75)
+          .toString();
 
         const { documents } = await database.listDocuments(
           config.website_db,
@@ -221,9 +224,11 @@ export default defineComponent({
               ? worker?.worker_name_hu || ''
               : '';
 
-          // Kép kezelése
-          const chiefImg = worker?.worker_img 
-            ? storage.getFileView(config.website_images, worker.worker_img)
+          // Thumbnail preview (not full original)
+          const chiefImg = worker?.worker_img
+            ? storage
+                .getFilePreview(config.website_images, worker.worker_img, 160, 160, 'center', 75)
+                .toString()
             : missingPicture;
 
           // Fogadóórák feldolgozása
@@ -235,7 +240,7 @@ export default defineComponent({
               receiving_schedules = doc.receiving_schedules;
             }
           } catch (e) {
-            console.log('Receiving schedules parsing hiba:', e);
+            console.error('Receiving schedules parsing hiba:', e);
             receiving_schedules = [];
           }
 

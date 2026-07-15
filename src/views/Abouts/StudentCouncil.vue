@@ -1,32 +1,20 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <!-- Hero Header -->
-        <div class="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-            <div class="absolute inset-0 bg-black/20"></div>
-            <!-- Background decoration -->
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-            
-            <div class="relative container mx-auto px-6 py-12">
-                <div class="max-w-4xl">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                        <h1 class="text-4xl font-bold text-white tracking-tight">{{ $t('student_parliament') }}</h1>
+    <div class="page-shell">
+        <!-- Main Content -->
+        <div class="page-panel container">
+            <div class="page-header">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-400 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/25">
+                        <i class="pi pi-users text-white text-lg"></i>
                     </div>
-                    <p class="text-blue-100 text-lg mb-6 leading-relaxed">
-                        {{ $t('sp_subtitle') }}
-                    </p>
+                    <h1 class="section-title !mb-0">{{ $t('student_parliament') }}</h1>
                 </div>
+                <div class="section-accent"></div>
+                <p class="page-subtitle">{{ $t('sp_subtitle') }}</p>
             </div>
-        </div>
 
-        <!-- Debug Info -->
-        <div v-if="debugMode" class="container mx-auto px-6 py-4">
-            <div class="bg-gray-100 rounded-lg p-4 text-sm">
+            <!-- Debug Info -->
+            <div v-if="debugMode" class="glass rounded-xl p-4 text-sm mb-6">
                 <h3 class="font-bold mb-2">Debug Info:</h3>
                 <p><strong>Loading:</strong> {{ loading }}</p>
                 <p><strong>Members count:</strong> {{ parliamentMembers.length }}</p>
@@ -36,89 +24,64 @@
                     <pre>{{ JSON.stringify(parliamentMembers[0], null, 2) }}</pre>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="container mx-auto px-6 py-8">
             <!-- Loading State -->
-            <div v-if="loading" class="flex flex-col items-center justify-center py-20">
-                <div class="relative">
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
-                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
-                </div>
-                <p class="mt-4 text-gray-600 font-medium">{{ $t('loading_data') }}</p>
+            <div v-if="loading" class="page-state">
+                <div class="page-spinner"></div>
+                <p class="page-state-text mt-4">{{ $t('loading_data') }}</p>
             </div>
 
             <!-- Error State -->
-            <div v-if="error" class="text-center py-20">
-                <div class="max-w-md mx-auto">
-                    <div class="text-red-400 mb-6">
-                        <svg class="mx-auto h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Hiba történt</h3>
-                    <p class="text-gray-600 mb-4">{{ error }}</p>
-                    <button 
-                        @click="loadData"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors duration-200"
-                    >
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        Újrapróbálás
-                    </button>
-                    <button 
-                        @click="debugMode = !debugMode"
-                        class="ml-4 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                        Debug {{ debugMode ? 'ki' : 'be' }}
-                    </button>
-                </div>
+            <div v-if="error" class="page-state">
+                <h3 class="page-state-title">{{ $t('error') || 'Hiba történt' }}</h3>
+                <p class="page-state-text">{{ error }}</p>
+                <button 
+                    @click="loadData"
+                    class="glass-btn inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-full"
+                >
+                    Újrapróbálás
+                </button>
+                <button 
+                    @click="debugMode = !debugMode"
+                    class="btn-ghost-glass ml-3"
+                >
+                    Debug {{ debugMode ? 'ki' : 'be' }}
+                </button>
             </div>
 
             <!-- Parliament Members Table -->
-            <div v-if="!loading && !error && sortedMembers.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div v-if="!loading && !error && sortedMembers.length > 0" class="page-table-wrap overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 text-white px-6 py-5">
+                <div class="page-table-bar">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-white/10 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
+                            <div class="p-2 bg-white/15 rounded-lg">
+                                <i class="pi pi-users"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">{{ $t('members_heading') }}</h3>
-                                <p class="text-gray-300 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
+                                <h3 class="text-lg font-semibold">{{ $t('members_heading') }}</h3>
+                                <p class="text-white/80 text-sm">{{ sortedMembers.length }} {{ $t("member") }}</p>
                             </div>
                         </div>
-                        <button 
-                        v-if="false"
-                            @click="debugMode = !debugMode"
-                            class="px-3 py-1 text-xs bg-white/10 rounded-lg hover:bg-white/20"
-                        >
-                            Debug
-                        </button>
                     </div>
                 </div>
 
                 <!-- Table Content -->
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gray-50 border-b border-gray-200">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">#</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('name') }}</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('class') }}</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">{{ $t('_role') }}</th>
+                                <th>#</th>
+                                <th>{{ $t('name') }}</th>
+                                <th>{{ $t('class') }}</th>
+                                <th>{{ $t('_role') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody>
                             <tr 
                                 v-for="(member, index) in sortedMembers" 
                                 :key="member.$id || member.id"
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group"
+                                class="group"
                             >
                                 <!-- Number -->
                                 <td class="px-6 py-4">
@@ -133,7 +96,7 @@
                                 <!-- Name -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <div class="text-base font-semibold text-gray-900">
+                                        <div class="text-base font-semibold text-gray-900 dark:text-white">
                                             {{ getDisplayName(member) }}
                                         </div>
                                         <div v-if="member.is_president" class="flex items-center">
@@ -208,9 +171,11 @@
 </template>
 
 <script lang="ts">
-import { Client, Databases, Query } from "appwrite";
+import { Databases, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import {useLoadingStore} from "@/stores/loading";
+
+const database = new Databases(appw);
 import {convertifserbian} from "@/lang";
 
 interface ParliamentMember {
@@ -323,7 +288,6 @@ export default {
         },
 
         async loadClasses() {
-            const database = new Databases(appw);
             try {
                 const response = await database.listDocuments(
                     config.website_db, 
@@ -338,7 +302,6 @@ export default {
                     name: this.getClassNameById(doc.year, doc.designation)
                 }));
                 
-                console.log('Classes loaded:', this.classes.length);
             } catch (error: any) {
                 console.error('Classes load error:', error);
                 throw new Error(`Osztályok betöltési hiba: ${error.message}`);
@@ -346,15 +309,12 @@ export default {
         },
 
         async loadParliamentMembers() {
-            const database = new Databases(appw);
             try {
                 const response = await database.listDocuments(
                     config.website_db,
                     config.parliament_members,
                     [Query.limit(200)]
                 );
-
-                console.log('Raw parliament data:', response.documents);
 
                 this.parliamentMembers = response.documents.map((doc: any) => ({
                     $id: doc.$id,
@@ -369,8 +329,6 @@ export default {
                     parliament_description_rs: convertifserbian(doc.parliament_description_rs) || ''
                 }));
 
-                console.log('Processed parliament members:', this.parliamentMembers);
-                
             } catch (error: any) {
                 console.error('Members load error:', error);
                 throw new Error(`Parlament tagok betöltési hiba: ${error.message}`);

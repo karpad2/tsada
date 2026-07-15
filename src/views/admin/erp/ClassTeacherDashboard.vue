@@ -1,8 +1,17 @@
 <template>
-  <v-container fluid>
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
     <!-- Class Selection Header -->
     <v-row class="mb-4">
       <v-col cols="12">
+        <div class="page-header">
+          <div class="inline-flex items-center gap-2 mb-1">
+            <v-icon color="primary">mdi-school</v-icon>
+            <h1 class="section-title !text-2xl !mb-0">{{ $t('class_teacher_dashboard') }}</h1>
+          </div>
+          <div class="section-accent !w-20 !mb-4"></div>
+        </div>
         <v-card>
           <v-card-title class="d-flex align-center flex-wrap">
             <v-icon class="mr-2">mdi-school</v-icon>
@@ -694,6 +703,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -705,6 +716,8 @@ import { ErpService, type Subject, type StudyProgram, type Generation, type Plac
 import { ExcelImportService, type ExcelSheetInfo, type ExcelColumnMapping, type ImportResult, type ExcelStudentData } from '@/services/ExcelImportService';
 import { useLoadingStore } from '@/stores/loading';
 import { useI18n } from 'vue-i18n';
+
+const databases = new Databases(appw);
 
 interface Student {
   $id?: string;
@@ -747,7 +760,6 @@ export default defineComponent({
   name: 'ClassTeacherDashboard',
   setup() {
     const { t } = useI18n();
-    const databases = new Databases(appw);
     const erpService = ErpService.getInstance();
     const excelImportService = ExcelImportService.getInstance();
     const loadingStore = useLoadingStore();
@@ -1151,7 +1163,7 @@ export default defineComponent({
     const editGrade = (grade: StudentGrade) => {
       // For simplicity, we'll delete and re-add
       // A proper implementation would have an edit dialog
-      console.log('Edit grade:', grade);
+      // TODO: implement edit grade dialog
     };
 
     const deleteGrade = async (gradeId?: string) => {

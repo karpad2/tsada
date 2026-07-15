@@ -1,5 +1,10 @@
 <template>
-  <div class="content-editor container px-5 mx-auto bg-white">
+  <div class="content-editor admin-panel container px-5 mx-auto">
+    <div class="page-header mb-2">
+      <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('content_editor') || 'Content Editor' }}</h1>
+      <div class="section-accent !w-20"></div>
+    </div>
+
     <!-- General Controls -->
     <GeneralControlsSection
       :visible="formData.visible"
@@ -24,24 +29,97 @@
         <v-switch
           v-model="formData.eu_funding_enabled"
           :label="$t('eu_funding_enabled')"
+          color="primary"
+          density="compact"
+          hide-details
           @change="save"
         />
       </template>
     </GeneralControlsSection>
 
     <!-- File Upload Section -->
-    <FileUploadSection
-      upload-type="image"
-      :multiple="false"
-      :auto-upload="true"
-      :preview-urls="img ? [img] : []"
-      :uploaded-file-ids="default_image ? [default_image] : []"
-      :storage-id="config.website_images"
-      @files-uploaded="handleFilesUploaded"
-    />
+    <section class="editor-section image-section relative">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-image</v-icon></span>
+        {{ $t('file_upload') }}
+      </div>
+      <FileUploadSection
+        upload-type="image"
+        :multiple="false"
+        :auto-upload="true"
+        :preview-urls="img ? [img] : []"
+        :uploaded-file-ids="default_image ? [default_image] : []"
+        :storage-id="config.website_images"
+        @files-uploaded="handleFilesUploaded"
+      />
+
+      <!-- Draggable crop box picker -->
+      <div v-if="default_image" class="mt-4">
+        <p class="text-caption text-medium-emphasis mb-2">{{ $t('image_position_hint') }}</p>
+        <div
+          class="position-picker editor-position-picker"
+          ref="positionPickerRef"
+        >
+          <img :src="img" class="position-picker-img" draggable="false" />
+          <div
+            class="crop-box"
+            :style="{
+              left: cropBoxLeft + '%',
+              top: cropBoxTop + '%',
+              width: cropBoxSizePercent.w + '%',
+              height: cropBoxSizePercent.h + '%'
+            }"
+            @mousedown="startDrag"
+            @touchstart="startDrag"
+          >
+            <div class="crop-box-inner"></div>
+          </div>
+        </div>
+
+        <!-- Élő preview, ahogy a kártyán / listázásban meg fog jelenni -->
+        <div class="mt-3 d-flex align-center" style="gap: 16px; flex-wrap: wrap;">
+          <div>
+            <span class="text-caption text-medium-emphasis d-block mb-1">{{ $t('preview_as_thumbnail') }}</span>
+            <div
+              class="thumb-preview editor-thumb-preview thumb-preview--card"
+              :style="{
+                backgroundImage: `url(${img})`,
+                backgroundPosition: `${formData.image_position_x}% ${formData.image_position_y}%`
+              }"
+            ></div>
+          </div>
+          <div>
+            <span class="text-caption text-medium-emphasis d-block mb-1">{{ $t('preview_as_square') }}</span>
+            <div
+              class="thumb-preview editor-thumb-preview thumb-preview--square"
+              :style="{
+                backgroundImage: `url(${img})`,
+                backgroundPosition: `${formData.image_position_x}% ${formData.image_position_y}%`
+              }"
+            ></div>
+          </div>
+
+          <v-btn
+            size="small"
+            variant="outlined"
+            color="primary"
+            class="ml-auto"
+            :disabled="formData.image_position_x === 50 && formData.image_position_y === 50"
+            @click="resetFocalPoint"
+          >
+            <v-icon left size="small">mdi-restore</v-icon>
+            {{ $t('reset_position') }}
+          </v-btn>
+        </div>
+      </div>
+    </section>
 
     <!-- Language Sections -->
-    <section class="language-sections">
+    <section class="editor-section language-sections">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-translate</v-icon></span>
+        {{ $t('multilingual_content') || $t('multilanguage_content') || 'Languages' }}
+      </div>
       <!-- Language Section Header with AI Translate -->
       <v-card  v-if="false" class="mb-4" elevation="2">
         <v-card-title  class="d-flex align-center bg-gradient-primary">
@@ -104,21 +182,34 @@
     </section>
 
     <!-- YouTube Video -->
-    <section class="youtube-section mb-6">
+    <section class="editor-section youtube-section">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-youtube</v-icon></span>
+        {{ $t('yt_video') }}
+      </div>
       <v-text-field
         v-model="formData.yt_video"
         :counter="100"
         :label="$t('yt_video')"
         hide-details
+        variant="outlined"
+        density="comfortable"
+        prepend-inner-icon="mdi-youtube"
         @change="save"
       />
     </section>
 
     <!-- Documents Section -->
-    <section class="documents-section mb-6">
+    <section class="editor-section documents-section">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-file-document</v-icon></span>
+        {{ $t('documents_flag') }}
+      </div>
       <v-switch
         v-model="formData.documents_flag"
         :label="$t('documents_flag')"
+        color="primary"
+        hide-details
         @change="handleDocumentsToggle"
       />
       <div v-if="formData.documents_flag" class="mt-4">
@@ -127,14 +218,20 @@
     </section>
 
     <!-- Album Section -->
-    <section class="album-section mb-6">
+    <section class="editor-section album-section">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-image-multiple</v-icon></span>
+        {{ $t('album_flag') }}
+      </div>
       <v-switch
         v-model="formData.album_flag"
         :label="$t('album_flag')"
+        color="primary"
+        hide-details
         @change="save"
       />
       <div v-if="formData.album_flag" class="mt-4">
-        <v-btn class="mb-4" @click="handleCreateGallery">
+        <v-btn class="mb-4" color="primary" prepend-icon="mdi-plus" @click="handleCreateGallery">
           {{ $t('create_a_new_album') }}
         </v-btn>
 
@@ -144,6 +241,8 @@
           :label="$t('gallery')"
           item-value="id"
           item-text="title"
+          variant="outlined"
+          density="comfortable"
           @update:modelValue="handleGalleryChange"
         />
 
@@ -154,28 +253,30 @@
     </section>
 
     <!-- Content Blocks Section -->
-    <section class="content-blocks-section mb-6">
-      <v-expansion-panels variant="accordion">
-        <v-expansion-panel>
-          <v-expansion-panel-title>
-            <v-icon left class="mr-2">mdi-view-dashboard-variant</v-icon>
-            {{ $t('content_blocks') }}
-            <v-chip size="x-small" color="info" class="ml-2">
-              {{ $t('advanced') }}
-            </v-chip>
-          </v-expansion-panel-title>
-          <v-expansion-panel-text>
-            <p class="text-body-2 text-grey mb-4">
-              {{ $t('content_blocks_description') }}
-            </p>
-            <ContentBlocksEditor :doc-id="id" @update="onTextComponentsUpdate" />
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
+    <section class="editor-section content-blocks-section !p-0 overflow-hidden">
+      <div class="pa-4 pb-2">
+        <div class="editor-section-title !border-0 !pb-0 !mb-2">
+          <span class="section-icon"><v-icon size="small" color="white">mdi-view-dashboard-variant</v-icon></span>
+          {{ $t('content_blocks') }}
+          <v-chip size="x-small" color="info" variant="tonal" class="ml-2">
+            {{ $t('advanced') }}
+          </v-chip>
+        </div>
+        <p class="text-body-2 text-medium-emphasis mb-3">
+          {{ $t('content_blocks_description') }}
+        </p>
+      </div>
+      <div class="px-3 pb-4">
+        <ContentBlocksEditor :doc-id="id" @update="onTextComponentsUpdate" />
+      </div>
     </section>
 
     <!-- Content History Section -->
-    <section class="content-history-section mb-6">
+    <section class="editor-section content-history-section">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-history</v-icon></span>
+        {{ $t('history') || 'History' }}
+      </div>
       <ContentHistoryPanel :content-id="id" @restored="loadContent" />
     </section>
 
@@ -248,7 +349,7 @@
 import { defineComponent, reactive, ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { notify } from '@kyvg/vue3-notification'
 import { useRoute, useRouter } from 'vue-router'
-import { Client, Databases, ID, Storage, Query } from "appwrite"
+import { Databases, ID, Storage, Query } from "appwrite"
 import { appw, config } from "@/appwrite"
 import axios from "axios"
 import { useLoadingStore } from "@/stores/loading"
@@ -286,6 +387,8 @@ interface FormData {
   pinned: boolean
   sort_order: number
   eu_funding_enabled: boolean
+  image_position_x: number
+  image_position_y: number
 }
 
 export default defineComponent({
@@ -320,6 +423,9 @@ export default defineComponent({
     const isTranslating = ref(false)
     const translationProgress = ref(0)
 
+    // Focal point / crop position picker
+    const positionPickerRef = ref<HTMLElement | null>(null)
+
     const formData = reactive<FormData>({
       title_en: "",
       title_hu: "",
@@ -339,7 +445,9 @@ export default defineComponent({
       notNews: false,
       pinned: false,
       sort_order: 0,
-      eu_funding_enabled: false
+      eu_funding_enabled: false,
+      image_position_x: 50,
+      image_position_y: 50
     })
 
     // Loading helpers
@@ -411,7 +519,9 @@ export default defineComponent({
           documents_flag: document.has_documents || false,
           album_flag: document.has_gallery || false,
           gallery_id: typeof document.gallery === 'string' ? document.gallery : (document.gallery?.$id || ""),
-          eu_funding_enabled: document.eu_funding_enabled || false
+          eu_funding_enabled: document.eu_funding_enabled || false,
+          image_position_x: typeof document.image_position_x === 'number' ? document.image_position_x : 50,
+          image_position_y: typeof document.image_position_y === 'number' ? document.image_position_y : 50
         })
         
         // Set image
@@ -430,8 +540,6 @@ export default defineComponent({
 
     const save = async (): Promise<void> => {
       try {
-        console.log('Saving document with default_image:', default_image.value)
-
         const newData = {
           title_rs: formData.title_rs,
           title_hu: formData.title_hu,
@@ -452,7 +560,9 @@ export default defineComponent({
           pinned: formData.pinned,
           sort_order: formData.sort_order,
           show_date: formData.show_date,
-          eu_funding_enabled: formData.eu_funding_enabled
+          eu_funding_enabled: formData.eu_funding_enabled,
+          image_position_x: formData.image_position_x,
+          image_position_y: formData.image_position_y
         }
 
         // Create backup before saving (if we have original data)
@@ -476,8 +586,6 @@ export default defineComponent({
 
         // Update original data after successful save
         originalData.value = { ...originalData.value, ...newData }
-
-        console.log('Document saved successfully with backup')
 
         // Show success notification (assuming $notify is available)
         // this.$notify(this.$t('saved'))
@@ -512,19 +620,19 @@ export default defineComponent({
           }
         )
         
-        console.log('Facebook share response:', response)
       } catch (error) {
         console.error('Failed to share on Facebook:', error)
       }
     }
 
     const handleFilesUploaded = async (uploadedFiles: any[]): Promise<void> => {
-      console.log('Files uploaded:', uploadedFiles)
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0]
-        console.log('Setting default_image to:', file.$id)
         default_image.value = file.$id
         img.value = storage.getFileView(config.website_images, file.$id).toString()
+        // Új kép feltöltésekor a fókuszpontot visszaállítjuk középre
+        formData.image_position_x = 50
+        formData.image_position_y = 50
         await save()
       }
     }
@@ -575,7 +683,6 @@ export default defineComponent({
     }
 
     const onTextComponentsUpdate = (): void => {
-      console.log('Text components updated')
       // Optionally refresh or notify about changes
     }
 
@@ -642,6 +749,110 @@ export default defineComponent({
     }
 
     /**
+     * Húzható crop doboz logika.
+     *
+     * A dobozt a felhasználó az egész képen szabadon húzhatja. A doboz fix
+     * arányú (négyzet, a kép rövidebb oldalához igazítva), a középpontja
+     * alapján számoljuk az image_position_x/y (0-100%) értékeket, amit
+     * a megjelenítésnél object-position/background-position formájában
+     * lehet felhasználni, hogy a kép cropolásakor (kártya, sablon ikon, stb.)
+     * a fontos rész (pl. egy fej) ne vágódjon le.
+     */
+    const cropBoxSizePercent = ref<{ w: number; h: number }>({ w: 40, h: 40 })
+    const isDragging = ref(false)
+    const dragOffset = ref({ x: 0, y: 0 })
+
+    const cropBoxLeft = computed(() => {
+      const half = cropBoxSizePercent.value.w / 2
+      return Math.min(100 - cropBoxSizePercent.value.w, Math.max(0, formData.image_position_x - half))
+    })
+
+    const cropBoxTop = computed(() => {
+      const half = cropBoxSizePercent.value.h / 2
+      return Math.min(100 - cropBoxSizePercent.value.h, Math.max(0, formData.image_position_y - half))
+    })
+
+    const getEventPoint = (event: MouseEvent | TouchEvent): { x: number; y: number } => {
+      if ('touches' in event && event.touches.length > 0) {
+        const touch = event.touches[0]
+        return { x: touch.clientX, y: touch.clientY }
+      }
+      if ('changedTouches' in event && event.changedTouches.length > 0) {
+        const touch = event.changedTouches[0]
+        return { x: touch.clientX, y: touch.clientY }
+      }
+      const mouseEvent = event as MouseEvent
+      return { x: mouseEvent.clientX, y: mouseEvent.clientY }
+    }
+
+    const startDrag = (event: MouseEvent | TouchEvent): void => {
+      event.preventDefault()
+      const el = positionPickerRef.value
+      if (!el) return
+
+      isDragging.value = true
+      const rect = el.getBoundingClientRect()
+      const point = getEventPoint(event)
+
+      // Megjegyezzük, hol fogtuk meg a dobozt, hogy ne ugorjon a sarka az egérre
+      const boxLeftPx = (cropBoxLeft.value / 100) * rect.width
+      const boxTopPx = (cropBoxTop.value / 100) * rect.height
+      dragOffset.value = {
+        x: (point.x - rect.left) - boxLeftPx,
+        y: (point.y - rect.top) - boxTopPx
+      }
+
+      window.addEventListener('mousemove', onDrag)
+      window.addEventListener('touchmove', onDrag, { passive: false })
+      window.addEventListener('mouseup', stopDrag)
+      window.addEventListener('touchend', stopDrag)
+    }
+
+    const onDrag = (event: MouseEvent | TouchEvent): void => {
+      if (!isDragging.value) return
+      event.preventDefault()
+
+      const el = positionPickerRef.value
+      if (!el) return
+
+      const rect = el.getBoundingClientRect()
+      const point = getEventPoint(event)
+
+      const boxLeftPx = (point.x - rect.left) - dragOffset.value.x
+      const boxTopPx = (point.y - rect.top) - dragOffset.value.y
+
+      const boxWPx = (cropBoxSizePercent.value.w / 100) * rect.width
+      const boxHPx = (cropBoxSizePercent.value.h / 100) * rect.height
+
+      const clampedLeftPx = Math.min(rect.width - boxWPx, Math.max(0, boxLeftPx))
+      const clampedTopPx = Math.min(rect.height - boxHPx, Math.max(0, boxTopPx))
+
+      const centerXPercent = ((clampedLeftPx + boxWPx / 2) / rect.width) * 100
+      const centerYPercent = ((clampedTopPx + boxHPx / 2) / rect.height) * 100
+
+      formData.image_position_x = Math.round(Math.min(100, Math.max(0, centerXPercent)))
+      formData.image_position_y = Math.round(Math.min(100, Math.max(0, centerYPercent)))
+    }
+
+    const stopDrag = (): void => {
+      if (!isDragging.value) return
+      isDragging.value = false
+
+      window.removeEventListener('mousemove', onDrag)
+      window.removeEventListener('touchmove', onDrag)
+      window.removeEventListener('mouseup', stopDrag)
+      window.removeEventListener('touchend', stopDrag)
+
+      save()
+    }
+
+    const resetFocalPoint = (): void => {
+      formData.image_position_x = 50
+      formData.image_position_y = 50
+      save()
+    }
+
+    /**
      * Intelligens AI fordítás - detektálja a legjobb forrásnyelvet
      */
     const detectSourceContent = (): { code: string; title: string; content: string } | null => {
@@ -662,7 +873,6 @@ export default defineComponent({
       if (scored.length === 0) return null
 
       const best = scored[0]
-      console.log('🔍 AI detected source language:', best.code, 'with score:', best.score)
       return { code: best.code, title: best.title.trim(), content: best.content.trim() }
     }
 
@@ -696,8 +906,6 @@ export default defineComponent({
           return
         }
 
-        console.log('🤖 Starting AI translation from', source.code, 'to', targetLanguages.map(l => l.code))
-
         const totalSteps = targetLanguages.length * 2 // title + content
         let completed = 0
 
@@ -705,7 +913,6 @@ export default defineComponent({
           try {
             // Fordítjuk a címet
             if (source.title) {
-              console.log(`🔄 Translating title to ${target.code}...`)
               const translatedTitle = await translateWithAI(source.title, source.code, target.code)
 
               // Frissítjük a címet
@@ -715,12 +922,10 @@ export default defineComponent({
 
               completed++
               translationProgress.value = (completed / totalSteps) * 100
-              console.log(`✅ Title translated to ${target.code}:`, translatedTitle)
             }
 
             // Fordítjuk a tartalmat
             if (source.content) {
-              console.log(`🔄 Translating content to ${target.code}...`)
               const translatedContent = await translateWithAI(source.content, source.code, target.code)
 
               // Frissítjük a tartalmat
@@ -730,7 +935,6 @@ export default defineComponent({
 
               completed++
               translationProgress.value = (completed / totalSteps) * 100
-              console.log(`✅ Content translated to ${target.code}`)
             }
 
             // Kis késleltetés a rate limiting elkerülésére
@@ -766,8 +970,7 @@ export default defineComponent({
 
     // Lifecycle hooks
     onMounted(() => {
-      loadContent()
-      loadGalleries()
+      Promise.all([loadContent(), loadGalleries()])
       window.addEventListener('beforeunload', handleBeforeUnload)
     })
 
@@ -803,6 +1006,14 @@ export default defineComponent({
       handleGalleryChange,
       onTextComponentsUpdate,
 
+      // Focal point / crop position (draggable box)
+      positionPickerRef,
+      cropBoxLeft,
+      cropBoxTop,
+      cropBoxSizePercent,
+      startDrag,
+      resetFocalPoint,
+
       // Translation
       showTranslateDialog,
       isTranslating,
@@ -821,40 +1032,59 @@ export default defineComponent({
 <style scoped>
 .content-editor {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.language-sections {
-  @apply border-b border-gray-200 pb-4;
-}
-
-.language-section {
-  @apply border border-gray-200 rounded-lg p-4;
 }
 
 .language-content {
   @apply space-y-4;
 }
 
-.action-buttons {
-  @apply flex-wrap;
+/* Focal point / crop position picker */
+.position-picker {
+  width: 100%;
+  height: 320px;
+  position: relative;
+  border-radius: 0.85rem;
+  overflow: hidden;
 }
 
-.preview-section {
-  @apply mt-4;
+.position-picker-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  display: block;
 }
 
-.image-section,
-.youtube-section,
-.documents-section,
-.album-section {
-  @apply border border-gray-200 rounded-lg p-4;
+.crop-box {
+  position: absolute;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.5), 0 2px 12px rgba(14, 165, 233, 0.35);
+  cursor: grab;
+  touch-action: none;
+  border-radius: 4px;
 }
 
-/* AI Translation Styles */
-.bg-gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.crop-box:active {
+  cursor: grabbing;
+}
+
+.crop-box-inner {
+  width: 100%;
+  height: 100%;
+  background: rgba(14, 165, 233, 0.18);
+  outline: 1px dashed rgba(255, 255, 255, 0.85);
+  outline-offset: -1px;
+}
+
+.thumb-preview--card {
+  width: 220px;
+  height: 120px;
+}
+
+.thumb-preview--square {
+  width: 100px;
+  height: 100px;
 }
 
 .rotating {
@@ -862,12 +1092,8 @@ export default defineComponent({
 }
 
 @keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .translation-progress {

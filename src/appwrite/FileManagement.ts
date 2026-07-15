@@ -172,15 +172,26 @@ export class FileManager {
         fileId: string,
         storageId?: string,
         width: number = 400,
-        height: number = 400
+        height: number = 400,
+        quality: number = 80
     ): string {
         const resolvedBucketId = this.resolveBucketId(storageId);
+        // Prefer WebP thumbs over full originals for list/card UI
         return this.storage.getFilePreview(
             resolvedBucketId,
             fileId,
             width,
-            height
-        );
+            height,
+            'center',
+            quality,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            'webp'
+        ).toString();
     }
 
     getFileView(fileId: string, storageId?: string): string {

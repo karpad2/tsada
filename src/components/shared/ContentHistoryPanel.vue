@@ -1,10 +1,10 @@
 <template>
-  <v-expansion-panels variant="accordion" class="mt-4">
+  <v-expansion-panels variant="accordion" class="content-history-panel mt-2">
     <v-expansion-panel>
       <v-expansion-panel-title>
-        <v-icon left class="mr-2">mdi-history</v-icon>
+        <v-icon left class="mr-2" color="primary">mdi-history</v-icon>
         {{ $t('content_history') || 'Módosítási előzmények' }}
-        <v-chip v-if="backups.length > 0" size="x-small" color="info" class="ml-2">
+        <v-chip v-if="backups.length > 0" size="x-small" color="primary" variant="tonal" class="ml-2">
           {{ backups.length }}
         </v-chip>
       </v-expansion-panel-title>
@@ -13,8 +13,8 @@
           <v-progress-circular indeterminate color="primary" size="32"></v-progress-circular>
         </div>
 
-        <div v-else-if="backups.length === 0" class="text-center py-4 text-grey">
-          <v-icon size="48" class="mb-2">mdi-history</v-icon>
+        <div v-else-if="backups.length === 0" class="text-center py-4 text-medium-emphasis">
+          <v-icon size="48" class="mb-2" color="primary">mdi-history</v-icon>
           <p>{{ $t('no_history') || 'Még nincsenek mentett előzmények' }}</p>
         </div>
 
@@ -22,8 +22,8 @@
           <v-list-item
             v-for="backup in backups"
             :key="backup.$id"
-            class="mb-2 rounded-lg"
-            :class="{ 'bg-blue-lighten-5': selectedBackup === backup.$id }"
+            class="mb-2 rounded-lg history-item"
+            :class="{ 'is-selected': selectedBackup === backup.$id }"
           >
             <template #prepend>
               <v-icon :color="getChangeTypeColor(backup.changeType)">
@@ -319,19 +319,51 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.content-history-panel {
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+
+.history-item {
+  border: 1px solid rgba(14, 165, 233, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.history-item.is-selected {
+  border-color: rgba(14, 165, 233, 0.4);
+  background: rgba(14, 165, 233, 0.1);
+}
+
+:global(.dark) .history-item {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+:global(.dark) .history-item.is-selected {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
 .backup-preview {
   max-height: 400px;
   overflow-y: auto;
 }
 
 .backup-data {
-  background: #f5f5f5;
+  background: rgba(14, 165, 233, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.15);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   font-size: 12px;
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+:global(.dark) .backup-data {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: rgba(148, 163, 184, 0.16);
 }
 
 .gap-1 {

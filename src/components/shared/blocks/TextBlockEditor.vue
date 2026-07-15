@@ -56,8 +56,15 @@ export default defineComponent({
 <style scoped>
 .editor-wrapper {
     min-height: 200px;
-    border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-    border-radius: 8px;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 0.85rem;
     overflow: hidden;
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+:global(.dark) .editor-wrapper {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(148, 163, 184, 0.2);
 }
 </style>

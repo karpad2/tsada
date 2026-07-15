@@ -1,33 +1,34 @@
 <template>
-  <div class="messaging-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
-    <div class="max-w-6xl mx-auto">
+  <div class="messaging-center page-shell py-8 px-4">
+    <div class="page-panel container max-w-6xl admin-dark-form">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-black text-white mb-2">{{ $t('messaging_center') }}</h1>
-        <p class="text-gray-300">{{ $t('messaging_center_description') }}</p>
+      <div class="page-header">
+        <h1 class="section-title">{{ $t('messaging_center') }}</h1>
+        <div class="section-accent"></div>
+        <p class="page-subtitle">{{ $t('messaging_center_description') }}</p>
       </div>
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="stat-card glass-card p-6 rounded-2xl">
           <div class="flex items-center gap-3 mb-2">
-            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
-            <h3 class="text-white font-semibold">{{ $t('messages') }}</h3>
+            <h3 class="text-gray-900 dark:text-white font-semibold">{{ $t('messages') }}</h3>
           </div>
-          <p class="text-3xl font-bold text-white">{{ stats.totalMessages }}</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.totalMessages }}</p>
           <p class="text-sm text-gray-400 mt-1">{{ $t('total_sent') }}</p>
         </div>
 
         <div class="stat-card glass-card p-6 rounded-2xl">
           <div class="flex items-center gap-3 mb-2">
-            <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 class="text-white font-semibold">{{ $t('mc_topics') }}</h3>
+            <h3 class="text-gray-900 dark:text-white font-semibold">{{ $t('mc_topics') }}</h3>
           </div>
-          <p class="text-3xl font-bold text-white">{{ topics.length }}</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ topics.length }}</p>
           <p class="text-sm text-gray-400 mt-1">{{ $t('mc_active_groups') }}</p>
         </div>
 
@@ -36,9 +37,9 @@
             <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="text-white font-semibold">{{ $t('mc_successful') }}</h3>
+            <h3 class="text-gray-900 dark:text-white font-semibold">{{ $t('mc_successful') }}</h3>
           </div>
-          <p class="text-3xl font-bold text-white">{{ stats.successful }}</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.successful }}</p>
           <p class="text-sm text-gray-400 mt-1">{{ $t('mc_delivered') }}</p>
         </div>
 
@@ -47,9 +48,9 @@
             <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="text-white font-semibold">{{ $t('mc_scheduled') }}</h3>
+            <h3 class="text-gray-900 dark:text-white font-semibold">{{ $t('mc_scheduled') }}</h3>
           </div>
-          <p class="text-3xl font-bold text-white">{{ stats.scheduled }}</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.scheduled }}</p>
           <p class="text-sm text-gray-400 mt-1">{{ $t('mc_waiting') }}</p>
         </div>
       </div>
@@ -59,7 +60,7 @@
         <!-- Send Notification Form -->
         <div class="lg:col-span-2">
           <div class="glass-card p-8 rounded-3xl">
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
@@ -77,8 +78,8 @@
                   :class="[
                     'flex-1 px-4 py-3 rounded-lg font-semibold transition-all',
                     selectedType === type.value
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      ? 'glass-btn text-white shadow-lg'
+                      : 'bg-slate-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10'
                   ]"
                 >
                   {{ type.label }}
@@ -88,7 +89,7 @@
               <!-- Title & Body -->
               <div class="space-y-4 mb-6">
                 <div>
-                  <label class="block text-white font-semibold mb-2">{{ $t('notification_title') }}</label>
+                  <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('notification_title') }}</label>
                   <input
                     v-model="notification.title"
                     type="text"
@@ -100,7 +101,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-white font-semibold mb-2">{{ $t('notification_body') }}</label>
+                  <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('notification_body') }}</label>
                   <textarea
                     v-model="notification.body"
                     maxlength="200"
@@ -114,7 +115,7 @@
 
               <!-- Target Selection -->
               <div class="mb-6">
-                <label class="block text-white font-semibold mb-2">{{ $t('mc_recipients') }}</label>
+                <label class="block text-gray-900 dark:text-white font-semibold mb-2">{{ $t('mc_recipients') }}</label>
                 <select v-model="notification.targetType" class="input-field">
                   <option value="all">{{ $t('mc_everyone') }}</option>
                   <option value="topic">{{ $t('mc_specific_topic') }}</option>
@@ -146,7 +147,7 @@
                 <button
                   type="button"
                   @click="showAdvanced = !showAdvanced"
-                  class="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                  class="flex items-center gap-2 text-sky-500 hover:text-sky-400 transition-colors"
                 >
                   <svg
                     class="w-5 h-5 transition-transform"
@@ -160,15 +161,15 @@
                   {{ $t('mc_advanced_settings') }}
                 </button>
 
-                <div v-if="showAdvanced" class="mt-4 space-y-4 p-4 bg-white/5 rounded-xl">
+                <div v-if="showAdvanced" class="mt-4 space-y-4 p-4 glass rounded-xl">
                   <!-- Icon & Sound -->
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-white text-sm mb-2">{{ $t('icon_url_optional') }}</label>
+                      <label class="block text-gray-900 dark:text-white text-sm mb-2">{{ $t('icon_url_optional') }}</label>
                       <input v-model="notification.icon" type="url" class="input-field" placeholder="https://..." />
                     </div>
                     <div>
-                      <label class="block text-white text-sm mb-2">{{ $t('mc_sound') }}</label>
+                      <label class="block text-gray-900 dark:text-white text-sm mb-2">{{ $t('mc_sound') }}</label>
                       <input v-model="notification.sound" type="text" class="input-field" placeholder="default" />
                     </div>
                   </div>
@@ -176,7 +177,7 @@
                   <!-- Priority & Badge -->
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-white text-sm mb-2">{{ $t('mc_priority') }}</label>
+                      <label class="block text-gray-900 dark:text-white text-sm mb-2">{{ $t('mc_priority') }}</label>
                       <select v-model="notification.priority" class="input-field">
                         <option value="default">{{ $t('mc_priority_default') }}</option>
                         <option value="high">{{ $t('mc_priority_high') }}</option>
@@ -185,14 +186,14 @@
                       </select>
                     </div>
                     <div>
-                      <label class="block text-white text-sm mb-2">{{ $t('mc_badge_number') }}</label>
+                      <label class="block text-gray-900 dark:text-white text-sm mb-2">{{ $t('mc_badge_number') }}</label>
                       <input v-model.number="notification.badge" type="number" class="input-field" placeholder="0" />
                     </div>
                   </div>
 
                   <!-- iOS Interruption Level -->
                   <div>
-                    <label class="block text-white text-sm mb-2">{{ $t('mc_ios_interruption') }}</label>
+                    <label class="block text-gray-900 dark:text-white text-sm mb-2">{{ $t('mc_ios_interruption') }}</label>
                     <select v-model="notification.interruptionLevel" class="input-field">
                       <option value="active">{{ $t('mc_interruption_active') }}</option>
                       <option value="time-sensitive">{{ $t('mc_interruption_time_sensitive') }}</option>
@@ -203,7 +204,7 @@
 
                   <!-- Schedule -->
                   <div>
-                    <label class="flex items-center gap-2 text-white mb-2">
+                    <label class="flex items-center gap-2 text-gray-900 dark:text-white mb-2">
                       <input v-model="notification.scheduled" type="checkbox" class="checkbox" />
                       {{ $t('mc_scheduled_send') }}
                     </label>
@@ -247,7 +248,7 @@
         <div class="space-y-6">
           <!-- Topics -->
           <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">{{ $t('mc_topics') }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{{ $t('mc_topics') }}</h3>
             <div v-if="topics.length === 0" class="text-center py-8 text-gray-400">
               <p>{{ $t('mc_no_topics') }}</p>
             </div>
@@ -255,11 +256,11 @@
               <div
                 v-for="topic in topics"
                 :key="topic.$id"
-                class="p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-all"
+                class="p-3 glass rounded-lg hover:border-sky-300 transition-all"
               >
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="text-white font-semibold">{{ topic.name }}</h4>
+                    <h4 class="text-gray-900 dark:text-white font-semibold">{{ topic.name }}</h4>
                     <p class="text-sm text-gray-400">{{ topic.total || 0 }} {{ $t('subscribers') }}</p>
                   </div>
                 </div>
@@ -269,7 +270,7 @@
 
           <!-- Recent Messages -->
           <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">{{ $t('mc_recent') }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{{ $t('mc_recent') }}</h3>
             <div v-if="recentMessages.length === 0" class="text-center py-8 text-gray-400">
               <p>{{ $t('mc_no_messages') }}</p>
             </div>
@@ -277,9 +278,9 @@
               <div
                 v-for="msg in recentMessages.slice(0, 5)"
                 :key="msg.$id"
-                class="p-3 bg-white/5 rounded-lg"
+                class="p-3 glass rounded-lg"
               >
-                <h4 class="text-white font-semibold text-sm truncate">{{ msg.data?.title || $t('untitled_document') }}</h4>
+                <h4 class="text-gray-900 dark:text-white font-semibold text-sm truncate">{{ msg.data?.title || $t('untitled_document') }}</h4>
                 <p class="text-xs text-gray-400">{{ formatDate(msg.$createdAt) }}</p>
                 <span
                   :class="[
@@ -452,27 +453,36 @@ function formatDate(dateString: string) {
 </script>
 
 <style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-}
-
 .input-field {
-  @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all;
+  @apply w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/70 dark:bg-slate-800/60 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all;
 }
 
 .btn-primary {
-  @apply px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/50 disabled:cursor-not-allowed;
+  @apply px-6 py-4 text-white font-bold rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.9), rgba(56, 189, 248, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 8px 28px rgba(14, 165, 233, 0.45);
 }
 
 .btn-secondary {
-  @apply bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all duration-300;
+  @apply px-6 py-4 font-semibold rounded-full transition-all duration-300;
+  color: #0369a1;
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.dark .btn-secondary {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.22);
 }
 
 .checkbox {
-  @apply w-5 h-5 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500;
+  @apply w-5 h-5 text-sky-600 rounded focus:ring-sky-500;
 }
 </style>

@@ -1,11 +1,14 @@
 <template>
-  <v-container fluid class="pa-4">
+  <div class="page-shell">
+  <div class="page-panel container">
+  <v-container fluid class="pa-0">
     <v-row>
       <v-col cols="12">
-        <div class="d-flex align-center justify-space-between mb-4">
+        <div class="d-flex align-center justify-space-between mb-4 flex-wrap ga-4">
           <div>
-            <h1 class="text-h4 text-black font-weight-bold">{{ $t('menu_editor') }}</h1>
-            <p class="text-body-2 text-grey mt-1">{{ $t('menu_editor_desc') }}</p>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('menu_editor') }}</h1>
+            <div class="section-accent !mb-2"></div>
+            <p class="page-subtitle !mt-0">{{ $t('menu_editor_desc') }}</p>
           </div>
           <div class="d-flex ga-2">
             <v-btn
@@ -331,6 +334,8 @@
       </v-card>
     </v-dialog>
   </v-container>
+  </div>
+  </div>
 </template>
 
 <script lang="ts">

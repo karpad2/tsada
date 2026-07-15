@@ -53,6 +53,9 @@ import { Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { useLoadingStore } from '@/stores/loading';
 
+const database = new Databases(appw);
+const storage = new Storage(appw);
+
 interface DocumentItem {
   $id: string;
   title: string;
@@ -77,8 +80,6 @@ export default defineComponent({
   },
   setup(props) {
     const { t } = useI18n();
-    const database = new Databases(appw);
-    const storage = new Storage(appw);
     const loadingStore = useLoadingStore();
 
     const documents = ref<DocumentItem[]>([]);

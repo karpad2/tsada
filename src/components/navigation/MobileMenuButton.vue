@@ -2,7 +2,7 @@
   <div v-if="isMobile" class="mobile-menu-container">
     <button
       @click="toggleMenu"
-      class="btn btn-ghost mobile-menu-button m-3 dark:text-white"
+      class="mobile-menu-button m-2 dark:text-white glass rounded-xl"
       :aria-expanded="isOpen"
       aria-label="Toggle mobile menu"
     >
@@ -53,16 +53,18 @@ export default defineComponent({
 
 .mobile-menu-button {
   padding: 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  color: inherit;
+  cursor: pointer;
 }
 
 .mobile-menu-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.2);
+  transform: scale(1.04);
 }
 
 .mobile-menu-button:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline: 2px solid rgba(14, 165, 233, 0.5);
   outline-offset: 2px;
 }
 

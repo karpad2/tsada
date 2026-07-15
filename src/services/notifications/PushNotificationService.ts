@@ -6,6 +6,8 @@
 import { Databases, Query } from 'appwrite';
 import { config, appw } from '@/appwrite';
 
+const database = new Databases(appw);
+
 export interface NotificationPayload {
   title: string;
   body: string;
@@ -223,7 +225,6 @@ export class PushNotificationService {
     subscription: globalThis.PushSubscription
   ): Promise<void> {
     try {
-      const database = new Databases(appw);
       const subscriptionData = subscription.toJSON();
 
       // Generate unique ID from endpoint
@@ -244,7 +245,7 @@ export class PushNotificationService {
     } catch (error: any) {
       // If document already exists, update it
       if (error.code === 409) {
-        console.log('Subscription already exists');
+        // Subscription already exists
       } else {
         console.error('Failed to save subscription to backend:', error);
       }
@@ -258,7 +259,6 @@ export class PushNotificationService {
     subscription: globalThis.PushSubscription
   ): Promise<void> {
     try {
-      const database = new Databases(appw);
       const subscriptionId = btoa(subscription.endpoint).replace(/[^a-zA-Z0-9]/g, '').substring(0, 36);
 
       await database.deleteDocument(

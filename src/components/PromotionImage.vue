@@ -46,7 +46,10 @@
 import { defineComponent } from "vue";
 import { Databases, Storage } from "appwrite";
 import { appw, config } from "@/appwrite";
-import gsap from "gsap";
+
+const database = new Databases(appw);
+const storage = new Storage(appw);
+
 
 export default defineComponent({
   name: "PromoImage",
@@ -75,9 +78,6 @@ export default defineComponent({
   },
   methods: {
     async getPromo() {
-      const database = new Databases(appw);
-      const storage = new Storage(appw);
-
       try {
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 8000)
@@ -129,18 +129,20 @@ export default defineComponent({
     },
 
     onImgError() {
-      console.log("Image 1 error - waiting for timer...");
+      // Image 1 error - waiting for timer
     },
 
     animateImage(selector: string, isSecond: boolean) {
-      const element = document.querySelector(selector);
-      if (!element || this.isDestroyed) return;
+      import('gsap').then(({ default: gsap }) => {
+        const element = document.querySelector(selector);
+        if (!element || this.isDestroyed) return;
 
-      gsap.to(selector, {
-        duration: 0.6,
-        opacity: 1,
-        delay: isSecond ? 0.2 : 0,
-        ease: "power2.out",
+        gsap.to(selector, {
+          duration: 0.6,
+          opacity: 1,
+          delay: isSecond ? 0.2 : 0,
+          ease: "power2.out",
+        });
       });
     }
   }
@@ -153,15 +155,21 @@ export default defineComponent({
   position: relative;
   width: 100%;
   aspect-ratio: 300 / 856;
-  border-radius: 16px;
+  border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 4px 24px rgba(14, 165, 233, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .image-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow:
+    0 16px 48px rgba(14, 165, 233, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Promo image - absolute pozíció a stabil layoutért */

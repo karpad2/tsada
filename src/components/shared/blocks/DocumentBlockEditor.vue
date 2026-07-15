@@ -44,12 +44,12 @@
             />
 
             <!-- Selected Documents Preview -->
-            <v-card v-if="selectedDocuments.length > 0" variant="outlined" class="mt-4">
-                <v-card-title class="text-body-2 d-flex align-center">
-                    <v-icon left size="small" class="mr-2">mdi-file-document-multiple</v-icon>
+            <div v-if="selectedDocuments.length > 0" class="block-preview mt-4">
+                <div class="block-preview-title d-flex align-center">
+                    <v-icon left size="small" color="primary" class="mr-2">mdi-file-document-multiple</v-icon>
                     {{ $t('selected_documents') }} ({{ selectedDocuments.length }})
-                </v-card-title>
-                <v-card-text>
+                </div>
+                <div class="block-preview-body">
                     <draggable
                         v-model="localSettings.documentIds"
                         item-key="id"
@@ -84,8 +84,8 @@
                             </v-list-item>
                         </template>
                     </draggable>
-                </v-card-text>
-            </v-card>
+                </div>
+            </div>
 
             <v-alert v-else type="info" variant="tonal" density="compact" class="mt-3">
                 <v-icon left size="small">mdi-information</v-icon>
@@ -278,6 +278,9 @@ import { useLoadingStore } from '@/stores/loading';
 import { notify } from '@kyvg/vue3-notification';
 import draggable from 'vuedraggable';
 
+const database = new Databases(appw);
+const storage = new Storage(appw);
+
 interface DocumentItem {
     id: string;
     title: string;
@@ -303,8 +306,6 @@ export default defineComponent({
     },
     emits: ['update:settings', 'save'],
     setup(props, { emit }) {
-        const database = new Databases(appw);
-        const storage = new Storage(appw);
         const loadingStore = useLoadingStore();
 
         // State
@@ -746,6 +747,30 @@ export default defineComponent({
     flex: 1;
 }
 
+.block-preview {
+    border-radius: 0.85rem;
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.block-preview-title {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(14, 165, 233, 0.12);
+    background: rgba(14, 165, 233, 0.06);
+}
+
+.block-preview-body {
+    padding: 0.85rem;
+}
+
+.doc-item {
+    border: 1px solid rgba(14, 165, 233, 0.12);
+    background: rgba(255, 255, 255, 0.5);
+}
+
 /* Dark mode */
 :deep(.v-theme--dark) .upload-section {
     background: rgba(0, 0, 0, 0.3);
@@ -757,5 +782,10 @@ export default defineComponent({
 
 :deep(.v-theme--dark) .doc-item {
     background: rgba(255, 255, 255, 0.05);
+}
+
+:global(.dark) .block-preview {
+    background: rgba(15, 23, 42, 0.45);
+    border-color: rgba(148, 163, 184, 0.16);
 }
 </style>

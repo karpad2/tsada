@@ -1,11 +1,11 @@
 <template>
-  <div class="w-full space-y-2">
-    <div v-for="(item, index) in items" :key="index" class="border-b border-gray-200 dark:border-gray-700">
+  <div class="w-full space-y-1">
+    <div v-for="(item, index) in items" :key="index" class="border-b border-white/20 dark:border-white/10 last:border-0">
       <!-- Item with submenu -->
       <div v-if="item.children && item.children.length > 0">
         <button
           @click="toggleItem(index)"
-          class="w-full px-4 py-3 flex items-center justify-between text-left dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:dark:text-white transition-colors"
+          class="w-full px-4 py-3 flex items-center justify-between text-left dark:text-white hover:bg-white/30 dark:hover:bg-white/10 rounded-xl hover:dark:text-white transition-all duration-200"
         >
           <span class="font-medium">{{ item.label }}</span>
           <svg
@@ -27,7 +27,7 @@
           @leave="onLeave"
         >
           <div v-show="openItems.has(index)" class="overflow-hidden">
-            <div class="bg-gray-50 dark:bg-gray-800 py-2">
+            <div class="bg-white/25 dark:bg-black/20 rounded-xl py-2 mx-1 my-1">
               <div v-for="(child, childIndex) in item.children" :key="childIndex">
                 <!-- Child with nested submenu -->
                 <div v-if="child.children && child.children.length > 0">

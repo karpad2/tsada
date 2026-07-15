@@ -52,7 +52,6 @@ export class ContentBackupService {
 
       // Ha nincs változás, nem mentünk
       if (changedFields.length === 0 && changeType === 'update') {
-        console.log('No changes detected, skipping backup');
         return null;
       }
 
@@ -72,8 +71,6 @@ export class ContentBackupService {
         ID.unique(),
         backup
       );
-
-      console.log(`📦 Backup created for ${contentType}/${contentId}`);
 
       // Töröljük a régi backup-okat
       await this.cleanupOldBackups();
@@ -118,7 +115,6 @@ export class ContentBackupService {
         previousData
       );
 
-      console.log(`✅ Content restored from backup ${backupId}`);
       return true;
     } catch (error) {
       console.error('Failed to restore backup:', error);
@@ -224,10 +220,6 @@ export class ContentBackupService {
         } catch (e) {
           console.error(`Failed to delete old backup ${doc.$id}:`, e);
         }
-      }
-
-      if (deletedCount > 0) {
-        console.log(`🗑️ Cleaned up ${deletedCount} old backups (older than ${this.RETENTION_DAYS} days)`);
       }
 
       return deletedCount;

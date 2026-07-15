@@ -142,9 +142,9 @@ export abstract class BaseApiService<T = any> {
    * Create new document with PWA offline support
    */
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
-    try {
-      const processedData = this.prepareForSave(data)
+    const processedData = this.prepareForSave(data)
 
+    try {
       const response = await this.pwaService.createDocument(
         this.databaseId,
         this.collectionId,
@@ -161,7 +161,6 @@ export abstract class BaseApiService<T = any> {
 
       // Fallback to regular Appwrite
       try {
-        const processedData = this.prepareForSave(data)
         const response = await this.database.createDocument(
           this.databaseId,
           this.collectionId,
@@ -265,9 +264,8 @@ export abstract class BaseApiService<T = any> {
   protected buildQueries(options: QueryOptions): any[] {
     const queries = []
 
-    if (options.limit) {
-      queries.push(Query.limit(options.limit))
-    }
+    // Appwrite defaults to 25 — always send an explicit limit
+    queries.push(Query.limit(options.limit ?? 100))
 
     if (options.offset) {
       queries.push(Query.offset(options.offset))
