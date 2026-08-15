@@ -42,6 +42,7 @@ export function useSEO() {
    * @param title - The page title (can be a translation key or plain text)
    */
   const setPageTitle = (title: string) => {
+    if (typeof document === 'undefined') return
     const schoolName = t('school_name')
     const formattedTitle = title ? `${title} ~ ${schoolName}` : schoolName
     document.title = formattedTitle
@@ -64,6 +65,8 @@ export function useSEO() {
    * Update HTML meta tags
    */
   const updateMetaTags = () => {
+    if (typeof document === 'undefined') return
+
     const seo = currentSEO.value
 
     // Update title with formatting
@@ -312,6 +315,8 @@ export function useSEO() {
  * @param title - The page title
  */
 export function setDocumentTitle(title: string) {
+  if (typeof document === 'undefined') return
+
   const loadingStore = useLoadingStore()
   const currentLang = loadingStore.language || 'hu'
 

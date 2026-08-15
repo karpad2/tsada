@@ -5,7 +5,10 @@
                     <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">{{ $t('erasmus_applies_result') }}</h1>
                     <div class="section-accent !w-20"></div>
                 </div>
-                <div v-if="loaded" v-for="role in roles" class="m-auto w-full popups mb-8" :key="role.role">
+                <div v-if="!moduleOpen && !admin" class="page-state">
+                    <h3 class="page-state-title">{{ $t('applies_are_closed') }}</h3>
+                </div>
+                <div v-else-if="loaded" v-for="role in roles" class="m-auto w-full popups mb-8" :key="role.role">
                 <h2 class="page-section-title">{{ role.role }}</h2>
                 <div class="page-table-wrap overflow-hidden">
                 <v-data-table height="400" :headers="headers" :items="role.workers" :items-per-page="-1">
@@ -24,6 +27,7 @@
     import {appw,config} from "@/appwrite";
     import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
+    import { isPublicModuleOpen } from '@/services/modules/windows';
     import {reactive,ref} from "vue";
     import dayjs from '@/utils/dayjs';
 
@@ -44,6 +48,10 @@
             const loadingStore = useLoadingStore();
             this.admin = loadingStore.userLoggedin && (loadingStore.userRole === 'admin' || loadingStore.userRole === 'editor');
             document.title=this.$t("erasmus_applies_result");
+            isPublicModuleOpen('erasmus_list').then((open) => {
+              this.moduleOpen = open;
+              if (!open && !this.admin) this.loaded = true;
+            });
     
             import('gsap').then(({ default: gsap }) => {
               gsap.fromTo(
@@ -98,7 +106,8 @@
                     colDefs:[],
                     loaded:false,
                     headers:[],
-                    admin:false
+                    admin:false,
+                    moduleOpen:true
                     
                 }),
         methods:{

@@ -229,6 +229,34 @@ export const BUILTIN_ASSETS = [
     ],
   },
   {
+    id: 'builtin:fuelBarrel', name: 'Fuel Barrel', icon: '🔥', hp: 60,
+    shapes: [
+      { kind:'cyl', rT:0.27, rB:0.27, h:0.92, color:0xCC2222, lx:0, ly:0.50, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.29, rB:0.29, h:0.06, color:0x333333, lx:0, ly:0.08, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.29, rB:0.29, h:0.06, color:0x333333, lx:0, ly:0.50, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.29, rB:0.29, h:0.06, color:0x333333, lx:0, ly:0.92, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.28, rB:0.28, h:0.28, color:0xFF5500, lx:0, ly:0.50, lz:0, segs:14, surface:'default' },
+    ],
+  },
+  {
+    id: 'builtin:gasTank', name: 'Gas Tank', icon: '☢', hp: 120,
+    shapes: [
+      { kind:'cyl', rT:0.38, rB:0.38, h:1.80, color:0x44AA44, lx:0, ly:0.95, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.40, rB:0.40, h:0.08, color:0x338833, lx:0, ly:0.08, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.40, rB:0.40, h:0.08, color:0x338833, lx:0, ly:1.85, lz:0, segs:14, surface:'metal' },
+      { kind:'cyl', rT:0.385, rB:0.385, h:0.10, color:0xFFCC00, lx:0, ly:0.50, lz:0, segs:14, surface:'default' },
+      { kind:'cyl', rT:0.385, rB:0.385, h:0.10, color:0xFFCC00, lx:0, ly:1.40, lz:0, segs:14, surface:'default' },
+    ],
+  },
+  {
+    id: 'builtin:electricPanel', name: 'Electric Panel', icon: '⚡', hp: 80,
+    shapes: [
+      { kind:'box', w:0.70, h:0.90, d:0.18, color:0x555555, lx:0, ly:0.75, lz:0, surface:'metal' },
+      { kind:'box', w:0.60, h:0.78, d:0.04, color:0x333333, lx:0, ly:0.75, lz:-0.10, surface:'metal' },
+      { kind:'box', w:0.68, h:0.06, d:0.04, color:0xFFCC00, lx:0, ly:1.18, lz:-0.10, surface:'default' },
+    ],
+  },
+  {
     id: 'builtin:workbench', name: 'Workbench', icon: '🔧', hp: 100,
     shapes: [
       { kind:'box', w:2.80, h:0.08, d:0.70, color:0xA07A3A, lx:0,     ly:0.89, lz:0,     surface:'wood' },

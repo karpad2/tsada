@@ -833,6 +833,7 @@ const PROP_COLORS = {
   container: '#2a3a1a', displayCase: '#3a3a2a', cargobox: '#4a3a1a', consolepod: '#1a2030',
   cabinet: '#2a2a3a', filecab: '#2a3a4a', pedestal: '#3a3a3a', gurney: '#3a3a3a',
   van: '#1a3a5a', truck: '#2a2a4a', car: '#2a4a2a',
+  fuelBarrel: '#cc2222', gasTank: '#2a8a2a', electricPanel: '#555555',
 }
 // Actual footprint sizes [w, d] for built-in prop types
 const PROP_SIZES = {
@@ -844,6 +845,7 @@ const PROP_SIZES = {
   cargobox:    [1.6, 1.1],   consolepod: [2.4, 0.8],   cabinet:    [0.6, 0.4],
   filecab:     [0.5, 0.6],   pedestal:   [0.7, 0.7],   gurney:     [0.7, 1.9],
   van:         [2.2, 4.8],   truck:      [2.6, 7.0],   car:        [1.8, 3.8],
+  fuelBarrel:  [0.58, 0.58], gasTank:    [0.80, 0.80], electricPanel: [0.70, 0.22],
 }
 function _propSize(p) {
   if (p.w && p.d) return [p.w, p.d]

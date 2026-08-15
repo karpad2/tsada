@@ -46,6 +46,10 @@ export default {
     { type: 'barrel', x: -10, z: -16  },
     { type: 'barrel', x:  10, z: -16  },
     { type: 'barrel', x:   0, z: -20  },
+    { type: 'fuelBarrel', x: -18, z: -16 },
+    { type: 'fuelBarrel', x:  18, z: -16 },
+    { type: 'fuelBarrel', x: -8,  z:  10 },
+    { type: 'gasTank',    x:  8,  z:  10 },
   ],
 
 

@@ -49,8 +49,9 @@ export default {
     // Barrels scattered
     { type: 'barrel', x: -5,  z:  5 },
     { type: 'barrel', x:  5,  z:  5 },
-    { type: 'barrel', x: -3,  z: -12 },
-    { type: 'barrel', x:  3,  z: -12 },
+    { type: 'fuelBarrel', x: -3,  z: -12 },
+    { type: 'fuelBarrel', x:  3,  z: -12 },
+    { type: 'gasTank', x: 0, z: 6 },
     // Control room
     { type: 'consolepod', x: -2, z: -22 },
     { type: 'consolepod', x:  2, z: -22 },

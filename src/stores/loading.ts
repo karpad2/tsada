@@ -96,7 +96,19 @@ export const useLoadingStore = defineStore('loading', () => {
 
     return { count,isLoading,language,erasmus_apply, theme,ErasmusAppliedID, setThemeSetting,setErasmusAppliedID,setLoading,setErasmus,setUserLoggedin,setLanguage,setErasmusAppliedSetting,hideheaders,sethideheaders,userLoggedin,userRole,assignedClasses,setUserRole,setAssignedClasses,notif,isErasmus, doubleCount,setAnimation,animationSetting,uid,setuid, increment,fireworkSetting,setfireworkSetting,currentPageEuFunding,setCurrentPageEuFunding,mobile_view,tablet_mode,mobile_mode }
   },
-{persist:true})
+  {
+    persist: {
+      pick: ['language', 'theme', 'userLoggedin', 'userRole', 'uid', 'animationSetting', 'assignedClasses', 'ErasmusAppliedID'],
+      afterHydrate: ({ store }) => {
+        store.isLoading = false
+        store.hideheaders = false
+        store.fireworkSetting = false
+        store.isErasmus = false
+        store.currentPageEuFunding = false
+      }
+    }
+  }
+)
 
   /*if (import.meta.hot) {
     import.meta.hot.accept(acceptHMRUpdate(useAuth, import.meta.hot))

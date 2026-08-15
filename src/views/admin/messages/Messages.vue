@@ -28,10 +28,9 @@
     
     import { Databases, ID,Storage,Query } from "appwrite";
     import {appw,config} from "@/appwrite";
-    import { convertifserbian } from "@/lang";
     import {useLoadingStore} from "@/stores/loading";
-    import {reactive,ref} from "vue";
     import dayjs from '@/utils/dayjs';
+    import { extractMessageBody } from '@/utils/contactMessage';
 
     const database = new Databases(appw);
     const storage = new Storage(appw);
@@ -54,8 +53,9 @@
             this.headers= [
                     { title: this.$t("name"), align: 'start', sortable: false, key: 'name',width: '200px' },
                     { title: this.$t("date"), align: 'start', key: 'date',width: '300px' },
-                    { title: this.$t("email"), align: 'start', key: 'email',width: '300px' },
-                    { title: this.$t("open_message"), align: 'start', key: 'edit',width: '300px' },
+                    { title: this.$t("email"), align: 'start', key: 'email',width: '220px' },
+                    { title: this.$t("message"), align: 'start', key: 'preview',width: '280px' },
+                    { title: this.$t("open_message"), align: 'start', key: 'edit',width: '120px' },
                     ];
             this.load_messages_base();
            
@@ -84,25 +84,27 @@
                 }),
         methods:{
             async load_messages_base(){
-                const loadingStore = useLoadingStore();
-                //loadingStore.setLoading(true);
-                this.workers=[];
-                this.roles=[];
-                //console.log();
-                let local=loadingStore.language;
+                try {
+                this.messages = [];
                 let n= await database.listDocuments(config.website_db, config.mess_coll,[Query.orderDesc("$createdAt"), Query.limit(100)]);
                 for (const el2 of n.documents) {
-                    let a={name:"",contact:"",email:"",date:"",id:""};
-                        a.id=el2.$id;
-                        a.date=el2.$createdAt;
-                        a.name=el2.name;
-                        a.email=el2.email;
-                    this.messages.push(a);
+                    const body = extractMessageBody(el2)
+                    this.messages.push({
+                        id: el2.$id,
+                        date: el2.$createdAt,
+                        name: el2.name || '',
+                        email: el2.email || '',
+                        preview: String(body).replace(/<[^>]+>/g, ' ').trim().slice(0, 80)
+                    });
                     }
                 //n.documents.forEach()
                 
             
-                this.loaded=true;
+                } catch (error) {
+                    console.error('Failed to load messages:', error);
+                } finally {
+                    this.loaded=true;
+                }
                 },
                 rt_time(a)
                 {   dayjs.locale('hu');

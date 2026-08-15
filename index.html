@@ -86,8 +86,27 @@
     <!--app-head-->
   </head>
   <body>
-    <div id="app"><!--app-html--></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="app"></div>
+    <script>
+      (function () {
+        var host = location.hostname
+        if (host !== 'localhost' && host !== '127.0.0.1') return
+        if (!('serviceWorker' in navigator)) return
+        try {
+          if (sessionStorage.getItem('tsada-sw-cleared') === '1') return
+        } catch (e) {}
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          var hadSw = regs.length > 0 || !!navigator.serviceWorker.controller
+          try { sessionStorage.setItem('tsada-sw-cleared', '1') } catch (e) {}
+          if (!hadSw) return
+          return Promise.all(regs.map(function (r) { return r.unregister() }))
+            .then(function () { return caches ? caches.keys() : [] })
+            .then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k) })) })
+            .then(function () { location.reload() })
+        }).catch(function () {})
+      })()
+    </script>
+    <script type="module" src="/src/entry-client.js?v=20260814c"></script>
     <noscript>
       <div style="max-width:720px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif">
         <h1>Tehnička Škola Ada</h1>
@@ -131,16 +150,16 @@
             app.__vue_app__ ||
             (app.children.length > 0 && !document.getElementById('seo-prerender'))
           );
-          // Only treat as failure if #app is empty or still only has SEO shell after timeout
-          const onlySeoShell = app && document.getElementById('seo-prerender') &&
-            !app.querySelector('[data-v-app]') && !app.__vue_app__;
-          if (!app || (!vueMounted && !document.getElementById('seo-prerender')) || onlySeoShell) {
-            // SEO shell alone is OK for crawlers; only show error if truly empty
-            if (!app || app.innerHTML.trim() === '') {
-              document.getElementById('loadError').style.display = 'block';
-              startCountdown();
-            }
-          }
+          if (vueMounted || (app && app.innerHTML.trim() !== '')) return;
+          const banner = document.getElementById('loadError');
+          if (banner) banner.style.display = 'block';
+          var host = location.hostname;
+          var isLocal = host === 'localhost' || host === '127.0.0.1';
+          var attempts = 0;
+          try { attempts = Number(sessionStorage.getItem('tsada-load-repair') || 0) } catch (e) {}
+          if (isLocal || attempts >= 1) return;
+          try { sessionStorage.setItem('tsada-load-repair', String(attempts + 1)) } catch (e) {}
+          startCountdown();
         }, 8000);
       });
 

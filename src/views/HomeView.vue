@@ -33,9 +33,11 @@ import Sponsors from '@/components/Sponsors.vue'
 // i18n kezelés
 const { t } = useI18n()
 
-// Oldalcím beállítása
+// Oldalcím beállítása (client only — SSR head comes from entry-server)
 onMounted(() => {
-  document.title = t('school_name')
+  if (typeof document !== 'undefined') {
+    document.title = t('school_name')
+  }
 })
 </script>
 

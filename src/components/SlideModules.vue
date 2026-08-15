@@ -279,6 +279,8 @@ import { defineComponent } from 'vue';
 import { Databases, ID, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { convertifserbian as convertIfSerbian, getStatus } from '@/lang';
+import { pickLocalized } from '@/utils/localizedText';
+import { isNewsLive, loadNewsSchedule } from '@/services/content/newsSchedule';
 import { useLoadingStore } from '@/stores/loading';
 
 
@@ -307,6 +309,7 @@ export default defineComponent({
       filterType: 'all', // 'all', 'visible', 'hidden'
       viewMode: 'grid', // 'grid', 'list'
       allCourses: [] as Array<any>, // Store all courses for filtering
+      newsSchedule: {} as Record<string, { from?: string; until?: string }>,
     };
   },
   computed: {
@@ -335,6 +338,10 @@ export default defineComponent({
       }
 
       // Apply visibility filter
+      if (!this.admin) {
+        filtered = filtered.filter(course => course.live !== false);
+      }
+
       if (this.filterType === 'visible') {
         filtered = filtered.filter(course => course.visible);
       } else if (this.filterType === 'hidden') {
@@ -360,9 +367,11 @@ export default defineComponent({
 
     // Improved animation with better performance
     this.$nextTick(() => {
+      const targets = this.$el?.querySelectorAll?.('.fade-slide')
+      if (!targets || targets.length === 0) return
       import('gsap').then(({ default: gsap }) => {
         gsap.fromTo(
-          '.fade-slide',
+          targets,
           { opacity: 0, y: 20 },
           {
             duration: 0.6,
@@ -373,7 +382,7 @@ export default defineComponent({
             clearProps: 'all'
           }
         );
-      });
+      }).catch(() => {});
     });
   },
   beforeUnmount() {
@@ -419,6 +428,9 @@ export default defineComponent({
         ];
 
         const { documents } = await db.listDocuments(config.website_db, config.about_us_db, filters);
+        if (this.page === 0 && this.mode === 'news') {
+          this.newsSchedule = await loadNewsSchedule();
+        }
 
         if (documents.length < this.limit) this.hasMore = false;
 
@@ -427,20 +439,17 @@ export default defineComponent({
           return {
             id: doc.$id,
             visible: doc.visible,
+            live: this.mode !== 'news' || isNewsLive(doc.$id, Boolean(doc.visible), this.newsSchedule),
             pinned: doc.pinned || false,
             sort_order: doc.sort_order || 0,
-            title:
-              lang === 'en'
-                ? doc.title_en
-                : lang === 'hu'
-                ? doc.title_hu
-                : convertIfSerbian(doc.title_rs),
-            subtitle:
-              lang === 'en'
-                ? doc.short_en
-                : lang === 'hu'
-                ? doc.short_hu
-                : convertIfSerbian(doc.short_rs),
+            title: pickLocalized(doc, ['title'], lang),
+            subtitle: pickLocalized(doc, ['short'], lang),
+            title_hu: doc.title_hu,
+            title_rs: doc.title_rs,
+            title_en: doc.title_en,
+            short_hu: doc.short_hu,
+            short_rs: doc.short_rs,
+            short_en: doc.short_en,
             text: '',
             img: doc.default_image
               ? storage.getFilePreview(

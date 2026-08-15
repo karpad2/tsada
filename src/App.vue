@@ -4,7 +4,7 @@ import Index from '@/views/Index.vue';
 import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useLoadingStore } from '@/stores/loading';
-import { computed, watch } from 'vue';
+import { watch } from 'vue';
 
 export default {
   name: 'App',
@@ -19,29 +19,25 @@ export default {
     const loadingStore = useLoadingStore();
     const route = useRoute();
 
-    const routeKey = computed(() => {
-      return `${loadingStore.language}`;
-    });
-
     // Reset EU funding logo when route changes
     watch(() => route.path, () => {
       loadingStore.setCurrentPageEuFunding(false);
     });
 
-    return {
-      routeKey
-    };
+    return {};
   }
 }
 </script>
 
 <template>
-  <Index class="app-ambient">
-    <notifications position="top right"/>
-    <RouterView :key="routeKey" />
-    <PWAUpdatePrompt />
-    <ConfirmDialog />
-  </Index>
+  <div class="app-ambient">
+    <Index>
+      <notifications position="top right" />
+      <RouterView />
+      <PWAUpdatePrompt />
+      <ConfirmDialog />
+    </Index>
+  </div>
 </template>
 
 <style scoped>

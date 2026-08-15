@@ -248,33 +248,33 @@
         <v-card-text>
           <v-text-field
             v-model="customLinkForm.labels.hu"
-            label="Magyar cimke"
+            :label="$t('hungarian_label')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customLinkForm.labels.sr"
-            label="Српска ознака"
+            :label="$t('serbian_label')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customLinkForm.labels.en"
-            label="English label"
+            :label="$t('english_label')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customLinkForm.to"
-            label="Router path (pl. /about/example)"
+            :label="$t('router_path')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customLinkForm.href"
-            label="External URL (pl. https://...)"
+            :label="$t('external_url')"
             density="compact"
-            hint="Router path VAGY External URL - nem mindketto"
+            :hint="$t('router_or_external_hint')"
           />
         </v-card-text>
         <v-card-actions>
@@ -303,26 +303,26 @@
           />
           <v-text-field
             v-model="customGroupForm.labels.hu"
-            label="Magyar megnevezes"
+            :label="$t('hungarian_name')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customGroupForm.labels.sr"
-            label="Српски назив"
+            :label="$t('serbian_name')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-model="customGroupForm.labels.en"
-            label="English name"
+            :label="$t('english_name')"
             density="compact"
             class="mb-2"
           />
           <v-text-field
             v-if="customGroupForm.type === 'direct-link'"
             v-model="customGroupForm.to"
-            label="Router path (pl. /page/example)"
+            :label="$t('router_path')"
             density="compact"
           />
         </v-card-text>

@@ -304,7 +304,8 @@ export default defineComponent({
       { label: t('admin'), value: 'admin' },
       { label: t('editor'), value: 'editor' },
       { label: t('teacher'), value: 'teacher' },
-      { label: t('photographer'), value: 'photographer' }
+      { label: t('photographer'), value: 'photographer' },
+      { label: t('secretary'), value: 'secretary' }
     ]);
 
     const tableHeaders = computed(() => [
@@ -322,6 +323,7 @@ export default defineComponent({
         case 'editor': return 'warning';
         case 'teacher': return 'info';
         case 'photographer': return 'success';
+        case 'secretary': return 'purple';
         default: return 'grey';
       }
     };

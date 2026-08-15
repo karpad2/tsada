@@ -206,21 +206,19 @@
       <!-- Paste modal -->
       <div v-if="showPasteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showPasteModal = false">
         <div class="glass-strong rounded-2xl p-6 w-full max-w-2xl mx-4">
-          <h3 class="text-lg font-bold mb-2 text-gray-800 dark:text-white">Paste from Spreadsheet</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Paste a tab-separated grid (8 rows x 5 columns) from Excel/Sheets.<br>
-            Rows = periods (1-8), Columns = days (Mon-Fri).<br>
-            Each cell = teacher name. Empty cells = no lesson.
+          <h3 class="text-lg font-bold mb-2 text-gray-800 dark:text-white">{{ $t('tt_paste_title') }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 whitespace-pre-line">
+            {{ $t('tt_paste_help') }}
           </p>
           <textarea v-model="pasteData" rows="10"
             class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-200 font-mono text-xs"
-            placeholder="Paste tab-separated data here...&#10;e.g.: Gordos Emil&#9;Polyák Anna&#9;&#9;Nagy Éva&#9;Tóth István"></textarea>
+            :placeholder="$t('tt_paste_placeholder')"></textarea>
           <div class="flex gap-3 justify-end mt-4">
             <button @click="showPasteModal = false" class="px-4 py-2 text-gray-600 dark:text-gray-400">
-              Cancel
+              {{ $t('cancel') }}
             </button>
             <button @click="applyPaste" class="px-4 py-2 glass-btn text-white rounded-lg font-medium hover:opacity-90 transition">
-              Apply
+              {{ $t('tt_apply') }}
             </button>
           </div>
         </div>

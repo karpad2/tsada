@@ -1,245 +1,60 @@
-# SSR (Server-Side Rendering) Setup Guide
+# SSR Setup — TSADA
 
-This document describes the painless SSR implementation added to the TSADA project.
+Az alkalmazás **SSR-alapú** (Vue 3 + Vite + Express). A publikus oldalak a szerveren renderelődnek, a kliens hydrálja a HTML-t.
 
-## Overview
-
-We've implemented a minimal SSR solution using Vite's built-in SSR capabilities, which is the least disruptive approach for the existing Vue 3 + Vite + PWA + Appwrite configuration.
-
-## Features
-
-✅ **Server-Side Rendering** - Pages are pre-rendered on the server for better SEO and initial page load
-✅ **Client-Side Hydration** - Full Vue.js functionality after hydration
-✅ **SEO Optimization** - Dynamic meta tags and structured data
-✅ **PWA Compatibility** - Works alongside existing PWA setup
-✅ **Development Mode** - Hot reload in SSR development
-✅ **Production Ready** - Optimized builds for production
-
-## Architecture
-
-### Entry Points
-
-- **`src/entry-client.js`** - Client-side entry point for hydration
-- **`src/entry-server.js`** - Server-side entry point for SSR rendering
-- **`src/main.ts`** - Shared application factory function
-
-### Server
-
-- **`server.js`** - Express server handling SSR requests
-- **Development**: Uses Vite middleware for hot reload
-- **Production**: Serves pre-built static assets with compression
-
-### Templates
-
-- **`index.html`** - Contains SSR placeholders:
-  - `<!--app-head-->` - Dynamic meta tags injection
-  - `<!--app-html-->` - Server-rendered app content
-
-## Usage
-
-### Development
+## Parancsok
 
 ```bash
-# Regular client-side development (existing)
+# Fejlesztés localhoston — Vite SPA (alapértelmezett)
 npm run dev
 
-# SSR development server
+# SSR fejlesztés (Express + Vite middleware)
 npm run dev:ssr
-```
 
-The SSR development server runs on `http://localhost:5173` with hot reload capabilities.
+# Csak client SPA (ugyanaz, mint npm run dev)
+npm run dev:spa
 
-### Production Build
-
-```bash
-# Build for client-side only (existing)
+# Production build (client + server)
 npm run build
 
-# Build for SSR (client + server)
-npm run build:ssr
-
-# Preview SSR production build
-npm run preview:ssr
+# Production indítás
+npm start
+# vagy
+NODE_ENV=production node server.js
 ```
 
-### Scripts Added
+## Architektúra
 
-```json
-{
-  "dev:ssr": "node server.js",
-  "build:client": "vite build --outDir dist/client",
-  "build:server": "vite build --outDir dist/server --ssr src/entry-server.js",
-  "build:ssr": "npm run build:client && npm run build:server",
-  "preview:ssr": "NODE_ENV=production node server.js"
-}
-```
+| Fájl | Szerep |
+|------|--------|
+| `src/main.ts` | Universal `createApp()` (`createSSRApp`) |
+| `src/entry-client.js` | Hydration entry |
+| `src/entry-server.js` | `renderToString` + SEO head |
+| `src/utils/seoMeta.ts` | Útvonal → meta HTML |
+| `src/utils/ssr.ts` | `isSSR` / storage helper |
+| `server.js` | Express: Vite middleware (dev) / sirv (prod) |
+| `index.html` | `<!--app-head-->` + `<!--app-html-->` |
 
-## Technical Implementation
+## Fontos viselkedés
 
-### 1. Universal App Factory
+- **Layout** (`Index.vue`): tartalom azonnal SSR-ben (nincs network-gate loading).
+- **Hero**: statikus shell SSR-ben, videó csak clienten.
+- **LazyWrapper**: SSR-ben azonnali render, mount után `v-lazy`.
+- **Auth guard**: csak böngészőben (Pinia persist).
+- **i18n**: az `@` karakter a fordításokban `{'@'}` formában kell (pl. e-mail).
+- **PWA**: továbbra is működik; online navigációnál a szerver adja az SSR HTML-t.
 
-The `main.ts` now exports a `createApp()` factory function instead of directly mounting:
-
-```typescript
-export function createApp() {
-  const app = createVueApp(App)
-  const router = createRouter()
-  const pinia = createPinia()
-
-  // Client-side only plugins
-  if (typeof window !== 'undefined') {
-    app.use(gtag)
-    app.use(VueLazyLoad)
-    app.use(Particles)
-  }
-
-  return { app, router, pinia }
-}
-```
-
-### 2. Universal Router
-
-Router now uses different history modes for server/client:
-
-```typescript
-export function createRouter() {
-  return createVueRouter({
-    history: typeof window !== 'undefined'
-      ? createWebHistory()
-      : createMemoryHistory(),
-    routes: [...]
-  })
-}
-```
-
-### 3. Server-Side Rendering
-
-The server entry point handles:
-- Route navigation
-- App rendering to string
-- Meta tags extraction
-- SEO optimization
-
-```javascript
-export async function render(url, manifest) {
-  const { app, router } = createApp()
-  await router.push(url)
-  await router.isReady()
-
-  const html = await renderToString(app, ctx)
-  const head = generateHead(metaTags, url)
-
-  return { html, head }
-}
-```
-
-### 4. Client-Side Hydration
-
-The client entry performs hydration instead of mounting:
-
-```javascript
-import { createApp } from './main'
-
-const { app } = createApp()
-app.mount('#app')
-```
-
-## SEO Benefits
-
-### Server-Side Meta Tags
-
-- Dynamic title and description generation
-- Open Graph tags for social sharing
-- Twitter Card metadata
-- Canonical URLs
-- Structured data (JSON-LD)
-
-### Search Engine Optimization
-
-- Faster initial page load (perceived performance)
-- Content available for web crawlers
-- Better Core Web Vitals scores
-- Enhanced social media sharing
-
-## PWA Compatibility
-
-The SSR implementation is fully compatible with the existing PWA setup:
-
-- Service Worker registration works normally
-- Cache strategies remain unchanged
-- Offline functionality preserved
-- App manifest and icons unaffected
-
-## Configuration Files
-
-### `vite.config.ssr.js`
-SSR-specific Vite configuration for server builds.
-
-### `server.js`
-Express server with Vite middleware for development and static serving for production.
-
-## Browser Support
-
-- **Modern Browsers**: Full SSR + hydration support
-- **Legacy Browsers**: Falls back to client-side rendering
-- **JavaScript Disabled**: Basic HTML content available
-
-## Performance Considerations
-
-### Development
-- SSR dev server has slightly longer startup time
-- Hot reload works for both client and server code
-
-### Production
-- Initial page load faster due to pre-rendered content
-- Subsequent navigation uses client-side routing
-- Server requires Node.js runtime environment
-
-## Deployment
-
-### Traditional Hosting
-Deploy the Express server (`server.js`) with the built assets.
-
-### Static Hosting + API
-Continue using existing static deployment for pure client-side mode.
-
-### Hybrid Approach
-Use SSR for public pages (home, about, etc.) and client-side for admin/dynamic pages.
-
-## Migration Notes
-
-### Existing Features Preserved
-✅ PWA functionality
-✅ Client-side routing
-✅ State management (Pinia)
-✅ Internationalization
-✅ Component lazy loading
-✅ Analytics tracking
-
-### Breaking Changes
-❌ None - existing client-side deployment continues to work
-
-## Next Steps
-
-1. **Test SSR Server**: Verify all routes render correctly
-2. **SEO Testing**: Check meta tag generation for different pages
-3. **Performance Testing**: Compare SSR vs client-side metrics
-4. **Production Deployment**: Set up SSR hosting environment
-
-## Commands Quick Reference
+## Deploy
 
 ```bash
-# Development
-npm run dev          # Client-side only (existing)
-npm run dev:ssr      # SSR development server
-
-# Building
-npm run build        # Client-side build (existing)
-npm run build:ssr    # Full SSR build
-
-# Preview
-npm run preview      # Preview client build (existing)
-npm run preview:ssr  # Preview SSR production
+npm run build
+NODE_ENV=production PORT=3000 node server.js
+# vagy Docker:
+docker compose up tsada-ssr
 ```
 
-The implementation provides a **painless migration path** to SSR while preserving all existing functionality and deployment options.
+Healthcheck: `GET /health` → `{ ok: true }`.
+
+## Hibakeresés
+
+Ha egy útvonal üres shell-t ad vissza (nincs Vue HTML a `#app`-ban), nézd a szerver log `[SSR]` sorait — a fallback SPA shell-t szolgálja ki hiba esetén.

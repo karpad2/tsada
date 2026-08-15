@@ -16,7 +16,7 @@ export interface MenuCondition {
   /** User must NOT have any of these roles */
   excludeRoles?: string[]
   /** A named dynamic setting that must be truthy */
-  setting?: 'erasmus-apply' | 'erasmus-list'
+  setting?: 'erasmus-apply' | 'erasmus-list' | 'gallery' | 'document-search'
 }
 
 // --- Menu structure types (from menu.json) ---

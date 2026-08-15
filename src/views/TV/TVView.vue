@@ -84,6 +84,24 @@
       </div>
     </div>
 
+    <!-- Today's absences + next period -->
+    <div class="absolute top-8 left-8 z-20 w-[28rem] max-w-[42vw]">
+      <div class="glass-card p-5 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl">
+        <h3 class="text-2xl font-black mb-3 text-white">{{ $t('today_schedule') }}</h3>
+        <div v-if="nextPeriodLabel" class="text-xl text-sky-200 mb-3">
+          {{ nextPeriodLabel }}
+        </div>
+        <div v-if="absenceLines.length" class="space-y-1 max-h-48 overflow-y-auto">
+          <div v-for="line in absenceLines" :key="line" class="text-lg text-amber-100">
+            {{ line }}
+          </div>
+        </div>
+        <div v-else class="text-lg text-white/70">
+          {{ $t('today_no_absences') }}
+        </div>
+      </div>
+    </div>
+
     <!-- Enhanced Date and Time Display -->
     <div class="absolute bottom-24 right-8 z-20">
       <div class="glass-pill px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
@@ -151,7 +169,9 @@ export default {
       currentSlide: 0,
       slides: [],
       newsItems: [],
-      events: [], 
+      events: [],
+      absenceLines: [],
+      nextPeriodLabel: '', 
       slideBackgrounds: ['#f87171', '#60a5fa', '#34d399', '#38bdf8', '#fbbf24'],
       storage: null
     }
@@ -245,12 +265,41 @@ export default {
     },
     getImageUrl(fileId) {
       return this.storage.getFileView(config.website_images, fileId).toString();
+    },
+    async fetchTodayBoard() {
+      try {
+        const [
+          { absencesForDate, currentPeriodIndex, loadActiveTimetable, loadSubstitutions, todayISO, weekdayNumber }
+        ] = await Promise.all([
+          import('@/services/timetable/today')
+        ]);
+        const date = todayISO();
+        const day = weekdayNumber(date);
+        const [{ schedules }, store] = await Promise.all([loadActiveTimetable(), loadSubstitutions()]);
+        const absences = absencesForDate(store.entries, date, schedules, day);
+        this.absenceLines = absences.map((item) => {
+          const sub = item.cancelled
+            ? this.$t('today_cancelled')
+            : (item.substituteTeacher || this.$t('today_no_substitute'));
+          return `${item.teacher} → ${sub}`;
+        });
+        const morning = currentPeriodIndex('morning');
+        const afternoon = currentPeriodIndex('afternoon');
+        const now = morning.current || afternoon.current;
+        const next = morning.current ? morning.next : (afternoon.current ? afternoon.next : (morning.next || afternoon.next));
+        if (now) this.nextPeriodLabel = `${this.$t('today_now')}: ${now}. ${this.$t('tt_period').toLowerCase()}`;
+        else if (next) this.nextPeriodLabel = `${this.$t('today_next')}: ${next}. ${this.$t('tt_period').toLowerCase()}`;
+        else this.nextPeriodLabel = '';
+      } catch (error) {
+        console.error('Failed to load TV day board:', error);
+      }
     }
   },
   mounted() {
     this.fetchContent();
     this.fetchNewsItems();
     this.fetchTemperature();
+    this.fetchTodayBoard();
 
     this.updateTime();
     setInterval(this.updateTime, 1000);
@@ -262,6 +311,7 @@ export default {
     }, 15000);
 
     setInterval(this.fetchContent, 30000);
+    setInterval(this.fetchTodayBoard, 60000);
   }
 }
 </script>

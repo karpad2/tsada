@@ -259,6 +259,10 @@ export function buildFromData(scene, data) {
           }
         }, p.hp ?? def.hp)
         if (p.rotY) d.mesh.rotation.y = p.rotY
+        if (typeof d.refreshBox === 'function') d.refreshBox()
+        if (p.type.includes('fuelBarrel')) d.hazardType = 'fuelBarrel'
+        else if (p.type.includes('gasTank')) d.hazardType = 'gasTank'
+        else if (p.type.includes('electricPanel')) d.hazardType = 'electricPanel'
       } else {
         d = makeProp(scene, p.x, p.z, 0.8, 0.8, 0.8, 0xFF00FF, p.hp ?? 60)
       }
@@ -267,6 +271,7 @@ export function buildFromData(scene, data) {
       if (factory) {
         d = factory(scene, p.x, p.z, p)
         if (p.rotY) d.mesh.rotation.y = p.rotY
+        if (typeof d.refreshBox === 'function') d.refreshBox()
         // Allow hp override
         if (p.hp !== undefined) d.health = d.maxHealth = p.hp
         // Tag hazard props for Engine to trigger special effects on destruction

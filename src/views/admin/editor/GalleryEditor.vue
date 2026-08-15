@@ -48,7 +48,6 @@
                     </div>
                     <div class="editor-toolbar-actions">
                         <v-btn
-                            v-if="!isPhotographer"
                             @click="save"
                             color="success"
                             prepend-icon="mdi-content-save"
@@ -80,6 +79,14 @@
                     </v-card-title>
 
                     <v-card-text class="pa-6">
+                        <v-alert
+                            v-if="isPhotographer"
+                            type="info"
+                            variant="tonal"
+                            class="mb-4"
+                        >
+                            {{ $t('gal_photographer_upload_info') }}
+                        </v-alert>
                         <v-file-input
                             @change="file_upload"
                             multiple
@@ -106,7 +113,7 @@
             </v-col>
 
             <!-- Language Fields Section -->
-            <v-col v-if="!isPhotographer" cols="12" lg="6">
+            <v-col cols="12" lg="6">
                 <v-card elevation="0" rounded="lg" class="language-card">
                     <v-card-title class="editor-card-header">
                         <v-icon left>mdi-translate</v-icon>
@@ -335,6 +342,11 @@
                                         {{ $t("approved") }}
                                     </div>
                                 </figure>
+                                <div class="px-2 pb-2 space-y-1">
+                                    <input v-model="image.caption_hu" type="text" class="w-full text-xs px-2 py-1 rounded border" :placeholder="$t('caption_hu')" @change="saveCaptionFor(image)" />
+                                    <input v-model="image.caption_rs" type="text" class="w-full text-xs px-2 py-1 rounded border" :placeholder="$t('caption_rs')" @change="saveCaptionFor(image)" />
+                                    <input v-model="image.caption_en" type="text" class="w-full text-xs px-2 py-1 rounded border" :placeholder="$t('caption_en')" @change="saveCaptionFor(image)" />
+                                </div>
                                 <div class="ge-card-actions">
                                     <v-btn
                                         v-if="!isPhotographer && default_image !== image.img_id"
@@ -425,6 +437,8 @@ import { Databases, ID, Storage, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
+import { loadCaptions, saveCaption } from '@/services/gallery/captions';
+import { galleryThumbUrl } from '@/services/gallery/imageUrl';
 
 const db = new Databases(appw);
 const storage = new Storage(appw);
@@ -439,13 +453,13 @@ export default {
             const loadingStore = useLoadingStore();
             return loadingStore.userRole === 'photographer';
         },
-        pendingImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+        pendingImages(): Array<any> {
             return this.images.filter(img => img.status === 'pending');
         },
-        approvedImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+        approvedImages(): Array<any> {
             return this.images.filter(img => img.status === 'approved');
         },
-        deleteRequestedImages(): Array<{ img: string; img_id: string; doc_id: string; status: string }> {
+        deleteRequestedImages(): Array<any> {
             return this.images.filter(img => img.status === 'delete_requested');
         }
     },
@@ -461,7 +475,7 @@ export default {
             visible: false,
             default_image: "",
             file_link: null,
-            images: [] as Array<{ img: string; img_id: string; doc_id: string; status: string }>,
+            images: [] as Array<{ img: string; img_id: string; doc_id: string; status: string; caption_hu: string; caption_rs: string; caption_en: string }>,
             uploading: false
         }
     },
@@ -491,17 +505,15 @@ export default {
                     this.default_image = doc.default_image || "";
 
                     const l = await db.listDocuments(config.website_db, config.album_images, [Query.equal("gallery", galleryId)]);
+                    const captions = await loadCaptions();
                     this.images = l.documents.map(element => ({
-                        img: storage.getFilePreview(
-                            config.gallery_pictures_storage,
-                            element.image_id,
-                            300, 0, 'center', 90,
-                            0, 'FFFFFF', 0,
-                            1, 0, 'FFFFFF', 'webp'
-                        ),
+                        img: galleryThumbUrl(element.image_id, 400),
                         img_id: element.image_id,
                         doc_id: element.$id,
-                        status: element.status || "approved"
+                        status: element.status || "approved",
+                        caption_hu: captions[element.$id]?.hu || '',
+                        caption_rs: captions[element.$id]?.rs || '',
+                        caption_en: captions[element.$id]?.en || ''
                     }));
                 }
             } catch (error) {
@@ -682,6 +694,18 @@ export default {
             } catch (error) {
                 console.error('Error requesting deletion:', error);
                 this.$notify({ type: 'error', text: this.$t('error_requesting_delete') });
+            }
+        },
+
+        async saveCaptionFor(image: any) {
+            try {
+                await saveCaption(image.doc_id, {
+                    hu: image.caption_hu,
+                    rs: image.caption_rs,
+                    en: image.caption_en
+                });
+            } catch (error) {
+                console.error('Failed to save caption:', error);
             }
         },
 

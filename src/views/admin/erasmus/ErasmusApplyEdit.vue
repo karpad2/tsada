@@ -9,22 +9,22 @@
             <div class="pb-2 w-full dark:text-white">
                 <v-form ref="form">
                     <!-- Form fields for name, email, phone, mark, motivation letter, positive document, and class -->
-                    <v-text-field required @change="save" v-model="name" label="Name"></v-text-field>
+                    <v-text-field required @change="save" v-model="name" :label="$t('name')"></v-text-field>
 
-                    <v-text-field required @change="save" v-model="phone" label="Phone"></v-text-field>
+                    <v-text-field required @change="save" v-model="phone" :label="$t('phone')"></v-text-field>
 
-                    <v-text-field required @change="save" v-model="email" label="Email"></v-text-field>
+                    <v-text-field required @change="save" v-model="email" :label="$t('email')"></v-text-field>
 
-                    <v-text-field required @change="save" v-model="mark" label="Mark"></v-text-field>
+                    <v-text-field required @change="save" v-model="mark" :label="$t('mark')"></v-text-field>
 
-                    <v-text-field required @change="calculateScore" v-model="motivation_letter" label="Motivational Letter Score (out of 10)"></v-text-field>
+                    <v-text-field required @change="calculateScore" v-model="motivation_letter" :label="$t('motivation_letter_score')"></v-text-field>
 
-                    <v-text-field required @change="calculateScore" v-model="positive_document" label="Positive Document Score (out of 10)"></v-text-field>
+                    <v-text-field required @change="calculateScore" v-model="positive_document" :label="$t('positive_document_score')"></v-text-field>
 
-                    <v-text-field required v-model="which_class" label="Class (e.g., IV-1)"></v-text-field>
+                    <v-text-field required v-model="which_class" :label="$t('class_example')"></v-text-field>
 
                     <!-- Score is automatically calculated and displayed as read-only -->
-                    <v-text-field v-model="score" label="Calculated Score" readonly></v-text-field>
+                    <v-text-field v-model="score" :label="$t('calculated_score')" readonly></v-text-field>
 
                     <!-- Submit button to save the data -->
                     <v-btn @click="save">{{ $t('submit') }}</v-btn>

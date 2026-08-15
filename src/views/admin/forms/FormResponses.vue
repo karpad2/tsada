@@ -7,16 +7,16 @@
       <v-col>
         <div class="d-flex align-center justify-space-between flex-wrap ga-4">
           <div>
-            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">Válaszok</h1>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('form_responses') }}</h1>
             <div class="section-accent !mb-2"></div>
             <p class="page-subtitle !mt-0" v-if="form">{{ form.title }}</p>
           </div>
           <div class="d-flex ga-2">
             <v-btn variant="outlined" prepend-icon="mdi-download" :disabled="responses.length === 0" @click="exportToCSV">
-              CSV Export
+              {{ $t('export_csv') }}
             </v-btn>
             <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="goBack">
-              Vissza
+              {{ $t('back') }}
             </v-btn>
           </div>
         </div>
@@ -27,7 +27,7 @@
     <v-row v-if="isLoading">
       <v-col class="text-center py-12">
         <v-progress-circular indeterminate color="primary" size="48" />
-        <p class="text-body-1 text-medium-emphasis mt-4">Betöltés...</p>
+        <p class="text-body-1 text-medium-emphasis mt-4">{{ $t('loading') }}...</p>
       </v-col>
     </v-row>
 
@@ -38,7 +38,7 @@
           <v-card>
             <v-card-text class="text-center">
               <div class="text-h4 font-weight-bold">{{ total }}</div>
-              <div class="text-caption text-medium-emphasis">Összes válasz</div>
+              <div class="text-caption text-medium-emphasis">{{ $t('total_responses') }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -46,7 +46,7 @@
           <v-card>
             <v-card-text class="text-center">
               <div class="text-h4 font-weight-bold">{{ form.fields.length }}</div>
-              <div class="text-caption text-medium-emphasis">Mező</div>
+              <div class="text-caption text-medium-emphasis">{{ $t('fields') }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -54,9 +54,9 @@
           <v-card>
             <v-card-text class="text-center">
               <v-chip :color="form.settings.active ? 'success' : 'error'" variant="tonal" size="large">
-                {{ form.settings.active ? 'Aktív' : 'Inaktív' }}
+                {{ form.settings.active ? $t('active') : $t('inactive') }}
               </v-chip>
-              <div class="text-caption text-medium-emphasis mt-1">Státusz</div>
+              <div class="text-caption text-medium-emphasis mt-1">{{ $t('status') }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -64,7 +64,7 @@
           <v-card>
             <v-card-text class="text-center">
               <div class="text-h6 font-weight-bold">{{ latestResponseDate || '-' }}</div>
-              <div class="text-caption text-medium-emphasis">Utolsó válasz</div>
+              <div class="text-caption text-medium-emphasis">{{ $t('latest_response') }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -74,9 +74,9 @@
       <v-row class="mb-4">
         <v-col>
           <v-btn-toggle v-model="viewMode" mandatory color="primary" variant="outlined">
-            <v-btn value="table" prepend-icon="mdi-table">Táblázat</v-btn>
-            <v-btn value="cards" prepend-icon="mdi-view-grid">Kártyák</v-btn>
-            <v-btn value="stats" prepend-icon="mdi-chart-bar">Statisztikák</v-btn>
+            <v-btn value="table" prepend-icon="mdi-table">{{ $t('table_view') }}</v-btn>
+            <v-btn value="cards" prepend-icon="mdi-view-grid">{{ $t('cards_view') }}</v-btn>
+            <v-btn value="stats" prepend-icon="mdi-chart-bar">{{ $t('stats_view') }}</v-btn>
           </v-btn-toggle>
         </v-col>
       </v-row>
@@ -84,10 +84,10 @@
       <!-- Empty State -->
       <v-card v-if="responses.length === 0" class="text-center pa-12">
         <v-icon size="64" color="grey">mdi-inbox-outline</v-icon>
-        <h3 class="text-h5 font-weight-bold mt-4">Még nincsenek válaszok</h3>
-        <p class="text-body-2 text-medium-emphasis mt-2">Oszd meg az űrlap linkjét, hogy válaszokat kapj!</p>
+        <h3 class="text-h5 font-weight-bold mt-4">{{ $t('no_responses') }}</h3>
+        <p class="text-body-2 text-medium-emphasis mt-2">{{ $t('share_form_link') }}</p>
         <v-btn color="primary" class="mt-4" prepend-icon="mdi-link" @click="copyFormLink">
-          Link másolása
+          {{ $t('copy_form_link') }}
         </v-btn>
       </v-card>
 
@@ -97,11 +97,11 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Dátum</th>
+              <th>{{ $t('date') }}</th>
               <th v-for="field in form.fields" :key="field.id" class="text-truncate" style="max-width: 200px;">
                 {{ field.label }}
               </th>
-              <th class="text-right">Műveletek</th>
+              <th class="text-right">{{ $t('actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -123,7 +123,7 @@
                   size="small"
                   variant="text"
                   @click="viewResponse(response)"
-                  title="Megtekintés"
+                  :title="$t('view')"
                 />
                 <v-btn
                   icon="mdi-delete"
@@ -131,7 +131,7 @@
                   variant="text"
                   color="error"
                   @click="confirmDeleteResponse(response)"
-                  title="Törlés"
+                  :title="$t('delete')"
                 />
               </td>
             </tr>
@@ -162,7 +162,7 @@
             <v-divider />
             <v-card-actions>
               <v-btn variant="text" size="small" prepend-icon="mdi-eye" @click="viewResponse(response)">
-                Részletek
+                {{ $t('view_details') }}
               </v-btn>
               <v-spacer />
               <v-btn variant="text" size="small" color="error" icon="mdi-delete" @click="confirmDeleteResponse(response)" />
@@ -199,7 +199,7 @@
                   <v-card variant="tonal" color="primary">
                     <v-card-text class="text-center pa-3">
                       <div class="text-h5 font-weight-bold">{{ stats.fieldStats[field.id].responses?.length || 0 }}</div>
-                      <div class="text-caption">Válaszok</div>
+                      <div class="text-caption">{{ $t('responses') }}</div>
                     </v-card-text>
                   </v-card>
                 </v-col>
@@ -207,13 +207,13 @@
                   <v-card variant="tonal" color="success">
                     <v-card-text class="text-center pa-3">
                       <div class="text-h5 font-weight-bold">{{ calculateAverage(stats.fieldStats[field.id].responses) }}</div>
-                      <div class="text-caption">Átlag</div>
+                      <div class="text-caption">{{ $t('average') }}</div>
                     </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
               <!-- Recent responses preview -->
-              <div class="text-subtitle-2 mb-2">Utolsó válaszok:</div>
+              <div class="text-subtitle-2 mb-2">{{ $t('recent_responses') }}:</div>
               <v-list density="compact" variant="tonal">
                 <v-list-item
                   v-for="(resp, idx) in (stats.fieldStats[field.id].responses || []).slice(-5).reverse()"
@@ -241,8 +241,8 @@
     <!-- Response Detail Dialog -->
     <v-dialog v-model="showDetailDialog" max-width="600">
       <v-card v-if="selectedResponse">
-        <v-card-title>Válasz részletei</v-card-title>
-        <v-card-subtitle>Beküldve: {{ formatDate(selectedResponse.submittedAt) }}</v-card-subtitle>
+        <v-card-title>{{ $t('response_details') }}</v-card-title>
+        <v-card-subtitle>{{ $t('submitted_on', { date: formatDate(selectedResponse.submittedAt) }) }}</v-card-subtitle>
         <v-card-text>
           <v-list>
             <v-list-item v-for="field in form?.fields" :key="field.id" class="px-0">
@@ -258,7 +258,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="showDetailDialog = false">Bezárás</v-btn>
+          <v-btn variant="text" @click="showDetailDialog = false">{{ $t('close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -266,15 +266,15 @@
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="420">
       <v-card>
-        <v-card-title>Válasz törlése</v-card-title>
+        <v-card-title>{{ $t('delete_response') }}</v-card-title>
         <v-card-text>
-          Biztosan törölni szeretnéd ezt a választ? Ez a művelet nem vonható vissza!
+          {{ $t('delete_response_confirm') }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="showDeleteDialog = false">Mégsem</v-btn>
+          <v-btn variant="text" @click="showDeleteDialog = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="error" variant="elevated" :loading="isDeleting" @click="deleteResponse">
-            Törlés
+            {{ $t('delete') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -287,8 +287,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { FormsService, type Form, type FormResponse } from '@/services/forms/FormsService';
 import { notify } from '@kyvg/vue3-notification';
+
+const { t, locale } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -331,7 +334,7 @@ onMounted(async () => {
     console.error('Failed to load form:', error);
     notify({
       type: 'error',
-      text: 'Nem sikerült betölteni az űrlapot!'
+      text: t('form_load_error')
     });
     router.push('/admin/forms');
   } finally {
@@ -350,7 +353,8 @@ async function loadResponses() {
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleString('hu-HU', {
+  const localeMap: Record<string, string> = { hu: 'hu-HU', sr: 'sr-RS', rs: 'sr-RS', en: 'en-GB' };
+  return date.toLocaleString(localeMap[locale.value] || 'hu-HU', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -360,7 +364,8 @@ function formatDate(dateStr: string): string {
 }
 
 function formatShortDate(date: Date): string {
-  return date.toLocaleDateString('hu-HU', {
+  const localeMap: Record<string, string> = { hu: 'hu-HU', sr: 'sr-RS', rs: 'sr-RS', en: 'en-GB' };
+  return date.toLocaleDateString(localeMap[locale.value] || 'hu-HU', {
     month: 'short',
     day: 'numeric'
   });
@@ -403,7 +408,7 @@ async function deleteResponse() {
     await formsService.deleteResponse(responseToDelete.value.$id);
     notify({
       type: 'success',
-      text: 'Válasz sikeresen törölve!'
+      text: t('response_deleted')
     });
     showDeleteDialog.value = false;
     responseToDelete.value = null;
@@ -415,7 +420,7 @@ async function deleteResponse() {
     console.error('Failed to delete response:', error);
     notify({
       type: 'error',
-      text: 'Nem sikerült törölni a választ!'
+      text: t('response_delete_error')
     });
   } finally {
     isDeleting.value = false;
@@ -428,7 +433,7 @@ function copyFormLink() {
   navigator.clipboard.writeText(url).then(() => {
     notify({
       type: 'success',
-      text: 'Link másolva a vágólapra!'
+      text: t('link_copied_clipboard')
     });
   });
 }
@@ -436,7 +441,7 @@ function copyFormLink() {
 function exportToCSV() {
   if (!form.value || responses.value.length === 0) return;
 
-  const headers = ['#', 'Dátum', ...form.value.fields.map(f => f.label)];
+  const headers = ['#', t('date'), ...form.value.fields.map(f => f.label)];
   const rows = responses.value.map((response, index) => {
     return [
       index + 1,
@@ -460,7 +465,7 @@ function exportToCSV() {
 
   notify({
     type: 'success',
-    text: 'CSV fájl letöltve!'
+    text: t('csv_exported')
   });
 }
 

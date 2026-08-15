@@ -112,6 +112,7 @@
   import { useLoadingStore } from '@/stores/loading';
   import { appw, config } from '@/appwrite';
   import { convertifserbian } from '@/lang';
+  import { normalizeLang, pickLocalized, pickLocalizedTrio } from '@/utils/localizedText';
   import dayjs from '@/utils/dayjs';
   import { jsPDF } from 'jspdf';
   import html2canvas from 'html2canvas';
@@ -159,7 +160,7 @@
       const route = useRoute();
       const router = useRouter();
       const loadingStore = useLoadingStore();
-      const { setSEO } = useSEO();
+      const { setSEO, setPageTitle } = useSEO();
       const pdfContent = ref(null);
   
       const state = reactive<ContentState>({
@@ -191,20 +192,12 @@
       
       const currentLanguage = computed(() => loadingStore.language);
       
-      const pickByLang = <T>(rs: T, hu: T, en: T, fallback: T): T => {
-        const lang = currentLanguage.value;
-        if (lang === 'sr' || lang === 'rs') return rs;
-        if (lang === 'hu') return hu;
-        if (lang === 'en') return en;
-        return fallback;
-      };
-
       const localizedTitle = computed(() =>
-        pickByLang(convertifserbian(state.titleRs), state.titleHu, state.titleEn, state.title)
+        pickLocalizedTrio(state.titleHu, state.titleRs, state.titleEn, currentLanguage.value) || state.title || ''
       );
 
       const localizedContent = computed(() =>
-        pickByLang(state.contentRs, state.contentHu, state.contentEn, state.content)
+        pickLocalizedTrio(state.contentHu, state.contentRs, state.contentEn, currentLanguage.value) || state.content || ''
       );
   
       const videoLink = computed(() => {
@@ -267,15 +260,13 @@
           state.contentEn = mainContent.text_en || '';
   
           // Set document title + full SEO meta for crawlers/social after content load
-          const pageTitle = localizedTitle.value || 'Tehnička Škola Ada';
+          const pageTitle = localizedTitle.value || ''
           const plainDesc = String(localizedContent.value || '')
             .replace(/<[^>]+>/g, ' ')
             .replace(/\s+/g, ' ')
             .trim()
             .slice(0, 160);
-          document.title = pageTitle.includes('Tehnička') || pageTitle.includes('Škola')
-            ? pageTitle
-            : `${pageTitle} ~ Tehnička Škola Ada`;
+          if (pageTitle) setPageTitle(pageTitle)
           setSEO({
             title: pageTitle,
             description: plainDesc || `Sadržaj sa sajta Tehničke škole Ada: ${pageTitle}`,
@@ -319,14 +310,13 @@
       };
   
       const formatDate = (dateString: string): string => {
-        const locale = pickByLang('sr', 'hu', 'en', 'sr');
-        dayjs.locale(locale);
+        const ui = normalizeLang(currentLanguage.value)
+        dayjs.locale(ui === 'rs' ? 'sr' : ui);
         return dayjs(dateString).format('LL');
       };
 
       const getLocalizedComponentContent = (component: any): string => {
-        return pickByLang(component.content_rs, component.content_hu, component.content_en, null)
-          || component.text || '';
+        return pickLocalized(component, ['content', 'text'], currentLanguage.value) || component.text || '';
       };
   
       const getYouTubeEmbedUrl = (url: string): string => {

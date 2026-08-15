@@ -74,9 +74,14 @@ export class I18nService {
   setCurrentLanguage(languageCode: string): void {
     const oldLanguage = this.currentLanguage
 
-    if (this.isLanguageSupported(languageCode)) {
-      this.currentLanguage = languageCode
-      trackLanguageChange(oldLanguage, languageCode)
+    const mapped = languageCode === 'rs' ? 'sr' : languageCode
+    if (this.isLanguageSupported(mapped)) {
+      this.currentLanguage = mapped
+      if (oldLanguage !== languageCode) {
+        try {
+          trackLanguageChange(oldLanguage, languageCode)
+        } catch { /* ignore */ }
+      }
     } else {
       console.warn(`Language ${languageCode} is not supported`)
     }
@@ -86,7 +91,8 @@ export class I18nService {
    * Check if language is supported
    */
   isLanguageSupported(languageCode: string): boolean {
-    return this.supportedLanguages.some(lang => lang.code === languageCode)
+    const code = languageCode === 'rs' ? 'sr' : languageCode
+    return this.supportedLanguages.some(lang => lang.code === code)
   }
 
   /**
@@ -101,24 +107,21 @@ export class I18nService {
    */
   getLocalizedContent(content: MultiLangContent, languageCode?: string, fallbackLang = 'hu'): string {
     const lang = languageCode || this.currentLanguage
-    const key = this.findContentKey(content, lang)
+    const order = [lang, fallbackLang, 'hu', 'rs', 'sr', 'en']
+    const seen = new Set<string>()
 
-    if (key && content[key]) {
-      // Apply Serbian Cyrillic conversion if needed
-      if ((lang === 'rs' || lang === 'sr') && content[key]) {
-        return convertifserbian(content[key])
-      }
-      return content[key]
+    for (const code of order) {
+      if (!code || seen.has(code)) continue
+      seen.add(code)
+      const key = this.findContentKey(content, code)
+      const value = key ? String(content[key] || '').trim() : ''
+      if (!value) continue
+      if (code === 'rs' || code === 'sr') return convertifserbian(value)
+      return value
     }
 
-    // Fallback to fallback language
-    if (lang !== fallbackLang) {
-      return this.getLocalizedContent(content, fallbackLang, 'en')
-    }
-
-    // Last resort: return first available content
-    const firstKey = Object.keys(content).find(key => content[key])
-    return firstKey ? content[firstKey] : ''
+    const firstKey = Object.keys(content).find((key) => String(content[key] || '').trim())
+    return firstKey ? String(content[firstKey]).trim() : ''
   }
 
   /**

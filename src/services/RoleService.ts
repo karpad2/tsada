@@ -20,9 +20,9 @@ const USER_ROLES_COLLECTION = config.user_roles
 // TYPES
 // ============================================
 
-export type UserRole = 'admin' | 'editor' | 'teacher' | 'photographer'
+export type UserRole = 'admin' | 'editor' | 'teacher' | 'photographer' | 'secretary'
 
-const VALID_ROLES: string[] = ['admin', 'editor', 'teacher', 'photographer']
+const VALID_ROLES: string[] = ['admin', 'editor', 'teacher', 'photographer', 'secretary']
 
 export interface UserRoleDocument {
   $id?: string
@@ -47,7 +47,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'erasmus'
   ],
   teacher: ['erp'],
-  photographer: ['gallery']
+  photographer: ['gallery'],
+  secretary: ['messages', 'erp']
 }
 
 export const ROUTE_PERMISSION_MAP: Record<string, string> = {
@@ -57,6 +58,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   text_document_editor: 'documents',
   student_document_editor: 'documents',
   gallery_editor: 'gallery',
+  gallery_approval: 'gallery',
   class_editor: 'classes',
   slide_editor: 'slides',
   messages: 'messages',
@@ -74,7 +76,12 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   erp_class_teacher: 'erp',
   erp_print_manager: 'erp',
   erp_template_editor: 'erp',
-  role_manager: 'roles'
+  role_manager: 'roles',
+  menu_editor: 'roles',
+  timetable_editor: 'content',
+  today_schedule: 'erp',
+  substitutions_editor: 'erp',
+  content_audit: 'content'
 }
 
 // ============================================

@@ -14,10 +14,22 @@
         </template>
     
       <template v-slot:item.edit1="{ item }">
-        <router-link :to="'/admin/erasmus/docviewer/'+item.motivation_letter"><i class="pi pi-envelope text-5xl"></i></router-link> 
+        <router-link
+          v-if="item.motivation_letter"
+          :to="'/admin/erasmus/docviewer/'+item.motivation_letter"
+        >
+          <i class="pi pi-envelope text-5xl"></i>
+        </router-link>
+        <span v-else class="text-gray-400">—</span>
       </template>
       <template v-slot:item.edit2="{ item }">
-        <router-link v-if="item.other_document!=null" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
+        <router-link
+          v-if="item.other_document"
+          :to="'/admin/erasmus/docviewer/'+item.other_document"
+        >
+          <i class="pi pi-envelope text-5xl"></i>
+        </router-link>
+        <span v-else class="text-gray-400">—</span>
       </template>
       
       <template v-slot:item.edit4="{ item }">
@@ -28,7 +40,7 @@
 
       <template v-slot:item.edit3="{ item }">
         <router-link v-if="false" :to="'/admin/erasmus/docviewer/'+item.other_document"><i class="pi pi-envelope text-5xl"></i></router-link> 
-        <v-btn @click="delete_content(item.id,item.other_document)">{{ $t("delete") }}</v-btn>
+        <v-btn @click="delete_content(item)">{{ $t("delete") }}</v-btn>
       </template>
       
         </v-data-table>
@@ -118,9 +130,8 @@
                 this.workers=[];
                 this.roles=[];
                 //console.log();
-                const loadingStore = useLoadingStore();
-                let local=loadingStore.language;
-                let n= await database.listDocuments(config.website_db, config.erasmus_applies,[Query.orderDesc("$createdAt"),Query.limit(50)]);
+                this.messages = [];
+                let n= await database.listDocuments(config.website_db, config.erasmus_applies,[Query.orderDesc("$createdAt"),Query.limit(100)]);
                 for (const el2 of n.documents) {
                     let a={name:"",class:"",contact:"",email:"",date:"",id:"",phone:"",mark:"",motivation_letter:"",other_document:""};
                         a.id=el2.$id;
@@ -139,25 +150,23 @@
 
                 this.loaded=true;
                 },
-                async delete_content(aaa,bbb)
+                async delete_content(item)
                 {
-                    try{
-                    let n=await storage.deleteFile(config.fs_erasmus,bbb);
+                    const files = [item?.motivation_letter, item?.other_document].filter(Boolean);
+                    for (const fileId of files) {
+                      try {
+                        await storage.deleteFile(config.fs_erasmus, fileId);
+                      } catch (ex) {
+                        console.warn(ex);
+                      }
                     }
-                    catch (ex)
-                    {
-                        console.warn(ex)
+                    try {
+                      await database.deleteDocument(config.website_db, config.erasmus_applies, item.id);
+                    } catch (ex) {
+                      console.warn(ex);
                     }
-                    try{
-                    let k= await database.deleteDocument(config.website_db, config.erasmus_applies,aaa);  
-                    }
-                    catch(ex)
-                    {
-                        console.warn(ex)
-                    }
-                    this.$notify(this.$t('deleted'));
+                    this.$notify({ type: 'success', text: this.$t('deleted') });
                     this.load_messages_base();
-                    //this.router.push("/home");
                 },
                 rt_time(a)
                 {   dayjs.locale('hu');

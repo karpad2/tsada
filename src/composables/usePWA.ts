@@ -51,8 +51,15 @@ const needRefresh = ref(false)
 const offlineReady = ref(false)
 const updateAvailable = ref(false)
 
+function isLocalhostHost(): boolean {
+  if (typeof window === 'undefined') return true
+  const host = window.location.hostname
+  return host === 'localhost' || host === '127.0.0.1'
+}
+
 function bindServiceWorker() {
   if (swBound || typeof window === 'undefined') return
+  if (isLocalhostHost()) return
   swBound = true
 
   const {
@@ -165,6 +172,8 @@ export function usePWA() {
       const runtime = cacheNames.filter(
         (name) =>
           name.includes('api-cache') ||
+          name.includes('appwrite-api-cache') ||
+          name.includes('school-api-cache') ||
           name.includes('dynamic-cache') ||
           name.includes('runtime-cache')
       )

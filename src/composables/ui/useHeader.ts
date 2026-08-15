@@ -32,8 +32,8 @@ export function useHeader() {
   // i18n
   const { t, locale } = useI18n()
 
-  // Menu registry (from menu.json)
-  const effectiveRegistry = ref<MenuGroupDefinition[]>([])
+  // Menu from JSON immediately — do not wait for Appwrite
+  const effectiveRegistry = ref<MenuGroupDefinition[]>(menuConfigService.getEffectiveRegistry())
 
   // Reactive state
   const state = reactive<HeaderState>({
@@ -111,38 +111,27 @@ export function useHeader() {
 
   // Navigation methods
   const initializeHeader = async (forceRefresh = false) => {
-    state.loading = true
     state.error = null
+    effectiveRegistry.value = menuConfigService.getEffectiveRegistry()
 
     try {
       trackUserInteraction('header_initialization', 'navigation', { forceRefresh })
 
-      // Initialize authentication check
       await appwriteService.checkAuth()
 
-      // Set current language and i18n locale AND i18nService
       state.currentLanguage = loadingStore.language
       locale.value = loadingStore.language
       i18nService.setCurrentLanguage(loadingStore.language)
       setCurrentLanguageFlag(state.currentLanguage)
 
-      // Load navigation data
       const response = await navigationService.getNavigationData(forceRefresh)
 
       if (response.success && response.data) {
         state.navigationData = response.data
-      } else {
-        throw new Error(response.error || 'Failed to load navigation data')
       }
-
-      // Load menu from JSON
-      effectiveRegistry.value = menuConfigService.getEffectiveRegistry()
     } catch (error: any) {
       console.error('Error initializing header:', error)
-      state.error = error.message
       trackError('header_initialization_error', error, {})
-    } finally {
-      state.loading = false
     }
   }
 

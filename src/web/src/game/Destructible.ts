@@ -22,8 +22,14 @@ export class Destructible {
     }
     this._rep = rep
 
+    root.updateMatrixWorld(true)
     this.box3       = new THREE.Box3().setFromObject(root)
-    this._origColor = rep.material.color.clone()
+    this._origColor = rep.material?.color ? rep.material.color.clone() : new THREE.Color(0x888888)
+
+    this.refreshBox = () => {
+      root.updateMatrixWorld(true)
+      this.box3.setFromObject(root)
+    }
 
     // Tag root AND all descendants so any raycast hit registers
     root.userData.destructible = this

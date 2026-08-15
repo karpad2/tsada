@@ -37,6 +37,24 @@
       </template>
     </GeneralControlsSection>
 
+    <section class="editor-section mb-4">
+      <div class="editor-section-title">
+        <span class="section-icon"><v-icon size="small" color="white">mdi-calendar-clock</v-icon></span>
+        {{ $t('news_schedule') }}
+      </div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="text-sm font-medium">{{ $t('news_publish_from') }}</span>
+          <input v-model="formData.publish_from" type="datetime-local" class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700" @change="saveSchedule" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">{{ $t('news_publish_until') }}</span>
+          <input v-model="formData.publish_until" type="datetime-local" class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700" @change="saveSchedule" />
+        </label>
+        <p class="md:col-span-2 text-xs text-gray-500">{{ $t('news_schedule_help') }}</p>
+      </div>
+    </section>
+
     <!-- File Upload Section -->
     <section class="editor-section image-section relative">
       <div class="editor-section-title">
@@ -351,6 +369,7 @@ import { notify } from '@kyvg/vue3-notification'
 import { useRoute, useRouter } from 'vue-router'
 import { Databases, ID, Storage, Query } from "appwrite"
 import { appw, config } from "@/appwrite"
+import { loadNewsSchedule, setNewsSchedule } from '@/services/content/newsSchedule'
 import axios from "axios"
 import { useLoadingStore } from "@/stores/loading"
 import AlbumViewer from "@/components/AlbumViewer.vue"
@@ -389,6 +408,8 @@ interface FormData {
   eu_funding_enabled: boolean
   image_position_x: number
   image_position_y: number
+  publish_from: string
+  publish_until: string
 }
 
 export default defineComponent({
@@ -446,6 +467,8 @@ export default defineComponent({
       pinned: false,
       sort_order: 0,
       eu_funding_enabled: false,
+      publish_from: "",
+      publish_until: "",
       image_position_x: 50,
       image_position_y: 50
     })
@@ -533,8 +556,32 @@ export default defineComponent({
         // Store original data for backup comparison
         originalData.value = { ...document }
 
+        const schedule = await loadNewsSchedule()
+        const window = schedule[id.value] || {}
+        formData.publish_from = toLocalInput(window.from)
+        formData.publish_until = toLocalInput(window.until)
+
       } catch (error) {
         console.error('Failed to load content:', error)
+      }
+    }
+
+    const toLocalInput = (iso?: string): string => {
+      if (!iso) return ''
+      const date = new Date(iso)
+      if (Number.isNaN(date.getTime())) return String(iso).slice(0, 16)
+      const pad = (n: number) => String(n).padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+    }
+
+    const saveSchedule = async (): Promise<void> => {
+      try {
+        await setNewsSchedule(id.value, {
+          from: formData.publish_from,
+          until: formData.publish_until
+        })
+      } catch (error) {
+        console.error('Failed to save news schedule:', error)
       }
     }
 
@@ -586,9 +633,7 @@ export default defineComponent({
 
         // Update original data after successful save
         originalData.value = { ...originalData.value, ...newData }
-
-        // Show success notification (assuming $notify is available)
-        // this.$notify(this.$t('saved'))
+        await saveSchedule()
 
       } catch (error) {
         console.error('Failed to save:', error)
@@ -997,6 +1042,7 @@ export default defineComponent({
 
       // Methods
       save,
+      saveSchedule,
       deleteContent,
       shareFacebook,
       handleFileUpload,

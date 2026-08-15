@@ -28,7 +28,13 @@
             :label="$t('email')"
             hide-details
           ></v-text-field>
-          <div style="min-height: 300px;" class="glass rounded-xl p-4 print_content" v-html="message"></div>
+          <p v-if="missing" class="text-rose-600">{{ $t('contact_message_missing') }}</p>
+          <div
+            v-else
+            class="rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 min-h-[12rem] whitespace-pre-wrap text-gray-900 dark:text-gray-100"
+          >
+            {{ bodyText || $t('contact_message_empty') }}
+          </div>
         </div>
     </div>
     </div>    
@@ -36,25 +42,21 @@
     
 </template>
 <script lang="ts">
-import {Databases,ID,Storage,Query } from "appwrite";
-import {appw,config} from "@/appwrite";
-
-import {useLoadingStore} from "@/stores/loading";
+import { Databases } from "appwrite";
+import { appw, config } from "@/appwrite";
+import { extractMessageBody } from "@/utils/contactMessage";
 
 const database = new Databases(appw);
-const storage = new Storage(appw);
 
 export default{
 data()
 {
     return{
-        name_hu:"",
+        name:"",
         email:"",
-        contact:"",
-        message:"",
-        default_img_link:"",
-        file_link:null,
-        img:""
+        bodyText:"",
+        loading:true,
+        missing:false
     }
 },
 components:{
@@ -67,79 +69,25 @@ mounted()
 methods:{
     async getMD()
         {
-            
-            const cc=useLoadingStore();
-            //just fucking kill me
-            let mode="";
-           
-            
-            let k= await database.listDocuments(config.website_db, config.mess_coll,[Query.equal("$id",this.$route.params.id)]);
-            
-                
-                    this.name=k.documents[0].name;
-                    this.email=k.documents[0].email;
-                    this.message=k.documents[0].message;
-                
-                    //this.contact=k.documents[0].contact;
-                  
-
-                    //this.visible=k.documents[0].visible;
-
-                    /*
-                    if(k.documents[0].worker_img==null||k.documents[0].worker_img=='')
-                    {
-                        this.img=storage.getFileView(config.website_images,config.missing_worker_picture).href;
-                    }
-                    else
-                    this.img=storage.getFileView(config.website_images,k.documents[0].worker_img).toString();
-                
-                    */
-               
-           /* if(this.chtml=="---")
-            {
-                this.$router.push("/home");
-            }*/
-
-            /*if(this.$route.params.node=="news")
-            {
-                this.newsmode=true;
-                if(k.documents[0].author!="")
-                this.author= convertifserbian(k.documents[0].author);
-                this.date= moment(k.documents[0].$createdAt).locale(cc.language).format('LL');
+            this.loading = true
+            this.missing = false
+            try {
+              const doc = await database.getDocument(
+                config.website_db,
+                config.mess_coll,
+                this.$route.params.id as string
+              )
+              this.name = doc.name || ''
+              this.email = doc.email || ''
+              this.bodyText = extractMessageBody(doc)
+            } catch (error) {
+              console.error('Failed to load message:', error)
+              this.missing = true
+            } finally {
+              this.loading = false
             }
-
-            if(this.$route.params.node=="education")
-            {
-                this.edumode=true;
-            }*/
-
-            //this.title=convertifserbian(k.documents[0].title);
-            /*let gal=k.documents[0].gallery;
-            console.log(k.documents[0].gallery);*/
-            /*let m= await database.listDocuments(config.website_db, config.album_images,[Query.equal("gallery",gal.$id)]);
-            
-            
-            console.log(m);
-            m.documents.forEach(element=>
-            {
-                let af={img:""};
-                af.img=storage.getFilePreview(config.gallery_pictures_storage,element.image_id).toString();
-                this.gallery.push(af);
-                this.image_cnt++;
-            });
-            //console.log(k.documents[0]);
-            */
-/*
-            this.video_id=k.documents[0].video;
-            let v2="659d5e6949ae7294f9f1";
-            this.video_id=v2;
-            this.video_link=storage.getFileView(config.website_images,this.video_id).href;
-            console.log(this.video_link);
-            this.video_link=config.default_video;
-            this.loaded=true;*/
         },
 
-    
     async delete_content()
     {
         let k= await database.deleteDocument(config.website_db, config.mess_coll,this.$route.params.id);  

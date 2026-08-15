@@ -231,7 +231,7 @@ import { useRouter } from 'vue-router'
 import { Databases, Query, Storage } from 'appwrite'
 import { appw, config } from '@/appwrite'
 import { useLoadingStore } from '@/stores/loading'
-import { convertifserbian as convertIfSerbian } from '@/lang'
+import { pickLocalized } from '@/utils/localizedText'
 import draggable from 'vuedraggable'
 
 interface NewsItem {
@@ -293,11 +293,7 @@ export default defineComponent({
           )
 
           for (const doc of documents) {
-            const title = lang === 'en'
-              ? (doc.title_en || doc.title_hu || doc.title_rs)
-              : lang === 'hu'
-                ? (doc.title_hu || doc.title_rs || doc.title_en)
-                : convertIfSerbian(doc.title_rs || doc.title_hu || doc.title_en)
+            const title = pickLocalized(doc, ['title'], lang)
 
             allItems.push({
               id: doc.$id,

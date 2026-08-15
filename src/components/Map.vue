@@ -8,9 +8,10 @@
       >
         <!-- leaflet-->
         <l-map
-          class="sm:hidden md:block absolute inset-0 h-250"
+          v-if="mapReady"
+          class="absolute inset-0"
           ref="map"
-          style="filter: grayscale(0.6) contrast(1.2) opacity(0.45); min-height:250px; min-width: 300px;"
+          style="filter: grayscale(0.6) contrast(1.2) opacity(0.45); min-height:250px; width: 100%; height: 100%;"
           :use-global-leaflet="false"
           v-model:zoom="zoom"
           :center="[45.790699127440185, 20.12923110967009]"
@@ -72,11 +73,15 @@ props: {
  mounted()
  {
    this.contact = con;
+   this.$nextTick(() => {
+     this.mapReady = true;
+   });
  },
  data() {
    return {
      zoom: 17,
-     contact:{}
+     contact: {},
+     mapReady: false
    };
  },
 };

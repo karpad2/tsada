@@ -4,6 +4,9 @@ import { i18nService } from '../i18n/I18nService'
 import { trackUserInteraction, trackError } from '@/utils/analytics'
 import { appwriteService } from '@/appwrite'
 import type { ApiResponse } from '../api/BaseApiService'
+import { defaultModuleMap, flagsFromWindows } from '@/services/modules/registry'
+import { loadModuleWindows } from '@/services/modules/windows'
+import type { ModuleId } from '@/services/modules/registry'
 
 export interface MenuItem {
   id: string
@@ -21,9 +24,12 @@ export interface NavigationData {
   aboutItems: MenuItem[]
   erasmusItems: MenuItem[]
   studentItems: MenuItem[]
+  moduleFlags: Record<ModuleId, boolean>
   erasmusSettings: {
     list_enabled: boolean
     apply_enabled: boolean
+    gallery_enabled: boolean
+    document_search_enabled: boolean
     eu_funding_enabled: boolean
   }
 }
@@ -64,12 +70,12 @@ export class NavigationService extends BaseApiService<any> {
         }
       }
 
-      const [documentCategories, aboutItems, erasmusItems, studentItems, erasmusSettings] = await Promise.all([
+      const [documentCategories, aboutItems, erasmusItems, studentItems, moduleSettings] = await Promise.all([
         this.getDocumentCategories(),
         this.getAboutItems(),
         this.getErasmusItems(),
         this.getStudentItems(),
-        this.getErasmusSettings()
+        this.getModuleSettings()
       ])
 
       const navigationData: NavigationData = {
@@ -77,9 +83,12 @@ export class NavigationService extends BaseApiService<any> {
         aboutItems: aboutItems.success ? aboutItems.data! : [],
         erasmusItems: erasmusItems.success ? erasmusItems.data! : [],
         studentItems: studentItems.success ? studentItems.data! : [],
-        erasmusSettings: erasmusSettings.success ? erasmusSettings.data! : {
+        moduleFlags: moduleSettings.success ? moduleSettings.data!.moduleFlags : flagsFromWindows(defaultModuleMap()),
+        erasmusSettings: moduleSettings.success ? moduleSettings.data!.erasmusSettings : {
           list_enabled: false,
           apply_enabled: false,
+          gallery_enabled: true,
+          document_search_enabled: true,
           eu_funding_enabled: false
         }
       }
@@ -219,22 +228,21 @@ export class NavigationService extends BaseApiService<any> {
   /**
    * Get Erasmus module settings
    */
-  async getErasmusSettings(): Promise<ApiResponse<{ list_enabled: boolean; apply_enabled: boolean; eu_funding_enabled: boolean }>> {
+  async getModuleSettings(): Promise<ApiResponse<Pick<NavigationData, 'moduleFlags' | 'erasmusSettings'>>> {
     try {
-      const databases = appwriteService.getDatabases()
-
-      const [listSetting, applySetting, euFundingSetting] = await Promise.all([
-        databases.getDocument(this.config.website_db, this.config.general_settings, 'erasmus_list').catch(() => null),
-        databases.getDocument(this.config.website_db, this.config.general_settings, 'erasmus_apply_on').catch(() => null),
-        databases.getDocument(this.config.website_db, this.config.general_settings, 'eu_funding_enabled').catch(() => null)
-      ])
+      const flags = flagsFromWindows(await loadModuleWindows())
 
       return {
         success: true,
         data: {
-          list_enabled: listSetting?.setting_status || false,
-          apply_enabled: applySetting?.setting_status || false,
-          eu_funding_enabled: euFundingSetting?.setting_status || false
+          moduleFlags: flags,
+          erasmusSettings: {
+            list_enabled: flags.erasmus_list,
+            apply_enabled: flags.erasmus_apply,
+            gallery_enabled: flags.gallery,
+            document_search_enabled: flags.document_search,
+            eu_funding_enabled: false
+          }
         }
       }
     } catch (error: any) {

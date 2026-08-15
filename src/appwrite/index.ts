@@ -12,7 +12,7 @@ const databases = new Databases(appw)
 const storage = new Storage(appw)
 
 // Valid user roles that can be extracted from Appwrite user labels
-const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer']
+const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer', 'secretary']
 
 interface AppwriteConfig {
   website_db: string

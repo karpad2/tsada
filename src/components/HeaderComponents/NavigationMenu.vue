@@ -159,10 +159,11 @@
       label: 'account',
       condition: props.isLoggedin,
       children: [
+        { label: 'dashboard', to: '/admin' },
         { label: 'messages', to: '/admin/messages' },
         { label: 'presentation_editor', to: '/admin/slide-editor' },
         { label: 'tt_editor', to: '/admin/timetable-editor' },
-        { label: 'logout', to: '/', action: 'logout' }, // Itt lehet `@click` is külön
+        { label: 'logout', to: '/', action: 'logout' },
       ],
     },
     {

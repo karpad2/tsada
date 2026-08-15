@@ -1,80 +1,70 @@
 <template>
-<div class="page-shell">
-  <div class="page-panel container !min-h-0" style="height: calc(100vh - 3rem);">
-    <iframe class="h-full w-full rounded-xl" :src="pdf_file"></iframe>
+  <div class="page-shell">
+    <div class="page-panel container !min-h-0" style="height: calc(100vh - 3rem);">
+      <div v-if="loading" class="page-state">
+        <div class="page-spinner mx-auto mb-3"></div>
+        <p>{{ $t('loading') }}...</p>
+      </div>
+      <div v-else-if="error" class="page-state">
+        <h3 class="page-state-title">{{ $t('erasmus_pdf_missing') }}</h3>
+        <a v-if="downloadUrl" class="text-sky-600 underline" :href="downloadUrl" target="_blank" rel="noopener">
+          {{ $t('erasmus_download_pdf') }}
+        </a>
+      </div>
+      <iframe v-else class="h-full w-full rounded-xl" :src="pdf_file" title="Erasmus document"></iframe>
+    </div>
   </div>
-</div>
 </template>
+
 <script>
-//import  VuePdfApp  from "vue3-pdf-app";//
-//import "vue3-pdf-app/dist/icons/main.css";
-//import "vue3-pdf-app/dist/icons/main.css";
-//import PDF from "pdf-vue3";
-//import { VuePDF, usePDF } from '@tato30/vue-pdf'
-//import '@tato30/vue-pdf/style.css'
-//import {usePDF, VuePDF} from 'VuePDF';
-//import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
-//import { VuePdfPropsType } from 'vue3-pdfjs/components/vue-pdf/vue-pdf-props'; // Prop type definitions can also be imported
-//import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
+import { Storage } from 'appwrite'
+import { appw, config } from '@/appwrite'
+import { asViewUrl } from '@/services/erasmus/upload'
 
-import { Databases, ID,Storage,Query } from "appwrite";
-import {appw,config} from "@/appwrite";
-import { ref } from 'vue';
-
-const storage = new Storage(appw);
+const storage = new Storage(appw)
 
 export default {
-    components: {
-        
-    },
-    data() {
-        return {
-            pdf_file: 'https://example.com/sample.pdf',
-            loading: true,
-            config: {
-        toolbar: {
-          toolbarViewerLeft: {
-            previous: false
-          }
-        },
-        pdf_link:null,
-        numOfPages: ref(0),
-      },
-        }
-    },
-    mounted() {
-        this.loadpdf();
-    },
-    methods: {
-        async loadpdf()
-        {
-            let tmp=await storage.getFileView(config.fs_erasmus,this.$route.params.id);
-            this.pdf_file=tmp;
-            //this.pdf_link=pdf;
-           /* const loadingTask = createLoadingTask(this.pdf_file)
-      loadingTask.promise.then((pdf) => {
-        numOfPages.value = pdf.numPages
-      });*/
-            this.loading=false;
-        
-        }
+  name: 'ErDocViewer',
+  data() {
+    return {
+      pdf_file: '',
+      downloadUrl: '',
+      loading: true,
+      error: false
     }
+  },
+  mounted() {
+    this.loadpdf()
+  },
+  methods: {
+    fileId() {
+      const id = this.$route.params.id
+      return Array.isArray(id) ? id[0] : id
+    },
+    async loadpdf() {
+      const id = this.fileId()
+      if (!id) {
+        this.error = true
+        this.loading = false
+        return
+      }
+      try {
+        this.pdf_file = asViewUrl(storage.getFileView({
+          bucketId: config.fs_erasmus,
+          fileId: id
+        }))
+        this.downloadUrl = asViewUrl(storage.getFileDownload({
+          bucketId: config.fs_erasmus,
+          fileId: id
+        }))
+        this.error = !this.pdf_file
+      } catch (error) {
+        console.error('Failed to open Erasmus document:', error)
+        this.error = true
+      } finally {
+        this.loading = false
+      }
+    }
+  }
 }
 </script>
-<style>
-#openFile {
-    display: none;
-}
-#secondaryToolbarToggle {
-    display: none;
-}
-#viewBookmark {
-    display: none;
-}
-#viewFind {
-    display: none;
-}
-#toolbarViewer{
-    z-index: 1;
-}
-</style>

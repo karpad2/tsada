@@ -9,7 +9,7 @@
         <v-card class="mb-4">
           <v-card-title class="text-subtitle-1">
             <v-icon class="mr-2">mdi-file-document-outline</v-icon>
-            Sablon típus
+            {{ $t('template_type') }}
           </v-card-title>
           <v-card-text>
             <v-select
@@ -17,7 +17,7 @@
               :items="documentTypes"
               item-title="label"
               item-value="value"
-              label="Dokumentum típus"
+              :label="$t('document_type')"
               density="compact"
               @update:model-value="onDocumentTypeChange"
             ></v-select>
@@ -26,7 +26,7 @@
               :items="yearOptions"
               item-title="label"
               item-value="value"
-              label="Évfolyam"
+              :label="$t('tpl_class_year')"
               density="compact"
               class="mt-2"
               :disabled="documentType === 'grade_book_base'"
@@ -36,11 +36,11 @@
               :items="studyProgramOptions"
               item-title="name"
               item-value="$id"
-              label="Szak (opcionális)"
+              :label="$t('optional_study_program')"
               density="compact"
               clearable
               class="mt-2"
-              hint="Ha üres, általános sablon"
+              :hint="$t('empty_general_template')"
               persistent-hint
             ></v-select>
             <v-select
@@ -48,7 +48,7 @@
               :items="formLanguageOptions"
               item-title="label"
               item-value="value"
-              label="Űrlap nyelve"
+              :label="$t('form_language')"
               density="compact"
               class="mt-2"
             ></v-select>
@@ -58,12 +58,12 @@
         <v-card class="mb-4">
           <v-card-title class="text-subtitle-1">
             <v-icon class="mr-2">mdi-image</v-icon>
-            Sablon háttér
+            {{ $t('template_background') }}
           </v-card-title>
           <v-card-text>
             <v-file-input
               v-model="templateFile"
-              label="Kép feltöltése"
+              :label="$t('upload_image')"
               accept="image/*"
               prepend-icon="mdi-camera"
               density="compact"
@@ -71,7 +71,7 @@
             ></v-file-input>
             <v-text-field
               v-model="templateName"
-              label="Sablon neve"
+              :label="$t('template_name')"
               density="compact"
               class="mt-2"
             ></v-text-field>
@@ -81,7 +81,7 @@
         <v-card class="mb-4">
           <v-card-title class="text-subtitle-1">
             <v-icon class="mr-2">mdi-ruler</v-icon>
-            Papírméret
+            {{ $t('paper_size') }}
           </v-card-title>
           <v-card-text>
             <v-select
@@ -96,7 +96,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="pageWidth"
-                  label="Szélesség"
+                  :label="$t('width')"
                   suffix="mm"
                   type="number"
                   density="compact"
@@ -105,7 +105,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="pageHeight"
-                  label="Magasság"
+                  :label="$t('height')"
                   suffix="mm"
                   type="number"
                   density="compact"
@@ -118,7 +118,7 @@
         <v-card class="mb-4">
           <v-card-title class="text-subtitle-1">
             <v-icon class="mr-2">mdi-form-textbox</v-icon>
-            Mezők
+            {{ $t('form_fields') }}
           </v-card-title>
           <v-card-text class="pa-2">
             <v-list density="compact">
@@ -172,7 +172,7 @@
                 class="mb-2"
               >
                 <v-icon left>mdi-plus</v-icon>
-                Jegy sor hozzáadása
+                {{ $t('add_grade_row') }}
               </v-btn>
 
               <v-btn
@@ -184,7 +184,7 @@
                 :disabled="allSubjects.length === 0"
               >
                 <v-icon left>mdi-auto-fix</v-icon>
-                Tantárgyak betöltése ({{ allSubjects.length }})
+                {{ $t('load_subjects', { count: allSubjects.length }) }}
               </v-btn>
             </template>
 
@@ -198,7 +198,7 @@
                 @click="addSubjectNameFields"
               >
                 <v-icon left>mdi-format-list-bulleted</v-icon>
-                Tantárgy nevek hozzáadása
+                {{ $t('add_subject_names') }}
               </v-btn>
             </template>
           </v-card-text>
@@ -208,14 +208,14 @@
         <v-card v-if="selectedFieldKey && placedFields[selectedFieldKey]">
           <v-card-title class="text-subtitle-1">
             <v-icon class="mr-2">mdi-cog</v-icon>
-            Mező beállítások
+            {{ $t('field_settings') }}
           </v-card-title>
           <v-card-text>
             <v-row dense>
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].x"
-                  label="X pozíció"
+                  :label="$t('x_position')"
                   suffix="mm"
                   type="number"
                   step="0.1"
@@ -225,7 +225,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].y"
-                  label="Y pozíció"
+                  :label="$t('y_position')"
                   suffix="mm"
                   type="number"
                   step="0.1"
@@ -235,7 +235,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].fontSize"
-                  label="Betűméret"
+                  :label="$t('font_size')"
                   suffix="pt"
                   type="number"
                   density="compact"
@@ -244,7 +244,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].width"
-                  label="Szélesség"
+                  :label="$t('width')"
                   suffix="mm"
                   type="number"
                   density="compact"
@@ -254,7 +254,7 @@
             <v-select
               v-model="placedFields[selectedFieldKey].fontFamily"
               :items="fontFamilies"
-              label="Betűtípus"
+              :label="$t('font_family')"
               density="compact"
               class="mt-2"
             ></v-select>
@@ -262,34 +262,34 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].letterSpacing"
-                  label="Betűköz"
+                  :label="$t('letter_spacing')"
                   suffix="mm"
                   type="number"
                   step="0.1"
                   density="compact"
-                  hint="Karakterek közti távolság"
+                  :hint="$t('letter_spacing_hint')"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
                 <v-text-field
                   v-model.number="placedFields[selectedFieldKey].lineHeight"
-                  label="Sormagasság"
+                  :label="$t('line_height')"
                   type="number"
                   step="0.1"
                   density="compact"
-                  hint="pl. 1.2, 1.5"
+                  :hint="$t('line_height_hint')"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-checkbox
               v-model="placedFields[selectedFieldKey].bold"
-              label="Félkövér"
+              :label="$t('bold')"
               density="compact"
               hide-details
             ></v-checkbox>
             <v-checkbox
               v-model="placedFields[selectedFieldKey].strikethrough"
-              label="Kihúzás ha üres"
+              :label="$t('strikethrough_if_empty')"
               density="compact"
               hide-details
               class="mt-2"
@@ -297,7 +297,7 @@
             <v-text-field
               v-if="placedFields[selectedFieldKey].strikethrough"
               v-model.number="placedFields[selectedFieldKey].strikethroughWidth"
-              label="Kihúzás szélesség"
+              :label="$t('strikethrough_width')"
               suffix="mm"
               type="number"
               step="0.1"
@@ -312,15 +312,15 @@
           <v-card-text>
             <v-btn color="primary" block class="mb-2" @click="saveTemplate">
               <v-icon left>mdi-content-save</v-icon>
-              Sablon mentése
+              {{ $t('save_template') }}
             </v-btn>
             <v-btn color="secondary" variant="outlined" block class="mb-2" @click="loadTemplate">
               <v-icon left>mdi-folder-open</v-icon>
-              Sablon betöltése
+              {{ $t('load_template') }}
             </v-btn>
             <v-btn color="success" variant="outlined" block @click="testPrint">
               <v-icon left>mdi-printer</v-icon>
-              Teszt nyomtatás
+              {{ $t('test_print') }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -332,11 +332,11 @@
           <v-btn-toggle v-model="viewMode" mandatory density="compact" class="mr-4">
             <v-btn value="edit" size="small">
               <v-icon>mdi-pencil</v-icon>
-              Szerkesztés
+              {{ $t('edit') }}
             </v-btn>
             <v-btn value="preview" size="small">
               <v-icon>mdi-eye</v-icon>
-              Előnézet
+              {{ $t('preview') }}
             </v-btn>
           </v-btn-toggle>
 
@@ -356,7 +356,7 @@
 
           <v-checkbox
             v-model="showGrid"
-            label="Rács"
+            :label="$t('show_grid')"
             density="compact"
             hide-details
             class="mr-4"
@@ -364,7 +364,7 @@
 
           <v-checkbox
             v-model="snapToGrid"
-            label="Rácshoz igazítás"
+            :label="$t('snap_to_grid')"
             density="compact"
             hide-details
           ></v-checkbox>
@@ -451,7 +451,7 @@
       <v-card>
         <v-card-title>
           <v-icon class="mr-2">mdi-folder-open</v-icon>
-          Sablon betöltése
+          {{ $t('load_template') }}
         </v-card-title>
         <v-card-text>
           <v-list v-if="savedTemplates.length > 0" lines="three">
@@ -474,15 +474,15 @@
                   {{ getDocumentTypeLabel(template._original.documentType) }}
                 </v-chip>
                 <v-chip size="x-small" class="mr-1" v-if="template._original && template._original.year > 0">
-                  {{ template._original.year }}. évfolyam
+                  {{ $t('year_n', { n: template._original.year }) }}
                 </v-chip>
                 <v-chip size="x-small" variant="outlined">
                   {{ template.pageWidth }}×{{ template.pageHeight }}mm
                 </v-chip>
               </v-list-item-subtitle>
               <v-list-item-subtitle class="text-caption mt-1">
-                <span v-if="template._original">Adatbázisban tárolva</span>
-                <span v-else>Helyi tárolás (localStorage)</span>
+                <span v-if="template._original">{{ $t('stored_in_database') }}</span>
+                <span v-else>{{ $t('stored_locally') }}</span>
               </v-list-item-subtitle>
               <template #append>
                 <v-btn icon size="small" variant="text" color="error" @click.stop="deleteTemplate(template.id)">
@@ -493,12 +493,12 @@
           </v-list>
           <div v-else class="text-center py-8 text-grey">
             <v-icon size="64" color="grey-lighten-1">mdi-file-document-outline</v-icon>
-            <p class="mt-4">Nincsenek mentett sablonok</p>
+            <p class="mt-4">{{ $t('no_saved_templates') }}</p>
           </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showLoadDialog = false">Bezárás</v-btn>
+          <v-btn variant="text" @click="showLoadDialog = false">{{ $t('close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -509,6 +509,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { notify } from '@kyvg/vue3-notification';
 import { useConfirmDialog } from '@/composables/ui/useConfirmDialog';
 import PrintTemplateService, { type PrintTemplate, type FieldPosition } from '@/services/PrintTemplateService';
@@ -565,117 +566,111 @@ export default defineComponent({
   name: 'TemplateEditor',
   setup() {
     const { openDialog } = useConfirmDialog();
+    const { t } = useI18n();
 
-    // Document types
-    const documentTypes = [
-      { value: 'grade_book_base', label: 'Főkönyv alap (beiratkozás)' },
-      { value: 'grade_book_year', label: 'Főkönyv évfolyam (jegyek)' },
-      { value: 'grade_book_matura', label: 'Főkönyv érettségi' },
-      { value: 'grade_book_certificates', label: 'Főkönyv oklevelek' },
-      { value: 'certificate', label: 'Bizonyítvány' },
-      { value: 'enrollment', label: 'Beiratkozási lap' },
-      { value: 'custom', label: 'Egyéni' }
-    ];
+    const documentTypes = computed(() => [
+      { value: 'grade_book_base', label: t('doc_grade_book_base') },
+      { value: 'grade_book_year', label: t('doc_grade_book_year') },
+      { value: 'grade_book_matura', label: t('doc_grade_book_matura') },
+      { value: 'grade_book_certificates', label: t('doc_grade_book_certificates') },
+      { value: 'certificate', label: t('doc_certificate') },
+      { value: 'enrollment', label: t('doc_enrollment') },
+      { value: 'custom', label: t('doc_custom') }
+    ]);
 
-    const yearOptions = [
-      { value: 0, label: 'Alap (beiratkozás)' },
-      { value: 1, label: '1. évfolyam' },
-      { value: 2, label: '2. évfolyam' },
-      { value: 3, label: '3. évfolyam' },
-      { value: 4, label: '4. évfolyam' }
-    ];
+    const yearOptions = computed(() => [
+      { value: 0, label: t('year_base') },
+      { value: 1, label: t('year_n', { n: 1 }) },
+      { value: 2, label: t('year_n', { n: 2 }) },
+      { value: 3, label: t('year_n', { n: 3 }) },
+      { value: 4, label: t('year_n', { n: 4 }) }
+    ]);
 
-    // Paper sizes
-    const paperSizes = [
+    const paperSizes = computed(() => [
       { id: 'a2', name: 'A2 (420×594mm)', width: 420, height: 594 },
-      { id: 'a2_landscape', name: 'A2 fekvő (594×420mm)', width: 594, height: 420 },
+      { id: 'a2_landscape', name: `A2 ${t('paper_landscape')} (594×420mm)`, width: 594, height: 420 },
       { id: 'a3', name: 'A3 (297×420mm)', width: 297, height: 420 },
-      { id: 'a3_landscape', name: 'A3 fekvő (420×297mm)', width: 420, height: 297 },
-      { id: 'custom', name: 'Egyéni', width: 420, height: 594 }
-    ];
+      { id: 'a3_landscape', name: `A3 ${t('paper_landscape')} (420×297mm)`, width: 420, height: 297 },
+      { id: 'custom', name: t('doc_custom'), width: 420, height: 594 }
+    ]);
 
     const fontFamilies = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana'];
 
-    // Nyelvi variánsok
-    const formLanguageOptions = [
-      { value: 'bilingual', label: 'Kétnyelvű (szerb + magyar)' },
-      { value: 'serbian', label: 'Egynyelvű (szerb)' }
-    ];
+    const formLanguageOptions = computed(() => [
+      { value: 'bilingual', label: t('lang_bilingual') },
+      { value: 'serbian', label: t('lang_serbian') }
+    ]);
 
-    // Alap mezők - beiratkozáskor (grade_book_base)
-    const baseFields = [
-      { key: 'enrollmentNumber', label: 'Anyakönyvi szám' },
-      { key: 'registryNumber', label: 'Belső sorszám' },
-      { key: 'studentName', label: 'Diák neve (magyar)' },
-      { key: 'studentNameRs', label: 'Diák neve (szerb)' },
-      { key: 'fatherName', label: 'Apa neve' },
-      { key: 'motherName', label: 'Anya neve' },
-      { key: 'birthDate', label: 'Születési dátum' },
-      { key: 'birthPlace', label: 'Születési hely (magyar)' },
-      { key: 'birthPlaceRs', label: 'Születési hely (szerb)' },
-      { key: 'jmbg', label: 'JMBG' },
-      { key: 'studyProgram', label: 'Szak (magyar)' },
-      { key: 'studyProgramRs', label: 'Szak (szerb)' },
-      { key: 'educationType', label: 'Képzés típusa (rendes/rendkívüli)' },
-      { key: 'educationDuration', label: 'Képzés időtartama' },
-      { key: 'enrollmentDate', label: 'Beiratkozás dátuma' },
-      { key: 'generation', label: 'Generáció' },
-      { key: 'schoolName', label: 'Iskola neve' },
-      { key: 'foreignLanguage', label: 'Idegen nyelv' },
-      { key: 'religionOption', label: 'Hittan/Polgári' },
-      { key: 'parentName', label: 'Szülő neve' },
-      { key: 'parentAddress', label: 'Szülő címe' },
-      { key: 'parentPhone', label: 'Szülő telefonszáma' }
-    ];
+    const baseFields = computed(() => [
+      { key: 'enrollmentNumber', label: t('tpl_enrollment_number') },
+      { key: 'registryNumber', label: t('tpl_registry_number') },
+      { key: 'studentName', label: t('tpl_student_name_hu') },
+      { key: 'studentNameRs', label: t('tpl_student_name_rs') },
+      { key: 'fatherName', label: t('tpl_father_name') },
+      { key: 'motherName', label: t('tpl_mother_name') },
+      { key: 'birthDate', label: t('tpl_birth_date') },
+      { key: 'birthPlace', label: t('tpl_birth_place_hu') },
+      { key: 'birthPlaceRs', label: t('tpl_birth_place_rs') },
+      { key: 'jmbg', label: t('tpl_jmbg') },
+      { key: 'studyProgram', label: t('tpl_study_program_hu') },
+      { key: 'studyProgramRs', label: t('tpl_study_program_rs') },
+      { key: 'educationType', label: t('tpl_education_type') },
+      { key: 'educationDuration', label: t('tpl_education_duration') },
+      { key: 'enrollmentDate', label: t('tpl_enrollment_date') },
+      { key: 'generation', label: t('tpl_generation') },
+      { key: 'schoolName', label: t('tpl_school_name') },
+      { key: 'foreignLanguage', label: t('tpl_foreign_language') },
+      { key: 'religionOption', label: t('tpl_religion_option') },
+      { key: 'parentName', label: t('tpl_parent_name') },
+      { key: 'parentAddress', label: t('tpl_parent_address') },
+      { key: 'parentPhone', label: t('tpl_parent_phone') }
+    ]);
 
-    // Évfolyam mezők - évvégi nyomtatáshoz (grade_book_year)
-    const yearFields = [
-      { key: 'schoolYear', label: 'Tanév' },
-      { key: 'classYear', label: 'Évfolyam' },
-      { key: 'className', label: 'Osztály neve' },
-      { key: 'classTeacher', label: 'Osztályfőnök' },
-      { key: 'finalGrade', label: 'Tanulmányi átlag' },
-      { key: 'behaviorText', label: 'Magaviselet (szöveges)' },
-      { key: 'generalSuccess', label: 'Általános siker' },
-      { key: 'absencesTotal', label: 'Össz. mulasztás' },
-      { key: 'absencesJustified', label: 'Igazolt mulasztás' },
-      { key: 'absencesUnjustified', label: 'Igazolatlan mulasztás' },
-      { key: 'date', label: 'Keltezés' },
-      { key: 'directorSignature', label: 'Igazgató aláírás' },
-      { key: 'dateNow', label: 'Mai dátum' }
-    ];
+    const yearFields = computed(() => [
+      { key: 'schoolYear', label: t('tpl_school_year') },
+      { key: 'classYear', label: t('tpl_class_year') },
+      { key: 'className', label: t('tpl_class_name') },
+      { key: 'classTeacher', label: t('tpl_class_teacher') },
+      { key: 'finalGrade', label: t('tpl_final_grade') },
+      { key: 'behaviorText', label: t('tpl_behavior_text') },
+      { key: 'generalSuccess', label: t('tpl_general_success') },
+      { key: 'absencesTotal', label: t('tpl_absences_total') },
+      { key: 'absencesJustified', label: t('tpl_absences_justified') },
+      { key: 'absencesUnjustified', label: t('tpl_absences_unjustified') },
+      { key: 'date', label: t('tpl_date') },
+      { key: 'directorSignature', label: t('tpl_director_signature') },
+      { key: 'dateNow', label: t('tpl_date_now') }
+    ]);
 
-    // Érettségi mezők (grade_book_matura)
-    const maturaFields = [
-      { key: 'maturaSchoolYear', label: 'Tanév' },
-      { key: 'maturaYear', label: 'Vizsgaidőszak éve' },
-      { key: 'maturaClassYear', label: 'Évfolyam szám' },
-      { key: 'maturaSubject1Name', label: '1. tárgy neve' },
-      { key: 'maturaSubject1Grade', label: '1. tárgy jegy' },
-      { key: 'maturaSubject2Name', label: '2. tárgy neve' },
-      { key: 'maturaSubject2Grade', label: '2. tárgy jegy' },
-      { key: 'maturaSubject3Name', label: '3. tárgy neve (szakmai)' },
-      { key: 'maturaSubject3Grade', label: '3. tárgy jegy' },
-      { key: 'maturaPracticalDesc', label: 'Gyakorlati vizsga leírás' },
-      { key: 'maturaPracticalGrade', label: 'Gyakorlati vizsga jegy' },
-      { key: 'maturaFinalGrade', label: 'Összesített eredmény' },
-      { key: 'maturaResult', label: 'Eredménnyel tette le' },
-      { key: 'maturaDate', label: 'Érettségi keltezés' }
-    ];
+    const maturaFields = computed(() => [
+      { key: 'maturaSchoolYear', label: t('tpl_matura_school_year') },
+      { key: 'maturaYear', label: t('tpl_matura_year') },
+      { key: 'maturaClassYear', label: t('tpl_matura_class_year') },
+      { key: 'maturaSubject1Name', label: t('tpl_matura_subject1_name') },
+      { key: 'maturaSubject1Grade', label: t('tpl_matura_subject1_grade') },
+      { key: 'maturaSubject2Name', label: t('tpl_matura_subject2_name') },
+      { key: 'maturaSubject2Grade', label: t('tpl_matura_subject2_grade') },
+      { key: 'maturaSubject3Name', label: t('tpl_matura_subject3_name') },
+      { key: 'maturaSubject3Grade', label: t('tpl_matura_subject3_grade') },
+      { key: 'maturaPracticalDesc', label: t('tpl_matura_practical_desc') },
+      { key: 'maturaPracticalGrade', label: t('tpl_matura_practical_grade') },
+      { key: 'maturaFinalGrade', label: t('tpl_matura_final_grade') },
+      { key: 'maturaResult', label: t('tpl_matura_result') },
+      { key: 'maturaDate', label: t('tpl_matura_date') }
+    ]);
 
-    // Oklevelek/bizonyítványok mezők (grade_book_certificates)
-    const certificatesFields = [
-      { key: 'diplomaNumber', label: 'Oklevél iktatószám' },
-      { key: 'diplomaDate', label: 'Oklevél keltezés' },
-      { key: 'certificateNumber', label: 'Bizonylat iktatószám' },
-      { key: 'certificateDate', label: 'Bizonylat keltezés' },
-      { key: 'serialNumber', label: 'Sorozatszám (szerijszki broj)' },
-      { key: 'classTeacherSign', label: 'Osztályfőnök aláírás' },
-      { key: 'examCommitteeChair', label: 'Vizsgabizottság elnöke' },
-      { key: 'receivedDate', label: 'Átvétel dátuma' },
-      { key: 'receivedSignature', label: 'Átvette (aláírás)' },
-      { key: 'notes', label: 'Megjegyzések' }
-    ];
+    const certificatesFields = computed(() => [
+      { key: 'diplomaNumber', label: t('tpl_diploma_number') },
+      { key: 'diplomaDate', label: t('tpl_diploma_date') },
+      { key: 'certificateNumber', label: t('tpl_certificate_number') },
+      { key: 'certificateDate', label: t('tpl_certificate_date') },
+      { key: 'serialNumber', label: t('tpl_serial_number') },
+      { key: 'classTeacherSign', label: t('tpl_class_teacher_sign') },
+      { key: 'examCommitteeChair', label: t('tpl_exam_committee_chair') },
+      { key: 'receivedDate', label: t('tpl_received_date') },
+      { key: 'receivedSignature', label: t('tpl_received_signature') },
+      { key: 'notes', label: t('tpl_notes') }
+    ]);
 
     // State - sablon azonosítás
     const documentType = ref<'grade_book_base' | 'grade_book_year' | 'grade_book_matura' | 'grade_book_certificates' | 'certificate' | 'enrollment' | 'custom'>('grade_book_base');
@@ -690,7 +685,7 @@ export default defineComponent({
     const saving = ref(false);
 
     // State
-    const templateName = ref('Új sablon');
+    const templateName = ref(t('new_template'));
     const templateFile = ref<File[]>([]);
     const templateImageUrl = ref<string | null>(null);
     const selectedPaperSize = ref('a3_landscape');
@@ -701,15 +696,15 @@ export default defineComponent({
     const availableFields = computed(() => {
       switch (documentType.value) {
         case 'grade_book_base':
-          return baseFields;
+          return baseFields.value;
         case 'grade_book_year':
-          return yearFields;
+          return yearFields.value;
         case 'grade_book_matura':
-          return maturaFields;
+          return maturaFields.value;
         case 'grade_book_certificates':
-          return certificatesFields;
+          return certificatesFields.value;
         default:
-          return [...baseFields, ...yearFields];
+          return [...baseFields.value, ...yearFields.value];
       }
     });
 
@@ -746,7 +741,7 @@ export default defineComponent({
 
     // Methods
     const applyPaperSize = (sizeId: string) => {
-      const size = paperSizes.find(p => p.id === sizeId);
+      const size = paperSizes.value.find(p => p.id === sizeId);
       if (size && sizeId !== 'custom') {
         pageWidth.value = size.width;
         pageHeight.value = size.height;
@@ -806,7 +801,7 @@ export default defineComponent({
     };
 
     const getFieldLabel = (key: string) => {
-      return availableFields.find(f => f.key === key)?.label || key;
+      return availableFields.value.find(f => f.key === key)?.label || key;
     };
 
     const getPreviewValue = (key: string) => {
@@ -1040,7 +1035,7 @@ export default defineComponent({
           paperSize: {
             width: pageWidth.value,
             height: pageHeight.value,
-            name: paperSizes.find(p => p.width === pageWidth.value && p.height === pageHeight.value)?.name || 'Egyéni'
+            name: paperSizes.value.find(p => p.width === pageWidth.value && p.height === pageHeight.value)?.name || t('doc_custom')
           },
           fields: convertToFieldPositions(),
           gradesTable: documentType.value === 'grade_book_year' ? {
@@ -1051,7 +1046,7 @@ export default defineComponent({
             fontSize: gradeRows.value[0]?.fontSize || 10,
             subjects: gradeRows.value.map((row, index) => ({
               subjectId: row.subjectId || `subject_${index}`,
-              subjectName: row.subjectName || `Tantárgy ${index + 1}`,
+              subjectName: row.subjectName || t('subject_n', { n: index + 1 }),
               rowIndex: index,
               gradeX: row.x + row.gradeOffsetX,
               baseY: row.y
@@ -1063,13 +1058,13 @@ export default defineComponent({
         const saved = await PrintTemplateService.saveTemplate(template);
         if (saved) {
           currentTemplateId.value = saved.$id || null;
-          notify({ type: 'success', text: 'Sablon sikeresen mentve az adatbázisba!' });
+          notify({ type: 'success', text: t('template_saved') });
         } else {
-          notify({ type: 'error', text: 'Hiba a sablon mentésekor!' });
+          notify({ type: 'error', text: t('template_save_error') });
         }
       } catch (error) {
         console.error('Save error:', error);
-        notify({ type: 'error', text: 'Hiba történt a mentés során!' });
+        notify({ type: 'error', text: t('error_saving') });
       } finally {
         saving.value = false;
       }
@@ -1147,9 +1142,9 @@ export default defineComponent({
 
     const deleteTemplate = async (id: string) => {
       const confirmed = await openDialog({
-        title: 'Sablon törlése',
-        message: 'Biztosan törölni szeretnéd a sablont?',
-        confirmText: 'Törlés',
+        title: t('delete_template'),
+        message: t('delete_template_confirm'),
+        confirmText: t('delete'),
         color: 'error',
         icon: 'mdi-delete'
       });
@@ -1236,13 +1231,13 @@ export default defineComponent({
     // Dokumentum típus címke
     const getDocumentTypeLabel = (type: string): string => {
       const labels: Record<string, string> = {
-        'grade_book_base': 'Főkönyv alap',
-        'grade_book_year': 'Főkönyv évfolyam',
-        'grade_book_matura': 'Főkönyv érettségi',
-        'grade_book_certificates': 'Főkönyv oklevelek',
-        'certificate': 'Bizonyítvány',
-        'enrollment': 'Beiratkozási lap',
-        'custom': 'Egyéni'
+        'grade_book_base': t('doc_grade_book_base'),
+        'grade_book_year': t('doc_grade_book_year'),
+        'grade_book_matura': t('doc_grade_book_matura'),
+        'grade_book_certificates': t('doc_grade_book_certificates'),
+        'certificate': t('doc_certificate'),
+        'enrollment': t('doc_enrollment'),
+        'custom': t('doc_custom')
       };
       return labels[type] || type;
     };
@@ -1251,7 +1246,7 @@ export default defineComponent({
     // Ez a főkönyv bal oldalára kerül, ahol a tantárgy nevek vannak előre nyomtatva
     const addSubjectNameFields = () => {
       if (allSubjects.value.length === 0) {
-        notify({ type: 'warning', text: 'Nincsenek betöltött tantárgyak!' });
+        notify({ type: 'warning', text: t('no_subjects_loaded') });
         return;
       }
 

@@ -52,6 +52,7 @@ import { useI18n } from 'vue-i18n';
 import { Databases, Storage, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
 import { useLoadingStore } from '@/stores/loading';
+import { pickLocalized } from '@/utils/localizedText';
 
 const database = new Databases(appw);
 const storage = new Storage(appw);
@@ -107,22 +108,8 @@ export default defineComponent({
         const lang = loadingStore.language;
 
         documents.value = result.documents.map(doc => {
-          let title = '';
-          let description = '';
-
-          switch (lang) {
-            case 'en':
-              title = doc.title_en || doc.title_hu || doc.title_rs;
-              description = doc.short_en || doc.short_hu || doc.short_rs;
-              break;
-            case 'hu':
-              title = doc.title_hu || doc.title_rs || doc.title_en;
-              description = doc.short_hu || doc.short_rs || doc.short_en;
-              break;
-            default:
-              title = doc.title_rs || doc.title_hu || doc.title_en;
-              description = doc.short_rs || doc.short_hu || doc.short_en;
-          }
+          const title = pickLocalized(doc, ['document_title', 'title'], lang);
+          const description = pickLocalized(doc, ['short'], lang);
 
           let fileUrl = '';
           let fileType = '';

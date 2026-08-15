@@ -19,17 +19,20 @@
           <div class="section-accent !w-20"></div>
         </div>
         
+        <div v-if="!moduleOpen && !isStaff" class="page-state w-full">
+          <h3 class="page-state-title">{{ $t('module_closed') }}</h3>
+        </div>
         <!-- Item counter -->
-        <div v-if="totalItems > 0" class="glass-badge px-3 py-1 rounded-full text-sm font-medium">
+        <div v-else-if="totalItems > 0" class="glass-badge px-3 py-1 rounded-full text-sm font-medium">
           {{ courses.length }} / {{ totalItems }} {{ $t("items") }}
         </div>
       </div>
 
       <!-- Gallery Grid -->
-      <div class="flex flex-wrap -m-3 justify-start" ref="scrollContainer">
-        <!-- Admin: New Item -->
+      <div v-if="moduleOpen || isStaff" class="flex flex-wrap -m-3 justify-start" ref="scrollContainer">
+        <!-- Staff: New Item -->
         <div
-          v-if="admin"
+          v-if="isStaff"
           @click="new_stuff"
           @keydown.enter="new_stuff"
           @keydown.space.prevent="new_stuff"
@@ -68,19 +71,26 @@
           <div class="relative overflow-hidden rounded-2xl glass-card">
             <!-- Image -->
             <div class="relative aspect-[4/3] overflow-hidden">
-              <img
-                v-lazy="course.img"
+              <ProgressiveImage
+                :image-id="course.imageId"
+                layer="cover"
+                :eager="index < 3"
                 :alt="course.title"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                @error="handleImageError"
+                img-class="transition-transform duration-500 group-hover:scale-105"
               />
               
               <!-- Visibility Badge -->
               <div
-                v-if="admin && !course.visible"
+                v-if="isStaff && !course.visible"
                 class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full font-medium"
               >
                 {{ $t('invisible') }}
+              </div>
+              <div
+                v-if="isStaff && pendingByGallery[course.id]"
+                class="absolute top-2 left-2 px-2 py-1 bg-amber-500 text-white text-xs rounded-full font-medium"
+              >
+                {{ pendingByGallery[course.id] }} {{ $t('pending') }}
               </div>
               
               <!-- Hover Overlay -->
@@ -141,7 +151,7 @@
           {{ $t("no_gallery_items") }}
         </h3>
         <p class="text-gray-500 dark:text-gray-400">
-          {{ admin ? $t("add_first_item") : $t("check_back_later") }}
+          {{ isStaff ? $t("add_first_item") : $t("check_back_later") }}
         </p>
       </div>
 
@@ -193,12 +203,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Databases, ID, Storage, Query } from "appwrite";
+import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import { convertifserbian } from "@/lang";
+import { pickLocalized } from "@/utils/localizedText";
+import ProgressiveImage from "@/components/ProgressiveImage.vue";
+import { isPublicModuleOpen } from '@/services/modules/windows';
 
 const database = new Databases(appw);
-const storage = new Storage(appw);
 import { useLoadingStore } from "@/stores/loading";
 import { setDocumentTitle } from "@/composables/useSEO";
 
@@ -208,14 +220,17 @@ interface Course {
   title: string;
   subtitle: string;
   text: string;
-  img: string;
+  imageId: string;
 }
 
 export default defineComponent({
   name: "Gallery",
+  components: { ProgressiveImage },
   data() {
     return {
       admin: false,
+      isStaff: false,
+      pendingByGallery: {} as Record<string, number>,
       courses: [] as Course[],
       page: 0,
       loading: false,
@@ -226,6 +241,7 @@ export default defineComponent({
       totalItems: 0,
       showBackToTop: false,
       handleScrollDebounced: null as any,
+      moduleOpen: true,
     };
   },
   props: {
@@ -255,7 +271,10 @@ export default defineComponent({
   async mounted() {
     setDocumentTitle(this.$t("gallery"));
     const role = this.loadingStore.userRole;
-    this.admin = this.userLoggedin && (role === 'admin' || role === 'editor' || role === 'photographer');
+    this.isStaff = this.userLoggedin && (role === 'admin' || role === 'editor' || role === 'photographer');
+    this.admin = this.isStaff;
+    this.moduleOpen = await isPublicModuleOpen('gallery');
+    if (!this.moduleOpen && !this.isStaff) return;
     
     // Setup scroll listener
     this.handleScrollDebounced = this.debounce(this.handleScroll, 200);
@@ -297,11 +316,14 @@ export default defineComponent({
           Query.orderDesc("$createdAt"),
         ];
 
-        if (!this.userLoggedin) {
+        if (!this.isStaff) {
           queries.push(Query.equal("visible", true));
         }
 
         const res = await database.listDocuments(config.website_db, config.gallery, queries);
+        if (this.page === 0 && this.isStaff) {
+          this.loadPendingCounts();
+        }
         
         // Set total on first load
         if (this.page === 0) {
@@ -321,7 +343,7 @@ export default defineComponent({
             title: this.getLocalizedTitle(doc),
             subtitle: this.getLocalizedSubtitle(doc),
             text: "",
-            img: this.getImageUrl(doc.default_image, storage),
+            imageId: doc.default_image || "",
           }));
 
           this.courses.push(...newCourses);
@@ -342,41 +364,34 @@ export default defineComponent({
     },
 
     getLocalizedTitle(doc: any): string {
-      const titles = {
-        en: doc.title_en,
-        hu: doc.title_hu,
-        rs: convertifserbian(doc.title_rs),
-      };
-      return titles[this.language as keyof typeof titles] || doc.title_en || 'Untitled';
+      return pickLocalized(doc, ['title'], this.language);
     },
 
     getLocalizedSubtitle(doc: any): string {
-      const subtitles = {
-        en: doc.short_en,
-        hu: doc.short_hu,
-        rs: convertifserbian(doc.short_rs),
-      };
-      return subtitles[this.language as keyof typeof subtitles] || doc.short_en || '';
-    },
-
-    getImageUrl(imageId: string, storage: Storage): string {
-      if (!imageId) return '';
-      
-      try {
-        return storage.getFilePreview(
-          config.gallery_pictures_storage,
-          imageId,
-          400, 300, 'center', 85, 0, 'FFFFFF', 10, 1, 0, 'FFFFFF', 'webp'
-        );
-      } catch (error) {
-        console.error('Error getting image URL:', error);
-        return '';
-      }
+      return pickLocalized(doc, ['short'], this.language);
     },
 
     courseopen(id: string) {
       // Az ID-t nem módosítjuk, mert az Appwrite ID-k case-sensitive-ek
       this.$router.push("/album/" + id);
+    },
+
+    async loadPendingCounts() {
+      try {
+        const pending = await database.listDocuments(config.website_db, config.album_images, [
+          Query.equal('status', 'pending'),
+          Query.limit(100)
+        ]);
+        const counts: Record<string, number> = {};
+        pending.documents.forEach((doc: any) => {
+          const galleryId = typeof doc.gallery === 'string' ? doc.gallery : doc.gallery?.$id;
+          if (!galleryId) return;
+          counts[galleryId] = (counts[galleryId] || 0) + 1;
+        });
+        this.pendingByGallery = counts;
+      } catch (error) {
+        console.error('Failed to load pending gallery counts:', error);
+      }
     },
 
     async new_stuff() {

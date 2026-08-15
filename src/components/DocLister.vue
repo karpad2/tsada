@@ -26,7 +26,7 @@ import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 import dayjs from '@/utils/dayjs';
 import { useLoadingStore } from "@/stores/loading";
-import { convertifserbian } from "@/lang";
+import { pickLocalized } from "@/utils/localizedText";
 
 const database = new Databases(appw);
 
@@ -91,9 +91,8 @@ export default{
                 ]);
 
                 this.documents = docs.map(el2 => {
-                    const isSerbian = local === "rs" || local === "sr";
                     return {
-                        name: isSerbian ? convertifserbian(el2.document_title_rs) : el2.document_title_hu,
+                        name: pickLocalized(el2, ['document_title', 'title'], local),
                         contact: el2.contact || "",
                         img: "",
                         id: el2.$id,

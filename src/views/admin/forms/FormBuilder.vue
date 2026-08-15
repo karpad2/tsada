@@ -7,19 +7,19 @@
       <v-col>
         <div class="d-flex align-center justify-space-between flex-wrap ga-4">
           <div>
-            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">Űrlap Szerkesztő</h1>
+            <h1 class="section-title !text-2xl sm:!text-3xl !mb-1">{{ $t('form_builder') }}</h1>
             <div class="section-accent !mb-2"></div>
-            <p class="page-subtitle !mt-0">Google Forms-szerű űrlap építő</p>
+            <p class="page-subtitle !mt-0">{{ $t('form_builder_subtitle') }}</p>
           </div>
           <div class="d-flex ga-2">
             <v-btn color="primary" prepend-icon="mdi-content-save" :loading="isSaving" @click="saveForm">
-              Mentés
+              {{ $t('save') }}
             </v-btn>
             <v-btn variant="outlined" prepend-icon="mdi-eye" @click="previewForm">
-              Előnézet
+              {{ $t('preview') }}
             </v-btn>
             <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="goBack">
-              Vissza
+              {{ $t('back') }}
             </v-btn>
           </div>
         </div>
@@ -30,7 +30,7 @@
       <!-- Field Types Palette -->
       <v-col cols="12" lg="3">
         <v-card class="sticky-palette">
-          <v-card-title>Mezők</v-card-title>
+          <v-card-title>{{ $t('form_fields') }}</v-card-title>
           <v-list density="compact">
             <v-list-item
               v-for="fieldType in fieldTypes"
@@ -52,13 +52,13 @@
           <v-card-text>
             <v-text-field
               v-model="form.title"
-              label="Űrlap címe"
+              :label="$t('form_title')"
               variant="outlined"
               class="text-h5 mb-2"
             />
             <v-textarea
               v-model="form.description"
-              label="Űrlap leírása (opcionális)"
+              :label="$t('form_description_optional')"
               variant="outlined"
               rows="2"
               auto-grow
@@ -89,7 +89,7 @@
                   <div class="flex-grow-1">
                     <v-text-field
                       v-model="field.label"
-                      :placeholder="`${getFieldTypeName(field.type)} címke`"
+                      :placeholder="$t('field_label_placeholder', { type: getFieldTypeName(field.type) })"
                       variant="underlined"
                       density="comfortable"
                       hide-details
@@ -97,7 +97,7 @@
                     />
                     <v-text-field
                       v-model="field.description"
-                      placeholder="Segítő szöveg (opcionális)"
+                      :placeholder="$t('help_text_optional')"
                       variant="plain"
                       density="compact"
                       hide-details
@@ -127,11 +127,11 @@
                       <div v-if="selectedField === field.id" class="mt-3 pa-3 bg-grey-lighten-5 rounded">
                         <!-- Options for select/radio/checkbox -->
                         <div v-if="['select', 'radio', 'checkbox'].includes(field.type)" class="mb-3">
-                          <div class="text-subtitle-2 mb-2">Opciók</div>
+                          <div class="text-subtitle-2 mb-2">{{ $t('field_options') }}</div>
                           <div v-for="(option, optIndex) in field.options" :key="optIndex" class="d-flex ga-2 mb-2">
                             <v-text-field
                               v-model="field.options[optIndex]"
-                              :placeholder="`Opció ${optIndex + 1}`"
+                              :placeholder="$t('option_n', { n: optIndex + 1 })"
                               variant="outlined"
                               density="compact"
                               hide-details
@@ -151,7 +151,7 @@
                             prepend-icon="mdi-plus"
                             @click="addOption(field)"
                           >
-                            Új opció
+                            {{ $t('add_option') }}
                           </v-btn>
                         </div>
 
@@ -159,7 +159,7 @@
                         <v-text-field
                           v-if="['text', 'textarea', 'email', 'number', 'tel'].includes(field.type)"
                           v-model="field.placeholder"
-                          label="Placeholder"
+                          :label="$t('placeholder')"
                           variant="outlined"
                           density="compact"
                           hide-details
@@ -171,7 +171,7 @@
                           <v-col cols="6">
                             <v-text-field
                               v-model.number="field.validation.min"
-                              label="Min"
+                              :label="$t('min_value')"
                               type="number"
                               variant="outlined"
                               density="compact"
@@ -181,7 +181,7 @@
                           <v-col cols="6">
                             <v-text-field
                               v-model.number="field.validation.max"
-                              label="Max"
+                              :label="$t('max_value')"
                               type="number"
                               variant="outlined"
                               density="compact"
@@ -192,7 +192,7 @@
 
                         <!-- Image upload -->
                         <div class="mb-3">
-                          <div class="text-subtitle-2 mb-2">Kép a kérdéshez</div>
+                          <div class="text-subtitle-2 mb-2">{{ $t('question_image') }}</div>
                           <div v-if="field.imageId" class="d-flex align-center ga-2 mb-2">
                             <v-img
                               :src="getFieldImageUrl(field.imageId)"
@@ -212,7 +212,7 @@
                           <v-file-input
                             v-if="!field.imageId"
                             accept="image/*"
-                            label="Kép feltöltése"
+                            :label="$t('upload_image')"
                             variant="outlined"
                             density="compact"
                             hide-details
@@ -225,7 +225,7 @@
                         <!-- Required toggle -->
                         <v-checkbox
                           v-model="field.required"
-                          label="Kötelező mező"
+                          :label="$t('field_required')"
                           density="compact"
                           hide-details
                         />
@@ -258,54 +258,54 @@
         <!-- Add Field Hint -->
         <v-card v-if="form.fields.length === 0" class="text-center pa-12">
           <v-icon size="64" color="grey">mdi-plus-circle-outline</v-icon>
-          <p class="text-body-1 text-medium-emphasis mt-4">Kattints a bal oldali mezőkre az űrlap építéséhez</p>
+          <p class="text-body-1 text-medium-emphasis mt-4">{{ $t('click_fields_to_build') }}</p>
         </v-card>
 
         <!-- Form Settings -->
         <v-card class="mt-4">
           <v-card-title>
             <v-icon class="mr-2">mdi-cog</v-icon>
-            Beállítások
+            {{ $t('settings') }}
           </v-card-title>
           <v-card-text>
             <v-checkbox
               v-model="form.settings.allowMultipleResponses"
-              label="Többszöri kitöltés engedélyezése"
+              :label="$t('allow_multiple_responses')"
               density="compact"
               hide-details
             />
             <v-checkbox
               v-model="form.settings.requireLogin"
-              label="Bejelentkezés kötelező"
+              :label="$t('require_login')"
               density="compact"
               hide-details
             />
             <v-checkbox
               v-model="form.settings.showProgressBar"
-              label="Haladásjelző megjelenítése"
+              :label="$t('show_progress_bar')"
               density="compact"
               hide-details
             />
             <v-checkbox
               v-model="form.settings.collectEmail"
-              label="Email cím gyűjtése"
+              :label="$t('collect_email')"
               density="compact"
               hide-details
             />
             <v-checkbox
               v-model="form.settings.active"
-              label="Űrlap aktív"
+              :label="$t('form_active')"
               density="compact"
               hide-details
               class="mb-4"
             />
             <v-textarea
               v-model="form.settings.confirmationMessage"
-              label="Megerősítő üzenet"
+              :label="$t('confirmation_message')"
               variant="outlined"
               rows="3"
               auto-grow
-              placeholder="Köszönjük a válaszod!"
+              :placeholder="$t('thank_you_message')"
             />
           </v-card-text>
         </v-card>
@@ -317,8 +317,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 import { FormsService, type Form, type FormField } from '@/services/forms/FormsService';
 import { FileManager } from '@/appwrite/FileManagement';
@@ -328,6 +329,7 @@ import FormFieldPreview from '@/components/forms/fields/FormFieldPreview.vue';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const formsService = FormsService.getInstance();
 
 const fileManager = new FileManager();
@@ -336,28 +338,28 @@ const isSaving = ref(false);
 const selectedField = ref<string | null>(null);
 const uploadingFieldId = ref<string | null>(null);
 
-const fieldTypes = [
-  { type: 'text', label: 'Rövid szöveg', icon: 'mdi-form-textbox', description: 'Egy soros szöveg' },
-  { type: 'textarea', label: 'Hosszú szöveg', icon: 'mdi-text-long', description: 'Több soros szöveg' },
-  { type: 'email', label: 'Email', icon: 'mdi-email-outline', description: 'Email cím' },
-  { type: 'number', label: 'Szám', icon: 'mdi-numeric', description: 'Számérték' },
-  { type: 'tel', label: 'Telefon', icon: 'mdi-phone-outline', description: 'Telefonszám' },
-  { type: 'date', label: 'Dátum', icon: 'mdi-calendar', description: 'Dátum választó' },
-  { type: 'time', label: 'Idő', icon: 'mdi-clock-outline', description: 'Idő választó' },
-  { type: 'select', label: 'Legördülő', icon: 'mdi-form-dropdown', description: 'Választás listából' },
-  { type: 'radio', label: 'Rádió gomb', icon: 'mdi-radiobox-marked', description: 'Egy választás' },
-  { type: 'checkbox', label: 'Jelölőnégyzet', icon: 'mdi-checkbox-marked-outline', description: 'Több választás' },
-];
+const fieldTypes = computed(() => [
+  { type: 'text', label: t('short_text'), icon: 'mdi-form-textbox', description: t('field_desc_short_text') },
+  { type: 'textarea', label: t('long_text'), icon: 'mdi-text-long', description: t('field_desc_long_text') },
+  { type: 'email', label: t('email'), icon: 'mdi-email-outline', description: t('field_desc_email') },
+  { type: 'number', label: t('field_desc_number'), icon: 'mdi-numeric', description: t('field_desc_number') },
+  { type: 'tel', label: t('phone'), icon: 'mdi-phone-outline', description: t('field_desc_phone') },
+  { type: 'date', label: t('date'), icon: 'mdi-calendar', description: t('field_desc_date') },
+  { type: 'time', label: t('time_picker'), icon: 'mdi-clock-outline', description: t('field_desc_time') },
+  { type: 'select', label: t('dropdown'), icon: 'mdi-form-dropdown', description: t('field_desc_select') },
+  { type: 'radio', label: t('radio_button'), icon: 'mdi-radiobox-marked', description: t('field_desc_radio') },
+  { type: 'checkbox', label: t('checkbox'), icon: 'mdi-checkbox-marked-outline', description: t('field_desc_checkbox') },
+]);
 
 const form = ref<Form>({
-  title: 'Névtelen űrlap',
+  title: t('untitled_form'),
   description: '',
   fields: [],
   settings: {
     allowMultipleResponses: true,
     requireLogin: false,
     showProgressBar: true,
-    confirmationMessage: 'Köszönjük a válaszod!',
+    confirmationMessage: t('thank_you_message'),
     collectEmail: false,
     active: true,
   },
@@ -374,7 +376,7 @@ async function loadForm(formId: string) {
     form.value = await formsService.getForm(formId);
   } catch (error) {
     console.error('Failed to load form:', error);
-    notify({ type: 'error', text: 'Nem sikerült betölteni az űrlapot!' });
+    notify({ type: 'error', text: t('form_load_error') });
   }
 }
 
@@ -382,13 +384,13 @@ function addField(type: string) {
   const field: FormField = {
     id: nanoid(),
     type: type as any,
-    label: `Új ${getFieldTypeName(type)}`,
+    label: t('new_field', { type: getFieldTypeName(type) }),
     required: false,
     validation: {},
   };
 
   if (['select', 'radio', 'checkbox'].includes(type)) {
-    field.options = ['Opció 1', 'Opció 2', 'Opció 3'];
+    field.options = [t('option_n', { n: 1 }), t('option_n', { n: 2 }), t('option_n', { n: 3 })];
   }
 
   form.value.fields.push(field);
@@ -401,7 +403,7 @@ function removeField(index: number) {
 
 function addOption(field: FormField) {
   if (!field.options) field.options = [];
-  field.options.push(`Opció ${field.options.length + 1}`);
+  field.options.push(t('option_n', { n: field.options.length + 1 }));
 }
 
 function removeOption(field: FormField, index: number) {
@@ -420,7 +422,7 @@ async function uploadFieldImage(field: FormField, files: File[] | null) {
     field.imageId = result.$id;
   } catch (error) {
     console.error('Failed to upload image:', error);
-    notify({ type: 'error', text: 'Nem sikerült feltölteni a képet!' });
+    notify({ type: 'error', text: t('image_upload_failed') });
   } finally {
     uploadingFieldId.value = null;
   }
@@ -438,7 +440,7 @@ function toggleFieldSettings(fieldId: string) {
 }
 
 function getFieldTypeName(type: string): string {
-  return fieldTypes.find(ft => ft.type === type)?.label || type;
+  return fieldTypes.value.find(ft => ft.type === type)?.label || type;
 }
 
 function getFieldComponent(_type: string) {
@@ -451,15 +453,15 @@ async function saveForm() {
   try {
     if (route.params.id && route.params.id !== 'new') {
       await formsService.updateForm(route.params.id as string, form.value);
-      notify({ type: 'success', text: 'Űrlap sikeresen frissítve!' });
+      notify({ type: 'success', text: t('form_updated_success') });
     } else {
       const created = await formsService.createForm(form.value);
-      notify({ type: 'success', text: 'Űrlap sikeresen létrehozva!' });
+      notify({ type: 'success', text: t('form_created_success') });
       router.replace(`/admin/forms/edit/${created.$id}`);
     }
   } catch (error: any) {
     console.error('Failed to save form:', error);
-    notify({ type: 'error', text: 'Hiba történt: ' + (error.message || 'Ismeretlen hiba') });
+    notify({ type: 'error', text: t('error_saving') + ': ' + (error.message || t('unknown_error')) });
   } finally {
     isSaving.value = false;
   }
@@ -469,7 +471,7 @@ function previewForm() {
   if (form.value.$id) {
     window.open(`/forms/${form.value.$id}`, '_blank');
   } else {
-    notify({ type: 'warning', text: 'Mentsd el először az űrlapot!' });
+    notify({ type: 'warning', text: t('form_save_first') });
   }
 }
 

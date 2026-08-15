@@ -111,6 +111,11 @@ export class SitemapService {
         priority: 0.6
       },
       {
+        url: `${this.baseUrl}/about/class-schedule`,
+        changefreq: 'weekly',
+        priority: 0.8
+      },
+      {
         url: `${this.baseUrl}/about/workerstimetable`,
         changefreq: 'weekly',
         priority: 0.5
@@ -129,6 +134,11 @@ export class SitemapService {
         url: `${this.baseUrl}/documents`,
         changefreq: 'weekly',
         priority: 0.6
+      },
+      {
+        url: `${this.baseUrl}/documents/search`,
+        changefreq: 'weekly',
+        priority: 0.7
       },
       {
         url: `${this.baseUrl}/studentdocuments`,

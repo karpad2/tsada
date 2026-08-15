@@ -68,6 +68,7 @@
     "type": "direct-link",
     "labelKey": "gallery",
     "to": "/gallery",
+    "condition": { "setting": "gallery" },
     "items": []
   },
   {
@@ -75,6 +76,7 @@
     "type": "dropdown",
     "labelKey": "for_students",
     "items": [
+      { "id": "student_doc_search", "labelKey": "docsearch_title", "to": "/documents/search?src=students", "condition": { "setting": "document-search" } },
       { "id": "student_parliament", "labelKey": "student_parliament", "to": "/about/studentcouncil" },
       { "id": "student_dynamic", "dynamicSource": "students", "dynamicRoutePrefix": "/renderer/students/" },
       { "id": "student_documents", "labelKey": "studentdocuments", "to": "/studentdocuments" },
@@ -86,6 +88,7 @@
     "type": "dropdown",
     "labelKey": "documents",
     "items": [
+      { "id": "doc_search", "labelKey": "docsearch_title", "to": "/documents/search", "condition": { "setting": "document-search" } },
       { "id": "doc_school", "labelKey": "school_documents", "to": "/documents" },
       { "id": "doc_procurements", "labelKey": "public_procurements", "to": "/docs/public_procurements" },
       { "id": "doc_leases", "labelKey": "lease", "to": "/docs/leases" },
@@ -122,6 +125,8 @@
     "labelKey": "erp_system",
     "condition": { "auth": "required", "roles": ["admin", "teacher"] },
     "items": [
+      { "id": "erp_today", "labelKey": "today_schedule", "to": "/admin/today" },
+      { "id": "erp_substitutions", "labelKey": "sub_editor", "to": "/admin/substitutions" },
       { "id": "erp_class", "labelKey": "erp_class_teacher", "to": "/admin/erp/class" },
       { "id": "erp_subjects", "labelKey": "erp_subjects", "to": "/admin/erp/subjects" },
       { "id": "erp_study_programs", "labelKey": "erp_study_programs", "to": "/admin/erp/study-programs" },
@@ -133,8 +138,14 @@
     "id": "admin",
     "type": "dropdown",
     "labelKey": "admin_panel",
+    "to": "/admin",
     "condition": { "auth": "required", "roles": ["admin", "editor"] },
     "items": [
+      { "id": "admin_dashboard", "labelKey": "dashboard", "to": "/admin" },
+      { "id": "admin_gallery_approval", "labelKey": "gal_approval_title", "to": "/admin/gallery-approval" },
+      { "id": "admin_today", "labelKey": "today_schedule", "to": "/admin/today" },
+      { "id": "admin_substitutions", "labelKey": "sub_editor", "to": "/admin/substitutions" },
+      { "id": "admin_content_audit", "labelKey": "audit_title", "to": "/admin/content-audit" },
       { "id": "admin_messages", "labelKey": "messages", "to": "/admin/messages" },
       { "id": "admin_messaging", "labelKey": "messaging_center", "to": "/admin/messaging", "condition": { "roles": ["admin"] } },
       { "id": "admin_forms", "labelKey": "forms_management", "to": "/admin/forms" },
@@ -142,6 +153,7 @@
       { "id": "admin_sponsors", "labelKey": "sponsors_editor", "to": "/admin/sponsors" },
       { "id": "admin_notifications", "labelKey": "push_notifications", "to": "/admin/notifications/send", "condition": { "roles": ["admin"] } },
       { "id": "admin_roles", "labelKey": "role_manager", "to": "/admin/roles", "condition": { "roles": ["admin"] } },
+      { "id": "admin_menu", "labelKey": "menu_editor", "to": "/admin/menu-editor", "condition": { "roles": ["admin"] } },
       { "id": "admin_logout", "labelKey": "logout", "isAction": "logout" }
     ]
   },
@@ -149,17 +161,33 @@
     "id": "photographer",
     "type": "dropdown",
     "labelKey": "admin_panel",
+    "to": "/admin",
     "condition": { "auth": "required", "roles": ["photographer"] },
     "items": [
+      { "id": "photo_dashboard", "labelKey": "dashboard", "to": "/admin" },
       { "id": "photo_gallery", "labelKey": "gallery", "to": "/gallery" },
       { "id": "photo_logout", "labelKey": "logout", "isAction": "logout" }
+    ]
+  },
+  {
+    "id": "secretary",
+    "type": "dropdown",
+    "labelKey": "admin_panel",
+    "to": "/admin",
+    "condition": { "auth": "required", "roles": ["secretary"] },
+    "items": [
+      { "id": "sec_dashboard", "labelKey": "dashboard", "to": "/admin" },
+      { "id": "sec_messages", "labelKey": "messages", "to": "/admin/messages" },
+      { "id": "sec_today", "labelKey": "today_schedule", "to": "/admin/today" },
+      { "id": "sec_substitutions", "labelKey": "sub_editor", "to": "/admin/substitutions" },
+      { "id": "sec_logout", "labelKey": "logout", "isAction": "logout" }
     ]
   },
   {
     "id": "teacher_logout",
     "type": "direct-link",
     "labelKey": "logout",
-    "condition": { "auth": "required", "excludeRoles": ["admin", "editor", "photographer"] },
+    "condition": { "auth": "required", "excludeRoles": ["admin", "editor", "photographer", "secretary"] },
     "items": [
       { "id": "teacher_logout_action", "labelKey": "logout", "isAction": "logout" }
     ]

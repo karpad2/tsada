@@ -2,9 +2,13 @@ import { createRouter as createVueRouter, createWebHistory, createMemoryHistory 
 import { useLoadingStore } from "@/stores/loading";
 import { trackPageView, trackNavigation, setUserProperties } from '@/utils/analytics';
 import { seoGuard } from './seoGuard';
-import { RoleService, ROUTE_PERMISSION_MAP } from '@/services/RoleService';
-import type { UserRole } from '@/services/RoleService';
+import { appwriteService } from '@/appwrite'
+import { messages } from '@/lang'
+import { normalizeLang } from '@/utils/localizedText'
 import HomeView from '../views/HomeView.vue'
+
+let lastAuthCheck = 0
+const AUTH_CHECK_TTL = 15_000
 
 export function createRouter() {
   const router = createVueRouter({
@@ -63,6 +67,10 @@ export function createRouter() {
       component: () => import('../views/Abouts/ClassSchedule.vue')
     },
     {
+      path: '/about/today',
+      redirect: '/admin/today'
+    },
+    {
       path: '/about/parentscouncil',
       name: 'parentscouncil',
      
@@ -96,6 +104,11 @@ export function createRouter() {
         path:'/documents',
         name:'documents',
         component: () => import('../views/documents/Documents.vue')      
+      },
+      {
+        path:'/documents/search',
+        name:'document_search',
+        component: () => import('../views/documents/DocumentSearch.vue')
       },
       {  
         path:'/docs/:id',
@@ -153,6 +166,12 @@ export function createRouter() {
       component: () => import('../views/admin/editor/GalleryEditor.vue')
     },
     {
+      path:'/admin/gallery-approval',
+      name:'gallery_approval',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/GalleryApproval.vue')
+    },
+    {
       path:'/admin/class-edit/:id',
       name:'class_editor',
       meta: { requiresAuth: true, roles: ['admin', 'editor'] },
@@ -167,13 +186,13 @@ export function createRouter() {
     {
       path:'/admin/messages',
       name:'messages',
-      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'secretary'] },
       component: () => import('../views/admin/messages/Messages.vue')
     },
     {
       path:'/admin/message/:id',
       name:'message',
-      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'secretary'] },
       component: () => import('../views/admin/messages/Message.vue')
     },
     {
@@ -288,6 +307,24 @@ export function createRouter() {
       meta: { requiresAuth: true, roles: ['admin', 'editor'] },
       component: () => import('../views/admin/editor/TimetableEditor.vue')
     },
+    {
+      path:'/admin/today',
+      name:'today_schedule',
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'teacher', 'secretary'] },
+      component: () => import('../views/Abouts/TodaySchedule.vue')
+    },
+    {
+      path:'/admin/substitutions',
+      name:'substitutions_editor',
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'teacher', 'secretary'] },
+      component: () => import('../views/admin/editor/SubstitutionEditor.vue')
+    },
+    {
+      path:'/admin/content-audit',
+      name:'content_audit',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/ContentAudit.vue')
+    },
     // Sponsors Editor
     {
       path:'/admin/sponsors',
@@ -301,6 +338,24 @@ export function createRouter() {
       name:'role_manager',
       meta: { requiresAuth: true, roles: ['admin'] },
       component: () => import('../views/admin/RoleManager.vue')
+    },
+    {
+      path:'/admin',
+      name:'admin_dashboard',
+      meta: { requiresAuth: true, roles: ['admin', 'editor', 'teacher', 'photographer', 'secretary'] },
+      component: () => import('../views/admin/Dashboard.vue')
+    },
+    {
+      path:'/admin/menu-editor',
+      name:'menu_editor',
+      meta: { requiresAuth: true, roles: ['admin'] },
+      component: () => import('../views/admin/MenuEditor.vue')
+    },
+    {
+      path:'/admin/modules',
+      name:'module_switches',
+      meta: { requiresAuth: true, roles: ['admin', 'editor'] },
+      component: () => import('../views/admin/ModuleSwitches.vue')
     },
     {
       path:'/dc',
@@ -360,125 +415,159 @@ export function createRouter() {
     }
   ]
 })
-router.beforeEach((to, from, next) => {
-  // Show loading screen
+router.beforeEach(async (to, from) => {
   const loadingStore = useLoadingStore();
   loadingStore.setLoading(true);
 
   const fullPath = to.fullPath;
+  const isBrowser = typeof window !== 'undefined';
 
-  // Track navigation
-  if (from.fullPath && from.fullPath !== to.fullPath) {
-    trackNavigation(from.fullPath, to.fullPath, 'router');
-  }
+  try {
+    if (isBrowser && from.fullPath && from.fullPath !== to.fullPath) {
+      trackNavigation(from.fullPath, to.fullPath, 'router');
+    }
+  } catch { /* analytics must not block routing */ }
+
   const isErasmus = fullPath.includes('erasmus');
   loadingStore.setErasmus(isErasmus);
   if (!isErasmus) loadingStore.setCurrentPageEuFunding(false);
 
-  if (fullPath.includes('/moodle')) {
+  if (isBrowser && fullPath.includes('/moodle')) {
     window.location.replace('https://moodle.tsada.edu.rs');
+    return false;
   }
 
   loadingStore.setfireworkSetting(fullPath.includes('/about/birthday'));
   loadingStore.sethideheaders(fullPath.includes('/tvview') || fullPath.includes('/dc') || fullPath.includes('/heist'));
 
-  // Role-based access control
-  const requiresAuth = to.meta?.requiresAuth || fullPath.includes('admin');
+  if (isBrowser) {
+    const requiresAuth = Boolean(to.meta?.requiresAuth) || to.path.startsWith('/admin');
 
-  if (requiresAuth && !loadingStore.userLoggedin) {
-    router.push("/home");
-    return;
-  }
+    if (requiresAuth && (Date.now() - lastAuthCheck > AUTH_CHECK_TTL || !loadingStore.userLoggedin)) {
+      try {
+        await appwriteService.checkAuth();
+      } catch { /* guest */ }
+      lastAuthCheck = Date.now();
+    }
 
-  // Check role-based permissions
-  if (to.meta?.roles && loadingStore.userLoggedin) {
-    const allowedRoles = to.meta.roles as string[];
-    const userRole = loadingStore.userRole;
+    if (requiresAuth && !loadingStore.userLoggedin) {
+      return { path: '/login', query: { redirect: to.fullPath } };
+    }
 
-    if (!userRole || !allowedRoles.includes(userRole)) {
-      router.push("/home");
-      return;
+    if (to.meta?.roles && loadingStore.userLoggedin) {
+      const allowedRoles = to.meta.roles as string[];
+      const userRole = loadingStore.userRole;
+
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        return '/home';
+      }
     }
   }
 
-
-
-  // Apply SEO guard
-  seoGuard(to);
-
-  next();
+  try {
+    seoGuard(to);
+  } catch { /* SEO must not block routing */ }
 });
 
-const TITLE_MAP: Record<string, string> = {
-  'home': 'Početna ~ TSADA',
-  'about': 'O nama ~ TSADA',
-  'workers': 'Zaposleni ~ TSADA',
-  'workerstimetable': 'Raspored zaposlenih ~ TSADA',
-  'classlist': 'Lista učenika ~ TSADA',
-  'parentvisiting': 'Roditeljski sastanak ~ TSADA',
-  'birthday': 'Rođendani ~ TSADA',
-  'timetable': 'Raspored časova ~ TSADA',
-  'class_schedule': 'Raspored odeljenja ~ TSADA',
-  'timetable_editor': 'Uređivač rasporeda ~ TSADA',
-  'parentscouncil': 'Savet roditelja ~ TSADA',
-  'pepsi': 'PEPSI ~ TSADA',
-  'SchoolBoard': 'Školski odbor ~ TSADA',
-  'studentcouncil': 'Učenički parlament ~ TSADA',
-  'documents': 'Dokumenti ~ TSADA',
-  'studentdocuments': 'Studentski dokumenti ~ TSADA',
-  'gallery': 'Galerija ~ TSADA',
-  'contact': 'Kontakt ~ TSADA',
-  'login': 'Prijava ~ TSADA',
-  'erasmus_apply': 'Erasmus prijava ~ TSADA',
-  'erasmus_results': 'Erasmus rezultati ~ TSADA',
-  'presentation': 'Prezentacija ~ TSADA',
-  'tvpresentation': 'TV prikaz ~ TSADA',
-  'messages': 'Poruke ~ TSADA',
-  'content_editor': 'Uređivanje sadržaja ~ TSADA',
-  'worker_editor': 'Uređivanje zaposlenih ~ TSADA',
-  'document_editor': 'Uređivanje dokumenata ~ TSADA',
-  'text_document_editor': 'Uređivanje tekstualnih dokumenata ~ TSADA',
-  'student_document_editor': 'Uređivanje studentskih dokumenata ~ TSADA',
-  'gallery_editor': 'Uređivanje galerije ~ TSADA',
-  'class_editor': 'Uređivanje klasa ~ TSADA',
-  'slide_editor': 'Uređivanje slajdova ~ TSADA',
-  'send_notification': 'Push értesítések ~ TSADA',
-  'messaging_center': 'Appwrite Messaging ~ TSADA',
-  'forms_admin': 'Űrlapok kezelése ~ TSADA',
-  'form_builder': 'Űrlap szerkesztő ~ TSADA',
-  'form_responses': 'Űrlap válaszok ~ TSADA',
-  'form_view': 'Űrlap kitöltése ~ TSADA',
-  'erp_subjects_admin': 'Tantárgyak kezelése ~ TSADA',
-  'erp_study_programs_admin': 'Szakok kezelése ~ TSADA',
-  'erp_class_teacher': 'Osztályfőnöki felület ~ TSADA',
-  'erp_print_manager': 'Nyomtatás kezelő ~ TSADA',
-  'erp_template_editor': 'Sablon szerkesztő ~ TSADA',
-  'news_order_manager': 'Hírek sorrendje ~ TSADA',
-  'sponsors_editor': 'Szponzorok szerkesztő ~ TSADA',
-  'menu_editor': 'Menü szerkesztő ~ TSADA',
-  'heist_game': 'HEIST ~ TSADA',
-  'missingpage': 'Stranica nije pronađena ~ TSADA'
-};
+const ROUTE_TITLE_KEYS: Record<string, string> = {
+  home: 'home',
+  home2: 'home',
+  about: 'aboutus',
+  workers: 'workers',
+  workerstimetable: 'teachers_receiving_hour',
+  classlist: 'classlist',
+  parentvisiting: 'parentsvisiting',
+  birthday: 'birthday',
+  timetable: 'timetable',
+  class_schedule: 'class_schedule',
+  today_schedule: 'today_schedule',
+  timetable_editor: 'tt_editor',
+  substitutions_editor: 'sub_editor',
+  content_audit: 'audit_title',
+  parentscouncil: 'parents_council',
+  pepsi: 'services',
+  SchoolBoard: 'school_board',
+  studentcouncil: 'student_parliament',
+  documents: 'documents',
+  document_search: 'docsearch_title',
+  studentdocuments: 'studentdocuments',
+  gallery: 'gallery',
+  album: 'gallery',
+  contact: 'contactus',
+  login: 'login',
+  erasmus_apply: 'erasmus_apply',
+  erasmus_results: 'erasmus_applies_result',
+  presentation: 'presentation_editor',
+  tvpresentation: 'gallery',
+  messages: 'messages',
+  content_editor: 'Edit',
+  worker_editor: 'Edit',
+  document_editor: 'document_editor',
+  text_document_editor: 'document_editor',
+  student_document_editor: 'document_editor',
+  gallery_editor: 'gallery_editor',
+  gallery_approval: 'gal_approval_title',
+  class_editor: 'Edit',
+  slide_editor: 'presentation_editor',
+  send_notification: 'push_notifications',
+  messaging_center: 'messaging_center',
+  forms_admin: 'forms_management',
+  form_builder: 'forms_management',
+  form_responses: 'forms_management',
+  form_view: 'forms_management',
+  erp_subjects_admin: 'erp_subjects',
+  erp_study_programs_admin: 'erp_study_programs',
+  erp_class_teacher: 'erp_class_teacher',
+  erp_print_manager: 'erp_print_manager',
+  erp_template_editor: 'erp_template_editor',
+  news_order_manager: 'manage_news_order',
+  sponsors_editor: 'sponsors_editor',
+  menu_editor: 'menu_editor',
+  module_switches: 'modules_title',
+  admin_dashboard: 'dashboard',
+  heist_game: 'home',
+  missingpage: 'home',
+  renderer: 'news',
+  document: 'documents',
+  documentLister: 'documents'
+}
 
-router.afterEach((to, from) => {
+function localizedRouteTitle(routeName: string, language: string): string {
+  const lang = normalizeLang(language)
+  const pack = (messages as any)[lang] || (messages as any).hu || {}
+  const key = ROUTE_TITLE_KEYS[routeName]
+  const school = pack.school_name || 'TSADA'
+  const label = (key && pack[key]) || school
+  return `${label} ~ ${school}`
+}
+
+router.afterEach((to) => {
   const loadingStore = useLoadingStore();
+  try {
+    const pageTitle = localizedRouteTitle(String(to.name || ''), loadingStore.language);
 
-  const pageTitle = TITLE_MAP[to.name as string] || `${to.name} ~ TSADA`;
-  document.title = pageTitle;
+    if (typeof document !== 'undefined') {
+      document.title = pageTitle;
+    }
 
-  // Track page view
-  trackPageView(to.fullPath, pageTitle);
-
-  // Update user properties
-  setUserProperties({
-    language: loadingStore.language,
-    user_type: loadingStore.userLoggedin ? 'admin' : 'visitor',
-    device_type: window.innerWidth <= 768 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop'
-  });
-
-  // Hide loading screen
-  loadingStore.setLoading(false);
+    if (typeof window !== 'undefined') {
+      try {
+        trackPageView(to.fullPath, pageTitle);
+        const width = window.innerWidth;
+        setUserProperties({
+          language: loadingStore.language,
+          user_type: loadingStore.userLoggedin ? 'admin' : 'visitor',
+          device_type: width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop'
+        });
+      } catch { /* ignore analytics */ }
+    }
+  } catch {
+    /* never block navigation */
+  } finally {
+    loadingStore.setLoading(false);
+  }
 });
+
   return router
 }
 

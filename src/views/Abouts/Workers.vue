@@ -295,8 +295,9 @@ export default defineComponent({
             Query.orderAsc('listasorrend'),
             Query.limit(100),
           ]),
+          // Do NOT Query.select() relationship attrs (e.g. roles) — Appwrite returns 400
+          // "Cannot select attributes: roles". Full docs are small enough for staff list.
           database.listDocuments(config.website_db, config.workers, [
-            Query.select(['worker_name_hu', 'worker_name_rs', 'contact', 'worker_img', 'roles', '$id']),
             Query.limit(100),
           ]),
         ]);
@@ -307,7 +308,6 @@ export default defineComponent({
           const pages = Math.ceil(Math.min(workersPage.total, 500) / 100);
           for (let p = 1; p < pages; p++) {
             const page = await database.listDocuments(config.website_db, config.workers, [
-              Query.select(['worker_name_hu', 'worker_name_rs', 'contact', 'worker_img', 'roles', '$id']),
               Query.limit(100),
               Query.offset(p * 100),
             ]);

@@ -154,6 +154,16 @@
                 <p class="text-sky-50 text-lg">
                   {{ $t("welcome") }}, <span class="font-semibold">{{ username }}</span>!
                 </p>
+                <v-btn
+                  v-if="isStaff"
+                  class="mt-4"
+                  color="white"
+                  variant="flat"
+                  prepend-icon="mdi-view-dashboard"
+                  @click="goToDashboard"
+                >
+                  {{ $t('dashboard') }}
+                </v-btn>
               </div>
               <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40 shadow-xl shadow-sky-500/20">
                 <i class="pi pi-user text-4xl text-white"></i>
@@ -375,11 +385,11 @@
 
 <script lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Account } from "appwrite";
 import { appw, user } from "@/appwrite";
 import { useLoadingStore } from "@/stores/loading";
 import { RoleService } from "@/services/RoleService";
-import router from "@/router";
 
 export default {
   name: "Login",
@@ -416,10 +426,19 @@ export default {
     const lastLogin = ref("");
 
     const loadingStore = useLoadingStore();
+    const router = useRouter();
+    const route = useRoute();
 
     const isLoggedin = computed(() => loadingStore.userLoggedin);
+    const isStaff = computed(() =>
+      ['admin', 'editor', 'teacher', 'photographer', 'secretary'].includes(loadingStore.userRole)
+    );
 
-    const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer'];
+    const goToDashboard = () => {
+      router.push('/admin');
+    };
+
+    const VALID_ROLES = ['admin', 'editor', 'teacher', 'photographer', 'secretary'];
 
     const loadUserRoleFromLabels = (labels: string[]) => {
       const role = labels?.find((l: string) => VALID_ROLES.includes(l)) || '';
@@ -496,10 +515,13 @@ export default {
         email.value = "";
         password.value = "";
 
-        // Optional: redirect after short delay
+        const staffRoles = ['admin', 'editor', 'teacher', 'photographer', 'secretary']
+        const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+        const safeRedirect = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : ''
+        const target = safeRedirect || (staffRoles.includes(loadingStore.userRole) ? '/admin' : '/home')
         setTimeout(() => {
-          router.push("/home");
-        }, 500);
+          router.push(target);
+        }, 300);
       } catch (err: any) {
         console.error("Login failed", err);
 
@@ -678,6 +700,8 @@ export default {
       closePasswordDialog,
       accountCreatedAt,
       lastLogin,
+      isStaff,
+      goToDashboard,
     };
   },
 };

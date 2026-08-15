@@ -1,8 +1,10 @@
 import { ref, computed } from 'vue';
 import { Databases, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
-import { convertifserbian } from '@/lang';
 import { useLoadingStore } from '@/stores/loading';
+import { pickLocalized } from '@/utils/localizedText';
+import { flagsFromWindows } from '@/services/modules/registry';
+import { loadModuleWindows } from '@/services/modules/windows';
 
 const database = new Databases(appw);
 
@@ -32,14 +34,7 @@ export function useNavigationData() {
   const isLoading = ref(false);
 
   const getLocalizedTitle = (element: any): string => {
-    const lang = loadingStore.language;
-
-    if (lang === 'en') return element.title_en || element.category_name_en || '';
-    if (lang === 'hu') return element.title_hu || element.category_name_hu || '';
-    if (lang === 'rs' || lang === 'sr') {
-      return convertifserbian(element.title_rs || element.category_name_rs || '');
-    }
-    return '';
+    return pickLocalized(element, ['title', 'category_name'], loadingStore.language)
   };
 
   const shouldRefreshCache = computed(() => {
@@ -118,14 +113,10 @@ export function useNavigationData() {
 
   const fetchErasmusSettings = async (): Promise<void> => {
     try {
-      const [listSetting, applySetting] = await Promise.all([
-        database.getDocument(config.website_db, config.general_settings, 'erasmus_list'),
-        database.getDocument(config.website_db, config.general_settings, 'erasmus_apply_on'),
-      ]);
-
+      const flags = flagsFromWindows(await loadModuleWindows());
       navigationCache.erasmusSettings.value = {
-        erasmus_list: listSetting.setting_status,
-        erasmus_apply_on: applySetting.setting_status,
+        erasmus_list: flags.erasmus_list,
+        erasmus_apply_on: flags.erasmus_apply,
       };
     } catch (error) {
       console.error('Error fetching Erasmus settings:', error);

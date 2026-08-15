@@ -2,10 +2,21 @@
     <section class="page-shell">
         <div class="page-panel container">
             <div class="page-header">
-                <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">
-                    {{ $t('documents') }}
-                </h1>
-                <div class="section-accent !w-20"></div>
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <h1 id="render_title" class="section-title !text-2xl sm:!text-3xl">
+                            {{ $t('documents') }}
+                        </h1>
+                        <div class="section-accent !w-20"></div>
+                    </div>
+                    <router-link
+                        to="/documents/search"
+                        class="px-4 py-2 rounded-full text-sm font-medium bg-sky-500 text-white hover:bg-sky-600 transition"
+                    >
+                        <i class="pi pi-search mr-1"></i>
+                        {{ $t('docsearch_title') }}
+                    </router-link>
+                </div>
             </div>
 
             <div v-if="!loaded">

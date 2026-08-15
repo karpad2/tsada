@@ -19,7 +19,7 @@
 
 import { Client, Users } from 'node-appwrite'
 
-const VALID_ROLES = new Set(['admin', 'editor', 'teacher', 'photographer'])
+const VALID_ROLES = new Set(['admin', 'editor', 'teacher', 'photographer', 'secretary'])
 
 function parseBody(req) {
   if (!req.body) return {}

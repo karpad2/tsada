@@ -3,7 +3,7 @@
   <div class="page-panel container">
   <v-container fluid class="pa-0">
     <div class="page-header">
-      <h1 class="section-title !text-2xl !mb-1">Nyomtatás</h1>
+      <h1 class="section-title !text-2xl !mb-1">{{ $t('print') }}</h1>
       <div class="section-accent !w-20"></div>
     </div>
     <v-row>
@@ -12,7 +12,7 @@
         <v-card class="mb-4">
           <v-card-title>
             <v-icon class="mr-2">mdi-printer</v-icon>
-            Nyomtatási beállítások
+            {{ $t('print_settings') }}
           </v-card-title>
           <v-card-text>
             <!-- 1. lépés: Fő dokumentum típus -->
@@ -21,7 +21,7 @@
               :items="mainDocumentTypes"
               item-title="label"
               item-value="value"
-              label="Dokumentum típus"
+              :label="$t('document_type')"
               class="mb-4"
               @update:model-value="onMainDocumentTypeChange"
             ></v-select>
@@ -33,7 +33,7 @@
               :items="gradeBookParts"
               item-title="label"
               item-value="value"
-              label="Nyomtatandó szekciók"
+              :label="$t('print_sections')"
               multiple
               chips
               closable-chips
@@ -48,7 +48,7 @@
               :items="yearOptions"
               item-title="label"
               item-value="value"
-              label="Nyomtatandó évfolyam"
+              :label="$t('print_year')"
               class="mb-4"
               @update:model-value="loadTemplateForSelection"
             ></v-select>
@@ -59,7 +59,7 @@
               :items="formLanguageOptions"
               item-title="label"
               item-value="value"
-              label="Űrlap típus (nyelv)"
+              :label="$t('form_language_label')"
               class="mb-4"
               @update:model-value="loadTemplateForSelection"
             ></v-select>
@@ -72,7 +72,7 @@
               variant="tonal"
               class="mb-4"
             >
-              <div class="text-caption">Betöltött sablonok ({{ loadedTemplates.length }}):</div>
+              <div class="text-caption">{{ $t('loaded_templates_count', { count: loadedTemplates.length }) }}</div>
               <div v-for="t in loadedTemplates" :key="t.documentType" class="font-weight-medium">
                 {{ t.name }}
               </div>
@@ -84,7 +84,7 @@
               variant="tonal"
               class="mb-4"
             >
-              Nincs sablon a kiválasztott konfigurációhoz. Alapértelmezett értékek használata.
+              {{ $t('no_template_for_config') }}
             </v-alert>
 
             <!-- Paper Size -->
@@ -93,7 +93,7 @@
               :items="paperSizes"
               item-title="name"
               item-value="id"
-              label="Papírméret"
+              :label="$t('paper_size')"
               class="mb-4"
               @update:model-value="applyPaperSize"
             ></v-select>
@@ -102,7 +102,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="pageSize.width"
-                  label="Szélesség"
+                  :label="$t('width')"
                   type="number"
                   suffix="mm"
                   density="compact"
@@ -111,7 +111,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="pageSize.height"
-                  label="Magasság"
+                  :label="$t('height')"
                   type="number"
                   suffix="mm"
                   density="compact"
@@ -125,7 +125,7 @@
               :items="classes"
               item-title="displayName"
               item-value="$id"
-              label="Osztály"
+              :label="$t('class')"
               class="mb-4"
             ></v-select>
 
@@ -135,7 +135,7 @@
               :items="studyPrograms"
               item-title="study_program_name_hu"
               item-value="$id"
-              label="Szak (szakonként eltérő papír)"
+              :label="$t('study_program_paper')"
               clearable
               class="mb-4"
               @update:model-value="loadTemplateForSelection"
@@ -146,7 +146,7 @@
               :items="schoolYears"
               item-title="name"
               item-value="$id"
-              label="Tanév"
+              :label="$t('school_year')"
               class="mb-4"
             ></v-select>
 
@@ -155,7 +155,7 @@
               :items="students"
               :item-title="studentDisplayName"
               item-value="$id"
-              label="Diák (opcionális - egyéni nyomtatás)"
+              :label="$t('student_optional_print')"
               clearable
               class="mb-4"
             ></v-autocomplete>
@@ -166,14 +166,14 @@
         <v-card class="mb-4">
           <v-card-title>
             <v-icon class="mr-2">mdi-ruler</v-icon>
-            Pozíció finomhangolás (mm)
+            {{ $t('position_fine_tune') }}
           </v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="6">
                 <v-text-field
                   v-model.number="globalOffsetX"
-                  label="Vízszintes eltolás"
+                  :label="$t('horizontal_offset')"
                   type="number"
                   suffix="mm"
                   density="compact"
@@ -183,7 +183,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model.number="globalOffsetY"
-                  label="Függőleges eltolás"
+                  :label="$t('vertical_offset') || $t('position_fine_tune')"
                   type="number"
                   suffix="mm"
                   density="compact"
@@ -193,7 +193,7 @@
             </v-row>
 
             <v-expansion-panels variant="accordion" class="mt-4">
-              <v-expansion-panel title="Mezők pozíciói">
+              <v-expansion-panel :title="$t('field_positions')">
                 <v-expansion-panel-text>
                   <div v-for="(field, key) in fieldPositions" :key="key" class="mb-3">
                     <div class="text-caption text-grey mb-1">{{ field.label }}</div>
@@ -223,7 +223,7 @@
                       <v-col cols="3">
                         <v-text-field
                           v-model.number="field.fontSize"
-                          label="Méret"
+                          :label="$t('size')"
                           type="number"
                           density="compact"
                           suffix="pt"
@@ -233,7 +233,7 @@
                       <v-col cols="3">
                         <v-text-field
                           v-model.number="field.letterSpacing"
-                          label="Betűköz"
+                          :label="$t('letter_spacing')"
                           type="number"
                           density="compact"
                           suffix="mm"
@@ -246,13 +246,13 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
 
-              <v-expansion-panel title="Jegyek táblázat">
+              <v-expansion-panel :title="$t('grades_table')">
                 <v-expansion-panel-text>
                   <v-row dense>
                     <v-col cols="6">
                       <v-text-field
                         v-model.number="gradesTablePosition.startX"
-                        label="Kezdő X"
+                        :label="$t('start_x')"
                         type="number"
                         suffix="mm"
                         density="compact"
@@ -262,7 +262,7 @@
                     <v-col cols="6">
                       <v-text-field
                         v-model.number="gradesTablePosition.startY"
-                        label="Kezdő Y"
+                        :label="$t('start_y')"
                         type="number"
                         suffix="mm"
                         density="compact"
@@ -272,7 +272,7 @@
                     <v-col cols="6">
                       <v-text-field
                         v-model.number="gradesTablePosition.rowHeight"
-                        label="Sor magasság"
+                        :label="$t('row_height')"
                         type="number"
                         suffix="mm"
                         density="compact"
@@ -282,7 +282,7 @@
                     <v-col cols="6">
                       <v-text-field
                         v-model.number="gradesTablePosition.gradeColumnX"
-                        label="Jegy oszlop X"
+                        :label="$t('grade_column_x')"
                         type="number"
                         suffix="mm"
                         density="compact"
@@ -302,7 +302,7 @@
               @click="saveSettings"
             >
               <v-icon left>mdi-content-save</v-icon>
-              Beállítások mentése
+              {{ $t('save_settings') }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -318,7 +318,7 @@
               @click="printDocument"
             >
               <v-icon left>mdi-printer</v-icon>
-              Nyomtatás
+              {{ $t('print') }}
             </v-btn>
             <v-btn
               color="secondary"
@@ -329,7 +329,7 @@
               :disabled="!selectedClassId"
             >
               <v-icon left>mdi-printer-multiple</v-icon>
-              Összes diák nyomtatása
+              {{ $t('print_all_students') }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -340,7 +340,7 @@
         <v-card>
           <v-card-title class="d-flex align-center">
             <v-icon class="mr-2">mdi-eye</v-icon>
-            Előnézet
+            {{ $t('preview') }}
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="previewMode" mandatory density="compact">
               <v-btn value="preview">
@@ -447,6 +447,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { notify } from '@kyvg/vue3-notification';
 import { Databases, Query } from 'appwrite';
 import { appw, config } from '@/appwrite';
@@ -491,34 +492,32 @@ export default defineComponent({
   name: 'PrintManager',
   setup() {
     const erpService = ErpService.getInstance();
+    const { t } = useI18n();
 
-    // Hierarchikus menü: Fő dokumentum típusok
-    const mainDocumentTypes = [
-      { value: 'grade_book', label: 'Főkönyv (Matična knjiga)' },
-      { value: 'certificate', label: 'Bizonyítvány' },
-      { value: 'enrollment', label: 'Beiratkozási lap' }
-    ];
+    const mainDocumentTypes = computed(() => [
+      { value: 'grade_book', label: t('doc_grade_book') },
+      { value: 'certificate', label: t('doc_certificate') },
+      { value: 'enrollment', label: t('doc_enrollment') }
+    ]);
 
-    // Főkönyv részei (almenü)
-    const gradeBookParts = [
-      { value: 'grade_book_base', label: 'Alap adatok (beiratkozás)' },
-      { value: 'grade_book_year', label: 'Évfolyam jegyek' },
-      { value: 'grade_book_matura', label: 'Érettségi vizsga' },
-      { value: 'grade_book_certificates', label: 'Oklevelek / bizonyítványok' }
-    ];
+    const gradeBookParts = computed(() => [
+      { value: 'grade_book_base', label: t('grade_book_base') },
+      { value: 'grade_book_year', label: t('grade_book_year') },
+      { value: 'grade_book_matura', label: t('grade_book_matura') },
+      { value: 'grade_book_certificates', label: t('grade_book_certificates') }
+    ]);
 
-    const yearOptions = [
-      { value: 1, label: '1. évfolyam' },
-      { value: 2, label: '2. évfolyam' },
-      { value: 3, label: '3. évfolyam' },
-      { value: 4, label: '4. évfolyam' }
-    ];
+    const yearOptions = computed(() => [
+      { value: 1, label: t('year_n', { n: 1 }) },
+      { value: 2, label: t('year_n', { n: 2 }) },
+      { value: 3, label: t('year_n', { n: 3 }) },
+      { value: 4, label: t('year_n', { n: 4 }) }
+    ]);
 
-    // Nyelvi variánsok
-    const formLanguageOptions = [
-      { value: 'bilingual', label: 'Kétnyelvű (szerb + magyar)' },
-      { value: 'serbian', label: 'Egynyelvű (szerb)' }
-    ];
+    const formLanguageOptions = computed(() => [
+      { value: 'bilingual', label: t('lang_bilingual') },
+      { value: 'serbian', label: t('lang_serbian') }
+    ]);
 
     // Current template from database
     const currentTemplate = ref<PrintTemplate | null>(null);
@@ -538,15 +537,15 @@ export default defineComponent({
     });
 
     // Paper sizes
-    const paperSizes = [
+    const paperSizes = computed(() => [
       { id: 'a2', name: 'A2 (420 × 594 mm)', width: 420, height: 594 },
-      { id: 'a2_landscape', name: 'A2 fekvő (594 × 420 mm)', width: 594, height: 420 },
+      { id: 'a2_landscape', name: `A2 ${t('paper_landscape')} (594 × 420 mm)`, width: 594, height: 420 },
       { id: 'a3', name: 'A3 (297 × 420 mm)', width: 297, height: 420 },
-      { id: 'a3_landscape', name: 'A3 fekvő (420 × 297 mm)', width: 420, height: 297 },
+      { id: 'a3_landscape', name: `A3 ${t('paper_landscape')} (420 × 297 mm)`, width: 420, height: 297 },
       { id: 'a4', name: 'A4 (210 × 297 mm)', width: 210, height: 297 },
-      { id: 'a4_landscape', name: 'A4 fekvő (297 × 210 mm)', width: 297, height: 210 },
-      { id: 'custom', name: 'Egyéni méret', width: 420, height: 594 }
-    ];
+      { id: 'a4_landscape', name: `A4 ${t('paper_landscape')} (297 × 210 mm)`, width: 297, height: 210 },
+      { id: 'custom', name: t('paper_custom'), width: 420, height: 594 }
+    ]);
     const selectedPaperSize = ref('a2');
 
     // Data
@@ -759,7 +758,7 @@ export default defineComponent({
     });
 
     const applyPaperSize = (sizeId: string) => {
-      const size = paperSizes.find(p => p.id === sizeId);
+      const size = paperSizes.value.find(p => p.id === sizeId);
       if (size && sizeId !== 'custom') {
         pageSize.value.width = size.width;
         pageSize.value.height = size.height;
@@ -772,13 +771,13 @@ export default defineComponent({
 
     // Field positions (in mm from top-left) - adjusted for A2 size
     const fieldPositions = ref<Record<string, FieldPosition>>({
-      studentName: { label: 'Diák neve', x: 80, y: 60, fontSize: 14 },
-      birthDate: { label: 'Születési dátum', x: 80, y: 75, fontSize: 11 },
-      birthPlace: { label: 'Születési hely', x: 80, y: 90, fontSize: 11 },
-      jmbg: { label: 'JMBG', x: 80, y: 105, fontSize: 11 },
-      studyProgram: { label: 'Szak', x: 80, y: 120, fontSize: 11 },
-      schoolYear: { label: 'Tanév', x: 300, y: 60, fontSize: 11 },
-      classYear: { label: 'Évfolyam', x: 300, y: 75, fontSize: 11 }
+      studentName: { label: t('tpl_student_name'), x: 80, y: 60, fontSize: 14 },
+      birthDate: { label: t('tpl_birth_date'), x: 80, y: 75, fontSize: 11 },
+      birthPlace: { label: t('tpl_birth_place'), x: 80, y: 90, fontSize: 11 },
+      jmbg: { label: t('tpl_jmbg'), x: 80, y: 105, fontSize: 11 },
+      studyProgram: { label: t('tpl_study_program'), x: 80, y: 120, fontSize: 11 },
+      schoolYear: { label: t('tpl_school_year'), x: 300, y: 60, fontSize: 11 },
+      classYear: { label: t('tpl_class_year'), x: 300, y: 75, fontSize: 11 }
     });
 
     // Grades table position - adjusted for A2 size
@@ -952,7 +951,7 @@ export default defineComponent({
         pageSize: pageSize.value
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-      notify({ type: 'success', text: 'Beállítások elmentve!' });
+      notify({ type: 'success', text: t('settings_saved') });
     };
 
     const loadSettings = () => {

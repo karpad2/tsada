@@ -8,8 +8,43 @@ import { visualizer } from 'rollup-plugin-visualizer'
 const analyze = process.env.ANALYZE === '1'
 
 // https://vitejs.dev/config/
+const killOldServiceWorker = {
+  name: 'kill-old-service-worker',
+  configureServer(server) {
+    const script = `
+self.addEventListener('install', function (e) { self.skipWaiting() })
+self.addEventListener('activate', function (e) {
+  e.waitUntil((async function () {
+    var keys = await caches.keys()
+    await Promise.all(keys.map(function (k) { return caches.delete(k) }))
+    await self.registration.unregister()
+  })())
+})
+`
+    server.middlewares.use((req, res, next) => {
+      const url = req.url || ''
+      if (
+        url === '/sw.js' ||
+        url.startsWith('/sw.js?') ||
+        url === '/dev-sw.js' ||
+        url.startsWith('/dev-sw.js?') ||
+        url.startsWith('/workbox-')
+      ) {
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'application/javascript')
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+        res.setHeader('Service-Worker-Allowed', '/')
+        res.end(script)
+        return
+      }
+      next()
+    })
+  }
+}
+
 export default defineConfig({
   plugins: [
+    killOldServiceWorker,
     ...(analyze
       ? [
           visualizer({
@@ -25,16 +60,28 @@ export default defineConfig({
         enabled: false // avoid SW noise in dev
       },
       injectRegister: 'auto',
-      includeAssets: ['favicon.png', 'robots.txt'],
+      includeAssets: ['favicon.png', 'robots.txt', 'disable-navigation-preload.js'],
       workbox: {
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         // CRITICAL: prevent infinite reload — wait for user + controlled claim
         skipWaiting: false,
         clientsClaim: false,
-        navigationPreload: true,
+        // NEVER enable navigation preload with navigateFallback shell —
+        // causes: "preloadResponse was cancelled before it settled"
+        navigationPreload: false,
+        // Disable leftover preload from older SW activations
+        importScripts: ['disable-navigation-preload.js'],
+        // SPA: all document navigations fall back to the precached shell
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/api/, /^\/v1/, /share\.tsada\.edu\.rs/],
+        navigateFallbackAllowlist: [/^(?!\/__).*/],
+        navigateFallbackDenylist: [
+          /^\/api/,
+          /^\/v1/,
+          /share\.tsada\.edu\.rs/,
+          // static assets / files — never rewrite these to index.html
+          /\.[a-zA-Z0-9]+$/
+        ],
         // Do not precache heavy optional routes — they load on demand + runtime cache
         globIgnores: [
           '**/HeistGame-*.js',
@@ -51,16 +98,29 @@ export default defineConfig({
           '**/materialdesignicons-webfont-*.eot',
           '**/materialdesignicons-webfont-*.ttf',
           '**/materialdesignicons-webfont-*.woff',
+          // SEO prerendered HTML shells (served by hosting files-first; SW uses SPA shell)
+          '**/about/**/index.html',
+          '**/renderer/**/index.html',
+          '**/album/**/index.html',
+          '**/gallery/index.html',
+          '**/contact/index.html',
+          '**/documents/index.html',
+          '**/erasmus/**/index.html',
+          '**/home/index.html',
+          '**/studentdocuments/index.html',
           '**/stats.html'
         ],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/appwrite\.tsada\.edu\.rs\/v1\/storage\//,
+            // Appwrite Storage — images/files
+            urlPattern: ({ url }) =>
+              url.origin === 'https://appwrite.tsada.edu.rs' &&
+              url.pathname.startsWith('/v1/storage/'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'appwrite-storage-cache',
               expiration: {
-                maxEntries: 500,
+                maxEntries: 900,
                 maxAgeSeconds: 30 * 24 * 60 * 60
               },
               cacheableResponse: {
@@ -69,15 +129,40 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /^https:\/\/.*\.tsada\.edu\.rs\/.*$/,
+            // Appwrite API only (NOT same-origin page navigations — that caused no-response)
+            urlPattern: ({ url, request }) =>
+              url.origin === 'https://appwrite.tsada.edu.rs' &&
+              url.pathname.startsWith('/v1/') &&
+              request.destination !== 'document',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'appwrite-api-cache',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 5 * 60
               },
-              networkTimeoutSeconds: 10,
+              networkTimeoutSeconds: 8,
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            // Other school API hosts (share, moodle, etc.) — never HTML documents
+            urlPattern: ({ url, request }) =>
+              /\.tsada\.edu\.rs$/i.test(url.hostname) &&
+              url.hostname !== 'www.tsada.edu.rs' &&
+              url.hostname !== 'tsada.edu.rs' &&
+              request.destination !== 'document' &&
+              request.mode !== 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'school-api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 5 * 60
+              },
+              networkTimeoutSeconds: 8,
               cacheableResponse: {
                 statuses: [0, 200]
               }
@@ -171,6 +256,30 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@a': fileURLToPath(new URL('./src/assets', import.meta.url))
     }
+  },
+  server: {
+    host: 'localhost',
+    port: 5173,
+    strictPort: false,
+    headers: {
+      'Cache-Control': 'no-store'
+    }
+  },
+  // Packages that must be bundled for SSR (CJS / CSS side-effects)
+  ssr: {
+    noExternal: [
+      'vuetify',
+      'vue-i18n',
+      '@intlify/core-base',
+      '@intlify/shared',
+      '@intlify/message-compiler',
+      'primevue',
+      '@primevue/themes',
+      '@kyvg/vue3-notification',
+      '@ipaat/vue3-tailwind3-cookie-comply',
+      'vue-country-flag-next',
+      'pinia-plugin-persistedstate'
+    ]
   },
   build: {
     target: 'esnext',

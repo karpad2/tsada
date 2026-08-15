@@ -1,6 +1,6 @@
 import dayjs from '@/utils/dayjs';
 import { useLoadingStore } from "@/stores/loading";
-import { convertifserbian } from "@/lang";
+import { pickLocalized } from "@/utils/localizedText";
 import { Databases, ID, Query } from "appwrite";
 import { appw, config } from "@/appwrite";
 
@@ -38,31 +38,11 @@ export const formatTime = (dateString: string): string => {
 };
 
 export const getLocalizedCategoryName = (category: any): string => {
-    const loadingStore = useLoadingStore();
-    const locale = loadingStore.language;
-
-    if (locale === "en") {
-        return category.category_name_en || '';
-    } else if (locale === "hu") {
-        return category.category_name_hu || '';
-    } else if (locale === "rs" || locale === "sr") {
-        return convertifserbian(category.category_name_rs || '');
-    }
-    return category.category_name_rs || '';
+    return pickLocalized(category, ['category_name', 'title'], useLoadingStore().language)
 };
 
 export const getLocalizedDocumentTitle = (document: any): string => {
-    const loadingStore = useLoadingStore();
-    const locale = loadingStore.language;
-
-    if (locale === "en") {
-        return document.document_title_en || document.document_title_hu || '';
-    } else if (locale === "hu") {
-        return document.document_title_hu || '';
-    } else if (locale === "rs" || locale === "sr") {
-        return convertifserbian(document.document_title_rs || '');
-    }
-    return document.document_title_rs || '';
+    return pickLocalized(document, ['document_title', 'title'], useLoadingStore().language)
 };
 
 export const createNewDocument = async (categoryId: string) => {

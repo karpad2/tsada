@@ -7,6 +7,7 @@ import type {
   MenuCondition
 } from '@/types/MenuTypes'
 import type { NavigationData, MenuItem } from './NavigationService'
+import { defaultModuleMap, flagsFromWindows, isMenuSettingOpen } from '@/services/modules/registry'
 
 /**
  * Menu service that reads the menu structure from menu.json (via MenuRegistry).
@@ -45,11 +46,7 @@ class MenuConfigService {
     currentLanguage: string,
     actions: { logout: () => void | Promise<void> }
   ): ResolvedMenuGroup[] {
-    const erasmusSettings = navigationData?.erasmusSettings || {
-      list_enabled: false,
-      apply_enabled: false,
-      eu_funding_enabled: false
-    }
+    const moduleFlags = navigationData?.moduleFlags || flagsFromWindows(defaultModuleMap())
 
     const checkCondition = (cond?: MenuCondition): boolean => {
       if (!cond) return true
@@ -66,8 +63,7 @@ class MenuConfigService {
         if (userRole && cond.excludeRoles.includes(userRole)) return false
       }
 
-      if (cond.setting === 'erasmus-apply' && !erasmusSettings.apply_enabled) return false
-      if (cond.setting === 'erasmus-list' && !erasmusSettings.list_enabled) return false
+      if (!isMenuSettingOpen(cond.setting, moduleFlags)) return false
 
       return true
     }
